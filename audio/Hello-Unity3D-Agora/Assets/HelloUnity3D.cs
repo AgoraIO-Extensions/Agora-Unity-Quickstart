@@ -20,7 +20,7 @@ public class HelloUnity3D : MonoBehaviour
 	// PLEASE KEEP THIS App ID IN SAFE PLACE
 	// Get your own App ID at https://dashboard.agora.io/
 	// After you entered the App ID, remove ## outside of Your App ID
-	private string appId = #YOUR APP ID#;
+	private string appId = #YOUR_APPID#;
 
 	void Awake ()
 	{
@@ -79,7 +79,7 @@ public class HelloUnity3D : MonoBehaviour
 				}
 			};
 
-			mRtcEngine.OnUserMuted += (uint uid, bool muted) => {
+			mRtcEngine.OnUserMutedAudio += (uint uid, bool muted) => {
 				string userMutedMessage = string.Format ("onUserMuted callback uid {0} {1}", uid, muted);
 				Debug.Log (userMutedMessage);
 			};
@@ -98,7 +98,7 @@ public class HelloUnity3D : MonoBehaviour
 
 			mRtcEngine.OnRtcStats += (RtcStats stats) => {
 				string rtcStatsMessage = string.Format ("onRtcStats callback duration {0}, tx: {1}, rx: {2}, tx kbps: {3}, rx kbps: {4}, tx(a) kbps: {5}, rx(a) kbps: {6} users {7}",
-					stats.duration, stats.txBytes, stats.rxBytes, stats.txKBitRate, stats.rxKBitRate, stats.txAudioKBitRate, stats.rxAudioKBitRate, stats.users);
+					stats.duration, stats.txBytes, stats.rxBytes, stats.txKBitRate, stats.rxKBitRate, stats.txAudioKBitRate, stats.rxAudioKBitRate, stats.userCount);
 				Debug.Log (rtcStatsMessage);
 
 				int lengthOfMixingFile = mRtcEngine.GetAudioMixingDuration();
