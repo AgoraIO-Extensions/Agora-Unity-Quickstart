@@ -169,4 +169,12 @@ public class HelloUnity3D : MonoBehaviour
 
 		mRtcEngine.LeaveChannel ();
 	}
+
+	void OnApplicationQuit()
+	{
+		if (mRtcEngine != null)
+		{
+			IRtcEngine.Destroy();
+		}
+	}
 }
