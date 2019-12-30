@@ -2,7 +2,7 @@
 
 *Read this in other languages: [English](README.en.md)*
 
-这个开源示例项目演示了如何在 Unity3D 中快速集成Agora游戏SDK，实现在游戏中的音频通话。
+这个开源示例项目演示了如何在 Unity3D 中快速集成 Agora Unity SDK，实现在 Unity 中的音频通话。
 
 在这个示例项目中包含了以下功能：
 
@@ -10,11 +10,6 @@
 
 你也可以在这里查看进阶版的示例项目：[Spacewar-with-AMG-Voice-SDK-Unity](https://github.com/AgoraIO/Spacewar-with-AMG-Voice-SDK-Unity)
 
-Agora游戏SDK支持 iOS / Android / Unity3D / Cocos2d 等多个平台，你可以查看对应各平台的示例项目：
-
-- [Hello-Gaming-Agora-iOS](https://github.com/AgoraIO/Hello-Gaming-Agora-iOS)
-- [Hello-Gaming-Agora-Android](https://github.com/AgoraIO/Hello-Gaming-Agora-Android)
-- [Hello-Cocos2d-Agora](https://github.com/AgoraIO/Hello-Cocos2d-Agora)
 
 ## 运行示例程序
 首先在 [Agora.io 注册](https://dashboard.agora.io/cn/signup/) 注册账号，并创建自己的测试项目，获取到 AppID。将 AppID 填写进 HelloUnity3D.cs
@@ -23,10 +18,13 @@ Agora游戏SDK支持 iOS / Android / Unity3D / Cocos2d 等多个平台，你可�
 private static string appId = "YOUR APP ID";
 ```
 
-然后在 [Agora.io SDK](https://www.agora.io/cn/blog/download/) 下载 **AMG 游戏语音SDK**，解压后
+然后在 [Agora.io SDK](https://www.agora.io/cn/blog/download/) 下载 **Agora Unity SDK**，解压后
 
 - 把SDK中 **libs/Android/** 下的内容，复制到项目的 **Assets/Plugins/Android/AgoraAudioKit.plugin/libs/** 文件夹下
 - 把SDK中 **libs/iOS/** 下的内容，复制到项目的 **Assets/Plugins/iOS/** 文件夹下
+- 把SDK中 **libs/macOS/** 下的内容，复制到项目的 **Assets/Plugins/macOS/** 文件夹下
+- 把SDK中 **libs/x86/** 下的内容，复制到项目的 **Assets/Plugins/x86/** 文件夹下
+- 把SDK中 **libs/x86_64/** 下的内容，复制到项目的 **Assets/Plugins/x86_64/** 文件夹下
 - 把SDK中 **libs/Scripts/AgoraGamingSDK/** 下的内容，复制到项目的 **Assets/Scripts/AgoraGamingSDK/** 文件夹下
 
 最后使用 Unity 打开本项目即可运行。
