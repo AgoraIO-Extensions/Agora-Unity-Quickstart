@@ -11,7 +11,7 @@ public class Logger {
     public void UpdateLog(string logMessage) {
         Debug.Log(logMessage);
         string srcLogMessage = text.text;
-        if (srcLogMessage.Length > 500) {
+        if (srcLogMessage.Length > 1000) {
             srcLogMessage = "";
         }
         srcLogMessage += "\r\n \r\n";
@@ -19,10 +19,12 @@ public class Logger {
         text.text = srcLogMessage;
     }
 
-    public void DebugAssert(bool condition, string message) {
+    public bool DebugAssert(bool condition, string message) {
         if (!condition) {
             UpdateLog(message);
+            return false;
         }
         Debug.Assert(condition, message);
+        return true;
     }
 }
