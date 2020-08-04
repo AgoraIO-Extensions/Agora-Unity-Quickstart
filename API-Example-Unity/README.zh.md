@@ -10,6 +10,8 @@
 - video-sample
 - screenshare-sample
 - video-rawdata-sample
+- multi-channel-sample
+- device-manager-sample
 
 ## 运行示例程序
 首先在 [Agora.io 注册](https://dashboard.agora.io/cn/signup/) 注册账号，并创建自己的测试项目，获取到 AppID。
