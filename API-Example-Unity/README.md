@@ -24,7 +24,7 @@ Next, download the **Agora Gaming SDK** from [Agora.io SDK](https://docs.agora.i
 
 - copy files from **samples/Hello-Video-Unity-Agora/Assets/AgoraEngine/** in SDK to **API-Example-Unity/Assets/** in project
 
-Open project with Unity. And then open the HelloUnity scene from the Demo folder on Unity Editor.  Fill your App ID into the GameController object's field.
+Open project with Unity. And then choose one of the scene that you want to run,  Fill your App ID into the scene according to the note.
 
 Run the game and you are now good to go!
 
