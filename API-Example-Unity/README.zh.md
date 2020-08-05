@@ -1,17 +1,17 @@
 # API-Example_Unity
 
-*Read this in other languages: [English](README.en.md)*
+*Read this in other languages: [English](README.md)*
 
 这个开源示例项目演示了不同场景下，Agora SDK 的基本集成逻辑。 项目中每个 Scene 都是一个独立的场景，都可以成功独立运行。
 
 在这个示例项目中包含了以下场景：
 
-- audio-sample
+- audio-sample
 - video-sample
+- device-manager-sample
+- multi-channel-sample
 - screenshare-sample
 - video-rawdata-sample
-- multi-channel-sample
-- device-manager-sample
 
 ## 运行示例程序
 首先在 [Agora.io 注册](https://dashboard.agora.io/cn/signup/) 注册账号，并创建自己的测试项目，获取到 AppID。
@@ -23,7 +23,7 @@
 最后使用 Unity 打开本项目, 选择想要运行的 Scene, 根据提示将 APPID 填入，然后运行程序。
 
 ## 运行环境
-* Unity 2017 LTS
+* Unity 2017 LTS 或以上
 
 ## 联系我们
 
