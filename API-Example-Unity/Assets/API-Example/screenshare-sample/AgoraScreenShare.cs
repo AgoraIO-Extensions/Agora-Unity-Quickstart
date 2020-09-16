@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using agora_gaming_rtc;
 using UnityEngine.UI;
-using agora_utilities;
 using System.Runtime.InteropServices;
+using agora_utilities;
 
 public class AgoraScreenShare : MonoBehaviour 
 {
@@ -232,7 +232,7 @@ public class AgoraScreenShare : MonoBehaviour
         // to be renderered onto
         go.AddComponent<RawImage>();
         // make the object draggable
-        go.AddComponent<UIElementDragger>();
+        go.AddComponent<UIElementDraggers>();
         GameObject canvas = GameObject.Find("VideoCanvas");
         if (canvas != null)
         {

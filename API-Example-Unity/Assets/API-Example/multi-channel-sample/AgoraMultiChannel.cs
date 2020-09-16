@@ -193,7 +193,7 @@ public class AgoraMultiChannel : MonoBehaviour
 
         go.name = goName;
 		// make the object draggable
-        go.AddComponent<UIElementDragger>();
+        go.AddComponent<UIElementDraggers>();
         // to be renderered onto
         go.AddComponent<RawImage>();
 
