@@ -173,7 +173,7 @@ public class HelloVideoAgora : MonoBehaviour {
         // to be renderered onto
         go.AddComponent<RawImage>();
         // make the object draggable
-        go.AddComponent<UIElementDragger>();
+        go.AddComponent<UIElementDrag>();
         GameObject canvas = GameObject.Find("VideoCanvas");
         if (canvas != null)
         {
