@@ -15,6 +15,7 @@ public class HelloVideoTokenAgora : MonoBehaviour {
   private const float Offset = 100;
   private static string channelName = "Agora_Channel";
   private static string channelToken = "";
+  private static string tokenBase = "http://localhost:8080";
   private CONNECTION_STATE_TYPE state = CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED;
 
 	// Use this for initialization
@@ -26,9 +27,14 @@ public class HelloVideoTokenAgora : MonoBehaviour {
 
   void UpdateToken(string newToken) {
     HelloVideoTokenAgora.channelToken = newToken;
-    if (state == CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED || state == CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED) {
+    if (state == CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED
+        || state == CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED
+        || state == CONNECTION_STATE_TYPE.CONNECTION_STATE_FAILED
+    ) {
+      // If we are not connected yet, connect to the channel as normal
       JoinChannel();
     } else {
+      // If we are already connected, we should just update the token
       UpdateToken();
     }
   }
@@ -72,7 +78,7 @@ public class HelloVideoTokenAgora : MonoBehaviour {
   void JoinChannel()
   {
     if (channelToken.Length == 0) {
-      StartCoroutine(HelperClass.FetchToken("http://localhost:8080", channelName, 0, this.UpdateToken));
+      StartCoroutine(HelperClass.FetchToken(tokenBase, channelName, 0, this.UpdateToken));
       return;
     }
     mRtcEngine.JoinChannelByKey(channelToken, channelName, "", 0);
@@ -83,7 +89,7 @@ public class HelloVideoTokenAgora : MonoBehaviour {
     logger.UpdateLog(string.Format("sdk version: ${0}", IRtcEngine.GetSdkVersion()));
     logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName, uid, elapsed));
     logger.UpdateLog(string.Format("New Token: {0}", HelloVideoTokenAgora.channelToken));
-    // HelperClass.FetchToken("http://localhost:8080", channelName, 0, this.UpdateToken);
+    // HelperClass.FetchToken(tokenBase, channelName, 0, this.UpdateToken);
     makeVideoView(0);
   }
 
@@ -107,7 +113,7 @@ public class HelloVideoTokenAgora : MonoBehaviour {
 
   void OnTokenPrivilegeWillExpireHandler(string token)
   {
-    StartCoroutine(HelperClass.FetchToken("http://localhost:8080", channelName, 0, this.UpdateToken));
+    StartCoroutine(HelperClass.FetchToken(tokenBase, channelName, 0, this.UpdateToken));
   }
 
   void OnConnectionStateChangedHandler(CONNECTION_STATE_TYPE state, CONNECTION_CHANGED_REASON_TYPE reason)

@@ -13,19 +13,25 @@ namespace agora_utilities
 {
   public static class HelperClass
   {
-      public static IEnumerator FetchToken(string url, string channel, int userId, Action<string> callback = null) {
-        UnityWebRequest www = UnityWebRequest.Get(string.Format("http://localhost:8080/rtc/{0}/publisher/uid/{1}/", channel, userId));
-        yield return www.SendWebRequest();
+    public static IEnumerator FetchToken(
+        string url, string channel, int userId, Action<string> callback = null
+    ) {
+      UnityWebRequest request = UnityWebRequest.Get(string.Format(
+        "{0}/rtc/{1}/publisher/uid/{2}/", url, channel, userId
+      ));
+      yield return request.SendWebRequest();
 
-        if(www.isNetworkError || www.isHttpError) {
-            Debug.Log(www.error);
-            callback(null);
-            yield break;
-        }
-
-        TokenObject tokenInfo = JsonUtility.FromJson<TokenObject>(www.downloadHandler.text);
-
-        callback(tokenInfo.rtcToken);
+      if (request.isNetworkError || request.isHttpError) {
+        Debug.Log(request.error);
+        callback(null);
+        yield break;
       }
+
+      TokenObject tokenInfo = JsonUtility.FromJson<TokenObject>(
+        request.downloadHandler.text
+      );
+
+      callback(tokenInfo.rtcToken);
+    }
   }
 }
