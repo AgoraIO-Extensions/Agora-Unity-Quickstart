@@ -25,7 +25,7 @@ public class HelloVideoTokenAgora : MonoBehaviour {
 		JoinChannel();
 	}
 
-  void UpdateToken(string newToken) {
+  void RenewOrJoinToken(string newToken) {
     HelloVideoTokenAgora.channelToken = newToken;
     if (state == CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED
         || state == CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED
@@ -78,7 +78,7 @@ public class HelloVideoTokenAgora : MonoBehaviour {
   void JoinChannel()
   {
     if (channelToken.Length == 0) {
-      StartCoroutine(HelperClass.FetchToken(tokenBase, channelName, 0, this.UpdateToken));
+      StartCoroutine(HelperClass.FetchToken(tokenBase, channelName, 0, this.RenewOrJoinToken));
       return;
     }
     mRtcEngine.JoinChannelByKey(channelToken, channelName, "", 0);
@@ -89,7 +89,7 @@ public class HelloVideoTokenAgora : MonoBehaviour {
     logger.UpdateLog(string.Format("sdk version: ${0}", IRtcEngine.GetSdkVersion()));
     logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName, uid, elapsed));
     logger.UpdateLog(string.Format("New Token: {0}", HelloVideoTokenAgora.channelToken));
-    // HelperClass.FetchToken(tokenBase, channelName, 0, this.UpdateToken);
+    // HelperClass.FetchToken(tokenBase, channelName, 0, this.RenewOrJoinToken);
     makeVideoView(0);
   }
 
@@ -113,7 +113,7 @@ public class HelloVideoTokenAgora : MonoBehaviour {
 
   void OnTokenPrivilegeWillExpireHandler(string token)
   {
-    StartCoroutine(HelperClass.FetchToken(tokenBase, channelName, 0, this.UpdateToken));
+    StartCoroutine(HelperClass.FetchToken(tokenBase, channelName, 0, this.RenewOrJoinToken));
   }
 
   void OnConnectionStateChangedHandler(CONNECTION_STATE_TYPE state, CONNECTION_CHANGED_REASON_TYPE reason)

@@ -11,6 +11,8 @@ This project contains these scenes:
 
 - video-sample
 
+- video-sample-token
+
 - device-manager-sample
 
 - multi-channel-sample
