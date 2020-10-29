@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 
 namespace agora_utilities
 {
-    public class UIElementDraggers : EventTrigger
+    public class UIElementDrag : EventTrigger
     {
 
         public override void OnDrag(PointerEventData eventData)

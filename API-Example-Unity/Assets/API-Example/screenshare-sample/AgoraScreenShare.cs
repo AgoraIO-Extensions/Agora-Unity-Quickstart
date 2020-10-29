@@ -232,7 +232,7 @@ public class AgoraScreenShare : MonoBehaviour
         // to be renderered onto
         go.AddComponent<RawImage>();
         // make the object draggable
-        go.AddComponent<UIElementDraggers>();
+        go.AddComponent<UIElementDrag>();
         GameObject canvas = GameObject.Find("VideoCanvas");
         if (canvas != null)
         {
