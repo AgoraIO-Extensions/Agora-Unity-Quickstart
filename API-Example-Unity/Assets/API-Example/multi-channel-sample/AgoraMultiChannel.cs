@@ -9,14 +9,24 @@ public class AgoraMultiChannel : MonoBehaviour
 {	
     [SerializeField]
     private string APP_ID = "YOUR_APPID";
+
+    [SerializeField]
+    private string TOKEN_1 = "YOUR_TOKEN_1";
+
+    [SerializeField]
+    private string CHANNEL_NAME_1 = "YOUR_CHANNEL_NAME_1";
+
+    [SerializeField]
+    private string TOKEN_2 = "YOUR_TOKEN_2";
+
+    [SerializeField]
+    private string CHANNEL_NAME_2 = "YOUR_CHANNEL_NAME_2";
     public Text logText;
 	private Logger logger;
 	private IRtcEngine mRtcEngine = null;
 	private AgoraChannel channel1 = null;
 	private AgoraChannel channel2 = null;
     private const float Offset = 100;
-    private static string channel1Name = "Agora_Channel";
-	private static string channel2Name = "Agora_Channel2";
 
 	// Use this for initialization
 	void Start () 
@@ -48,8 +58,8 @@ public class AgoraMultiChannel : MonoBehaviour
 		mRtcEngine.EnableVideo();
 		mRtcEngine.EnableVideoObserver();
 
-		channel1 = mRtcEngine.CreateChannel(channel1Name);
-		channel2 = mRtcEngine.CreateChannel(channel2Name);
+		channel1 = mRtcEngine.CreateChannel(CHANNEL_NAME_1);
+		channel2 = mRtcEngine.CreateChannel(CHANNEL_NAME_2);
 		channel1.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
 		channel2.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
 
@@ -65,8 +75,8 @@ public class AgoraMultiChannel : MonoBehaviour
 
     void JoinChannel()
     {
-		channel1.JoinChannel("", "", 0, new ChannelMediaOptions(true, true));
-		channel2.JoinChannel("", "", 0, new ChannelMediaOptions(true, true));
+		channel1.JoinChannel(TOKEN_1, "", 0, new ChannelMediaOptions(true, true));
+		channel2.JoinChannel(TOKEN_2, "", 0, new ChannelMediaOptions(true, true));
 
 		channel2.Publish();
     }

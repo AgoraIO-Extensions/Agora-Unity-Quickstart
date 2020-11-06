@@ -8,9 +8,12 @@ public class HelloAgoraVoice : MonoBehaviour
 {
     [SerializeField]
     private string APP_ID = "YOUR_APPID";
-    public InputField ChannelInputField;
-    public Button JoinBtn;
-    public Button LeaveBtn;
+    
+    [SerializeField]
+    private string TOKEN = "YOUR_TOKEN";
+
+    [SerializeField]
+    private string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
     public Text logText;
     private Logger logger;
     private IRtcEngine mRtcEngine = null;
@@ -19,8 +22,8 @@ public class HelloAgoraVoice : MonoBehaviour
     void Start()
     {
         CheckAppId();
-        InitUI();
         InitRtcEngine();
+        JoinChannel();
     }
 
     void Update() 
@@ -34,12 +37,6 @@ public class HelloAgoraVoice : MonoBehaviour
         logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in Canvas!!!!!");
     }
 
-    void InitUI()
-    {
-        JoinBtn.onClick.AddListener(OnJoinBtnClick);
-        LeaveBtn.onClick.AddListener(OnLeaveBtnClick);
-    }
-
     void InitRtcEngine()
     {
         mRtcEngine = IRtcEngine.GetEngine(APP_ID);
@@ -51,10 +48,9 @@ public class HelloAgoraVoice : MonoBehaviour
         mRtcEngine.OnConnectionLost += OnConnectionLostHandler;
     }
 
-    void OnJoinBtnClick() 
+    void JoinChannel() 
     {
-        logger.DebugAssert(ChannelInputField.text != null && ChannelInputField.text.Length > 0, "Please input your channelName!");
-        mRtcEngine.JoinChannel(ChannelInputField.text, "", 0);
+        mRtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
     }
 
     void OnLeaveBtnClick() 

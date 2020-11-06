@@ -9,6 +9,12 @@ public class HelloVideoAgora : MonoBehaviour {
 	
     [SerializeField]
     private string APP_ID = "YOUR_APPID";
+
+    [SerializeField]
+    private string TOKEN = "YOUR_TOKEN";
+
+    [SerializeField]
+    private string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
     public Text logText;
 	private Logger logger;
 	private IRtcEngine mRtcEngine = null;
@@ -54,7 +60,7 @@ public class HelloVideoAgora : MonoBehaviour {
 
     void JoinChannel()
     {
-        mRtcEngine.JoinChannel(channelName, "", 0);
+        mRtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
     }
 
 	void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)

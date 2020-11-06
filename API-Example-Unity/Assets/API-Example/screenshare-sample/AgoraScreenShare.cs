@@ -11,6 +11,12 @@ public class AgoraScreenShare : MonoBehaviour
 
     [SerializeField]
     private string APP_ID = "YOUR_APPID";
+
+    [SerializeField]
+    private string TOKEN = "YOUR_TOKEN";
+
+    [SerializeField]
+    private string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
    	public Text logText;
     private Logger logger;
 	public IRtcEngine mRtcEngine = null;
@@ -88,7 +94,7 @@ public class AgoraScreenShare : MonoBehaviour
 
 	void JoinChannel()
 	{
-		int ret = mRtcEngine.JoinChannel(channelName, "", 0);
+        int ret = mRtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
         Debug.Log(string.Format("JoinChannel ret: ${0}", ret));
 	}
 
