@@ -2,10 +2,10 @@
 
 This repo contains examples of applications using the Agora Video/Voice SDKs.  Please navigate to the following folders for further content description:
 
-* API-Example-Unity - simple applications showing important API calls
-* Advanced-Demos - Varies demos covering common used advanced features
-* audio/Hello-Unity3D-Agora - example Voice SDK project (1)
-* video/Hello-Video-Unity-Agora - example Video SDK project (2)
+* **API-Example-Unity** - simple applications showing important API calls
+* **Advanced-Demos** - varies demos covering commonly used advanced features
+* **audio/Hello-Unity3D-Agora** - example Voice SDK project (1)
+* **video/Hello-Video-Unity-Agora** - example Video SDK project (2)
 
 
 ## Note 
