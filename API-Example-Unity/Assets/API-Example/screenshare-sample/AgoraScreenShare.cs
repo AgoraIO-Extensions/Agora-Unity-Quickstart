@@ -58,7 +58,7 @@ public class AgoraScreenShare : MonoBehaviour
             int size = Marshal.SizeOf(bytes[0]) * bytes.Length;
             ExternalVideoFrame externalVideoFrame = new ExternalVideoFrame();
             externalVideoFrame.type = ExternalVideoFrame.VIDEO_BUFFER_TYPE.VIDEO_BUFFER_RAW_DATA;
-            externalVideoFrame.format = ExternalVideoFrame.VIDEO_PIXEL_FORMAT.VIDEO_PIXEL_RGBA;
+            externalVideoFrame.format = ExternalVideoFrame.VIDEO_PIXEL_FORMAT.VIDEO_PIXEL_BGRA;
             externalVideoFrame.buffer = bytes;
             externalVideoFrame.stride = (int)mRect.width;
             externalVideoFrame.height = (int)mRect.height;
@@ -78,7 +78,7 @@ public class AgoraScreenShare : MonoBehaviour
         mRtcEngine = IRtcEngine.GetEngine(APP_ID);
 		mRtcEngine.SetLogFile("log.txt");
 		mRtcEngine.SetChannelProfile(CHANNEL_PROFILE.CHANNEL_PROFILE_LIVE_BROADCASTING);
-		mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+		mRtcEngine.SetClientRole(CLIENT_ROLE.BROADCASTER);
 		mRtcEngine.EnableAudio();
 		mRtcEngine.EnableVideo();
 		mRtcEngine.EnableVideoObserver();

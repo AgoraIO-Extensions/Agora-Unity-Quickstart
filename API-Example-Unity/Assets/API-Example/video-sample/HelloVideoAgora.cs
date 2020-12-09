@@ -45,7 +45,7 @@ public class HelloVideoAgora : MonoBehaviour {
         mRtcEngine = IRtcEngine.GetEngine(APP_ID);
 		mRtcEngine.SetLogFile("log.txt");
 		mRtcEngine.SetChannelProfile(CHANNEL_PROFILE.CHANNEL_PROFILE_LIVE_BROADCASTING);
-		mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+		mRtcEngine.SetClientRole(CLIENT_ROLE.BROADCASTER);
 		mRtcEngine.EnableAudio();
 		mRtcEngine.EnableVideo();
 		mRtcEngine.EnableVideoObserver();
