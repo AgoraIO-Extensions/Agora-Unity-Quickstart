@@ -151,14 +151,15 @@ public class AgoraMultiChannel : MonoBehaviour
 
     private void makeVideoView(string channelId, uint uid)
     {
-        GameObject go = GameObject.Find(uid.ToString());
+        string objName = channelId + "_" + uid.ToString();
+        GameObject go = GameObject.Find(objName);
         if (!ReferenceEquals(go, null))
         {
             return; // reuse
         }
 
         // create a GameObject and assign to this new user
-        VideoSurface videoSurface = makeImageSurface(uid.ToString());
+        VideoSurface videoSurface = makeImageSurface(objName);
         if (!ReferenceEquals(videoSurface, null))
         {
             // configure videoSurface
