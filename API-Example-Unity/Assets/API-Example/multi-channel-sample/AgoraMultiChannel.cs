@@ -11,13 +11,13 @@ public class AgoraMultiChannel : MonoBehaviour
     private string APP_ID = "YOUR_APPID";
 
     [SerializeField]
-    private string TOKEN_1 = "YOUR_TOKEN_1";
+    private string TOKEN_1 = "";
 
     [SerializeField]
     private string CHANNEL_NAME_1 = "YOUR_CHANNEL_NAME_1";
 
     [SerializeField]
-    private string TOKEN_2 = "YOUR_TOKEN_2";
+    private string TOKEN_2 = "";
 
     [SerializeField]
     private string CHANNEL_NAME_2 = "YOUR_CHANNEL_NAME_2";
