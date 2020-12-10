@@ -11,7 +11,7 @@ public class HelloVideoAgora : MonoBehaviour {
     private string APP_ID = "YOUR_APPID";
 
     [SerializeField]
-    private string TOKEN = "YOUR_TOKEN";
+    private string TOKEN = "";
 
     [SerializeField]
     private string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
