@@ -1,7 +1,15 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using agora_gaming_rtc;
+#if (UNITY_2018_3_OR_NEWER && UNITY_ANDROID)
+using UnityEngine.Android;
+#endif
+using System.Collections;
 
+
+/// <summary>
+///    AgoraTest serves a game controller object for this application.
+/// </summary>
 public class AgoraTest : MonoBehaviour
 {
     public string AppID;
@@ -12,6 +20,9 @@ public class AgoraTest : MonoBehaviour
 
     IRtcEngine mRtcEngine;
 
+#if (UNITY_2018_3_OR_NEWER && UNITY_ANDROID)
+    private ArrayList permissionList = new ArrayList() { Permission.Camera, Permission.Microphone };
+#endif
     private void Awake()
     {
         SetupUI();
@@ -20,6 +31,27 @@ public class AgoraTest : MonoBehaviour
     private void Start()
     {
         SetupAgora();
+    }
+
+    void Update()
+    {
+        CheckPermissions();
+    }
+
+    /// <summary>
+    ///   Checks for platform dependent permissions.
+    /// </summary>
+    private void CheckPermissions()
+    {
+#if (UNITY_2018_3_OR_NEWER && UNITY_ANDROID)
+        foreach (string permission in permissionList)
+        {
+            if (!Permission.HasUserAuthorizedPermission(permission))
+            {
+                Permission.RequestUserPermission(permission);
+            }
+        }
+#endif
     }
 
     void SetupUI()
