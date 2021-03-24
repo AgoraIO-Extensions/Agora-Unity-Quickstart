@@ -83,7 +83,7 @@ public class video_encoder_configuration : MonoBehaviour
             degradationPreference = DEGRADATION_PREFERENCE.MAINTAIN_FRAMERATE,
             mirrorMode = VIDEO_MIRROR_MODE_TYPE.VIDEO_MIRROR_MODE_AUTO
         };
-        mRtcEngine?.SetVideoEncoderConfiguration(config);
+        mRtcEngine.SetVideoEncoderConfiguration(config);
     }
 
     void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
