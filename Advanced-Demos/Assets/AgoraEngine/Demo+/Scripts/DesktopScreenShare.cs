@@ -72,7 +72,6 @@ public class DesktopScreenShare : PlayerViewControllerBase
     int displayID0or1 = 0;
     void ShareDisplayScreen()
     {
-        mRtcEngine.SetEncryptionSecret("HelloWorld1121414144");
         ScreenCaptureParameters sparams = new ScreenCaptureParameters
         {
             captureMouseCursor = true,
