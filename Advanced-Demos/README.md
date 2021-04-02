@@ -1,12 +1,11 @@
 # Agora Unity Video SDK Demos
 
 This project contains sample code to demonstrate advanced features provided by the Agora Video SDK.
-
-  
+ 
 
 ## Main scene view
 
-![Screen Shot 2020-07-07 at 2 28 35 PM](https://user-images.githubusercontent.com/1261195/90931055-b2b24c00-e3b0-11ea-9cd7-f159f51c96b0.png)
+![Advanced Demo Home](https://user-images.githubusercontent.com/1261195/113460520-ed13ab00-93cd-11eb-8084-0f5928f2f68f.png)
 
   
 ## Feature Note
@@ -14,16 +13,18 @@ This project contains sample code to demonstrate advanced features provided by t
   
 
  **1. App Screen Share**
-     This demo shows how to share the screen (or rather "current app window") by recording the current camera view and push as an external video frame.  Applicable to mobile and desktop platforms.<br>
+     This demo shows how to share the screen (or rather "current app window") by recording the current camera view and push as an external video frame.  Applicable to mobile and desktop platforms.<br>  Remote user show see the exact same screen the host user is sharing below.
+     ![appshare](https://user-images.githubusercontent.com/1261195/113460842-edf90c80-93ce-11eb-8dca-31abc948fc5d.png)
  **2. Desktop Screen Share**
-     This demo shows how to share the desktop/window of the current running OS.  Applicable to desktop platforms only (Windows/MacOS). Note SDK calls for Windows are still under improvement.  Sharing specific window is not working.<br>
+     This demo shows how to share the desktop/window of the current running OS.  Applicable to desktop platforms only (Windows/MacOS). Note SDK calls for Windows are still under improvement.  **Sharing a specific window on Windows is not working**.  Developer should provide a native plugin to pass the window Id to the app.  <br>
+     ![Desktop Share](https://user-images.githubusercontent.com/1261195/113460887-1c76e780-93cf-11eb-9101-e89b1e8ed89a.png)
  **3. Transcoding**
-     The demo shows the configuration to publish live streaming video to known CDNs, including Youtube, Facebook and Twitch.<br>
- **4. Inject Stream**
-     This demo show the configuration to inject real time video source to the video chat/broadcast. <br>
+     The demo shows the configuration to publish live streaming video to known CDNs, including Youtube, Facebook and Twitch.<br> You need to set up your own CDN provider account and set the required information in order to have this to work.  The button on the UI leads you to the corresponding dashboard area for that provider.
+     ![Screen Shot 2021-04-02 at 4 14 10 PM](https://user-images.githubusercontent.com/1261195/113460984-6eb80880-93cf-11eb-8388-d302dd2fe7a7.png)
+ **4. 1-to-1 Call**
+     This demo show simple video chat capability with option to choose Communication mode (default) or LiveStreaming as AudienceRole.  Its main purpose is to serve as a helper App to test other feature like the ones above. <br>
     
 
-With this sample app, you can:
 
   
 
@@ -51,19 +52,10 @@ This section shows you how to prepare, build, and run the sample application.
 
 ### Obtain an App ID
 
-  
+Before you can build and run the project, you will need to add your AppID to the configuration. Go to your [developer account’s project console](https://console.agora.io/projects), create a new AppId or copy the AppId from an existing project. 
 
-To build and run the sample application, get an App ID:
-
-  
-
-1.  Create a developer account at  [agora.io](https://dashboard.agora.io/signin/). Once you finish the signup process, you will be redirected to the Dashboard.
-
-2.  Navigate in Agora Console on the left to  ****Projects****  >  ****More****  >  ****Create****  >  ****Create New Project****.
-
-3.  Save the  ****App ID****  from the Dashboard for later use.
-
-  
+Note it is important that for a production ready project, you should always use an AppId with certificate enabled.  However, in this simple quick start demo, we will skip this part.  So you AppId should be created for testing mode.
+![enter image description here](https://user-images.githubusercontent.com/1261195/110023464-11eb0480-7ce2-11eb-99d6-031af60715ab.png)
 
   
 
@@ -79,7 +71,7 @@ To build and run the sample application, get an App ID:
 
 4. [Mac only] import the downloaded plugin from Asset->Import Package->Custom Package
 
-5.  From Project window, open Asset/AgoraEngine/Demo+/SceneHome2.scene
+5.  From Project window, open Asset/AgoraEngine/Demo+/Main.scene
 
 6. Next go into your Hierarchy window and select  ****GameController****, in the Inspector add your  ****App ID****  to to the  ****AppID****  Input field
 
@@ -87,7 +79,7 @@ To build and run the sample application, get an App ID:
 
 ****Note****
 
-The library from Step 3/4 is non-official.  You may build your own Mac library in case this doesn't work for you.  Source code gist can be found [here](https://gist.github.com/icywind/0fd26481dd6884821d7f917944ec0042).
+The library from Step 3/4 is **non-official**.  You may build your own Mac library in case this doesn't work for you.  Source code gist can be found [here](https://gist.github.com/icywind/0fd26481dd6884821d7f917944ec0042).
 
 #### [](https://github.com/AgoraIO-Community/Unity-RTM#test-in-editor)Test in Editor
 
@@ -129,7 +121,5 @@ The library from Step 3/4 is non-official.  You may build your own Mac library i
 
 
 ## License
+The MIT License (MIT).  [See doc.](../LICENSE.md)
 
-  
-
-The MIT License (MIT).
