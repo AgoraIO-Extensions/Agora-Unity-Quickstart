@@ -67,7 +67,7 @@ public static class AgoraNativeBridge
             Debug.LogWarning("JSON list count = " + macWindows.windows.Count);
             foreach (MacWindowModel win in macWindows.windows)
             {
-                Debug.LogWarning(win.kCGWindowOwnerName + " => " + win.kCGWindowNumber);
+//                Debug.LogWarning(win.kCGWindowOwnerName + " => " + win.kCGWindowNumber);
             }
         }
         return macWindows;

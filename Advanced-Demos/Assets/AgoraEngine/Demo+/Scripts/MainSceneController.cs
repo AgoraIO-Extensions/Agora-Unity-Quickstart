@@ -153,9 +153,6 @@ public class MainSceneController : MonoBehaviour
             case TestSceneEnum.Transcoding:
                 app = new TranscodingApp();
                 break;
-            case TestSceneEnum.InjectStream:
-                app = new InjectStreamApp();
-                break;
             case TestSceneEnum.One2One:
                 if (roleToggle.isOn)
                 {
