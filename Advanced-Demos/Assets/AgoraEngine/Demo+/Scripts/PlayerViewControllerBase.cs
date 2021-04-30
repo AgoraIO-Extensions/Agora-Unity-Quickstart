@@ -135,7 +135,8 @@ public class PlayerViewControllerBase : IVideoChatClient
 
     protected virtual void OnVideoSizeChanged(uint uid, int width, int height, int rotation)
     {
-        Debug.LogWarningFormat("OnVideoSizeChanged width = {0} height = {1} for rotation:{2}", width, height, rotation);
+        Debug.LogWarningFormat("uid:{3} OnVideoSizeChanged width = {0} height = {1} for rotation:{2}", width, height, rotation, uid);
+         
         if (UserVideoDict.ContainsKey(uid))
         {
             GameObject go = UserVideoDict[uid].gameObject;

@@ -22,6 +22,9 @@ public class TestAppScreenShare : PlayerViewControllerBase
     MonoBehaviour monoProxy;
     GameObject particleEffect;
 
+    int EncodeWidth;
+    int EncodeHeight;
+
     protected override void PrepareToJoin()
     {
         base.PrepareToJoin();
@@ -31,18 +34,27 @@ public class TestAppScreenShare : PlayerViewControllerBase
         mRtcEngine.SetChannelProfile(CHANNEL_PROFILE.CHANNEL_PROFILE_LIVE_BROADCASTING);
         mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
 
-        // This block of code push frame at full resolution, proving the support of 720p
+        EncodeWidth = Screen.width;
+        EncodeHeight = Screen.height;
+
+        // do not exceed 1080p
+        if ( System.Math.Min(EncodeWidth, EncodeHeight) > 1080) { 
+            Vector2 vector2 = agora_utilities.AgoraUIUtils.GetScaledDimension(EncodeWidth, EncodeHeight, 720);
+            EncodeHeight = (int)vector2.y;
+            EncodeWidth = (int)vector2.x;
+	    }
+
         mRtcEngine.SetVideoEncoderConfiguration(new VideoEncoderConfiguration()
         {
             bitrate = 1130,
             frameRate = FRAME_RATE.FRAME_RATE_FPS_15,
-            dimensions = new VideoDimensions() { width = Screen.width, height = Screen.height },
+            dimensions = new VideoDimensions() { width = EncodeWidth, height = EncodeHeight },
 
             // Note if your remote user video surface to set to flip Horizontal, then we should flip it before sending
             mirrorMode = VIDEO_MIRROR_MODE_TYPE.VIDEO_MIRROR_MODE_ENABLED
         });
 
-        Debug.LogFormat("Sharing Screen with width = {0} height = {1}", Screen.width, Screen.height);
+        Debug.LogFormat("Sharing Screen with width = {0} height = {1}, encoding at {2},{3}", Screen.width, Screen.height, EncodeWidth, EncodeHeight);
     }
 
 
