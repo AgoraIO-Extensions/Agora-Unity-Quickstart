@@ -26,10 +26,15 @@ public class DesktopScreenShare : MonoBehaviour
     private Button _startShareBtn;
     private Button _stopShareBtn;
 
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+    private Dictionary<uint, AgoraNativeBridge.RECT> _dispRect;
+#endif
+
     // Use this for initialization
     void Start()
     {
         _logger = new Logger(logText);
+        _dispRect = new Dictionary<uint, AgoraNativeBridge.RECT>();
         CheckAppId();
         InitEngine();
         JoinChannel();
@@ -93,6 +98,27 @@ public class DesktopScreenShare : MonoBehaviour
                     .ToList());
             }
 #else
+            var winDispInfoList = AgoraNativeBridge.GetWinDisplayInfo();
+            if (winDispInfoList != null)
+            {
+                foreach (var dpInfo in winDispInfoList)
+                {
+                    _dispRect.Add(dpInfo.MonitorInfo.flags, dpInfo.MonitorInfo.monitor);
+                }
+
+                _winIdSelect.AddOptions(winDispInfoList.Select(w =>
+                    new Dropdown.OptionData(
+                        string.Format("Display {0}", w.MonitorInfo.flags))).ToList());
+            }
+
+            Dictionary<string, IntPtr> winWinIdList;
+            AgoraNativeBridge.GetDesktopWindowHandlesAndTitles(out winWinIdList);
+            if (winWinIdList != null)
+            {
+                _winIdSelect.AddOptions(winWinIdList.Select(w =>
+                    new Dropdown.OptionData(string.Format("{0, -20} | {1}",
+                        w.Key.Substring(0, Math.Min(w.Key.Length, 20)), w.Value))).ToList());
+            }
 #endif
         }
 
@@ -112,7 +138,6 @@ public class DesktopScreenShare : MonoBehaviour
         if (_stopShareBtn != null) _stopShareBtn.gameObject.SetActive(true);
         mRtcEngine.StopScreenCapture();
 
-#if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
         if (_winIdSelect == null) return;
         var option = _winIdSelect.options[_winIdSelect.value].text;
         if (string.IsNullOrEmpty(option)) return;
@@ -125,14 +150,26 @@ public class DesktopScreenShare : MonoBehaviour
         }
         else
         {
+#if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
             var dispId = uint.Parse(option.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1]);
             _logger.UpdateLog(string.Format(">>>>> Start sharing display {0}", dispId));
             mRtcEngine.StartScreenCaptureByDisplayId(dispId, default(Rectangle),
                 new ScreenCaptureParameters {captureMouseCursor = true, frameRate = 30});
-        }
-
 #else
+            var diapFlag = uint.Parse(option.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1]);
+            var screenRect = new Rectangle
+            {
+                x = _dispRect[diapFlag].left,
+                y = _dispRect[diapFlag].top,
+                width = _dispRect[diapFlag].right - _dispRect[diapFlag].left,
+                height = _dispRect[diapFlag].bottom - _dispRect[diapFlag].top
+            };
+            _logger.UpdateLog(string.Format(">>>>> Start sharing display {0}: {1} {2} {3} {4}", diapFlag, screenRect.x,
+                screenRect.y, screenRect.width, screenRect.height));
+            var ret = mRtcEngine.StartScreenCaptureByScreenRect(screenRect,
+                new Rectangle {x = 0, y = 0, width = 0, height = 0}, default(ScreenCaptureParameters));
 #endif
+        }
     }
 
     private void OnStopShareBtnClick()
