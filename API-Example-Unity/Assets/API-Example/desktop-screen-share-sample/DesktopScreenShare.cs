@@ -34,7 +34,9 @@ public class DesktopScreenShare : MonoBehaviour
     void Start()
     {
         _logger = new Logger(logText);
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
         _dispRect = new Dictionary<uint, AgoraNativeBridge.RECT>();
+#endif
         CheckAppId();
         InitEngine();
         JoinChannel();
