@@ -178,10 +178,7 @@ public class DesktopScreenShare : MonoBehaviour
     {
         if (_startShareBtn != null) _startShareBtn.gameObject.SetActive(true);
         if (_stopShareBtn != null) _stopShareBtn.gameObject.SetActive(false);
-#if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
         mRtcEngine.StopScreenCapture();
-#else
-#endif
     }
 
     private void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
