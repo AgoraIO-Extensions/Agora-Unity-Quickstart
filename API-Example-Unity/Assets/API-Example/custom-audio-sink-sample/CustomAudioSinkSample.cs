@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 using agora_gaming_rtc;
-using NUnit.Framework.Constraints;
 using RingBuffer;
 
 namespace CustomAudioSink
@@ -25,12 +19,11 @@ namespace CustomAudioSink
         private Logger logger;
         private IRtcEngine mRtcEngine = null;
         private IAudioRawDataManager _audioRawDataManager;
+
         private int CHANNEL = 1;
         private int SAMPLE_RATE = 44100;
         private int PULL_FREQ_PER_SEC = 100;
 
-        private readonly Queue<Action> _actionQueue = new Queue<Action>();
-        
         private int count;
 
         private int writeCount;
@@ -51,7 +44,13 @@ namespace CustomAudioSink
             CheckAppId();
             InitRtcEngine();
             JoinChannel();
-            StartPullAudioFrame();
+
+            var aud = GetComponent<AudioSource>();
+            if (aud == null)
+            {
+                gameObject.AddComponent<AudioSource>(); 
+	        }
+            StartPullAudioFrame(aud, "externalClip");
         }
         
         void Update()
@@ -82,7 +81,7 @@ namespace CustomAudioSink
             mRtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
         }
 
-        void StartPullAudioFrame()
+        void StartPullAudioFrame(AudioSource aud, string clipName)
         {
             _audioRawDataManager = AudioRawDataManager.GetInstance(mRtcEngine);
             
@@ -92,8 +91,7 @@ namespace CustomAudioSink
             _pullAudioFrameThread = new Thread(PullAudioFrameThread);
             _pullAudioFrameThread.Start();
 
-            var aud = GetComponent<AudioSource>();
-            _audioClip = AudioClip.Create("externalAudio",
+            _audioClip = AudioClip.Create(clipName,
                 SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL, CHANNEL, SAMPLE_RATE, true,
                 OnAudioRead);
             aud.clip = _audioClip;
@@ -194,7 +192,7 @@ namespace CustomAudioSink
             var floatArray = new float[byteArray.Length / 2];
             for (var i = 0; i < floatArray.Length; i++)
             {
-                floatArray[i] = BitConverter.ToInt16(byteArray, i * 2) / 32768f;
+                floatArray[i] = BitConverter.ToInt16(byteArray, i * 2) / 32768f; // -Int16.MinValue
             }
 
             return floatArray;
