@@ -31,37 +31,38 @@ namespace CustomAudioSink
 
         private RingBuffer<float> audioBuffer;
         private AudioClip _audioClip;
-        
+
 
         private Thread _pullAudioFrameThread;
         private bool _pullAudioFrameThreadSignal = true;
-        
+
         private bool _startSignal;
 
         // Start is called before the first frame update
         void Start()
         {
-            CheckAppId();
+            var ifValid = CheckAppId();
             InitRtcEngine();
             JoinChannel();
 
             var aud = GetComponent<AudioSource>();
             if (aud == null)
             {
-                gameObject.AddComponent<AudioSource>(); 
-	        }
-            StartPullAudioFrame(aud, "externalClip");
+                gameObject.AddComponent<AudioSource>();
+            }
+
+            if (ifValid) StartPullAudioFrame(aud, "externalClip");
         }
-        
+
         void Update()
         {
             PermissionHelper.RequestMicrophontPermission();
         }
 
-        void CheckAppId()
+        bool CheckAppId()
         {
             logger = new Logger(logText);
-            logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in Canvas!!!!!");
+            return logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in Canvas!!!!!");
         }
 
         void InitRtcEngine()
@@ -84,10 +85,10 @@ namespace CustomAudioSink
         void StartPullAudioFrame(AudioSource aud, string clipName)
         {
             _audioRawDataManager = AudioRawDataManager.GetInstance(mRtcEngine);
-            
+
             var bufferLength = SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL * 1000; // 10-sec-length buffer
             audioBuffer = new RingBuffer<float>(bufferLength);
-            
+
             _pullAudioFrameThread = new Thread(PullAudioFrameThread);
             _pullAudioFrameThread.Start();
 
@@ -97,11 +98,6 @@ namespace CustomAudioSink
             aud.clip = _audioClip;
             aud.loop = true;
             aud.Play();
-        }
-
-        void OnLeaveBtnClick()
-        {
-            mRtcEngine.LeaveChannel();
         }
 
         void OnApplicationQuit()
@@ -150,32 +146,31 @@ namespace CustomAudioSink
             var channels = CHANNEL;
             var samples = SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL;
             var samplesPerSec = SAMPLE_RATE;
+            var buffer = Marshal.AllocHGlobal(samples * bytesPerSample);
+            var freq = 1000 / PULL_FREQ_PER_SEC;
 
             var tic = new TimeSpan(DateTime.Now.Ticks);
 
             while (_pullAudioFrameThreadSignal)
             {
                 var toc = new TimeSpan(DateTime.Now.Ticks);
-                if (toc.Subtract(tic).Duration().Milliseconds >= 10)
+                if (toc.Subtract(tic).Duration().Milliseconds >= freq)
                 {
+                    tic = new TimeSpan(DateTime.Now.Ticks);
+                    _audioRawDataManager.PullAudioFrame(buffer, (int) type, samples, bytesPerSample, channels,
+                        samplesPerSec, 0, avsync_type);
+
+                    var byteArray = new byte[samples * bytesPerSample];
+                    Marshal.Copy(buffer, byteArray, 0, samples * bytesPerSample);
+
+                    var floatArray = ConvertByteToFloat16(byteArray);
                     lock (audioBuffer)
                     {
-                        tic = new TimeSpan(DateTime.Now.Ticks);
-                        var buffer = Marshal.AllocHGlobal(samples * bytesPerSample);
-                        _audioRawDataManager.PullAudioFrame(buffer, (int) type, samples, bytesPerSample, channels,
-                            samplesPerSec, 0, avsync_type);
-
-                        var byteArray = new byte[samples * bytesPerSample];
-                        Marshal.Copy(buffer, byteArray, 0, samples * bytesPerSample);
-
-                        var floatArray = ConvertByteToFloat16(byteArray);
                         audioBuffer.Put(floatArray);
-
-                        writeCount += floatArray.Length;
-                        Marshal.FreeHGlobal(buffer);
-
-                        count += 1;
                     }
+
+                    writeCount += floatArray.Length;
+                    count += 1;
                 }
 
                 if (count == 100)
@@ -184,7 +179,7 @@ namespace CustomAudioSink
                 }
             }
 
-            // Marshal.FreeHGlobal(buffer);
+            Marshal.FreeHGlobal(buffer);
         }
 
         private static float[] ConvertByteToFloat16(byte[] byteArray)
@@ -207,8 +202,9 @@ namespace CustomAudioSink
                 lock (audioBuffer)
                 {
                     data[i] = audioBuffer.Get();
-                    readCount += 1;
                 }
+
+                readCount += 1;
             }
 
             Debug.LogFormat("buffer length remains: {0}", writeCount - readCount);
