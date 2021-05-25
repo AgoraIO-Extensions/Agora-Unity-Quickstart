@@ -10,22 +10,22 @@ namespace CustomAudioSink
 {
     /// <summary>
     ///    Sample code showing per user based audio frame data conversion to AudioSource
-    ///    Requires .net v4 (Unity 2019) using BlockingCollection to implement 
-    ///    MainThreadDispatcher concept.
+    ///    Requires .net v4.6 using BlockingCollection to implement the MainThreadDispatcher concept.
     /// </summary>
     public class UserAudioFrame2SourceSample : MonoBehaviour, IUserAudioFrameDelegate
     {
+        public AudioRawDataManager.OnPlaybackAudioFrameBeforeMixingHandler HandleAudioFrameForUser { get; set; }
         [SerializeField] private string APP_ID = "YOUR_APPID";
 
         [SerializeField] private string TOKEN = "";
 
         [SerializeField] private string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
         public Text logText;
+#if NET_4_6
         private Logger logger;
         private IRtcEngine mRtcEngine = null;
         private IAudioRawDataManager _audioRawDataManager;
 
-        public AudioRawDataManager.OnPlaybackAudioFrameBeforeMixingHandler HandleAudioFrameForUser { get; set; }
         private const float Offset = 100;
 
         Dictionary<uint, GameObject> RemoteUserObject = new Dictionary<uint, GameObject>();
@@ -245,6 +245,12 @@ namespace CustomAudioSink
             VideoSurface videoSurface = go.AddComponent<VideoSurface>();
             return videoSurface;
         }
-
+#else
+        public string USE_NET46 = "PLEASE USE .NET 4.6!";
+        void Start()
+        {
+            Debug.LogError("PLease use .Net 4.6 to run this demo!!");
+	    }
+#endif
     }
 }
