@@ -99,7 +99,7 @@ public class DesktopScreenShare : MonoBehaviour
                             string.Format("{0, -20} | {1}", w.kCGWindowOwnerName, w.kCGWindowNumber)))
                     .ToList());
             }
-#else
+#elif UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             var winDispInfoList = AgoraNativeBridge.GetWinDisplayInfo();
             if (winDispInfoList != null)
             {
@@ -157,7 +157,7 @@ public class DesktopScreenShare : MonoBehaviour
             _logger.UpdateLog(string.Format(">>>>> Start sharing display {0}", dispId));
             mRtcEngine.StartScreenCaptureByDisplayId(dispId, default(Rectangle),
                 new ScreenCaptureParameters {captureMouseCursor = true, frameRate = 30});
-#else
+#elif UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             var diapFlag = uint.Parse(option.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1]);
             var screenRect = new Rectangle
             {
