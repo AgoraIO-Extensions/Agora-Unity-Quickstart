@@ -1,86 +1,84 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Concurrent;
-
 using UnityEngine;
 using UnityEngine.UI;
 using agora_gaming_rtc;
-using agora_utilities;
 
-namespace CustomAudioSink
+namespace agora_sample_code
 {
     /// <summary>
-    ///    Sample code showing per user based audio frame data conversion to AudioSource
-    ///    Requires .net v4.6 using BlockingCollection to implement the MainThreadDispatcher concept.
+    ///   Demo for sending individual audio stream into audio source instance.
+    ///   This demo does not manage local user's camera for simplicity.
     /// </summary>
     public class UserAudioFrame2SourceSample : MonoBehaviour, IUserAudioFrameDelegate
     {
-        public AudioRawDataManager.OnPlaybackAudioFrameBeforeMixingHandler HandleAudioFrameForUser { get; set; }
-        [SerializeField] private string APP_ID = "YOUR_APPID";
+        [SerializeField]
+        private string APP_ID = "";
 
-        [SerializeField] private string TOKEN = "";
+        [SerializeField]
+        private string TOKEN = "";
 
-        [SerializeField] private string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
+        [SerializeField]
+        private string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
         public Text logText;
-#if NET_4_6
         private Logger logger;
         private IRtcEngine mRtcEngine = null;
+
+        [SerializeField] Transform rootSpace;
+        [SerializeField] GameObject userPrefab;
+
         private IAudioRawDataManager _audioRawDataManager;
+        public AudioRawDataManager.OnPlaybackAudioFrameBeforeMixingHandler HandleAudioFrameForUser
+        {
+            get; set;
+        }
 
-        private const float Offset = 100;
-
+#if NET_4_6 || NET_STANDARD_2_0
+        BlockingCollection<System.Action> blockingCollection;
         Dictionary<uint, GameObject> RemoteUserObject = new Dictionary<uint, GameObject>();
         HashSet<uint> RemoteUserConfigured = new HashSet<uint>();
-
-        BlockingCollection<System.Action> blockingCollection;
 
         private void Awake()
         {
             blockingCollection = new BlockingCollection<System.Action>();
+            if (userPrefab == null)
+            {
+                Debug.LogWarning("User prefab wasn't assigned, generating primitive object as prefab.");
+                MakePrefab();
+            }
         }
 
-        // Start is called before the first frame update
         void Start()
         {
-            bool appIdOK = CheckAppId();
-            if (!appIdOK) return;
-
-            InitRtcEngine();
+            PermissionHelper.RequestMicrophontPermission();
+            PermissionHelper.RequestCameraPermission();
+            CheckAppId();
+            InitEngine();
             JoinChannel();
         }
 
         void Update()
         {
-            PermissionHelper.RequestMicrophontPermission();
             System.Action action;
             while (blockingCollection.TryTake(out action)) action();
         }
 
-        private void OnDestroy()
-        {
-            blockingCollection.Dispose();
-        }
-
-        public void dispatch(System.Action action)
-        {
-            blockingCollection.Add(action);
-        }
-
-        bool CheckAppId()
+        void CheckAppId()
         {
             logger = new Logger(logText);
-            return logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in Canvas!!!!!");
+            logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
         }
 
-        void InitRtcEngine()
+        void InitEngine()
         {
             mRtcEngine = IRtcEngine.GetEngine(APP_ID);
-            if (mRtcEngine == null)
-            {
-                logger.UpdateLog("Engine creation failure!!!! App not running");
-                return;
-            }
-
             mRtcEngine.SetLogFile("log.txt");
+            //mRtcEngine.SetChannelProfile(CHANNEL_PROFILE.CHANNEL_PROFILE_LIVE_BROADCASTING);
+            //mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            mRtcEngine.EnableAudio();
+            mRtcEngine.EnableVideo();
+            mRtcEngine.EnableLocalVideo(false);
+            mRtcEngine.EnableVideoObserver();
             mRtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
             mRtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
             mRtcEngine.OnWarning += OnSDKWarningHandler;
@@ -88,54 +86,66 @@ namespace CustomAudioSink
             mRtcEngine.OnConnectionLost += OnConnectionLostHandler;
             mRtcEngine.OnUserJoined += OnUserJoinedHandler;
             mRtcEngine.OnUserOffline += OnUserOfflineHandler;
-
-            _audioRawDataManager = AudioRawDataManager.GetInstance(mRtcEngine);
-            Debug.Assert(_audioRawDataManager.RegisterAudioRawDataObserver() == 0, "Error registering audio rawdata observer!");
-            mRtcEngine.SetParameter("che.audio.external_render", true);
         }
 
         void JoinChannel()
         {
-            mRtcEngine.EnableVideo();
-            mRtcEngine.EnableVideoObserver();
+            _audioRawDataManager = AudioRawDataManager.GetInstance(mRtcEngine);
+            _audioRawDataManager.RegisterAudioRawDataObserver();
+
+            mRtcEngine.SetParameter("che.audio.external_render", true);
             mRtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
         }
-
-        void OnApplicationQuit()
-        {
-            Debug.Log("OnApplicationQuit");
-            if (mRtcEngine != null)
-            {
-                IRtcEngine.Destroy();
-            }
-        }
-
         void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
         {
-            logger.UpdateLog(string.Format("sdk version: {0}", IRtcEngine.GetSdkVersion()));
-            logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName,
-                uid, elapsed));
+            logger.UpdateLog(string.Format("sdk version: ${0}", IRtcEngine.GetSdkVersion()));
+            logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName, uid, elapsed));
+            // makeVideoView(0);
 
             _audioRawDataManager.SetOnPlaybackAudioFrameBeforeMixingCallback(OnPlaybackAudioFrameBeforeMixingHandler);
-        }
 
-        void OnUserOfflineHandler(uint uid, USER_OFFLINE_REASON reason)
-        {
-            Debug.LogWarning("User " + uid + " went offline, reason:" + reason);
-            lock (RemoteUserConfigured)
-            {
-                if (RemoteUserConfigured.Contains(uid))
-                {
-                    RemoteUserConfigured.Remove(uid);
-                    Destroy(RemoteUserObject[uid]);
-                    RemoteUserObject.Remove(uid);
-                }
-            }
         }
 
         void OnLeaveChannelHandler(RtcStats stats)
         {
             logger.UpdateLog("OnLeaveChannelSuccess");
+        }
+
+        int userCount = 0;
+        void OnUserJoinedHandler(uint uid, int elapsed)
+        {
+            logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+            GameObject go = Instantiate(userPrefab);
+            RemoteUserObject[uid] = go;
+            go.transform.SetParent(rootSpace);
+            go.transform.localScale = Vector3.one;
+            go.transform.localPosition = new Vector3(userCount * 2, 0, 0);
+
+            VideoSurface v = go.AddComponent<VideoSurface>();
+            v.SetForUser(uid);
+            v.SetEnable(true);
+            v.SetVideoSurfaceType(AgoraVideoSurfaceType.Renderer);
+            userCount++;
+        }
+
+        void OnUserOfflineHandler(uint uid, USER_OFFLINE_REASON reason)
+        {
+            logger.UpdateLog("User " + uid + " went offline, reason:" + reason);
+            dispatch(() => { logger.UpdateLog("Dispatched log + OFFLINE reason = " + reason); });
+
+            lock (RemoteUserConfigured)
+            {
+                if (RemoteUserObject.ContainsKey(uid))
+                {
+                    Destroy(RemoteUserObject[uid]);
+                    RemoteUserObject.Remove(uid);
+                }
+
+                if (RemoteUserConfigured.Contains(uid))
+                {
+                    RemoteUserConfigured.Remove(uid);
+                }
+            }
         }
 
         void OnSDKWarningHandler(int warn, string msg)
@@ -153,23 +163,52 @@ namespace CustomAudioSink
             logger.UpdateLog(string.Format("OnConnectionLost "));
         }
 
+        public void dispatch(System.Action action)
+        {
+            blockingCollection.Add(action);
+        }
+
+        int count = 0;
+        const int MAXAUC = 5;
         void OnPlaybackAudioFrameBeforeMixingHandler(uint uid, AudioFrame audioFrame)
         {
+            // limited log
+            if (count < MAXAUC)
+                Debug.LogWarning("count(" + count + "): OnPlaybackAudioFrameBeforeMixingHandler =============+> " + audioFrame);
+            count++;
 
             // The audio stream info contains in this audioframe, we will use this construct the AudioClip
             lock (RemoteUserConfigured)
             {
                 if (!RemoteUserConfigured.Contains(uid) && RemoteUserObject.ContainsKey(uid))
                 {
+                    if (count < MAXAUC)
+                        dispatch(() =>
+                        {
+                            logger.UpdateLog("Uid:" + uid + " setting up audio frame handler....");
+                        });
+
                     GameObject go = RemoteUserObject[uid];
                     if (go != null)
                     {
                         dispatch(() =>
-                       {
-                           UserAudioFrameHandler userAudio = go.AddComponent<UserAudioFrameHandler>();
-                           userAudio.Init(uid, this, audioFrame);
-                           RemoteUserConfigured.Add(uid);
-                       });
+                        {
+                            UserAudioFrameHandler userAudio = go.GetComponent<UserAudioFrameHandler>();
+                            if (userAudio == null)
+                            {
+                                userAudio = go.AddComponent<UserAudioFrameHandler>();
+                                userAudio.Init(uid, this, audioFrame);
+                                RemoteUserConfigured.Add(uid);
+                            }
+                            go.SetActive(true);
+                        });
+                    }
+                    else
+                    {
+                        dispatch(() =>
+                        {
+                            logger.UpdateLog("Uid: " + uid + " setting up audio frame handler._<> no go");
+                        });
                     }
                 }
             }
@@ -180,77 +219,41 @@ namespace CustomAudioSink
             }
         }
 
-        void OnUserJoinedHandler(uint uid, int elapsed)
+        void OnApplicationQuit()
         {
-            logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-            GameObject go = makeVideoView(uid);
-            RemoteUserObject[uid] = go;
+            Debug.Log("OnApplicationQuit");
+            if (mRtcEngine != null)
+            {
+                mRtcEngine.LeaveChannel();
+                mRtcEngine.DisableVideoObserver();
+                if (_audioRawDataManager != null)
+                {
+                    AudioRawDataManager.ReleaseInstance();
+                }
+                IRtcEngine.Destroy();
+            }
         }
 
-        private GameObject makeVideoView(uint uid)
+        protected virtual void MakePrefab()
         {
-            GameObject go = GameObject.Find(uid.ToString());
-            if (!ReferenceEquals(go, null))
+            Debug.LogWarning("Generating cube as prefab.");
+            GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            userPrefab = go;
+            go.transform.SetPositionAndRotation(Vector3.zero, Quaternion.Euler(0, 45f, 45f));
+            MeshRenderer mesh = GetComponent<MeshRenderer>();
+            if (mesh != null)
             {
-                return go; // reuse
+                mesh.material = new Material(Shader.Find("Unlit/Texture"));
             }
-
-            // create a GameObject and assign to this new user
-            VideoSurface videoSurface = makeImageSurface(uid.ToString());
-            if (!ReferenceEquals(videoSurface, null))
-            {
-                // configure videoSurface
-                videoSurface.SetForUser(uid);
-                videoSurface.SetEnable(true);
-                videoSurface.SetVideoSurfaceType(AgoraVideoSurfaceType.RawImage);
-                videoSurface.SetGameFps(30);
-            }
-
-            return videoSurface.gameObject;
-        }
-
-        public VideoSurface makeImageSurface(string goName)
-        {
-            GameObject go = new GameObject();
-
-            if (go == null)
-            {
-                return null;
-            }
-
-            go.name = goName;
-            // to be renderered onto
-            go.AddComponent<RawImage>();
-            // make the object draggable
-            go.AddComponent<UIElementDrag>();
-            GameObject canvas = GameObject.Find("Canvas");
-            if (canvas != null)
-            {
-                go.transform.parent = canvas.transform;
-                Debug.Log("add video view");
-            }
-            else
-            {
-                Debug.Log("Canvas is null video view");
-            }
-            // set up transform
-            go.transform.Rotate(0f, 0.0f, 180.0f);
-            float xPos = UnityEngine.Random.Range(Offset - Screen.width / 2f, Screen.width / 2f - Offset);
-            float yPos = UnityEngine.Random.Range(Offset, Screen.height / 2f - Offset);
-            Debug.Log("position x " + xPos + " y: " + yPos);
-            go.transform.localPosition = new Vector3(xPos, yPos, 0f);
-            go.transform.localScale = new Vector3(1f, 1.6f, 1f);
-
-            // configure videoSurface
-            VideoSurface videoSurface = go.AddComponent<VideoSurface>();
-            return videoSurface;
+            go.SetActive(false);
         }
 #else
-        public string USE_NET46 = "PLEASE USE .NET 4.6!";
-        void Start()
-        {
-            Debug.LogError("PLease use .Net 4.6 to run this demo!!");
-	    }
+    public string USE_NET46 = "PLEASE USE .NET 4.6 or Standard 2.0";
+    void Start()
+    {
+        Debug.LogError("PLease use .Net 4.6 or standard 2.0 to run this demo!!");
+    }
 #endif
+
     }
 }
