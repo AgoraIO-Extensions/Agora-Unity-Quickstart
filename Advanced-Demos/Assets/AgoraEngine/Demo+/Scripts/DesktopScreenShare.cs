@@ -36,7 +36,7 @@ public class DesktopScreenShare : PlayerViewControllerBase
                 dropdown.options = list.windows.Select(w =>
                     new Dropdown.OptionData(w.kCGWindowOwnerName + " | " + w.kCGWindowNumber)).ToList();
             }
-#else
+#elif UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             // Monitor Display info
             var winDispInfoList = AgoraNativeBridge.GetWinDisplayInfo();
             if (winDispInfoList != null)
@@ -104,15 +104,15 @@ public class DesktopScreenShare : PlayerViewControllerBase
 #if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
         mRtcEngine.StartScreenCaptureByDisplayId(MacDisplays[CurrentDisplay], default(Rectangle), sparams); 
         CurrentDisplay = (CurrentDisplay + 1) % MacDisplays.Count;
-#else
+#elif UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
         ShareWinDisplayScreen(CurrentDisplay);
         CurrentDisplay = (CurrentDisplay + 1) % WinDisplays.Count;
 #endif
     }
 
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
     void ShareWinDisplayScreen(int index)
     {
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
         var screenRect = new Rectangle
         {
             x = WinDisplays[index].left,
@@ -124,8 +124,8 @@ public class DesktopScreenShare : PlayerViewControllerBase
             screenRect.y, screenRect.width, screenRect.height));
         var ret = mRtcEngine.StartScreenCaptureByScreenRect(screenRect,
             new Rectangle { x = 0, y = 0, width = 0, height = 0 }, default(ScreenCaptureParameters));
-    }
 #endif
+    }
 
     void TestRectCrop(int order)
     {
