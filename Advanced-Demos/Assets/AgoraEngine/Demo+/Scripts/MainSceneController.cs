@@ -1,8 +1,8 @@
 ﻿using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine;
-#if (UNITY_2018_3_OR_NEWER && UNITY_ANDROID)
 using System.Collections;
+#if (UNITY_2018_3_OR_NEWER && UNITY_ANDROID)
 using UnityEngine.Android;
 #endif
 using agora_gaming_rtc;
@@ -44,6 +44,10 @@ public class MainSceneController : MonoBehaviour
     private RawImage previewImage;
     [SerializeField]
     private Toggle roleToggle;
+    [SerializeField]
+    private Text appIDText;
+    [SerializeField]
+    private Text echoHintText;
 
     private bool _initialized = false;
 
@@ -65,6 +69,7 @@ public class MainSceneController : MonoBehaviour
         CheckAppId();
         LoadLastChannel();
         ShowVersion();
+        SetupEchoTest();
     }
 
     void Update()
@@ -73,16 +78,32 @@ public class MainSceneController : MonoBehaviour
         CheckExit();
     }
 
+    IEnumerator EchoTestHint()
+    {
+        var duration = new WaitForSeconds(2);
+        while(_echoTesting)
+        {
+            echoHintText.text = "Speak and listen";
+            yield return duration;
+            echoHintText.text = "Note all other RTC functions are disabled";
+            yield return duration;
+	    }
+
+        echoHintText.text = "";
+    }
+    
     private void CheckAppId()
     {
         Debug.Assert(AppID.Length > 10, "Please fill in your AppId first on Game Controller object.");
-        if (AppID.Length > 10) { _initialized = true; }
-        GameObject go = GameObject.Find("AppIDText");
-        if (_initialized && go != null)
-        {
-            Text appIDText = go.GetComponent<Text>();
-            appIDText.text = "AppID:" + AppID.Substring(0, 4) + "********" + AppID.Substring(AppID.Length - 4, 4);
-        }
+        if (AppID.Length > 10) {
+            SetAppIdText();
+	        _initialized = true; 
+	    }
+    }
+
+    void SetAppIdText()
+    { 
+        appIDText.text = "AppID:" + AppID.Substring(0, 4) + "********" + AppID.Substring(AppID.Length - 4, 4);
     }
 
     /// <summary>
@@ -123,6 +144,34 @@ public class MainSceneController : MonoBehaviour
         }
     }
 
+    bool _echoTesting = false;
+    Button EchoButton;
+    int EchoRecordSecs = 2;
+    void SetupEchoTest()
+    {
+        EchoButton = GameObject.Find("EchoButton").GetComponent<Button>();
+        EchoButton.onClick.AddListener(() => {
+            var engine = IRtcEngine.QueryEngine();
+            if (engine != null)
+            {
+                if (_echoTesting) {
+                    engine.StopEchoTest();
+                    EchoButton.GetComponentInChildren<Text>().text = "Test Echo";
+                    SetAppIdText();
+                    _echoTesting = false;
+                }
+                else {
+                    _echoTesting = true;
+                    EchoButton.GetComponentInChildren<Text>().text = "Stop Echo";
+                    engine.StartEchoTest(EchoRecordSecs);
+                    StartCoroutine(EchoTestHint());
+		        }
+            }
+	    }); 
+    }
+
+    
+
     public void HandleSceneButtonClick(int sceneEnum)
     {
         // get parameters (channel name, channel profile, etc.)
@@ -141,6 +190,12 @@ public class MainSceneController : MonoBehaviour
             Debug.LogError("AppID null or app is not initialized properly!");
             return;
         }
+
+        if (_echoTesting)
+        {
+            Debug.LogWarning("Echo test is running!");
+            return;
+	    }
 
         switch (scenename)
         {
@@ -195,6 +250,10 @@ public class MainSceneController : MonoBehaviour
     public void HandlePreviewClick(Button button)
     {
         if (!_initialized) return;
+        if (_echoTesting) {
+            Debug.LogWarning("Echo testing! can't do preview right now!");
+            return;
+	    }
         var engine = IRtcEngine.GetEngine(AppID);
         _previewing = !_previewing;
         previewImage.GetComponent<VideoSurface>().SetEnable(_previewing);
