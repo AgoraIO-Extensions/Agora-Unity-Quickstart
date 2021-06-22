@@ -5,8 +5,7 @@ This project contains sample code to demonstrate advanced features provided by t
 
 ## Main scene view
 
-![Advanced Demo Home](https://user-images.githubusercontent.com/1261195/113460520-ed13ab00-93cd-11eb-8084-0f5928f2f68f.png)
-
+![Advanced Demo Home](https://user-images.githubusercontent.com/1261195/122968475-6f15cf00-d340-11eb-9b05-9b1d76404ec8.png)
   
 ## Feature Note
 
