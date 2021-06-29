@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+#if NET_4_6 || NET_STANDARD_2_0
 using System.Collections.Concurrent;
+#endif
 using UnityEngine;
 using UnityEngine.UI;
 using agora_gaming_rtc;
