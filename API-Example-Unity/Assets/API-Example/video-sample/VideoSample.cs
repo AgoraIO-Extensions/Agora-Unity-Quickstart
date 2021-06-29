@@ -57,7 +57,6 @@ namespace VideoSample
             AgoraRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             AgoraRtcEngine.EnableAudio();
             AgoraRtcEngine.EnableVideo();
-            AgoraRtcEngine.EnableVideoObserver();
             AgoraRtcEngine.JoinChannel(token, channelName, "");
         }
 
@@ -66,7 +65,6 @@ namespace VideoSample
             Debug.Log("OnApplicationQuit");
             if (AgoraRtcEngine == null) return;
             AgoraRtcEngine.LeaveChannel();
-            AgoraRtcEngine.DisableVideoObserver();
             AgoraRtcEngine.Dispose();
         }
 
@@ -160,7 +158,7 @@ namespace VideoSample
 
     internal class UserEventHandler : IAgoraRtcEngineEventHandler
     {
-        private VideoSample _videoSample;
+        private readonly VideoSample _videoSample;
 
         internal UserEventHandler(VideoSample videoSample)
         {
@@ -242,7 +240,6 @@ namespace VideoSample
 
         public override void OnApiCallExecuted(int err, string api, string result)
         {
-            _videoSample.Logger.UpdateLog("OnApiCallExecuted");
         }
 
         public override void OnRequestToken()
