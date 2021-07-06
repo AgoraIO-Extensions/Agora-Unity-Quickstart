@@ -61,452 +61,452 @@ namespace AudioSample
 
     internal class UserEventHandler : IAgoraRtcEngineEventHandler
     {
-        private AudioSample _helloVideoAgora;
+        private readonly AudioSample _audioSample;
 
-        internal UserEventHandler(AudioSample helloVideoAgora)
+        internal UserEventHandler(AudioSample audioSample)
         {
-            _helloVideoAgora = helloVideoAgora;
+            _audioSample = audioSample;
         }
 
         public override void OnWarning(int warn, string msg)
         {
-            _helloVideoAgora.Logger.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
+            _audioSample.Logger.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
         }
 
         public override void OnError(int err, string msg)
         {
-            _helloVideoAgora.Logger.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+            _audioSample.Logger.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
         }
 
         public override void OnJoinChannelSuccess(string channel, uint uid, int elapsed)
         {
-            _helloVideoAgora.Logger.UpdateLog(string.Format("sdk version: ${0}",
-                _helloVideoAgora.AgoraRtcEngine.GetVersion()));
-            _helloVideoAgora.Logger.UpdateLog(
+            _audioSample.Logger.UpdateLog(string.Format("sdk version: ${0}",
+                _audioSample.AgoraRtcEngine.GetVersion()));
+            _audioSample.Logger.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channel, uid, elapsed));
         }
 
         public override void OnRejoinChannelSuccess(string channel, uint uid, int elapsed)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnRejoinChannelSuccess");
+            _audioSample.Logger.UpdateLog("OnRejoinChannelSuccess");
         }
 
         public override void OnLeaveChannel(RtcStats stats)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnLeaveChannel");
+            _audioSample.Logger.UpdateLog("OnLeaveChannel");
         }
 
         public override void OnClientRoleChanged(CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnClientRoleChanged");
+            _audioSample.Logger.UpdateLog("OnClientRoleChanged");
         }
 
         public override void OnUserJoined(uint uid, int elapsed)
         {
-            _helloVideoAgora.Logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+            _audioSample.Logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
         }
 
         public override void OnUserOffline(uint uid, USER_OFFLINE_REASON_TYPE reason)
         {
-            _helloVideoAgora.Logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+            _audioSample.Logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                 (int) reason));
         }
 
         public override void OnLastmileQuality(int quality)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnLastmileQuality");
+            _audioSample.Logger.UpdateLog("OnLastmileQuality");
         }
 
         public override void OnLastmileProbeResult(LastmileProbeResult result)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnLastmileProbeResult");
+            _audioSample.Logger.UpdateLog("OnLastmileProbeResult");
         }
 
         public override void OnConnectionInterrupted()
         {
-            _helloVideoAgora.Logger.UpdateLog("OnConnectionInterrupted");
+            _audioSample.Logger.UpdateLog("OnConnectionInterrupted");
         }
 
         public override void OnConnectionLost()
         {
-            _helloVideoAgora.Logger.UpdateLog("OnConnectionLost");
+            _audioSample.Logger.UpdateLog("OnConnectionLost");
         }
 
         public override void OnConnectionBanned()
         {
-            _helloVideoAgora.Logger.UpdateLog("OnConnectionBanned");
+            _audioSample.Logger.UpdateLog("OnConnectionBanned");
         }
 
         public override void OnApiCallExecuted(int err, string api, string result)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnApiCallExecuted");
+            _audioSample.Logger.UpdateLog("OnApiCallExecuted");
         }
 
         public override void OnRequestToken()
         {
-            _helloVideoAgora.Logger.UpdateLog("OnRequestToken");
+            _audioSample.Logger.UpdateLog("OnRequestToken");
         }
 
         public override void OnTokenPrivilegeWillExpire(string token)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnTokenPrivilegeWillExpire");
+            _audioSample.Logger.UpdateLog("OnTokenPrivilegeWillExpire");
         }
 
         public override void OnAudioQuality(uint uid, int quality, ushort delay, ushort lost)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnAudioQuality");
+            _audioSample.Logger.UpdateLog("OnAudioQuality");
         }
 
         public override void OnRtcStats(RtcStats stats)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnRtcStats");
+            _audioSample.Logger.UpdateLog("OnRtcStats");
         }
 
         public override void OnNetworkQuality(uint uid, int txQuality, int rxQuality)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnNetworkQuality");
+            _audioSample.Logger.UpdateLog("OnNetworkQuality");
         }
 
         public override void OnLocalVideoStats(LocalVideoStats stats)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnLocalVideoStats");
+            _audioSample.Logger.UpdateLog("OnLocalVideoStats");
         }
 
         public override void OnRemoteVideoStats(RemoteVideoStats stats)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnRemoteVideoStats");
+            _audioSample.Logger.UpdateLog("OnRemoteVideoStats");
         }
 
         public override void OnLocalAudioStats(LocalAudioStats stats)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnLocalAudioStats");
+            _audioSample.Logger.UpdateLog("OnLocalAudioStats");
         }
 
         public override void OnRemoteAudioStats(RemoteAudioStats stats)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnRemoteAudioStats");
+            _audioSample.Logger.UpdateLog("OnRemoteAudioStats");
         }
 
         public override void OnLocalAudioStateChanged(LOCAL_AUDIO_STREAM_STATE state, LOCAL_AUDIO_STREAM_ERROR error)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnLocalAudioStateChanged");
+            _audioSample.Logger.UpdateLog("OnLocalAudioStateChanged");
         }
 
         public override void OnRemoteAudioStateChanged(uint uid, REMOTE_AUDIO_STATE state,
             REMOTE_AUDIO_STATE_REASON reason, int elapsed)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnRemoteAudioStateChanged");
+            _audioSample.Logger.UpdateLog("OnRemoteAudioStateChanged");
         }
 
         public override void OnAudioPublishStateChanged(string channel, STREAM_PUBLISH_STATE oldState,
             STREAM_PUBLISH_STATE newState, int elapseSinceLastState)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnAudioPublishStateChanged");
+            _audioSample.Logger.UpdateLog("OnAudioPublishStateChanged");
         }
 
         public override void OnVideoPublishStateChanged(string channel, STREAM_PUBLISH_STATE oldState,
             STREAM_PUBLISH_STATE newState, int elapseSinceLastState)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnVideoPublishStateChanged");
+            _audioSample.Logger.UpdateLog("OnVideoPublishStateChanged");
         }
 
         public override void OnAudioSubscribeStateChanged(string channel, uint uid, STREAM_SUBSCRIBE_STATE oldState,
             STREAM_SUBSCRIBE_STATE newState, int elapseSinceLastState)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnAudioSubscribeStateChanged");
+            _audioSample.Logger.UpdateLog("OnAudioSubscribeStateChanged");
         }
 
         public override void OnVideoSubscribeStateChanged(string channel, uint uid, STREAM_SUBSCRIBE_STATE oldState,
             STREAM_SUBSCRIBE_STATE newState, int elapseSinceLastState)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnVideoSubscribeStateChanged");
+            _audioSample.Logger.UpdateLog("OnVideoSubscribeStateChanged");
         }
 
         public override void OnAudioVolumeIndication(AudioVolumeInfo[] speakers, uint speakerNumber, int totalVolume)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnAudioVolumeIndication");
+            _audioSample.Logger.UpdateLog("OnAudioVolumeIndication");
         }
 
         public override void OnActiveSpeaker(uint uid)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnActiveSpeaker");
+            _audioSample.Logger.UpdateLog("OnActiveSpeaker");
         }
 
         public override void OnVideoStopped()
         {
-            _helloVideoAgora.Logger.UpdateLog("OnVideoStopped");
+            _audioSample.Logger.UpdateLog("OnVideoStopped");
         }
 
         public override void OnFirstLocalVideoFrame(int width, int height, int elapsed)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnFirstLocalVideoFrame");
+            _audioSample.Logger.UpdateLog("OnFirstLocalVideoFrame");
         }
 
         public override void OnFirstLocalVideoFramePublished(int elapsed)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnFirstLocalVideoFramePublished");
+            _audioSample.Logger.UpdateLog("OnFirstLocalVideoFramePublished");
         }
 
         public override void OnFirstRemoteVideoDecoded(uint uid, int width, int height, int elapsed)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnFirstRemoteVideoDecoded");
+            _audioSample.Logger.UpdateLog("OnFirstRemoteVideoDecoded");
         }
 
         public override void OnFirstRemoteVideoFrame(uint uid, int width, int height, int elapsed)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnFirstRemoteVideoFrame");
+            _audioSample.Logger.UpdateLog("OnFirstRemoteVideoFrame");
         }
 
         public override void OnUserMuteAudio(uint uid, bool muted)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnUserMuteAudio");
+            _audioSample.Logger.UpdateLog("OnUserMuteAudio");
         }
 
         public override void OnUserMuteVideo(uint uid, bool muted)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnUserMuteVideo");
+            _audioSample.Logger.UpdateLog("OnUserMuteVideo");
         }
 
         public override void OnUserEnableVideo(uint uid, bool enabled)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnUserEnableVideo");
+            _audioSample.Logger.UpdateLog("OnUserEnableVideo");
         }
 
         public override void OnAudioDeviceStateChanged(string deviceId, int deviceType, int deviceState)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnAudioDeviceStateChanged");
+            _audioSample.Logger.UpdateLog("OnAudioDeviceStateChanged");
         }
 
         public override void OnAudioDeviceVolumeChanged(MEDIA_DEVICE_TYPE deviceType, int volume, bool muted)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnAudioDeviceVolumeChanged");
+            _audioSample.Logger.UpdateLog("OnAudioDeviceVolumeChanged");
         }
 
         public override void OnCameraReady()
         {
-            _helloVideoAgora.Logger.UpdateLog("OnCameraReady");
+            _audioSample.Logger.UpdateLog("OnCameraReady");
         }
 
         public override void OnCameraFocusAreaChanged(int x, int y, int width, int height)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnCameraFocusAreaChanged");
+            _audioSample.Logger.UpdateLog("OnCameraFocusAreaChanged");
         }
 
         public override void OnFacePositionChanged(int imageWidth, int imageHeight, Rectangle vecRectangle,
             int[] vecDistance, int numFaces)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnFacePositionChanged");
+            _audioSample.Logger.UpdateLog("OnFacePositionChanged");
         }
 
         public override void OnCameraExposureAreaChanged(int x, int y, int width, int height)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnCameraExposureAreaChanged");
+            _audioSample.Logger.UpdateLog("OnCameraExposureAreaChanged");
         }
 
         public override void OnAudioMixingFinished()
         {
-            _helloVideoAgora.Logger.UpdateLog("OnAudioMixingFinished");
+            _audioSample.Logger.UpdateLog("OnAudioMixingFinished");
         }
 
         public override void OnAudioMixingStateChanged(AUDIO_MIXING_STATE_TYPE state, AUDIO_MIXING_ERROR_TYPE errorCode)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnAudioMixingStateChanged");
+            _audioSample.Logger.UpdateLog("OnAudioMixingStateChanged");
         }
 
         public override void OnRemoteAudioMixingBegin()
         {
-            _helloVideoAgora.Logger.UpdateLog("OnRemoteAudioMixingBegin");
+            _audioSample.Logger.UpdateLog("OnRemoteAudioMixingBegin");
         }
 
         public override void OnRemoteAudioMixingEnd()
         {
-            _helloVideoAgora.Logger.UpdateLog("OnRemoteAudioMixingEnd");
+            _audioSample.Logger.UpdateLog("OnRemoteAudioMixingEnd");
         }
 
         public override void OnAudioEffectFinished(int soundId)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnAudioEffectFinished");
+            _audioSample.Logger.UpdateLog("OnAudioEffectFinished");
         }
 
         public override void OnFirstRemoteAudioDecoded(uint uid, int elapsed)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnFirstRemoteAudioDecoded");
+            _audioSample.Logger.UpdateLog("OnFirstRemoteAudioDecoded");
         }
 
         public override void OnVideoDeviceStateChanged(string deviceId, int deviceType, int deviceState)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnVideoDeviceStateChanged");
+            _audioSample.Logger.UpdateLog("OnVideoDeviceStateChanged");
         }
 
         public override void OnLocalVideoStateChanged(LOCAL_VIDEO_STREAM_STATE localVideoState,
             LOCAL_VIDEO_STREAM_ERROR error)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnLocalVideoStateChanged");
+            _audioSample.Logger.UpdateLog("OnLocalVideoStateChanged");
         }
 
         public override void OnVideoSizeChanged(uint uid, int width, int height, int rotation)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnVideoSizeChanged");
+            _audioSample.Logger.UpdateLog("OnVideoSizeChanged");
         }
 
         public override void OnRemoteVideoStateChanged(uint uid, REMOTE_VIDEO_STATE state,
             REMOTE_VIDEO_STATE_REASON reason, int elapsed)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnRemoteVideoStateChanged");
+            _audioSample.Logger.UpdateLog("OnRemoteVideoStateChanged");
         }
 
         public override void OnUserEnableLocalVideo(uint uid, bool enabled)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnUserEnableLocalVideo");
+            _audioSample.Logger.UpdateLog("OnUserEnableLocalVideo");
         }
 
         public override void OnStreamMessage(uint uid, int streamId, byte[] data, uint length)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnStreamMessage");
+            _audioSample.Logger.UpdateLog("OnStreamMessage");
         }
 
         public override void OnStreamMessageError(uint uid, int streamId, int code, int missed, int cached)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnStreamMessageError");
+            _audioSample.Logger.UpdateLog("OnStreamMessageError");
         }
 
         public override void OnMediaEngineLoadSuccess()
         {
-            _helloVideoAgora.Logger.UpdateLog("OnMediaEngineLoadSuccess");
+            _audioSample.Logger.UpdateLog("OnMediaEngineLoadSuccess");
         }
 
         public override void OnMediaEngineStartCallSuccess()
         {
-            _helloVideoAgora.Logger.UpdateLog("OnMediaEngineStartCallSuccess");
+            _audioSample.Logger.UpdateLog("OnMediaEngineStartCallSuccess");
         }
 
         public override void OnUserSuperResolutionEnabled(uint uid, bool enabled, SUPER_RESOLUTION_STATE_REASON reason)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnUserSuperResolutionEnabled");
+            _audioSample.Logger.UpdateLog("OnUserSuperResolutionEnabled");
         }
 
         public override void OnChannelMediaRelayStateChanged(CHANNEL_MEDIA_RELAY_STATE state,
             CHANNEL_MEDIA_RELAY_ERROR code)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnChannelMediaRelayStateChanged");
+            _audioSample.Logger.UpdateLog("OnChannelMediaRelayStateChanged");
         }
 
         public override void OnChannelMediaRelayEvent(CHANNEL_MEDIA_RELAY_EVENT code)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnChannelMediaRelayEvent");
+            _audioSample.Logger.UpdateLog("OnChannelMediaRelayEvent");
         }
 
         public override void OnFirstLocalAudioFrame(int elapsed)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnFirstLocalAudioFrame");
+            _audioSample.Logger.UpdateLog("OnFirstLocalAudioFrame");
         }
 
         public override void OnFirstLocalAudioFramePublished(int elapsed)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnFirstLocalAudioFramePublished");
+            _audioSample.Logger.UpdateLog("OnFirstLocalAudioFramePublished");
         }
 
         public override void OnFirstRemoteAudioFrame(uint uid, int elapsed)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnFirstRemoteAudioFrame");
+            _audioSample.Logger.UpdateLog("OnFirstRemoteAudioFrame");
         }
 
         public override void OnRtmpStreamingStateChanged(string url, RTMP_STREAM_PUBLISH_STATE state,
             RTMP_STREAM_PUBLISH_ERROR errCode)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnRtmpStreamingStateChanged");
+            _audioSample.Logger.UpdateLog("OnRtmpStreamingStateChanged");
         }
 
         public override void OnRtmpStreamingEvent(string url, RTMP_STREAMING_EVENT eventCode)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnRtmpStreamingEvent");
+            _audioSample.Logger.UpdateLog("OnRtmpStreamingEvent");
         }
 
         public override void OnStreamPublished(string url, int error)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnStreamPublished");
+            _audioSample.Logger.UpdateLog("OnStreamPublished");
         }
 
         public override void OnStreamUnpublished(string url)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnStreamUnpublished");
+            _audioSample.Logger.UpdateLog("OnStreamUnpublished");
         }
 
         public override void OnTranscodingUpdated()
         {
-            _helloVideoAgora.Logger.UpdateLog("OnTranscodingUpdated");
+            _audioSample.Logger.UpdateLog("OnTranscodingUpdated");
         }
 
         public override void OnStreamInjectedStatus(string url, uint uid, int status)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnStreamInjectedStatus");
+            _audioSample.Logger.UpdateLog("OnStreamInjectedStatus");
         }
 
         public override void OnAudioRouteChanged(AUDIO_ROUTE_TYPE routing)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnAudioRouteChanged");
+            _audioSample.Logger.UpdateLog("OnAudioRouteChanged");
         }
 
         public override void OnLocalPublishFallbackToAudioOnly(bool isFallbackOrRecover)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnLocalPublishFallbackToAudioOnly");
+            _audioSample.Logger.UpdateLog("OnLocalPublishFallbackToAudioOnly");
         }
 
         public override void OnRemoteSubscribeFallbackToAudioOnly(uint uid, bool isFallbackOrRecover)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnRemoteSubscribeFallbackToAudioOnly");
+            _audioSample.Logger.UpdateLog("OnRemoteSubscribeFallbackToAudioOnly");
         }
 
         public override void OnRemoteAudioTransportStats(uint uid, ushort delay, ushort lost, ushort rxKBitRate)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnRemoteAudioTransportStats");
+            _audioSample.Logger.UpdateLog("OnRemoteAudioTransportStats");
         }
 
         public override void OnRemoteVideoTransportStats(uint uid, ushort delay, ushort lost, ushort rxKBitRate)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnRemoteVideoTransportStats");
+            _audioSample.Logger.UpdateLog("OnRemoteVideoTransportStats");
         }
 
         public override void OnMicrophoneEnabled(bool enabled)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnMicrophoneEnabled");
+            _audioSample.Logger.UpdateLog("OnMicrophoneEnabled");
         }
 
         public override void OnConnectionStateChanged(CONNECTION_STATE_TYPE state,
             CONNECTION_CHANGED_REASON_TYPE reason)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnConnectionStateChanged");
+            _audioSample.Logger.UpdateLog("OnConnectionStateChanged");
         }
 
         public override void OnNetworkTypeChanged(NETWORK_TYPE type)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnNetworkTypeChanged");
+            _audioSample.Logger.UpdateLog("OnNetworkTypeChanged");
         }
 
         public override void OnLocalUserRegistered(uint uid, string userAccount)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnLocalUserRegistered");
+            _audioSample.Logger.UpdateLog("OnLocalUserRegistered");
         }
 
         public override void OnUserInfoUpdated(uint uid, UserInfo info)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnUserInfoUpdated");
+            _audioSample.Logger.UpdateLog("OnUserInfoUpdated");
         }
 
         public override void OnUploadLogResult(string requestId, bool success, UPLOAD_ERROR_REASON reason)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnUploadLogResult");
+            _audioSample.Logger.UpdateLog("OnUploadLogResult");
         }
 
         public override bool OnReadyToSendMetadata(Metadata metadata)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnReadyToSendMetadata");
+            _audioSample.Logger.UpdateLog("OnReadyToSendMetadata");
             return true;
         }
 
         public override void OnMetadataReceived(Metadata metadata)
         {
-            _helloVideoAgora.Logger.UpdateLog("OnMetadataReceived");
+            _audioSample.Logger.UpdateLog("OnMetadataReceived");
         }
     }
 }
