@@ -68,6 +68,11 @@ namespace VideoSample
             AgoraRtcEngine.Dispose();
         }
 
+        internal string GetChannelName()
+        {
+            return channelName;
+        }
+
         internal static void DestroyVideoView(uint uid)
         {
             var go = GameObject.Find(uid.ToString());
@@ -77,7 +82,7 @@ namespace VideoSample
             }
         }
 
-        internal static void MakeVideoView(uint uid)
+        internal static void MakeVideoView(uint uid, string channelId = "")
         {
             var go = GameObject.Find(uid.ToString());
             if (!ReferenceEquals(go, null))
@@ -89,7 +94,7 @@ namespace VideoSample
             var videoSurface = MakeImageSurface(uid.ToString());
             if (ReferenceEquals(videoSurface, null)) return;
             // configure videoSurface
-            videoSurface.SetForUser(uid);
+            videoSurface.SetForUser(uid, channelId);
             videoSurface.SetEnable(true);
         }
 
@@ -203,7 +208,7 @@ namespace VideoSample
         public override void OnUserJoined(uint uid, int elapsed)
         {
             _videoSample.Logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-            VideoSample.MakeVideoView(uid);
+            VideoSample.MakeVideoView(uid, _videoSample.GetChannelName());
         }
 
         public override void OnUserOffline(uint uid, USER_OFFLINE_REASON_TYPE reason)
