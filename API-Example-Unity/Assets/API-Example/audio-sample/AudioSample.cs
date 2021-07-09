@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 using agora_gaming_rtc;
 using UnityEngine.Serialization;
@@ -56,6 +57,14 @@ namespace AudioSample
         private void OnLeaveBtnClick()
         {
             AgoraRtcEngine.LeaveChannel();
+        }
+
+        private void OnApplicationQuit()
+        {
+            Debug.Log("OnApplicationQuit");
+            if (AgoraRtcEngine == null) return;
+            AgoraRtcEngine.LeaveChannel();
+            AgoraRtcEngine.Dispose();
         }
     }
 
