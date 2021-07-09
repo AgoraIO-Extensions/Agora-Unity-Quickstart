@@ -39,6 +39,9 @@ namespace DesktopScreenShare
         // Use this for initialization
         private void Start()
         {
+#if UNITY_IPHONE || UNITY_ANDROID
+            throw new PlatformNotSupportedException();
+#else
             Logger = new Logger(logText);
             CheckAppId();
             InitEngine();
@@ -46,6 +49,7 @@ namespace DesktopScreenShare
             InitEngine(AgoraEngineType.SubProcess);
             JoinChannel(AgoraEngineType.SubProcess);
             PrepareScreenCapture();
+#endif
         }
 
         private void CheckAppId()
@@ -167,13 +171,13 @@ namespace DesktopScreenShare
             if (AgoraRtcEngineDict == null) return;
 
             // Release the sub-process engine first.
-            if (AgoraRtcEngineDict[AgoraEngineType.SubProcess] != null)
+            if (AgoraRtcEngineDict.ContainsKey(AgoraEngineType.SubProcess))
             {
                 AgoraRtcEngineDict[AgoraEngineType.SubProcess].LeaveChannel();
                 AgoraRtcEngineDict[AgoraEngineType.SubProcess].Dispose(true);
             }
 
-            if (AgoraRtcEngineDict[AgoraEngineType.MainProcess] != null)
+            if (AgoraRtcEngineDict.ContainsKey(AgoraEngineType.MainProcess))
             {
                 AgoraRtcEngineDict[AgoraEngineType.MainProcess].LeaveChannel();
                 AgoraRtcEngineDict[AgoraEngineType.MainProcess].Dispose();
