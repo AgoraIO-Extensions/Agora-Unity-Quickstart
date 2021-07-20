@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using agora_gaming_rtc;
 using agora_utilities;
@@ -19,7 +17,13 @@ public class video_encoder_configuration : MonoBehaviour
     private Logger logger;
     private IRtcEngine mRtcEngine = null;
     private const float Offset = 100;
-    private static string channelName = "Agora_Channel";
+
+    // A list of dimensions for swithching
+    VideoDimensions[] dimensions = new VideoDimensions[]{
+        new VideoDimensions { width = 640, height = 480 },
+        new VideoDimensions { width = 480, height = 480 },
+        new VideoDimensions { width = 480, height = 240 }
+    };
 
     // Start is called before the first frame update
     void Start()
@@ -27,7 +31,7 @@ public class video_encoder_configuration : MonoBehaviour
         CheckAppId();
         InitEngine();
         JoinChannel();
-        SetVideoEncoderConfiguration();
+        SetVideoEncoderConfiguration(); // use default one
     }
 
     // Update is called once per frame
@@ -66,15 +70,21 @@ public class video_encoder_configuration : MonoBehaviour
         mRtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
     }
 
-    void SetVideoEncoderConfiguration()
+
+    /// <summary>
+    ///   Setting the Encoder Configuration.  Possbily called from UI button
+    /// </summary>
+    /// <param name="dim"></param>
+    public void SetVideoEncoderConfiguration(int dim = 0)
     {
+        if (dim >= dimensions.Length) {
+            Debug.LogError("Invalid dimension choice!");
+            return;
+	    }
+
         VideoEncoderConfiguration config = new VideoEncoderConfiguration
         {
-            dimensions = new VideoDimensions
-            {
-                width = 640,
-                height = 480
-            },
+            dimensions = dimensions[dim],
             frameRate = FRAME_RATE.FRAME_RATE_FPS_15,
             minFrameRate = -1,
             bitrate = 0,
