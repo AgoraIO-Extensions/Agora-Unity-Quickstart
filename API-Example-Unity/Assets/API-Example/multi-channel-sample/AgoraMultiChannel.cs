@@ -5,80 +5,73 @@ using UnityEngine.UI;
 using agora_gaming_rtc;
 using agora_utilities;
 
-public class AgoraMultiChannel : MonoBehaviour 
-{	
-    [SerializeField]
-    private string APP_ID = "YOUR_APPID";
+public class AgoraMultiChannel : MonoBehaviour
+{
+    [SerializeField] private string APP_ID = "YOUR_APPID";
 
-    [SerializeField]
-    private string TOKEN_1 = "";
+    [SerializeField] private string TOKEN_1 = "";
 
-    [SerializeField]
-    private string CHANNEL_NAME_1 = "YOUR_CHANNEL_NAME_1";
+    [SerializeField] private string CHANNEL_NAME_1 = "YOUR_CHANNEL_NAME_1";
 
-    [SerializeField]
-    private string TOKEN_2 = "";
+    [SerializeField] private string TOKEN_2 = "";
 
-    [SerializeField]
-    private string CHANNEL_NAME_2 = "YOUR_CHANNEL_NAME_2";
+    [SerializeField] private string CHANNEL_NAME_2 = "YOUR_CHANNEL_NAME_2";
     public Text logText;
-	private Logger logger;
-	private IRtcEngine mRtcEngine = null;
-	private AgoraChannel channel1 = null;
-	private AgoraChannel channel2 = null;
+    private Logger logger;
+    private IRtcEngine mRtcEngine = null;
+    private AgoraChannel channel1 = null;
+    private AgoraChannel channel2 = null;
     private const float Offset = 100;
 
-	// Use this for initialization
-	void Start () 
-	{
-		CheckAppId();
-		InitEngine();
-		JoinChannel();	
-	}
+    // Use this for initialization
+    void Start()
+    {
+        CheckAppId();
+        InitEngine();
+        JoinChannel();
+    }
 
-	void Update () 
-	{
-		PermissionHelper.RequestMicrophontPermission();
-		PermissionHelper.RequestCameraPermission();
-	}
-	
-	void CheckAppId()
+    void Update()
+    {
+        PermissionHelper.RequestMicrophontPermission();
+        PermissionHelper.RequestCameraPermission();
+    }
+
+    void CheckAppId()
     {
         logger = new Logger(logText);
         logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
     }
 
-	void InitEngine()
-	{
+    void InitEngine()
+    {
         mRtcEngine = IRtcEngine.GetEngine(APP_ID);
-		mRtcEngine.SetChannelProfile(CHANNEL_PROFILE.CHANNEL_PROFILE_LIVE_BROADCASTING);
-		// If you want to user Multi Channel Video, please call "SetMultiChannleWant to true"
-		mRtcEngine.SetMultiChannelWant(true);
-		mRtcEngine.EnableAudio();
-		mRtcEngine.EnableVideo();
-		mRtcEngine.EnableVideoObserver();
+        mRtcEngine.SetChannelProfile(CHANNEL_PROFILE.CHANNEL_PROFILE_LIVE_BROADCASTING);
+        // If you want to user Multi Channel Video, please call "SetMultiChannleWant to true"
+        mRtcEngine.SetMultiChannelWant(true);
+        mRtcEngine.EnableAudio();
+        mRtcEngine.EnableVideo();
+        mRtcEngine.EnableVideoObserver();
 
-		channel1 = mRtcEngine.CreateChannel(CHANNEL_NAME_1);
-		channel2 = mRtcEngine.CreateChannel(CHANNEL_NAME_2);
-		channel1.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-		channel2.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+        channel1 = mRtcEngine.CreateChannel(CHANNEL_NAME_1);
+        channel2 = mRtcEngine.CreateChannel(CHANNEL_NAME_2);
+        channel1.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+        channel2.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_AUDIENCE);
 
-		channel1.ChannelOnJoinChannelSuccess = Channel1OnJoinChannelSuccessHandler;
-		channel1.ChannelOnLeaveChannel = Channel1OnLeaveChannelHandler;
-		channel1.ChannelOnUserJoined = Channel1OnUserJoinedHandler;
-		channel1.ChannelOnError = Channel1OnErrorHandler;
-		channel2.ChannelOnJoinChannelSuccess = Channel2OnJoinChannelSuccessHandler;
-		channel2.ChannelOnLeaveChannel = Channel2OnLeaveChannelHandler;
-		channel2.ChannelOnUserJoined = Channel2OnUserJoinedHandler;
-		channel2.ChannelOnError = Channel2OnErrorHandler;
-	}
+        channel1.ChannelOnJoinChannelSuccess = Channel1OnJoinChannelSuccessHandler;
+        channel1.ChannelOnLeaveChannel = Channel1OnLeaveChannelHandler;
+        channel1.ChannelOnUserJoined = Channel1OnUserJoinedHandler;
+        channel1.ChannelOnError = Channel1OnErrorHandler;
+        channel2.ChannelOnJoinChannelSuccess = Channel2OnJoinChannelSuccessHandler;
+        channel2.ChannelOnLeaveChannel = Channel2OnLeaveChannelHandler;
+        channel2.ChannelOnUserJoined = Channel2OnUserJoinedHandler;
+        channel2.ChannelOnError = Channel2OnErrorHandler;
+    }
 
     void JoinChannel()
     {
-		channel1.JoinChannel(TOKEN_1, "", 0, new ChannelMediaOptions(true, true));
-		channel2.JoinChannel(TOKEN_2, "", 0, new ChannelMediaOptions(true, true));
-
-		channel2.Publish();
+        channel1.JoinChannel(TOKEN_1, "", 0, new ChannelMediaOptions(true, true));
+        channel2.JoinChannel(TOKEN_2, "", 0, new ChannelMediaOptions(true, true, false, false));
     }
 
     void OnApplicationQuit()
@@ -86,65 +79,71 @@ public class AgoraMultiChannel : MonoBehaviour
         Debug.Log("OnApplicationQuit");
         if (mRtcEngine != null)
         {
-			channel1.LeaveChannel();
-			channel2.LeaveChannel();
-			channel1.ReleaseChannel();
-			channel2.ReleaseChannel();
+            channel1.LeaveChannel();
+            channel2.LeaveChannel();
+            channel1.ReleaseChannel();
+            channel2.ReleaseChannel();
 
-			mRtcEngine.DisableVideoObserver();
+            mRtcEngine.DisableVideoObserver();
             IRtcEngine.Destroy();
         }
     }
 
-	void Channel1OnJoinChannelSuccessHandler(string channelId, uint uid, int elapsed)
-	{
-    	logger.UpdateLog(string.Format("sdk version: ${0}", IRtcEngine.GetSdkVersion()));
-    	logger.UpdateLog(string.Format("onJoinChannelSuccess channelId: {0}, uid: {1}, elapsed: {2}", channelId, uid, elapsed));
-		makeVideoView(channelId ,0);
-	}
-
-	void Channel2OnJoinChannelSuccessHandler(string channelId, uint uid, int elapsed)
-	{
-    	logger.UpdateLog(string.Format("sdk version: ${0}", IRtcEngine.GetSdkVersion()));
-    	logger.UpdateLog(string.Format("onJoinChannelSuccess channelId: {0}, uid: {1}, elapsed: {2}", channelId, uid, elapsed));
-		makeVideoView(channelId, 0);
-	}
-
-	void Channel1OnLeaveChannelHandler(string channelId, RtcStats rtcStats)
-	{
-    	logger.UpdateLog(string.Format("Channel1OnLeaveChannelHandler channelId: {0}", channelId));
-	}
-
-	void Channel2OnLeaveChannelHandler(string channelId, RtcStats rtcStats)
-	{
-    	logger.UpdateLog(string.Format("Channel1OnLeaveChannelHandler channelId: {0}", channelId));
-	}
-
-	void Channel1OnErrorHandler(string channelId, int err, string message)
-	{
-		logger.UpdateLog(string.Format("Channel1OnErrorHandler channelId: {0}, err: {1}, message: {2}", channelId, err, message));
-	}
-
-	void Channel2OnErrorHandler(string channelId, int err, string message)
-	{
-		logger.UpdateLog(string.Format("Channel2OnErrorHandler channelId: {0}, err: {1}, message: {2}", channelId, err, message));
-	}
-
-	void Channel1OnUserJoinedHandler(string channelId, uint uid, int elapsed)
+    void Channel1OnJoinChannelSuccessHandler(string channelId, uint uid, int elapsed)
     {
-        logger.UpdateLog(string.Format("Channel1OnUserJoinedHandler channelId: {0} uid: ${1} elapsed: ${2}", channelId, uid, elapsed));
+        logger.UpdateLog(string.Format("sdk version: ${0}", IRtcEngine.GetSdkVersion()));
+        logger.UpdateLog(string.Format("onJoinChannelSuccess channelId: {0}, uid: {1}, elapsed: {2}", channelId, uid,
+            elapsed));
+        makeVideoView(channelId, 0);
+    }
+
+    void Channel2OnJoinChannelSuccessHandler(string channelId, uint uid, int elapsed)
+    {
+        logger.UpdateLog(string.Format("sdk version: ${0}", IRtcEngine.GetSdkVersion()));
+        logger.UpdateLog(string.Format("onJoinChannelSuccess channelId: {0}, uid: {1}, elapsed: {2}", channelId, uid,
+            elapsed));
+        makeVideoView(channelId, 0);
+    }
+
+    void Channel1OnLeaveChannelHandler(string channelId, RtcStats rtcStats)
+    {
+        logger.UpdateLog(string.Format("Channel1OnLeaveChannelHandler channelId: {0}", channelId));
+    }
+
+    void Channel2OnLeaveChannelHandler(string channelId, RtcStats rtcStats)
+    {
+        logger.UpdateLog(string.Format("Channel1OnLeaveChannelHandler channelId: {0}", channelId));
+    }
+
+    void Channel1OnErrorHandler(string channelId, int err, string message)
+    {
+        logger.UpdateLog(string.Format("Channel1OnErrorHandler channelId: {0}, err: {1}, message: {2}", channelId, err,
+            message));
+    }
+
+    void Channel2OnErrorHandler(string channelId, int err, string message)
+    {
+        logger.UpdateLog(string.Format("Channel2OnErrorHandler channelId: {0}, err: {1}, message: {2}", channelId, err,
+            message));
+    }
+
+    void Channel1OnUserJoinedHandler(string channelId, uint uid, int elapsed)
+    {
+        logger.UpdateLog(string.Format("Channel1OnUserJoinedHandler channelId: {0} uid: ${1} elapsed: ${2}", channelId,
+            uid, elapsed));
         makeVideoView(channelId, uid);
     }
 
-	void Channel2OnUserJoinedHandler(string channelId, uint uid, int elapsed)
+    void Channel2OnUserJoinedHandler(string channelId, uint uid, int elapsed)
     {
-        logger.UpdateLog(string.Format("Channel2OnUserJoinedHandler channelId: {0} uid: ${1} elapsed: ${2}", channelId, uid, elapsed));
+        logger.UpdateLog(string.Format("Channel2OnUserJoinedHandler channelId: {0} uid: ${1} elapsed: ${2}", channelId,
+            uid, elapsed));
         makeVideoView(channelId, uid);
     }
 
     void Channel2OnUserOfflineHandler(string channelId, uint uid, USER_OFFLINE_REASON reason)
     {
-        logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid, (int)reason));
+        logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid, (int) reason));
         DestroyVideoView(uid);
     }
 
@@ -179,6 +178,7 @@ public class AgoraMultiChannel : MonoBehaviour
         {
             return null;
         }
+
         go.name = goName;
         // set up transform
         go.transform.Rotate(-90.0f, 0.0f, 0.0f);
@@ -203,7 +203,7 @@ public class AgoraMultiChannel : MonoBehaviour
         }
 
         go.name = goName;
-		// make the object draggable
+        // make the object draggable
         go.AddComponent<UIElementDrag>();
         // to be renderered onto
         go.AddComponent<RawImage>();
@@ -218,6 +218,7 @@ public class AgoraMultiChannel : MonoBehaviour
         {
             Debug.Log("Canvas is null video view");
         }
+
         // set up transform
         go.transform.Rotate(0f, 0.0f, 180.0f);
         float xPos = Random.Range(Offset - Screen.width / 2f, Screen.width / 2f - Offset);
