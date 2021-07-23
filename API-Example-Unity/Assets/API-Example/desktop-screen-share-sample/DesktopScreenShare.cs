@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_STANDALONE_OSX || UNITY_STANDALONE_WIN || UNITY_EDITOR_OSX || UNITY_EDITOR_WIN
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -24,7 +25,6 @@ namespace DesktopScreenShare
         internal Dictionary<AgoraEngineType, IAgoraRtcEngine> AgoraRtcEngineDict =
             new Dictionary<AgoraEngineType, IAgoraRtcEngine>();
 
-        private uint remoteUid = 0;
         private const float Offset = 100;
         public Text logText;
         internal Logger Logger;
@@ -534,7 +534,7 @@ namespace DesktopScreenShare
             _desktopScreenShare.Logger.UpdateLog("OnAudioMixingFinished");
         }
 
-        public override void OnAudioMixingStateChanged(AUDIO_MIXING_STATE_TYPE state, AUDIO_MIXING_ERROR_TYPE errorCode)
+        public override void OnAudioMixingStateChanged(AUDIO_MIXING_STATE_TYPE state, AUDIO_MIXING_REASON_TYPE reason)
         {
             _desktopScreenShare.Logger.UpdateLog("OnAudioMixingStateChanged");
         }
@@ -736,3 +736,4 @@ namespace DesktopScreenShare
         }
     }
 }
+#endif

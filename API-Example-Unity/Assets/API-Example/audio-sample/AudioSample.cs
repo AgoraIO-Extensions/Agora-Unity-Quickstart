@@ -317,7 +317,7 @@ namespace AudioSample
             _audioSample.Logger.UpdateLog("OnAudioMixingFinished");
         }
 
-        public override void OnAudioMixingStateChanged(AUDIO_MIXING_STATE_TYPE state, AUDIO_MIXING_ERROR_TYPE errorCode)
+        public override void OnAudioMixingStateChanged(AUDIO_MIXING_STATE_TYPE state, AUDIO_MIXING_REASON_TYPE reason)
         {
             _audioSample.Logger.UpdateLog("OnAudioMixingStateChanged");
         }

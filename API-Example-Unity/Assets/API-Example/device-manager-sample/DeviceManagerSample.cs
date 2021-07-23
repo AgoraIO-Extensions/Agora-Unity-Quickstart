@@ -379,7 +379,7 @@ namespace DeviceManagerSample
             _deviceManagerSample.Logger.UpdateLog("OnAudioMixingFinished");
         }
 
-        public override void OnAudioMixingStateChanged(AUDIO_MIXING_STATE_TYPE state, AUDIO_MIXING_ERROR_TYPE errorCode)
+        public override void OnAudioMixingStateChanged(AUDIO_MIXING_STATE_TYPE state, AUDIO_MIXING_REASON_TYPE reason)
         {
             _deviceManagerSample.Logger.UpdateLog("OnAudioMixingStateChanged");
         }
