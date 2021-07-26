@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using agora_gaming_rtc;
 using agora_utilities;
 using UnityEngine.Serialization;
+using Logger = agora_utilities.Logger;
 using Random = UnityEngine.Random;
 
 namespace DesktopScreenShare
