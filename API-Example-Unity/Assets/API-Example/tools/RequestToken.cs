@@ -9,7 +9,7 @@ public class TokenObject {
   public string rtcToken;
 }
 
-namespace agora_utilities
+namespace agora.util
 {
   public static class HelperClass
   {

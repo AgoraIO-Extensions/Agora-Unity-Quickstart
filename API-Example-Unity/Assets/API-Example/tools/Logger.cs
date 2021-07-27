@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace agora_utilities
+namespace agora.util
 {
     public class Logger
     {

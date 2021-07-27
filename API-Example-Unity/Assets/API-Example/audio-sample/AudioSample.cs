@@ -1,10 +1,10 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.UI;
-using agora_gaming_rtc;
-using agora_utilities;
+using agora.rtc;
+using agora.util;
 using UnityEngine.Serialization;
-using Logger = agora_utilities.Logger;
+using Logger = agora.util.Logger;
 
 
 namespace AudioSample
@@ -45,7 +45,7 @@ namespace AudioSample
 
         private void InitRtcEngine()
         {
-            AgoraRtcEngine = agora_gaming_rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
+            AgoraRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
             AgoraRtcEngine.Initialize(new RtcEngineContext(appID, AREA_CODE.AREA_CODE_GLOB, new LogConfig("log.txt")));
             AgoraRtcEngine.InitEventHandler(new UserEventHandler(this));
         }

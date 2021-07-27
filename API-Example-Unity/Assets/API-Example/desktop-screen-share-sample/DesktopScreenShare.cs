@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using agora_gaming_rtc;
-using agora_utilities;
+using agora.rtc;
+using agora.util;
 using UnityEngine.Serialization;
-using Logger = agora_utilities.Logger;
+using Logger = agora.util.Logger;
 using Random = UnityEngine.Random;
 
 namespace DesktopScreenShare
