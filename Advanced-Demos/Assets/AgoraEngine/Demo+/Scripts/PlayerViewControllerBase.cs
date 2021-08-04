@@ -110,7 +110,7 @@ public class PlayerViewControllerBase : IVideoChatClient
             });
         }
 
-        go = GameObject.Find("Toggle360p");
+        go = GameObject.Find("ToggleScale");
         if (go != null)
         {
             Toggle toggle = go.GetComponent<Toggle>();
@@ -144,7 +144,7 @@ public class PlayerViewControllerBase : IVideoChatClient
             RawImage image = go.GetComponent<RawImage>();
             if (_enforcing360p)
             {
-                v2 = AgoraUIUtils.GetScaledDimension(width, height, 360f);
+                v2 = AgoraUIUtils.GetScaledDimension(width, height, 240f);
             }
 
             if (IsPortraitOrientation(rotation))
@@ -295,8 +295,8 @@ public class PlayerViewControllerBase : IVideoChatClient
         }
         // set up transform
         go.transform.Rotate(0f, 0.0f, 180.0f);
-        Vector2 v2 = AgoraUIUtils.GetRandomPosition(100);
-        go.transform.localPosition = new Vector3(v2.x, v2.y, 0);
+        Vector2 v2 = AgoraUIUtils.GetRandomPosition(200);
+        go.transform.position = new Vector3(v2.x, v2.y, 0);
         go.transform.localScale = Vector3.one;
 
         // configure videoSurface
