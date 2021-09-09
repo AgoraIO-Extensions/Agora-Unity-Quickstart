@@ -33,10 +33,6 @@ namespace DesktopScreenShare
         private Button _startShareBtn;
         private Button _stopShareBtn;
 
-#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-    private Dictionary<uint, Rectangle> _dispRect;
-#endif
-
         // Use this for initialization
         private void Start()
         {
@@ -99,13 +95,6 @@ namespace DesktopScreenShare
                     new Dropdown.OptionData(
                         string.Format("{0}-{1} | {2}", w.AppName, w.WindowName, w.WindowId)))
                 .ToList());
-#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-            _dispRect = new Dictionary<uint, Rectangle>();
-            foreach (var displayInfo in displayInfos)
-            {
-                _dispRect[displayInfo.DisplayId] = displayInfo.WorkArea;
-            }
-#endif
             _startShareBtn = GameObject.Find("startShareBtn").GetComponent<Button>();
             _stopShareBtn = GameObject.Find("stopShareBtn").GetComponent<Button>();
             if (_startShareBtn != null) _startShareBtn.onClick.AddListener(OnStartShareBtnClick);
@@ -137,25 +126,10 @@ namespace DesktopScreenShare
             }
             else
             {
-#if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
                 var dispId = uint.Parse(option.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1]);
                 Logger.UpdateLog(string.Format(">>>>> Start sharing display {0}", dispId));
                 AgoraRtcEngineDict[AgoraEngineType.SubProcess].StartScreenCaptureByDisplayId(dispId, default(Rectangle),
                     new ScreenCaptureParameters {captureMouseCursor = true, frameRate = 30});
-#elif UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-            var diapFlag = uint.Parse(option.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1]);
-            var screenRect = new Rectangle
-            {
-                x = _dispRect[diapFlag].x,
-                y = _dispRect[diapFlag].y,
-                width = _dispRect[diapFlag].width,
-                height = _dispRect[diapFlag].height
-            };
-            Logger.UpdateLog(string.Format(">>>>> Start sharing display {0}: {1} {2} {3} {4}", diapFlag, screenRect.x,
-                screenRect.y, screenRect.width, screenRect.height));
-            var ret = AgoraRtcEngineDict[AgoraEngineType.SubProcess].StartScreenCaptureByScreenRect(screenRect,
-                new Rectangle {x = 0, y = 0, width = 0, height = 0}, default(ScreenCaptureParameters));
-#endif
             }
         }
 
