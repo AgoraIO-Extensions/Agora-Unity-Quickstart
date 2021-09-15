@@ -61,12 +61,12 @@ public class AudioMixing : MonoBehaviour
     void StartAudioMixing()
     {
         string path = "https://video-1305146285.cos.ap-shanghai.myqcloud.com/WeChat_20210810135742.mp4";
-        
-#if UNITY_ANDROID
-        string localPath = "/assets/audio/DESERTMUSIC.wav";
-#else
-        string localPath = Application.streamingAssetsPath + "/Audio/" + "DESERTMUSIC.wav";
-#endif
+
+//#if UNITY_ANDROID && !UNITY_EDITOR
+ //       string localPath = "/assets/audio/DESERTMUSIC.wav";
+//else
+        string localPath = Application.streamingAssetsPath + "/audio/" + "DESERTMUSIC.wav";
+//#endif
         logger.UpdateLog(string.Format("the audio file path: {0}", localPath));
         mRtcEngine.StartAudioMixing(localPath, true, false, -1, 0);
     }
@@ -75,7 +75,7 @@ public class AudioMixing : MonoBehaviour
     {
         manager = mRtcEngine.GetAudioPlaybackDeviceManager();
         string fileStreamName =
-            Application.streamingAssetsPath + "/Audio/" + "DESERTMUSIC.wav";
+            Application.streamingAssetsPath + "/audio/" + "DESERTMUSIC.wav";
         string path = "https://video-1305146285.cos.ap-shanghai.myqcloud.com/WeChat_20210810135742.mp4";
         manager.CreateAAudioPlaybackDeviceManager();
         manager.StartAudioPlaybackDeviceTest(fileStreamName);
@@ -83,10 +83,10 @@ public class AudioMixing : MonoBehaviour
     
     public void PlayEffectTest () {
         IAudioEffectManager effectManager = mRtcEngine.GetAudioEffectManager ();
-#if UNITY_ANDROID
+#if UNITY_ANDROID && !UNITY_EDITOR
         string localPath = "/assets/audio/DESERTMUSIC.wav";
 #else
-        string localPath = Application.streamingAssetsPath + "/Audio/" + "DESERTMUSIC.wav";
+        string localPath = Application.streamingAssetsPath + "/audio/" + "DESERTMUSIC.wav";
 #endif
         
         effectManager.PlayEffect (1, localPath, 1, 1.0, 0, 100, true);
