@@ -80,6 +80,17 @@ public class AudioMixing : MonoBehaviour
         manager.CreateAAudioPlaybackDeviceManager();
         manager.StartAudioPlaybackDeviceTest(fileStreamName);
     }
+    
+    public void PlayEffectTest () {
+        IAudioEffectManager effectManager = mRtcEngine.GetAudioEffectManager ();
+#if UNITY_ANDROID
+        string localPath = "/assets/audio/DESERTMUSIC.wav";
+#else
+        string localPath = Application.streamingAssetsPath + "/Audio/" + "DESERTMUSIC.wav";
+#endif
+        
+        effectManager.PlayEffect (1, localPath, 1, 1.0, 0, 100, true);
+    }
 
     void OnLeaveBtnClick() 
     {
@@ -105,6 +116,7 @@ public class AudioMixing : MonoBehaviour
         logger.UpdateLog(string.Format("sdk version: {0}", IRtcEngine.GetSdkVersion()));
         logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName, uid, elapsed));
         StartAudioMixing();
+        //PlayEffectTest();
     }
 
     void OnLeaveChannelHandler(RtcStats stats)
