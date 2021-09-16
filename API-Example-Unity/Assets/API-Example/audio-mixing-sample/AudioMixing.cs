@@ -60,7 +60,7 @@ public class AudioMixing : MonoBehaviour
 
     void StartAudioMixing()
     {
-        string path = "https://video-1305146285.cos.ap-shanghai.myqcloud.com/WeChat_20210810135742.mp4";
+        string path = "https://agoracdn.s3.us-west-1.amazonaws.com/videos/Agora.io-Interactions.mp4";
         
 #if UNITY_ANDROID
         string localPath = "/assets/audio/DESERTMUSIC.wav";
@@ -76,7 +76,7 @@ public class AudioMixing : MonoBehaviour
         manager = mRtcEngine.GetAudioPlaybackDeviceManager();
         string fileStreamName =
             Application.streamingAssetsPath + "/Audio/" + "DESERTMUSIC.wav";
-        string path = "https://video-1305146285.cos.ap-shanghai.myqcloud.com/WeChat_20210810135742.mp4";
+        string path = "https://agoracdn.s3.us-west-1.amazonaws.com/videos/Agora.io-Interactions.mp4";
         manager.CreateAAudioPlaybackDeviceManager();
         manager.StartAudioPlaybackDeviceTest(fileStreamName);
     }
