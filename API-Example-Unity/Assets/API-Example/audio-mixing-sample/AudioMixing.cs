@@ -69,7 +69,7 @@ public class AudioMixing : MonoBehaviour
         _useURL = urlToggle.isOn;
 
 #if UNITY_ANDROID && !UNITY_EDITOR
-       string localPath = "/assets/audio/DESERTMUSIC.wav";
+        localPath = "/assets/audio/DESERTMUSIC.wav";
 #else
         localPath = Application.streamingAssetsPath + "/audio/" + "DESERTMUSIC.wav";
 #endif
