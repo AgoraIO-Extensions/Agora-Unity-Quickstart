@@ -5,17 +5,22 @@ using agora_gaming_rtc;
 public class AudioMixing : MonoBehaviour
 {
     [SerializeField]
-    private string APP_ID = "YOUR_APPID";
+    string APP_ID = "YOUR_APPID";
     
     [SerializeField]
-    private string TOKEN = "";
+    string TOKEN = "";
 
     [SerializeField]
-    private string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
+    string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
+
+    [SerializeField]
+    string Sound_URL = "";
+
+    string localPath = "";
+
     public Text logText;
     private Logger logger;
     private IRtcEngine mRtcEngine = null;
-    private AgoraChannel channel = null;
     private IAudioPlaybackDeviceManager manager = null;
 
     // Start is called before the first frame update
@@ -23,6 +28,7 @@ public class AudioMixing : MonoBehaviour
     {
         CheckAppId();
         InitRtcEngine();
+        SetupUI();
         //StartAudioPlaybackTest();
         JoinChannel();
     }
@@ -52,6 +58,31 @@ public class AudioMixing : MonoBehaviour
         mRtcEngine.OnConnectionLost += OnConnectionLostHandler;
         
     }
+    void SetupUI()
+    { 
+        MixingButton = GameObject.Find("MixButton").GetComponent<Button>();
+        MixingButton.onClick.AddListener(HandleAudioMixingButton);
+        EffectButton = GameObject.Find("EffectButton").GetComponent<Button>();
+        EffectButton.onClick.AddListener(HandleEffectButton);
+        urlToggle = GameObject.Find("Toggle").GetComponent<Toggle>();
+        urlToggle.onValueChanged.AddListener(OnToggle);
+        _useURL = urlToggle.isOn;
+
+//#if UNITY_ANDROID && !UNITY_EDITOR
+ //       string localPath = "/assets/audio/DESERTMUSIC.wav";
+//#else
+        localPath = Application.streamingAssetsPath + "/audio/" + "DESERTMUSIC.wav";
+//#endif
+        logger.UpdateLog(string.Format("the audio file path: {0}", localPath));
+
+        EnableUI(false); // enable it after joining
+    }
+
+    void EnableUI(bool enable)
+    { 
+        MixingButton.enabled = enable;
+        EffectButton.enabled = enable;
+    }
 
     void JoinChannel()
     {
@@ -60,15 +91,9 @@ public class AudioMixing : MonoBehaviour
 
     void StartAudioMixing()
     {
-        string path = "https://video-1305146285.cos.ap-shanghai.myqcloud.com/WeChat_20210810135742.mp4";
+        Debug.Log("Playing with " + ( _useURL? "URL" : "local file") );
 
-//#if UNITY_ANDROID && !UNITY_EDITOR
- //       string localPath = "/assets/audio/DESERTMUSIC.wav";
-//else
-        string localPath = Application.streamingAssetsPath + "/audio/" + "DESERTMUSIC.wav";
-//#endif
-        logger.UpdateLog(string.Format("the audio file path: {0}", localPath));
-        mRtcEngine.StartAudioMixing(localPath, true, false, -1, 0);
+        mRtcEngine.StartAudioMixing( _useURL? Sound_URL : localPath, true, false, -1, 0);
     }
 
     void StartAudioPlaybackTest()
@@ -76,26 +101,21 @@ public class AudioMixing : MonoBehaviour
         manager = mRtcEngine.GetAudioPlaybackDeviceManager();
         string fileStreamName =
             Application.streamingAssetsPath + "/audio/" + "DESERTMUSIC.wav";
-        string path = "https://video-1305146285.cos.ap-shanghai.myqcloud.com/WeChat_20210810135742.mp4";
         manager.CreateAAudioPlaybackDeviceManager();
         manager.StartAudioPlaybackDeviceTest(fileStreamName);
     }
     
-    public void PlayEffectTest () {
+    void PlayEffectTest () {
+        Debug.Log("Playing with " + ( _useURL? "URL" : "local file") );
         IAudioEffectManager effectManager = mRtcEngine.GetAudioEffectManager ();
-#if UNITY_ANDROID && !UNITY_EDITOR
-        string localPath = "/assets/audio/DESERTMUSIC.wav";
-#else
-        string localPath = Application.streamingAssetsPath + "/audio/" + "DESERTMUSIC.wav";
-#endif
-        
-        effectManager.PlayEffect (1, localPath, 1, 1.0, 0, 100, true);
+        effectManager.PlayEffect (1, _useURL? Sound_URL : localPath, 1, 1.0, 0, 100, true);
     }
 
-    void OnLeaveBtnClick() 
-    {
-        mRtcEngine.LeaveChannel();
+    void StopEffectTest() {
+        IAudioEffectManager effectManager = mRtcEngine.GetAudioEffectManager();
+        effectManager.StopAllEffects();
     }
+
 
     void OnApplicationQuit()
     {
@@ -115,8 +135,7 @@ public class AudioMixing : MonoBehaviour
     {
         logger.UpdateLog(string.Format("sdk version: {0}", IRtcEngine.GetSdkVersion()));
         logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName, uid, elapsed));
-        StartAudioMixing();
-        //PlayEffectTest();
+        EnableUI(true);
     }
 
     void OnLeaveChannelHandler(RtcStats stats)
@@ -137,5 +156,59 @@ public class AudioMixing : MonoBehaviour
     void OnConnectionLostHandler()
     {
         logger.UpdateLog(string.Format("OnConnectionLost "));
+    }
+
+    bool _isMixing = false;
+    Button MixingButton { get; set; }
+    void HandleAudioMixingButton()
+    {
+        if (_effectOn)
+        {
+            logger.UpdateLog("Testing Effect right now, can't play effect...");
+            return;
+        }
+
+        if (_isMixing)
+        {
+            mRtcEngine.StopAudioMixing();
+        }
+        else
+        {
+            StartAudioMixing();
+        }
+
+        _isMixing = !_isMixing;
+        MixingButton.GetComponentInChildren<Text>().text = (_isMixing ? "Stop Mixing" : "Start Mixing");
+    }
+
+
+    bool _effectOn = false;
+    Button EffectButton { get; set; }
+    void HandleEffectButton()
+    {
+        if (_isMixing)
+        { 
+	        logger.UpdateLog("Testing Mixing right now, can't play effect...");
+            return;
+	    }
+
+        if (_effectOn)
+        {
+            StopEffectTest();
+        }
+        else
+        {
+            PlayEffectTest();
+        }
+
+        _effectOn = !_effectOn;
+        EffectButton.GetComponentInChildren<Text>().text = (_effectOn ? "Stop Effect" : "Play Effect");
+    }
+
+    bool _useURL { get; set;}
+    Toggle urlToggle { get; set; }
+    void OnToggle(bool enable)
+    { 
+        _useURL = enable;
     }
 }
