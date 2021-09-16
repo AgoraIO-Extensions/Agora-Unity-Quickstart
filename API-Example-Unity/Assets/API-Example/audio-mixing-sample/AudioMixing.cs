@@ -68,11 +68,11 @@ public class AudioMixing : MonoBehaviour
         urlToggle.onValueChanged.AddListener(OnToggle);
         _useURL = urlToggle.isOn;
 
-//#if UNITY_ANDROID && !UNITY_EDITOR
- //       string localPath = "/assets/audio/DESERTMUSIC.wav";
-//#else
+#if UNITY_ANDROID && !UNITY_EDITOR
+       string localPath = "/assets/audio/DESERTMUSIC.wav";
+#else
         localPath = Application.streamingAssetsPath + "/audio/" + "DESERTMUSIC.wav";
-//#endif
+#endif
         logger.UpdateLog(string.Format("the audio file path: {0}", localPath));
 
         EnableUI(false); // enable it after joining
