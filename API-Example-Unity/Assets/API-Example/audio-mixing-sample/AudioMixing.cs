@@ -69,6 +69,7 @@ public class AudioMixing : MonoBehaviour
         _useURL = urlToggle.isOn;
 
 #if UNITY_ANDROID && !UNITY_EDITOR
+        // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
         localPath = "/assets/audio/DESERTMUSIC.wav";
 #else
         localPath = Application.streamingAssetsPath + "/audio/" + "DESERTMUSIC.wav";
@@ -89,6 +90,7 @@ public class AudioMixing : MonoBehaviour
         mRtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
     }
 
+    #region -- Test Control logic ---
     void StartAudioMixing()
     {
         Debug.Log("Playing with " + ( _useURL? "URL" : "local file") );
@@ -99,10 +101,8 @@ public class AudioMixing : MonoBehaviour
     void StartAudioPlaybackTest()
     {
         manager = mRtcEngine.GetAudioPlaybackDeviceManager();
-        string fileStreamName =
-            Application.streamingAssetsPath + "/audio/" + "DESERTMUSIC.wav";
         manager.CreateAAudioPlaybackDeviceManager();
-        manager.StartAudioPlaybackDeviceTest(fileStreamName);
+        manager.StartAudioPlaybackDeviceTest(localPath);
     }
     
     void PlayEffectTest () {
@@ -116,6 +116,7 @@ public class AudioMixing : MonoBehaviour
         effectManager.StopAllEffects();
     }
 
+    #endregion
 
     void OnApplicationQuit()
     {
@@ -131,6 +132,7 @@ public class AudioMixing : MonoBehaviour
         }
     }
 
+    #region -- SDK callbacks ----
     void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
     {
         logger.UpdateLog(string.Format("sdk version: {0}", IRtcEngine.GetSdkVersion()));
@@ -158,6 +160,9 @@ public class AudioMixing : MonoBehaviour
         logger.UpdateLog(string.Format("OnConnectionLost "));
     }
 
+    #endregion
+
+    #region -- Application UI Logic ---
     bool _isMixing = false;
     Button MixingButton { get; set; }
     void HandleAudioMixingButton()
@@ -211,4 +216,6 @@ public class AudioMixing : MonoBehaviour
     { 
         _useURL = enable;
     }
+
+    #endregion
 }
