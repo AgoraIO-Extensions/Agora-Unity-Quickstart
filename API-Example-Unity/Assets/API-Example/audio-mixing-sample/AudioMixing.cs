@@ -16,6 +16,9 @@ public class AudioMixing : MonoBehaviour
     [SerializeField]
     string Sound_URL = "";
 
+    [SerializeField]
+    Toggle loopbackToggle;
+
     string localPath = "";
 
     public Text logText;
@@ -95,9 +98,10 @@ public class AudioMixing : MonoBehaviour
     void StartAudioMixing()
     {
         Debug.Log("Playing with " + ( _useURL? "URL" : "local file") );
+        bool bLoopback = loopbackToggle.isOn;
 
         mRtcEngine.StartAudioMixing( filePath: _useURL? Sound_URL : localPath, 
-	                                 loopback: false, 
+	                                 loopback: bLoopback, 
 				                      replace: true, 
 				                        cycle: -1, 
 					                 startPos: 0);
