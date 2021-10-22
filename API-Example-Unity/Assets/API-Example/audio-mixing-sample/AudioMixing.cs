@@ -16,12 +16,16 @@ public class AudioMixing : MonoBehaviour
     [SerializeField]
     string Sound_URL = "";
 
+    [SerializeField]
+    Toggle loopbackToggle;
+
     string localPath = "";
 
     public Text logText;
     private Logger logger;
     private IRtcEngine mRtcEngine = null;
     private IAudioPlaybackDeviceManager manager = null;
+    const string SampleAudioSubpath = "/audio/Agora.io-Interactions.mp3";
 
     // Start is called before the first frame update
     void Start()
@@ -70,9 +74,9 @@ public class AudioMixing : MonoBehaviour
 
 #if UNITY_ANDROID && !UNITY_EDITOR
         // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
-        localPath = "/assets/audio/DESERTMUSIC.wav";
+        localPath = "/assets" + SampleAudioSubpath;
 #else
-        localPath = Application.streamingAssetsPath + "/audio/" + "DESERTMUSIC.wav";
+        localPath = Application.streamingAssetsPath + SampleAudioSubpath;
 #endif
         logger.UpdateLog(string.Format("the audio file path: {0}", localPath));
 
@@ -94,8 +98,13 @@ public class AudioMixing : MonoBehaviour
     void StartAudioMixing()
     {
         Debug.Log("Playing with " + ( _useURL? "URL" : "local file") );
+        bool bLoopback = loopbackToggle.isOn;
 
-        mRtcEngine.StartAudioMixing( _useURL? Sound_URL : localPath, true, false, -1, 0);
+        mRtcEngine.StartAudioMixing( filePath: _useURL? Sound_URL : localPath, 
+	                                 loopback: bLoopback, 
+				                      replace: true, 
+				                        cycle: -1, 
+					                 startPos: 0);
     }
 
     void StartAudioPlaybackTest()
