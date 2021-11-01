@@ -6,12 +6,32 @@
 
 在这个示例项目中包含了以下场景：
 
-- audio-sample
-- video-sample
-- device-manager-sample
-- multi-channel-sample
-- screenshare-sample
-- video-rawdata-sample
+- **基本功能案例:**
+
+| Demo             | Description                                        | APIs                                                         |
+| ---------------- | -------------------------------------------------- | ------------------------------------------------------------ |
+| JoinChannelAudio | basic demo to show audio call                      | GetEngine, JoinChannelByKey, LeaveChannel                    |
+| JoinChannelVideo | video demo with role selection in Editor Inspector | SetChannelProfile,SetClientRole,EnableVideo,EnableVideoObserver, JoinChannelByKey, VideoSurface |
+
+* **进阶功能案例:**
+
+| Demo                         | Description                                                  | APIs                                                         |
+| ---------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| ScreenShareApp               | sharing application screen view from Unity camera            | PushVideoFrame, SetExternalVideoSource                       |
+| AudioMixing                  | audioMixing and play audio effect in the channel             | StartAudioMixing, PlayEffect                                 |
+| ScreenShareDesktop           | sharing desktop screen or individual windows                 | StartScreenCaptureByWindowId, StartScreenCaptureByDisplayId, StartScreenCaptureByScreenRect |
+| CustomRenderAudio            | use AudioSource to play raw data received in the Agora channel | PullAudioFrame                                               |
+| CustomCaptureAudio           | Sending raw data from AudioSource into the Agora channel     | PushAudioFrame                                               |
+| CustomCaptureFile            | feeding audio raw data using a file                          | PushAudioFrame                                               |
+| DeviceManager                | show how to get and set Device on the desktop platforms      | GetAudioRecordingDeviceManager, CreateAAudioRecordingDeviceManager,   GetAudioRecordingDeviceCount, GetAudioRecordingDevice, GetVideoDevice, SetAudioRecordingDevice,  SetAudioPlaybackDevice, SetAudioRecordingDeviceVolume, SetAudioPlaybackDeviceVolume, ReleaseAAudioRecordingDeviceManager, ReleaseAAudioPlaybackDeviceManager, ReleaseAVideoDeviceManager |
+| SetEncryption                | sending video with encryption                                | EnableEncryption                                             |
+| JoinMultipleChannel          | multi-channel video call with AgoraChannel class             | CreateChannel, SetClientRole, EnableEncryption, LeaveChannel, ReleaseChannel |
+| ProcessVideoRawData          | show how to setup raw video capture and render               | SetOnCaptureVideoFrameCallback, SetOnRenderVideoFrameCallback,  OnRenderVideoFrameHandler, OnCaptureVideoFrameHandler |
+| ProcessAudioRawData          | playback audio frames from the channel on an AudioSource object | RegisterAudioRawDataObserver, SetOnPlaybackAudioFrameCallback, OnPlaybackAudioFrameHandler |
+| RtmpStreaming                | stream video by RTMP Push to a CDN                           | SetVideoEncoderConfiguration, SetLiveTranscoding, AddPublishStreamUrl, RemovePublishStreamUrl |
+| JoinChannelVideoTokn         | demo on how to run Agora app with a token                    | RenewToken                                                   |
+| SendIndividualAudioStream    | playback single user's audio frame on an AudioSource object  | RegisterAudioRawDataObserver, SetOnPlaybackAudioFrameBeforeMixingCallback, OnPlaybackAudioFrameBeforeMixingHandler |
+| SetVideoEncoderConfiguration | video demo with multiple encoding dimension choice           | SetVideoEncoderConfiguration                                 |
 
 ## 运行示例程序
 首先在 [Agora.io 注册](https://dashboard.agora.io/cn/signup/) 注册账号，并创建自己的测试项目，获取到 AppID。
