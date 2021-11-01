@@ -67,7 +67,7 @@ public class AgoraScreenShare : MonoBehaviour
             externalVideoFrame.cropRight = 10;
             externalVideoFrame.cropBottom = 10;
             externalVideoFrame.rotation = 180;
-            externalVideoFrame.timestamp = i++;
+            externalVideoFrame.timestamp = System.DateTime.Now.Ticks / 10000;
             int a = rtc.PushVideoFrame(externalVideoFrame);
             Debug.Log("PushVideoFrame ret = " + a);
         }
