@@ -19,9 +19,9 @@ This project contains these scenes:
 
 | Demo                         | Description                                                  | APIs                                                         |
 | ---------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| ScreenShareApp               | sharing application screen view from Unity camera            | PushVideoFrame, SetExternalVideoSource                       |
+| ScreenShareOnMobile          | sharing application screen view from Unity camera            | PushVideoFrame, SetExternalVideoSource                       |
+| ScreenShareOnDesktop         | sharing desktop screen or individual windows                 | StartScreenCaptureByWindowId, StartScreenCaptureByDisplayId, StartScreenCaptureByScreenRect |
 | AudioMixing                  | audioMixing and play audio effect in the channel             | StartAudioMixing, PlayEffect                                 |
-| ScreenShareDesktop           | sharing desktop screen or individual windows                 | StartScreenCaptureByWindowId, StartScreenCaptureByDisplayId, StartScreenCaptureByScreenRect |
 | CustomRenderAudio            | use AudioSource to play raw data received in the Agora channel | PullAudioFrame                                               |
 | CustomCaptureAudio           | Sending raw data from AudioSource into the Agora channel     | PushAudioFrame                                               |
 | CustomCaptureFile            | feeding audio raw data using a file                          | PushAudioFrame                                               |
@@ -31,8 +31,8 @@ This project contains these scenes:
 | ProcessVideoRawData          | show how to setup raw video capture and render               | SetOnCaptureVideoFrameCallback, SetOnRenderVideoFrameCallback,  OnRenderVideoFrameHandler, OnCaptureVideoFrameHandler |
 | ProcessAudioRawData          | playback audio frames from the channel on an AudioSource object | RegisterAudioRawDataObserver, SetOnPlaybackAudioFrameCallback, OnPlaybackAudioFrameHandler |
 | RtmpStreaming                | stream video by RTMP Push to a CDN                           | SetVideoEncoderConfiguration, SetLiveTranscoding, AddPublishStreamUrl, RemovePublishStreamUrl |
-| JoinChannelVideoTokn         | demo on how to run Agora app with a token                    | RenewToken                                                   |
-| SendIndividualAudioStream    | playback single user's audio frame on an AudioSource object  | RegisterAudioRawDataObserver, SetOnPlaybackAudioFrameBeforeMixingCallback, OnPlaybackAudioFrameBeforeMixingHandler |
+| JoinChannelVideoToken        | demo on how to run Agora app with a token                    | RenewToken                                                   |
+| PlaybackAudioFrame           | playback single user's audio frame on an AudioSource object  | RegisterAudioRawDataObserver, SetOnPlaybackAudioFrameBeforeMixingCallback, OnPlaybackAudioFrameBeforeMixingHandler |
 | SetVideoEncoderConfiguration | video demo with multiple encoding dimension choice           | SetVideoEncoderConfiguration                                 |
 
 
