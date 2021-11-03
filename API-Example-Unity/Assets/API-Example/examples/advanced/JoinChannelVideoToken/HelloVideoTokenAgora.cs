@@ -77,7 +77,7 @@ public class HelloVideoTokenAgora : MonoBehaviour {
 
   void JoinChannel()
   {
-    if (channelToken.Length == 0) {
+    if (string.IsNullOrEmpty(channelToken)) {
       StartCoroutine(HelperClass.FetchToken(tokenBase, channelName, 0, this.RenewOrJoinToken));
       return;
     }
@@ -172,33 +172,10 @@ public class HelloVideoTokenAgora : MonoBehaviour {
             videoSurface.SetForUser(uid);
             videoSurface.SetEnable(true);
             videoSurface.SetVideoSurfaceType(AgoraVideoSurfaceType.RawImage);
-            videoSurface.SetGameFps(30);
         }
     }
 
-    // VIDEO TYPE 1: 3D Object
-    public VideoSurface makePlaneSurface(string goName)
-    {
-        GameObject go = GameObject.CreatePrimitive(PrimitiveType.Plane);
-
-        if (go == null)
-        {
-            return null;
-        }
-        go.name = goName;
-        // set up transform
-        go.transform.Rotate(-90.0f, 0.0f, 0.0f);
-        float yPos = Random.Range(3.0f, 5.0f);
-        float xPos = Random.Range(-2.0f, 2.0f);
-        go.transform.position = new Vector3(xPos, yPos, 0f);
-        go.transform.localScale = new Vector3(0.25f, 0.5f, .5f);
-
-        // configure videoSurface
-        VideoSurface videoSurface = go.AddComponent<VideoSurface>();
-        return videoSurface;
-    }
-
-    // Video TYPE 2: RawImage
+    // Create Video Surface on RawImage
     public VideoSurface makeImageSurface(string goName)
     {
         GameObject go = new GameObject();
