@@ -1,6 +1,5 @@
 using System;
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -22,7 +21,7 @@ namespace agora_utilities
       yield return request.SendWebRequest();
 
       if (request.isNetworkError || request.isHttpError) {
-        Debug.Log(request.error);
+        Debug.LogWarning("FetchToken: url = " + url + " error:" + request.error);
         callback(null);
         yield break;
       }
