@@ -2,7 +2,7 @@
 
 *Read this in other languages: [English](README.md)*
 
-## 概述
+## 简介
 
 这个开源示例项目演示了不同场景下，Agora SDK 的基本集成逻辑。 项目中每个 Scene 都是一个独立的场景，都可以成功独立运行。
 
@@ -45,15 +45,15 @@
 
 * Unity 2017 LTS 或以上
 
-#### 步骤
+#### 运行步骤
 
-首先在 [Agora.io 注册](https://dashboard.agora.io/cn/signup/) 注册账号，并创建自己的测试项目，获取到 AppID。
+* 首先在 [Agora.io 注册](https://dashboard.agora.io/cn/signup/) 注册账号，并创建自己的测试项目，获取到 AppID。
 
-然后在 [Agora.io SDK](https://docs.agora.io/cn/Agora%20Platform/downloads) 下载 **Unity SDK**，解压后
+* 然后在 [Agora.io SDK](https://docs.agora.io/cn/Agora%20Platform/downloads) 下载 **Unity SDK**，解压后把 sdk 包中的 samples/Hello-Video-Unity-Agora/Assets/AgoraEngine 文件夹拷贝到 API-Example-Unity/Assets 目录下。
 
-- 把 sdk 包中的 samples/Hello-Video-Unity-Agora/Assets/AgoraEngine 文件夹拷贝到 API-Example-Unity/Assets 目录下。
+* 最后使用 Unity 打开本项目, 选择想要运行的 Scene, 根据提示将 APPID 填入，然后运行程序。
 
-最后使用 Unity 打开本项目, 选择想要运行的 Scene, 根据提示将 APPID 填入，然后运行程序。
+* 一切就绪。你可以自由探索示例项目，体验 SDK 的丰富功能。
 
 
 
@@ -61,12 +61,7 @@
 
 如果您对示例项目有任何问题或建议，请随时提交问题。
 
-- 如果在集成中遇到问题, 你可以到 [开发者社区](https://dev.agora.io/cn/) 提问
-- 如果有售前咨询问题, 可以拨打 400 632 6626，或加入官方Q群 12742516 提问
-- 如果需要售后技术支持, 你可以在 [Agora Dashboard](https://dashboard.agora.io) 提交工单
-- 如果发现了示例代码的bug, 欢迎提交 [issue](https://github.com/AgoraIO/Hello-Unity3D-Agora/issues)
-
-## 参考
+## 参考文档
 
 - 您可以在 [文档中心](https://docs.agora.io/cn/Video/API%20Reference/unity/index.html)找到完整的API文档
 
@@ -74,13 +69,13 @@
 
 ## 相关资源
 
-- 查看[FAQ](https://docs.agora.io/en/faq) 查看您的问题是否已被记录
-- 更多教程可以在 [Agora SDK Samples](https://github.com/AgoraIO) 找到
-- 参考 [Agora Use Case](https://github.com/AgoraIO-usecase) 对于更复杂的实际用例
-- 开发者社区管理的文档库可在 [Agora Community](https://github.com/AgoraIO-Community)中找到
-
-- 如果您在集成过程中遇到问题，请在 [Stack Overflow](https://stackoverflow.com/questions/tagged/agora.io)中自由提问
+- 你可以先参阅[常见问题](https://docs.agora.io/cn/faq)
+- 如果你想了解更多官方示例，可以参考[官方 SDK 示例](https://github.com/AgoraIO)
+- 如果你想了解声网 SDK 在复杂场景下的应用，可以参考[官方场景案例](https://github.com/AgoraIO-usecase)
+- 如果你想了解声网的一些社区开发者维护的项目，可以查看[社区](https://github.com/AgoraIO-Community)
+- 若遇到问题需要开发者帮助，你可以到[开发者社区](https://rtcdeveloper.com/)提问
+- 如果需要售后技术支持, 你可以在[Agora Dashboard](https://dashboard.agora.io/)提交工单
 
 ## 代码许可
 
-The MIT License (MIT).
+示例项目遵守 MIT 许可证。
