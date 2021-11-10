@@ -1,31 +1,31 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
-using agora_gaming_rtc;
+using agora.rtc;
+using agora.util;
+using UnityEngine.Serialization;
+using Logger = agora.util.Logger;
 
 public class AudioMixing : MonoBehaviour
 {
-    [SerializeField]
-    string APP_ID = "YOUR_APPID";
-    
-    [SerializeField]
-    string TOKEN = "";
+    [FormerlySerializedAs("APP_ID")] [SerializeField]
+    private string appID = "";
 
-    [SerializeField]
-    string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
+    [FormerlySerializedAs("TOKEN")] [SerializeField]
+    private string token = "";
+
+    [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
+    private string channelName = "YOUR_CHANNEL_NAME";
 
     [SerializeField]
     string Sound_URL = "";
 
-    [SerializeField]
-    Toggle loopbackToggle;
-
     string localPath = "";
 
     public Text logText;
-    private Logger logger;
-    private IRtcEngine mRtcEngine = null;
-    private IAudioPlaybackDeviceManager manager = null;
-    const string SampleAudioSubpath = "/audio/Agora.io-Interactions.mp3";
+    internal Logger Logger;
+    private IAgoraRtcEngine _mRtcEngine = null;
+    private IAgoraRtcAudioPlaybackDeviceManager manager = null;
 
     // Start is called before the first frame update
     void Start()
@@ -44,23 +44,20 @@ public class AudioMixing : MonoBehaviour
 
     void CheckAppId()
     {
-        logger = new Logger(logText);
-        logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in Canvas!!!!!");
+        Logger = new Logger(logText);
+        Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in Canvas!!!!!");
     }
 
     void InitRtcEngine()
     {
-        mRtcEngine = IRtcEngine.GetEngine(APP_ID);
-        mRtcEngine.SetLogFile("log.txt");
-        //mRtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY,
-        //    AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
-        //mRtcEngine.EnableAudio();
-        mRtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
-        mRtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
-        mRtcEngine.OnWarning += OnSDKWarningHandler;
-        mRtcEngine.OnError += OnSDKErrorHandler;
-        mRtcEngine.OnConnectionLost += OnConnectionLostHandler;
-        
+        _mRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
+        UserEventHandler handler = new UserEventHandler(this);
+        RtcEngineContext context = new RtcEngineContext(handler, appID, null, true, 
+                                    CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
+                                    AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
+        var ret = _mRtcEngine.Initialize(context);
+        _mRtcEngine.InitEventHandler(handler);
+        _mRtcEngine.EnableAudio();
     }
     void SetupUI()
     { 
@@ -74,16 +71,16 @@ public class AudioMixing : MonoBehaviour
 
 #if UNITY_ANDROID && !UNITY_EDITOR
         // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
-        localPath = "/assets" + SampleAudioSubpath;
+        localPath = "/assets/audio/DESERTMUSIC.wav";
 #else
-        localPath = Application.streamingAssetsPath + SampleAudioSubpath;
+        localPath = Application.streamingAssetsPath + "/audio/" + "DESERTMUSIC.wav";
 #endif
-        logger.UpdateLog(string.Format("the audio file path: {0}", localPath));
+        Logger.UpdateLog(string.Format("the audio file path: {0}", localPath));
 
         EnableUI(false); // enable it after joining
     }
 
-    void EnableUI(bool enable)
+    internal void EnableUI(bool enable)
     { 
         MixingButton.enabled = enable;
         EffectButton.enabled = enable;
@@ -91,38 +88,34 @@ public class AudioMixing : MonoBehaviour
 
     void JoinChannel()
     {
-        mRtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
+        _mRtcEngine.JoinChannel(token, channelName);
     }
 
     #region -- Test Control logic ---
     void StartAudioMixing()
     {
         Debug.Log("Playing with " + ( _useURL? "URL" : "local file") );
-        bool bLoopback = loopbackToggle.isOn;
 
-        mRtcEngine.StartAudioMixing( filePath: _useURL? Sound_URL : localPath, 
-	                                 loopback: bLoopback, 
-				                      replace: true, 
-				                        cycle: -1, 
-					                 startPos: 0);
+        var ret = _mRtcEngine.StartAudioMixing( _useURL? Sound_URL : localPath, true, false, -1);
+        Debug.Log("StartAudioMixing returns: " + ret);
     }
 
-    void StartAudioPlaybackTest()
-    {
-        manager = mRtcEngine.GetAudioPlaybackDeviceManager();
-        manager.CreateAAudioPlaybackDeviceManager();
-        manager.StartAudioPlaybackDeviceTest(localPath);
-    }
+    // void StartAudioPlaybackTest()
+    // {
+    //     manager = _mRtcEngine.GetAudioPlaybackDeviceManager();
+    //     manager.CreateAAudioPlaybackDeviceManager();
+    //     manager.StartAudioPlaybackDeviceTest(localPath);
+    // }
     
     void PlayEffectTest () {
         Debug.Log("Playing with " + ( _useURL? "URL" : "local file") );
-        IAudioEffectManager effectManager = mRtcEngine.GetAudioEffectManager ();
-        effectManager.PlayEffect (1, _useURL? Sound_URL : localPath, 1, 1.0, 0, 100, true);
+        //IAudioEffectManager effectManager = _mRtcEngine.GetAudioEffectManager();
+        _mRtcEngine.PlayEffect(1, _useURL? Sound_URL : localPath, 1, 1.0, 0, 100, true);
     }
 
     void StopEffectTest() {
-        IAudioEffectManager effectManager = mRtcEngine.GetAudioEffectManager();
-        effectManager.StopAllEffects();
+        //IAudioEffectManager effectManager = _mRtcEngine.GetAudioEffectManager();
+        _mRtcEngine.StopAllEffects();
     }
 
     #endregion
@@ -132,44 +125,15 @@ public class AudioMixing : MonoBehaviour
         Debug.Log("OnApplicationQuit");
         if (manager != null)
         {
-            manager.StopAudioPlaybackDeviceTest();
-            manager.ReleaseAAudioPlaybackDeviceManager();
+            // manager.StopAudioPlaybackDeviceTest();
+            // manager.ReleaseAAudioPlaybackDeviceManager();
         }
-        if (mRtcEngine != null)
+        if (_mRtcEngine != null)
         {
-            IRtcEngine.Destroy();
+            _mRtcEngine.LeaveChannel();
+            _mRtcEngine.Dispose();
         }
     }
-
-    #region -- SDK callbacks ----
-    void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
-    {
-        logger.UpdateLog(string.Format("sdk version: {0}", IRtcEngine.GetSdkVersion()));
-        logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName, uid, elapsed));
-        EnableUI(true);
-    }
-
-    void OnLeaveChannelHandler(RtcStats stats)
-    {
-        logger.UpdateLog("OnLeaveChannelSuccess");
-    }
-
-    void OnSDKWarningHandler(int warn, string msg)
-    {
-        logger.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
-    }
-    
-    void OnSDKErrorHandler(int error, string msg)
-    {
-        logger.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
-    }
-    
-    void OnConnectionLostHandler()
-    {
-        logger.UpdateLog(string.Format("OnConnectionLost "));
-    }
-
-    #endregion
 
     #region -- Application UI Logic ---
     bool _isMixing = false;
@@ -178,13 +142,13 @@ public class AudioMixing : MonoBehaviour
     {
         if (_effectOn)
         {
-            logger.UpdateLog("Testing Effect right now, can't play effect...");
+            Logger.UpdateLog("Testing Effect right now, can't play effect...");
             return;
         }
 
         if (_isMixing)
         {
-            mRtcEngine.StopAudioMixing();
+            _mRtcEngine.StopAudioMixing();
         }
         else
         {
@@ -202,7 +166,7 @@ public class AudioMixing : MonoBehaviour
     {
         if (_isMixing)
         { 
-	        logger.UpdateLog("Testing Mixing right now, can't play effect...");
+	        Logger.UpdateLog("Testing Mixing right now, can't play effect...");
             return;
 	    }
 
@@ -228,3 +192,64 @@ public class AudioMixing : MonoBehaviour
 
     #endregion
 }
+
+internal class UserEventHandler : IAgoraRtcEngineEventHandler
+    {
+        private readonly AudioMixing _audioMixing;
+
+        internal UserEventHandler(AudioMixing audioMixing)
+        {
+            _audioMixing = audioMixing;
+        }
+
+        public override void OnWarning(int warn, string msg)
+        {
+            _audioMixing.Logger.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
+        }
+
+        public override void OnError(int err, string msg)
+        {
+            _audioMixing.Logger.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+        }
+
+        public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
+        {
+            // _audioSample.Logger.UpdateLog(string.Format("sdk version: ${0}",
+            //     _audioSample.AgoraRtcEngine.GetVersion()));
+            _audioMixing.Logger.UpdateLog(
+                string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", 
+                                connection.channelId, connection.localUid, elapsed));
+            _audioMixing.EnableUI(true);
+        }
+
+        public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
+        {
+            _audioMixing.Logger.UpdateLog("OnRejoinChannelSuccess");
+        }
+
+        public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
+        {
+            _audioMixing.Logger.UpdateLog("OnLeaveChannel");
+        }
+
+        public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
+        {
+            _audioMixing.Logger.UpdateLog("OnClientRoleChanged");
+        }
+
+        public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
+        {
+            _audioMixing.Logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+        }
+
+        public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
+        {
+            _audioMixing.Logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+                (int) reason));
+        }
+
+        public override void OnAudioMixingStateChanged(AUDIO_MIXING_STATE_TYPE state, AUDIO_MIXING_ERROR_TYPE errorCode)
+        {
+            _audioMixing.Logger.UpdateLog(string.Format("AUDIO_MIXING_STATE_TYPE: ${0}, AUDIO_MIXING_ERROR_TYPE: ${1}", state, errorCode));
+        }
+    }

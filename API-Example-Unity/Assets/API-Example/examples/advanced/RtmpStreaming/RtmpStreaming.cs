@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
-using agora_gaming_rtc;
-using agora_utilities;
+using agora.rtc;
+using agora.util;
+using Logger = agora.util.Logger;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
@@ -20,15 +17,14 @@ public class RtmpStreaming : MonoBehaviour
     [SerializeField] private string RTMP_URL = "";
 
     public Text logText;
-    private Logger logger;
-    private IRtcEngine mRtcEngine = null;
+    internal Logger Logger;
+    internal IAgoraRtcEngine _mRtcEngine = null;
     private const float Offset = 100;
-    private static string channelName = "Agora_Channel";
     private uint remoteUid = 0;
     private bool isStreaming = false;
 
     // Use this for initialization
-    void Start()
+    private void Start()
     {
         CheckAppId();
         InitEngine();
@@ -36,50 +32,46 @@ public class RtmpStreaming : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         PermissionHelper.RequestMicrophontPermission();
         PermissionHelper.RequestCameraPermission();
     }
 
-    void CheckAppId()
+    private void CheckAppId()
     {
-        logger = new Logger(logText);
-        logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+        Logger = new Logger(logText);
+        Logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
     }
 
-    void InitEngine()
+    private void InitEngine()
     {
-        mRtcEngine = IRtcEngine.GetEngine(APP_ID);
-        mRtcEngine.SetLogFile("log.txt");
-        mRtcEngine.SetChannelProfile(CHANNEL_PROFILE.CHANNEL_PROFILE_LIVE_BROADCASTING);
-        mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-        mRtcEngine.SetVideoEncoderConfiguration(new VideoEncoderConfiguration
+        _mRtcEngine = AgoraRtcEngine.CreateAgoraRtcEngine();
+        UserEventHandler handler = new UserEventHandler(this);
+        RtcEngineContext context = new RtcEngineContext(handler, APP_ID, null, true, 
+                                    CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
+                                    AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
+        _mRtcEngine.Initialize(context);
+        _mRtcEngine.InitEventHandler(new UserEventHandler(this));
+        _mRtcEngine.SetLogFile("./log.txt");
+
+        _mRtcEngine.SetChannelProfile(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING);
+        _mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+        _mRtcEngine.SetVideoEncoderConfiguration(new VideoEncoderConfiguration
         {
             dimensions = new VideoDimensions {width = 720, height = 640},
             frameRate = FRAME_RATE.FRAME_RATE_FPS_24
         });
-        mRtcEngine.EnableAudio();
-        mRtcEngine.EnableVideo();
-        mRtcEngine.EnableVideoObserver();
-        mRtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
-        mRtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
-        mRtcEngine.OnWarning += OnSDKWarningHandler;
-        mRtcEngine.OnError += OnSDKErrorHandler;
-        mRtcEngine.OnConnectionLost += OnConnectionLostHandler;
-        mRtcEngine.OnUserJoined += OnUserJoinedHandler;
-        mRtcEngine.OnUserOffline += OnUserOfflineHandler;
-        mRtcEngine.OnStreamPublished += OnStreamPublishedHandler;
-        mRtcEngine.OnRtmpStreamingStateChanged += OnRtmpStreamingStateChangedHandler;
-        mRtcEngine.OnRtmpStreamingEvent += OnRtmpStreamingEventHandler;
+        _mRtcEngine.EnableAudio();
+        _mRtcEngine.EnableVideo();
     }
 
-    void StartTranscoding(bool ifRemoteUser = false)
+    private void StartTranscoding(bool ifRemoteUser = false)
     {
         if (isStreaming && !ifRemoteUser) return;
         if (isStreaming && ifRemoteUser)
         {
-            mRtcEngine.RemovePublishStreamUrl(RTMP_URL);
+            _mRtcEngine.RemovePublishStreamUrl(RTMP_URL);
         }
         
         var lt = new LiveTranscoding();
@@ -92,7 +84,7 @@ public class RtmpStreaming : MonoBehaviour
         lt.audioBitrate = 48;
         lt.audioChannels = 1;
         lt.audioCodecProfile = AUDIO_CODEC_PROFILE_TYPE.AUDIO_CODEC_PROFILE_LC_AAC;
-        lt.liveStreamAdvancedFeatures = new LiveStreamAdvancedFeature[0];
+        //lt.liveStreamAdvancedFeatures = new LiveStreamAdvancedFeature[0];
         
         var localUesr = new TranscodingUser()
         {
@@ -130,88 +122,31 @@ public class RtmpStreaming : MonoBehaviour
             lt.transcodingUsers = new[] {localUesr};
         }
         
-        mRtcEngine.SetLiveTranscoding(lt);
+        _mRtcEngine.SetLiveTranscoding(lt);
 
-        var rc = mRtcEngine.AddPublishStreamUrl(RTMP_URL, true);
-        if (rc == 0) logger.UpdateLog(string.Format("Error in AddPublishStreamUrl: {0}", RTMP_URL));
+        var rc = _mRtcEngine.AddPublishStreamUrl(RTMP_URL, true);
+        if (rc == 0) Logger.UpdateLog(string.Format("Error in AddPublishStreamUrl: {0}", RTMP_URL));
     }
 
-    void JoinChannel()
+    private void JoinChannel()
     {
-        mRtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
+        _mRtcEngine.JoinChannel(TOKEN, CHANNEL_NAME, "");
     }
 
-    void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
-    {
-        logger.UpdateLog(string.Format("sdk version: ${0}", IRtcEngine.GetSdkVersion()));
-        logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName,
-            uid, elapsed));
-        makeVideoView(0);
-        StartTranscoding();
-    }
-
-    void OnLeaveChannelHandler(RtcStats stats)
-    {
-        logger.UpdateLog("OnLeaveChannelSuccess");
-        DestroyVideoView(0);
-    }
-
-    void OnUserJoinedHandler(uint uid, int elapsed)
-    {
-        if (remoteUid == 0) remoteUid = uid;
-        StartTranscoding(true);
-        logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-        makeVideoView(uid);
-    }
-
-    void OnUserOfflineHandler(uint uid, USER_OFFLINE_REASON reason)
-    {
-        remoteUid = 0;
-        logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid, (int) reason));
-        DestroyVideoView(uid);
-    }
-
-    void OnSDKWarningHandler(int warn, string msg)
-    {
-        logger.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
-    }
-
-    void OnSDKErrorHandler(int error, string msg)
-    {
-        logger.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
-    }
-
-    void OnConnectionLostHandler()
-    {
-        logger.UpdateLog("OnConnectionLost ");
-    }
-
-    void OnStreamPublishedHandler(string url, int error)
-    {
-        logger.UpdateLog(string.Format("OnStreamPublished url: {0}, error : {1}", url, error));
-    }
-
-    void OnRtmpStreamingStateChangedHandler(string url, RTMP_STREAM_PUBLISH_STATE state, RTMP_STREAM_PUBLISH_ERROR code)
-    {
-        logger.UpdateLog(string.Format("OnRtmpStreamingStateChanged url: {0}, state: {1}, code: {2}", url, state,
-            code));
-    }
-
-    void OnRtmpStreamingEventHandler(string url, RTMP_STREAMING_EVENT code)
-    {
-        logger.UpdateLog(string.Format("OnRtmpStreamingEvent url: {0}, code: {1}", url, code));
-    }
-
-    void OnApplicationQuit()
+    private void OnApplicationQuit()
     {
         Debug.Log("OnApplicationQuit");
-        if (mRtcEngine != null)
+        if (_mRtcEngine != null)
         {
-            mRtcEngine.RemovePublishStreamUrl(RTMP_URL);
-            mRtcEngine.LeaveChannel();
-            mRtcEngine.DisableVideoObserver();
-            IRtcEngine.Destroy();
+            _mRtcEngine.RemovePublishStreamUrl(RTMP_URL);
+            _mRtcEngine.LeaveChannel();
+            _mRtcEngine.Dispose();
         }
+    }
+    
+    internal string GetChannelName()
+    {
+        return CHANNEL_NAME;
     }
 
     private void DestroyVideoView(uint uid)
@@ -223,7 +158,7 @@ public class RtmpStreaming : MonoBehaviour
         }
     }
 
-    private void makeVideoView(uint uid)
+    private void MakeVideoView(uint uid, string channelId = "")
     {
         GameObject go = GameObject.Find(uid.ToString());
         if (!ReferenceEquals(go, null))
@@ -232,19 +167,17 @@ public class RtmpStreaming : MonoBehaviour
         }
 
         // create a GameObject and assign to this new user
-        VideoSurface videoSurface = makeImageSurface(uid.ToString());
+        AgoraVideoSurface videoSurface = makeImageSurface(uid.ToString());
         if (!ReferenceEquals(videoSurface, null))
         {
             // configure videoSurface
-            videoSurface.SetForUser(uid);
+            videoSurface.SetForUser(uid, channelId);
             videoSurface.SetEnable(true);
-            videoSurface.SetVideoSurfaceType(AgoraVideoSurfaceType.RawImage);
-            videoSurface.SetGameFps(30);
         }
     }
 
     // VIDEO TYPE 1: 3D Object
-    public VideoSurface makePlaneSurface(string goName)
+    public AgoraVideoSurface makePlaneSurface(string goName)
     {
         GameObject go = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
@@ -262,12 +195,12 @@ public class RtmpStreaming : MonoBehaviour
         go.transform.localScale = new Vector3(0.25f, 0.5f, .5f);
 
         // configure videoSurface
-        VideoSurface videoSurface = go.AddComponent<VideoSurface>();
+        AgoraVideoSurface videoSurface = go.AddComponent<AgoraVideoSurface>();
         return videoSurface;
     }
 
     // Video TYPE 2: RawImage
-    public VideoSurface makeImageSurface(string goName)
+    public AgoraVideoSurface makeImageSurface(string goName)
     {
         GameObject go = new GameObject();
 
@@ -301,7 +234,78 @@ public class RtmpStreaming : MonoBehaviour
         go.transform.localScale = new Vector3(3f, 4f, 1f);
 
         // configure videoSurface
-        VideoSurface videoSurface = go.AddComponent<VideoSurface>();
+        AgoraVideoSurface videoSurface = go.AddComponent<AgoraVideoSurface>();
         return videoSurface;
+    }
+    
+    internal class UserEventHandler : IAgoraRtcEngineEventHandler
+    {
+        private readonly RtmpStreaming _rtmpStreaming;
+
+        internal UserEventHandler(RtmpStreaming rtmpStreaming)
+        {
+            _rtmpStreaming = rtmpStreaming;
+        }
+
+        public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
+        {
+            //_rtmpStreaming.Logger.UpdateLog(string.Format("sdk version: ${0}", _rtmpStreaming.mRtcEngine.GetVersion()));
+            _rtmpStreaming.Logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
+                connection.localUid, elapsed));
+            _rtmpStreaming.MakeVideoView(0, _rtmpStreaming.GetChannelName());
+            _rtmpStreaming.StartTranscoding();
+        }
+
+        public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
+        {
+            _rtmpStreaming.Logger.UpdateLog("OnLeaveChannelSuccess");
+            _rtmpStreaming.DestroyVideoView(0);
+        }
+
+        public override void OnUserJoined(RtcConnection connection, uint remoteUid, int elapsed)
+        {
+            if (_rtmpStreaming.remoteUid == 0) _rtmpStreaming.remoteUid = remoteUid;
+            _rtmpStreaming.StartTranscoding(true);
+            _rtmpStreaming.Logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", connection.localUid, elapsed));
+            _rtmpStreaming.MakeVideoView(connection.localUid, _rtmpStreaming.GetChannelName());
+        }
+
+        public override void OnUserOffline(RtcConnection connection, uint remoteUid, USER_OFFLINE_REASON_TYPE reason)
+        {
+            _rtmpStreaming.remoteUid = 0;
+            _rtmpStreaming.Logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", remoteUid, (int) reason));
+            _rtmpStreaming.DestroyVideoView(remoteUid);
+        }
+
+        public override void OnWarning(int warn, string msg)
+        {
+            _rtmpStreaming.Logger.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
+        }
+
+        public override void OnError(int error, string msg)
+        {
+            _rtmpStreaming.Logger.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
+        }
+
+        public override void OnConnectionLost(RtcConnection connection)
+        {
+            _rtmpStreaming.Logger.UpdateLog("OnConnectionLost ");
+        }
+
+        public override void OnStreamPublished(string url, int error)
+        {
+            _rtmpStreaming.Logger.UpdateLog(string.Format("OnStreamPublished url: {0}, error : {1}", url, error));
+        }
+
+        public override void OnRtmpStreamingStateChanged(string url, RTMP_STREAM_PUBLISH_STATE state, RTMP_STREAM_PUBLISH_ERROR code)
+        {
+            _rtmpStreaming.Logger.UpdateLog(string.Format("OnRtmpStreamingStateChanged url: {0}, state: {1}, code: {2}", url, state,
+                code));
+        }
+
+        // public override void OnRtmpStreamingEvent(string url, RTMP_STREAMING_EVENT code)
+        // {
+        //     _rtmpStreaming.Logger.UpdateLog(string.Format("OnRtmpStreamingEvent url: {0}, code: {1}", url, code));
+        // }
     }
 }

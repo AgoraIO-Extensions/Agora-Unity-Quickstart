@@ -1,5 +1,6 @@
 using System;
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -8,7 +9,7 @@ public class TokenObject {
   public string rtcToken;
 }
 
-namespace agora_utilities
+namespace agora.util
 {
   public static class HelperClass
   {
@@ -21,7 +22,7 @@ namespace agora_utilities
       yield return request.SendWebRequest();
 
       if (request.isNetworkError || request.isHttpError) {
-        Debug.LogWarning("FetchToken: url = " + url + " error:" + request.error);
+        Debug.Log(request.error);
         callback(null);
         yield break;
       }
