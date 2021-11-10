@@ -1,4 +1,4 @@
-# API-Example_Unity
+# API-Example-Unity
 
 *Read this in other languages: [English](README.md)*
 
