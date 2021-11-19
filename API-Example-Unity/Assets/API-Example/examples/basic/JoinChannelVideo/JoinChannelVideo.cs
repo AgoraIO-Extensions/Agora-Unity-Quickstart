@@ -187,7 +187,6 @@ namespace JoinChannelVideo
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            _videoSample.isJoinChannel = true;
             // _videoSample.Logger.UpdateLog(string.Format("sdk version: ${0}",
             //     _videoSample.AgoraRtcEngine.GetVersion()));
             _videoSample.Logger.UpdateLog(
@@ -204,7 +203,6 @@ namespace JoinChannelVideo
 
         public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
         {
-            _videoSample.isJoinChannel = false;
             _videoSample.Logger.UpdateLog("OnLeaveChannel");
             JoinChannelVideo.DestroyVideoView(0);
         }
