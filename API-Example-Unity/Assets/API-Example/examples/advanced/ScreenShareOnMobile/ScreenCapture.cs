@@ -83,7 +83,7 @@ public class ScreenCapture : MonoBehaviour
 
         _mRtcEngine.InitEventHandler(new UserEventHandler(this));
         _mRtcEngine.SetLogFile("./log.txt");
-        var ret = _mRtcEngine.SetExternalVideoSource(true, false);
+        var ret = _mRtcEngine.SetExternalVideoSource(true, false, false, new EncodedVideoTrackOptions());
         Debug.Log("SetExternalVideoSource returns:" + ret);
     }
 
