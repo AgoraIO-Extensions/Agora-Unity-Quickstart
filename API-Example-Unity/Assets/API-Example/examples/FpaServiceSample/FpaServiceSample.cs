@@ -193,7 +193,7 @@ public class FpaServiceSample : MonoBehaviour
 
     private void DownloadFile(string url, ushort port)
     {
-        DownLoaderEnum down;
+        DownLoaderEnum down = new DownLoaderEnum("", "");
 #if UNITY_ANDROID
         down = new DownLoaderEnum(url, "/storage/emulated/0/Android/data/test_fpa/");
 #elif UNITY_IOS
