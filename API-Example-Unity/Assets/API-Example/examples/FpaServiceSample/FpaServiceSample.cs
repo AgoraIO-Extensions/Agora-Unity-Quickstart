@@ -26,6 +26,7 @@ public class FpaServiceSample : MonoBehaviour
     private Button _downloadButton2;
     private Button _downloadButton3; 
     private Button _downloadButton4;
+    private Button _updatePortButton;
     private InputField field;
 
     internal IAgoraFpaProxyService _mFpaProxyService = null;
@@ -88,6 +89,8 @@ public class FpaServiceSample : MonoBehaviour
         _downloadButton3.onClick.AddListener(onDownloadButton3Press);
         _downloadButton4 = GameObject.Find("DownloadButton4").GetComponent<Button>();
         _downloadButton4.onClick.AddListener(onDownloadButton4Press);
+        _updatePortButton = GameObject.Find("PortButton").GetComponent<Button>();
+        _updatePortButton.onClick.AddListener(onUpdatePortButtonPress);
         field = GameObject.Find("InputField").GetComponent<InputField>();
     }
 
@@ -189,6 +192,12 @@ public class FpaServiceSample : MonoBehaviour
             GetTransparentProxyPort(_fpaChainInfo5);
             DownloadFile(DownlaodUrl3, proxy_port);
         }
+    }
+
+    private void onUpdatePortButtonPress()
+    {
+        _mFpaProxyService.GetHttpProxyPort(ref port);
+        InfoLogger.UpdateLog(string.Format("AgoraFpaUnityLog: HttpProxyPort: {0}", port));
     }
 
     private void DownloadFile(string url, ushort port)
