@@ -56,7 +56,7 @@ public class FpaServiceSample : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ServicePointManager.DefaultConnectionLimit = 60;
+        ServicePointManager.DefaultConnectionLimit = 512;
         ThreadPool.SetMinThreads(200, 200);
         SetUpUI();
         CheckAppId();
@@ -161,6 +161,7 @@ public class FpaServiceSample : MonoBehaviour
         call_number = Convert.ToInt32(field.text);
         for (int i = 0; i < call_number; i++)
         {
+            GetHttpProxyPort();
             DownloadFile(DownlaodUrl1, port);
         }
     }
@@ -170,6 +171,7 @@ public class FpaServiceSample : MonoBehaviour
         call_number = Convert.ToInt32(field.text);
         for (int i = 0; i < call_number; i++)
         {
+            GetHttpProxyPort();
             DownloadFile(DownlaodUrl2, port);
         }
     }
