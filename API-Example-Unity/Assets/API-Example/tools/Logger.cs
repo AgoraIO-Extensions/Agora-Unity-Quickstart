@@ -37,5 +37,10 @@ namespace agora.util
             Debug.Assert(condition, message);
             return true;
         }
+
+        public void ClearLog()
+        {
+            text.text = "";
+        }
     }
 }

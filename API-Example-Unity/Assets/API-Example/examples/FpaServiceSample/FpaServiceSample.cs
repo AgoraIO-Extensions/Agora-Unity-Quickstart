@@ -26,11 +26,10 @@ public class FpaServiceSample : MonoBehaviour
     private Button _downloadButton2;
     private Button _downloadButton3; 
     private Button _downloadButton4;
-    private Button _updatePortButton;
     private InputField field;
+    private Toggle StartFpaToggle;
 
     internal IAgoraFpaProxyService _mFpaProxyService = null;
-    
     
     private FpaChainInfo _fpaChainInfo1 = new FpaChainInfo("www.qq.com", 80, 259, true);
     private FpaChainInfo _fpaChainInfo2 = new FpaChainInfo("frank-web-demo.rtns.sd-rtn.com", 30113, 254, true);
@@ -89,9 +88,12 @@ public class FpaServiceSample : MonoBehaviour
         _downloadButton3.onClick.AddListener(onDownloadButton3Press);
         _downloadButton4 = GameObject.Find("DownloadButton4").GetComponent<Button>();
         _downloadButton4.onClick.AddListener(onDownloadButton4Press);
-        _updatePortButton = GameObject.Find("PortButton").GetComponent<Button>();
-        _updatePortButton.onClick.AddListener(onUpdatePortButtonPress);
+
         field = GameObject.Find("InputField").GetComponent<InputField>();
+        
+        StartFpaToggle = GameObject.Find("StartFpaToggle").GetComponent<Toggle>();
+        StartFpaToggle.onValueChanged.AddListener(onFpaToggle);
+        StartFpaToggle.isOn = true;
     }
 
     private void InitFpaService()
@@ -104,6 +106,16 @@ public class FpaServiceSample : MonoBehaviour
             return;
         }
         
+        //set AgoraFpaProxyServiceEventHandler
+        _mFpaProxyService.InitEventHandler(new UserEventHandler(this));
+
+        StartFpaService();
+    }
+
+    private void StartFpaService()
+    {
+        InfoLogger.UpdateLog(string.Format("=========StartFpaService========="));
+        
         //start FpaProxyService
         FpaProxyServiceConfig config = new FpaProxyServiceConfig();
         config.app_id = appID;
@@ -112,16 +124,22 @@ public class FpaServiceSample : MonoBehaviour
         Debug.Log("AgoraFpaUnityLog: AgoraFpaProxyService.Start returns " + ret);
         InfoLogger.UpdateLog(string.Format("SDK Version: {0}", _mFpaProxyService.GetAgoraFpaProxyServiceSdkVersion()));
         InfoLogger.UpdateLog(string.Format("SDK Info: {0}", _mFpaProxyService.GetAgoraFpaProxyServiceSdkBuildInfo()));
-        
-        //set AgoraFpaProxyServiceEventHandler
-        _mFpaProxyService.InitEventHandler(new UserEventHandler(this));
-        
+
         //set HttpProxyChainConfig
         FpaHttpProxyChainConfig http_config = new FpaHttpProxyChainConfig();
         http_config.chain_array = new FpaChainInfo[3]{_fpaChainInfo1, _fpaChainInfo2, _fpaChainInfo3};
         http_config.chain_array_size = 3;
         ret = _mFpaProxyService.SetOrUpdateHttpProxyChainConfig(http_config);
         Debug.Log("AgoraFpaUnityLog: AgoraFpaProxyService.SetOrUpdateHttpProxyChainConfig returns: " + ret);
+    }
+
+    private void StopFpaService()
+    {
+        InfoLogger.UpdateLog(string.Format("=========StopFpaService========="));
+        
+        //stop FpaProxyService
+        var ret = _mFpaProxyService.Stop();
+        Debug.Log("AgoraFpaUnityLog: AgoraFpaProxyService.Stop returns " + ret);
     }
     
     private void GetHttpProxyPort()
@@ -144,15 +162,12 @@ public class FpaServiceSample : MonoBehaviour
         InfoLogger.UpdateLog(string.Format("DiagnosisInfo_install_id: {0}, DiagnosisInfo_instance_id: {1}", info.install_id, info.instance_id));
     }
     
+    
     private void OnApplicationQuit()
     {
         Debug.Log("AgoraFpaUnityLog: OnApplicationQuit");
         if (_mFpaProxyService == null) return;
-        
-        //stop FpaProxyService
-        var ret = _mFpaProxyService.Stop();
-        Debug.Log("AgoraFpaUnityLog: AgoraFpaProxyService.Stop returns " + ret);
-        
+        StopFpaService();
         _mFpaProxyService.Dispose();
     }
 
@@ -196,11 +211,25 @@ public class FpaServiceSample : MonoBehaviour
         }
     }
 
-    private void onUpdatePortButtonPress()
+    private void onFpaToggle(bool isStart)
     {
-        _mFpaProxyService.GetHttpProxyPort(ref port);
-        InfoLogger.UpdateLog(string.Format("AgoraFpaUnityLog: HttpProxyPort: {0}", port));
+        if (_mFpaProxyService == null) return;
+        if (isStart)
+        {
+            StartFpaService();
+        }
+        else
+        {
+            StopFpaService();
+        }
     }
+
+    public void onClearButtonPress()
+    {
+        Logger.ClearLog();
+        InfoLogger.ClearLog();
+    }
+    
 
     private void DownloadFile(string url, ushort port)
     {
@@ -224,11 +253,24 @@ public class FpaServiceSample : MonoBehaviour
             _serviceSample = serviceSample;
         }
 
-        public override void OnProxyEvent(FPA_PROXY_EVENT @event, FpaProxyConnectionInfo connection_info, FPA_ERROR_CODE err)
+        public override void OnAccelerationSuccess(FpaProxyConnectionInfo info)
         {
-            _serviceSample.Logger.UpdateLog(string.Format("OnProxyEvent event: {0}, errcode: {1}", @event, err));
-            _serviceSample.Logger.UpdateLog(string.Format("OnProxyEvent FpaProxyConnectionInfo connection_id: {0}, dst_ip_or_domain: {1}, dst_port: {2}, local_port: {3}, proxy_type: {4}", 
-                connection_info.connection_id, connection_info.dst_ip_or_domain, connection_info.dst_port, connection_info.local_port, connection_info.proxy_type));
+            _serviceSample.Logger.UpdateLog("OnAccelerationSuccess");
+        }
+
+        public override void OnConnected(FpaProxyConnectionInfo info)
+        {
+            _serviceSample.Logger.UpdateLog("OnConnected");
+        }
+
+        public override void OnDisconnectedAndFallback(FpaProxyConnectionInfo info, FPA_FAILED_REASON_CODE reason)
+        {
+            _serviceSample.Logger.UpdateLog(string.Format("OnDisconnectedAndFallback, reason: {0}", reason));
+        }
+
+        public override void OnConnectionFailed(FpaProxyConnectionInfo info, FPA_FAILED_REASON_CODE reason)
+        {
+            _serviceSample.Logger.UpdateLog(string.Format("OnConnectionFailed, reason: {0}", reason));
         }
     }
 }
