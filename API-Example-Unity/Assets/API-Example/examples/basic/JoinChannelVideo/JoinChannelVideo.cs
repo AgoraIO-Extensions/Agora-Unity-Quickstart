@@ -52,9 +52,10 @@ namespace JoinChannelVideo
             RtcEngineContext context = new RtcEngineContext(handler, appID, null, true, 
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            _mRtcEngine.Initialize(context);
+            var ret = _mRtcEngine.Initialize(context);
+            Debug.Log("Agora: Initialize " + ret);
             _mRtcEngine.InitEventHandler(handler);
-            _mRtcEngine.SetLogFile("./log.txt");
+            //_mRtcEngine.SetLogFile("./log.txt");
         }
 
         private void JoinChannel()
@@ -62,7 +63,9 @@ namespace JoinChannelVideo
             _mRtcEngine.EnableAudio();
             _mRtcEngine.EnableVideo();
             _mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            _mRtcEngine.JoinChannel(token, channelName);
+            var ret = _mRtcEngine.SetVideoEncoderConfiguration(new VideoEncoderConfiguration { dimensions = new VideoDimensions { height = 2160, width = 4096} });
+            ret = _mRtcEngine.JoinChannel(token, channelName);
+            Debug.Log("Agora: JoinChannel " + ret);
         }
 
         private void OnApplicationQuit()
@@ -90,7 +93,13 @@ namespace JoinChannelVideo
             var videoSurface = MakeImageSurface(uid.ToString());
             if (ReferenceEquals(videoSurface, null)) return;
             // configure videoSurface
-            videoSurface.SetForUser(uid, channelId);
+            if (uid == 0)
+            {
+                videoSurface.SetForUser(uid, channelId);
+            } else
+            {
+                videoSurface.SetForUser(uid, channelId, VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE);
+            }
             videoSurface.SetEnable(true);
         }
 
@@ -187,6 +196,7 @@ namespace JoinChannelVideo
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
+            Debug.Log("Agora: OnJoinChannelSuccess ");
             // _videoSample.Logger.UpdateLog(string.Format("sdk version: ${0}",
             //     _videoSample.AgoraRtcEngine.GetVersion()));
             _videoSample.Logger.UpdateLog(

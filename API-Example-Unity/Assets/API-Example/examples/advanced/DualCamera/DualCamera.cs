@@ -246,10 +246,13 @@ namespace DualCamera {
             Debug.Log("PrimaryCamera: " + config1.deviceId);
             config1.format = new VideoFormat();
 
-            config2 = new CameraCapturerConfiguration();
-            config2.deviceId = _videoDeviceInfos[1].deviceId;
-            Debug.Log("SecondaryCamera: " + config2.deviceId);
-            config2.format = new VideoFormat();
+            if (_videoDeviceInfos.Length > 1)
+            {
+                config2 = new CameraCapturerConfiguration();
+                config2.deviceId = _videoDeviceInfos[1].deviceId;
+                Debug.Log("SecondaryCamera: " + config2.deviceId);
+                config2.format = new VideoFormat();
+            }
         }
     }
 

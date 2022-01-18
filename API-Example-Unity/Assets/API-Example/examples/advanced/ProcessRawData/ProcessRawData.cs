@@ -140,15 +140,14 @@ public class ProcessRawData : MonoBehaviour {
 	    {
 		    _agoraVideoRawData = agoraVideoRawData;
 	    }
-	    
-	    public override bool OnCaptureVideoFrame(VideoFrame videoFrame, VideoSourceType source_type)
-	    {
-		    //logger.UpdateLog(string.Format("OnCaptureVideoFrameHandler  width: ${1}, height: ${2}", videoFrame.width, videoFrame.height));
-		    Debug.Log("OnCaptureVideoFrame--------------");
-		    return true;
-	    }
 
-	    public override bool OnRenderVideoFrame(uint uid, VideoFrame videoFrame)
+        public override bool OnCaptureVideoFrame(VideoFrame videoFrame, VideoFrameBufferConfig config)
+        {
+            Debug.Log("OnCaptureVideoFrame-----------");
+            return true;
+        }
+
+        public override bool OnRenderVideoFrame(uint uid, VideoFrame videoFrame)
 	    {
 		    //logger.UpdateLog(string.Format("OnRenderVideoFrameHandler uid: ${0}, width: ${1}, height: ${2}", uid, videoFrame.width, videoFrame.height));
 		    Debug.Log("OnRenderVideoFrameHandler-----------");
