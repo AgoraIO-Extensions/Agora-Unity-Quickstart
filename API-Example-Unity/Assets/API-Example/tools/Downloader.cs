@@ -32,6 +32,7 @@ namespace agora.util
             HttpWebRequest request = null;
             HttpWebResponse response = null;
             DateTime timeBeforeDownload;
+            string filename = Guid.NewGuid().ToString() + ".txt";
 
             try
             {
@@ -42,6 +43,7 @@ namespace agora.util
 
                 if ((down as DownLoaderEnum).enableFpa)
                 {
+                    Debug.Log("AgoraFpaUnityLog：set proxy");
                     WebProxy proxyObject = new WebProxy("127.0.0.1", port);
                     request.Proxy = proxyObject;
                 }
@@ -55,7 +57,7 @@ namespace agora.util
                 if (!Directory.Exists(dir))
                     Directory.CreateDirectory(dir);
                 //文件写入路径
-                FileStream file = new FileStream((down as DownLoaderEnum).path + "1.txt", FileMode.OpenOrCreate, FileAccess.Write);
+                FileStream file = new FileStream((down as DownLoaderEnum).path + filename, FileMode.OpenOrCreate, FileAccess.Write);
                 //返回内容总长度
                 int max = (int)response.ContentLength;
                 int len = 0;
@@ -69,10 +71,12 @@ namespace agora.util
                     file.Write(data, 0, _len);
                     len += _len;
                 }
+
                 file.Close();
                 stream.Close();
                 
                 Debug.Log("AgoraFpaUnityLog: 下载完成, 用时：" + ((TimeSpan)(DateTime.Now - timeBeforeDownload)).TotalMilliseconds + "ms");
+                File.Delete((down as DownLoaderEnum).path + filename);
             }
             catch (Exception ex)
             {
