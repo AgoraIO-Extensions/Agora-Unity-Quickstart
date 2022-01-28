@@ -51,6 +51,7 @@ public class FpaServiceSample : MonoBehaviour
     ushort proxy_port = 0;
     public static int download_state = 0;
     private int call_number = 1;
+    private bool enableFpa = true;
     
     // Start is called before the first frame update
     void Start()
@@ -213,6 +214,7 @@ public class FpaServiceSample : MonoBehaviour
 
     private void onFpaToggle(bool isStart)
     {
+        enableFpa = isStart;
         if (_mFpaProxyService == null) return;
         if (isStart)
         {
@@ -233,11 +235,11 @@ public class FpaServiceSample : MonoBehaviour
 
     private void DownloadFile(string url, ushort port)
     {
-        DownLoaderEnum down = new DownLoaderEnum("", "");
+        DownLoaderEnum down = new DownLoaderEnum("", "", enableFpa);
 #if UNITY_ANDROID
-        down = new DownLoaderEnum(url, "/storage/emulated/0/Android/data/test_fpa/");
+        down = new DownLoaderEnum(url, Application.persistentDataPath + "/test_fpa/", enableFpa);
 #elif UNITY_IOS
-        down = new DownLoaderEnum(url, Application.persistentDataPath + "/test_fpa/");
+        down = new DownLoaderEnum(url, Application.persistentDataPath + "/test_fpa/", enableFpa);
 #endif
         HttpDownload download = new HttpDownload();
         download.port = port;

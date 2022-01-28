@@ -14,10 +14,12 @@ namespace agora.util
     {
         public string url;
         public string path;
-        public DownLoaderEnum(string URL, string PATH)
+        public bool enableFpa;
+        public DownLoaderEnum(string URL, string PATH, bool enableFpa)
         {
-            url = URL;
-            path = PATH;
+            this.url = URL;
+            this.path = PATH;
+            this.enableFpa = enableFpa;
         }
     }
  
@@ -27,52 +29,50 @@ namespace agora.util
 
         public void HttpDownloader(object down)
         {
-            // if (!Directory.Exists((down as DownLoaderEnum).path))
-            //     Directory.CreateDirectory((down as DownLoaderEnum).path);
-            // string tempPath = System.IO.Path.GetDirectoryName((down as DownLoaderEnum).path) + @"\temp";
-            // Debug.Log("AgoraFpaUnityLog：tempPath" + tempPath);
-            // System.IO.Directory.CreateDirectory(tempPath);
-            // string tempFile = tempPath + @"\" + System.IO.Path.GetFileName((down as DownLoaderEnum).path) + ".temp";
-     
-            // if (System.IO.File.Exists(tempFile))
-            // {
-            //     System.IO.File.Delete(tempFile);
-            // }
             HttpWebRequest request = null;
             HttpWebResponse response = null;
+            DateTime timeBeforeDownload;
+
             try
             {
+                timeBeforeDownload = DateTime.Now;
+                
                 Debug.Log("AgoraFpaUnityLog：下载准备");
-                WebProxy proxyObject = new WebProxy("127.0.0.1", port);
                 request = WebRequest.Create((down as DownLoaderEnum).url) as HttpWebRequest;
-                request.Proxy = proxyObject;
-                response = request.BeginGetResponse(null, null) as HttpWebResponse;
+
+                if ((down as DownLoaderEnum).enableFpa)
+                {
+                    WebProxy proxyObject = new WebProxy("127.0.0.1", port);
+                    request.Proxy = proxyObject;
+                }
+
+                //以下为接收响应的方法
+                response = (HttpWebResponse) request.GetResponse();
+                //创建接收流
+                Stream stream = response.GetResponseStream();
                 
-                //FileStream fs = new FileStream(tempFile, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
-                //直到request.GetResponse()程序才开始向目标网页发送Post请求
-                // Stream responseStream = response.GetResponseStream();
-                //创建本地文件写入流
-                //Stream stream = new FileStream(tempFile, FileMode.Create);
-                //  byte[] bArr = new byte[1024];
-                //  int size = responseStream.Read(bArr, 0, (int)bArr.Length);
-                //  Debug.Log("size=" + size);
-                //  while (size > 0)
-                //  {
-                //      //stream.Write(bArr, 0, size);
-                //      fs.Write(bArr, 0, size);
-                //      size = responseStream.Read(bArr, 0, (int)bArr.Length);
-                //  }
-                //  //stream.Close();
-                //  fs.Close();
-                //  responseStream.Close();
-                //  string suffixName = (down as DownLoaderEnum).url;
-                //  int su = suffixName.LastIndexOf('/');
-                //  suffixName = (down as DownLoaderEnum).path+suffixName.Substring(su);
-                // // Debug.LogError(suffixName);
-                //  System.IO.File.Move(tempFile, suffixName);
-                // return true;
+                string dir = (down as DownLoaderEnum).path.Substring(0, (down as DownLoaderEnum).path.LastIndexOf("/"));
+                if (!Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
+                //文件写入路径
+                FileStream file = new FileStream((down as DownLoaderEnum).path + "1.txt", FileMode.OpenOrCreate, FileAccess.Write);
+                //返回内容总长度
+                int max = (int)response.ContentLength;
+                int len = 0;
+                while (len < max)
+                {
+                    //byte容器
+                    byte[] data = new byte[10240000];
+                    //循环读取
+                    int _len = stream.Read(data, 0, data.Length);
+                    //写入文件
+                    file.Write(data, 0, _len);
+                    len += _len;
+                }
+                file.Close();
+                stream.Close();
                 
-                Debug.Log("AgoraFpaUnityLog: 下载完成");
+                Debug.Log("AgoraFpaUnityLog: 下载完成, 用时：" + ((TimeSpan)(DateTime.Now - timeBeforeDownload)).TotalMilliseconds + "ms");
             }
             catch (Exception ex)
             {
