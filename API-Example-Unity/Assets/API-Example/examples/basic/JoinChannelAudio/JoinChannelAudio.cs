@@ -423,7 +423,7 @@ namespace JoinChannelAudio
         }
 
         public override void OnRtmpStreamingStateChanged(string url, RTMP_STREAM_PUBLISH_STATE state,
-            RTMP_STREAM_PUBLISH_ERROR errCode)
+            RTMP_STREAM_PUBLISH_ERROR_TYPE errCode)
         {
             _audioSample.Logger.UpdateLog("OnRtmpStreamingStateChanged");
         }
