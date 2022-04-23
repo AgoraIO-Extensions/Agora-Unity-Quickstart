@@ -135,7 +135,7 @@ namespace DeviceManager
         {
             Debug.Log("OnApplicationQuit");
             if (_mRtcEngine == null) return;
-            _mRtcEngine.LeaveChannel();
+            //_mRtcEngine.LeaveChannel();
             _mRtcEngine.Dispose();
         }
     }
