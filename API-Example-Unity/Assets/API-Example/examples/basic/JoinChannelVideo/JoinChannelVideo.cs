@@ -54,13 +54,13 @@ namespace Agora_Plugin.API_Example.examples.basic.JoinChannelVideo
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             _mRtcEngine.Initialize(context);
             _mRtcEngine.InitEventHandler(handler);
+            _mRtcEngine.EnableAudio();
+            _mRtcEngine.EnableVideo();
+            _mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
         }
 
         private void JoinChannel()
         {
-            _mRtcEngine.EnableAudio();
-            _mRtcEngine.EnableVideo();
-            _mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             _mRtcEngine.JoinChannel(token, channelName);
         }
 
