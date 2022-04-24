@@ -7,7 +7,7 @@ using UnityEngine.Serialization;
 using Logger = agora.util.Logger;
 
 
-namespace JoinChannelAudio
+namespace Agora_Plugin.API_Example.examples.basic.JoinChannelAudio
 {
     public class JoinChannelAudio : MonoBehaviour
     {
@@ -22,7 +22,7 @@ namespace JoinChannelAudio
 
         public Text logText;
         internal Logger Logger;
-        private IAgoraRtcEngine _mRtcEngine = null;
+        internal IAgoraRtcEngine _mRtcEngine = null;
 
         // Start is called before the first frame update
         private void Start()
@@ -47,10 +47,10 @@ namespace JoinChannelAudio
         {
             _mRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(handler, appID, null, true, 
+            RtcEngineContext context = new RtcEngineContext(null, appID, null, true, 
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            var ret = _mRtcEngine.Initialize(context);
+            _mRtcEngine.Initialize(context);
             _mRtcEngine.InitEventHandler(handler);
         }
 
@@ -95,8 +95,8 @@ namespace JoinChannelAudio
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            // _audioSample.Logger.UpdateLog(string.Format("sdk version: ${0}",
-            //     _audioSample.AgoraRtcEngine.GetVersion()));
+            _audioSample.Logger.UpdateLog(string.Format("sdk version: ${0}",
+                _audioSample._mRtcEngine.GetVersion()));
             _audioSample.Logger.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", 
                                 connection.channelId, connection.localUid, elapsed));

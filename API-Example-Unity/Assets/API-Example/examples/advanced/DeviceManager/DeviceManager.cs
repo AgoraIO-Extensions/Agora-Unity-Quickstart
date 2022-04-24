@@ -5,7 +5,7 @@ using agora.util;
 using UnityEngine.Serialization;
 using Logger = agora.util.Logger;
 
-namespace DeviceManager
+namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
 {
     public class DeviceManager : MonoBehaviour
     {
@@ -53,7 +53,7 @@ namespace DeviceManager
         {
             _mRtcEngine = AgoraRtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(handler, appID, null, true, 
+            RtcEngineContext context = new RtcEngineContext(null, appID, null, true, 
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             _mRtcEngine.Initialize(context);
@@ -161,8 +161,8 @@ namespace DeviceManager
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            // _deviceManagerSample.Logger.UpdateLog(string.Format("sdk version: ${0}",
-            //     _deviceManagerSample.AgoraRtcEngine.GetVersion()));
+            _deviceManagerSample.Logger.UpdateLog(string.Format("sdk version: ${0}",
+                _deviceManagerSample._mRtcEngine.GetVersion()));
             _deviceManagerSample.Logger.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", 
                                 connection.channelId, connection.localUid, elapsed));
