@@ -6,7 +6,7 @@ using agora.util;
 using Logger = agora.util.Logger;
 
 
-namespace JoinChannelVideo
+namespace Agora_Plugin.API_Example.examples.basic.JoinChannelVideo
 {
     public class JoinChannelVideo : MonoBehaviour
     {
@@ -49,13 +49,11 @@ namespace JoinChannelVideo
         {
             _mRtcEngine = AgoraRtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(handler, appID, null, true, 
+            RtcEngineContext context = new RtcEngineContext(null, appID, null, true, 
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            var ret = _mRtcEngine.Initialize(context);
-            Debug.Log("Agora: Initialize " + ret);
+            _mRtcEngine.Initialize(context);
             _mRtcEngine.InitEventHandler(handler);
-            //_mRtcEngine.SetLogFile("./log.txt");
         }
 
         private void JoinChannel()
@@ -63,9 +61,7 @@ namespace JoinChannelVideo
             _mRtcEngine.EnableAudio();
             _mRtcEngine.EnableVideo();
             _mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            var ret = _mRtcEngine.SetVideoEncoderConfiguration(new VideoEncoderConfiguration { dimensions = new VideoDimensions { height = 2160, width = 4096} });
-            ret = _mRtcEngine.JoinChannel(token, channelName);
-            Debug.Log("Agora: JoinChannel " + ret);
+            _mRtcEngine.JoinChannel(token, channelName);
         }
 
         private void OnApplicationQuit()
@@ -197,8 +193,8 @@ namespace JoinChannelVideo
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
             Debug.Log("Agora: OnJoinChannelSuccess ");
-            // _videoSample.Logger.UpdateLog(string.Format("sdk version: ${0}",
-            //     _videoSample.AgoraRtcEngine.GetVersion()));
+            _videoSample.Logger.UpdateLog(string.Format("sdk version: ${0}",
+                _videoSample._mRtcEngine.GetVersion()));
             _videoSample.Logger.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", 
                                 connection.channelId, connection.localUid, elapsed));

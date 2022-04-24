@@ -1570,6 +1570,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   appID: 
   token: 
-  channelName: unity3d
+  channelName: 
   Sound_URL: https://agoracdn.s3.us-west-1.amazonaws.com/videos/Agora+Online+Learning+Engagement+Platform.mp3
   logText: {fileID: 634102969}
