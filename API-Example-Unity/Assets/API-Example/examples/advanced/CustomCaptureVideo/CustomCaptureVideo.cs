@@ -37,6 +37,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
             InitTexture();
             CheckAppId();
             InitEngine();
+            SetExternalVideoSource();
             JoinChannel();
         }
 
@@ -91,9 +92,14 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             _mRtcEngine.Initialize(context);
-
             _mRtcEngine.InitEventHandler(new UserEventHandler(this));
-            _mRtcEngine.SetLogFile("./log.txt");
+            _mRtcEngine.EnableAudio();
+            _mRtcEngine.EnableVideo();
+            _mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+        }
+
+        private void SetExternalVideoSource()
+        {
             var ret = _mRtcEngine.SetExternalVideoSource(true, false, EXTERNAL_VIDEO_SOURCE_TYPE.VIDEO_FRAME,
                 new EncodedVideoTrackOptions());
             Debug.Log("SetExternalVideoSource returns:" + ret);
@@ -101,9 +107,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
 
         private void JoinChannel()
         {
-            _mRtcEngine.EnableAudio();
-            _mRtcEngine.EnableVideo();
-            _mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             _mRtcEngine.JoinChannel(token, channelName);
         }
 
