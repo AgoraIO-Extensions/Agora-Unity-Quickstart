@@ -9,6 +9,10 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
 {
     public class AudioMixing : MonoBehaviour
     {
+        [FormerlySerializedAs("AgoraBaseProfile")] [SerializeField]
+        private AgoraBaseProfile agoraBaseProfile;
+        
+        [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")] [SerializeField]
         private string appID = "";
 
@@ -16,7 +20,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
         private string token = "";
 
         [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
-        private string channelName = "YOUR_CHANNEL_NAME";
+        private string channelName = "";
 
         [SerializeField] string Sound_URL = "";
 
@@ -30,6 +34,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
         // Start is called before the first frame update
         void Start()
         {
+            LoadAssetData();
             CheckAppId();
             InitRtcEngine();
             SetupUI();
@@ -40,6 +45,16 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
         void Update()
         {
             PermissionHelper.RequestMicrophontPermission();
+        }
+        
+        //Show data in AgoraBasicProfile
+        [ContextMenu("ShowAgoraBasicProfileData")]
+        public void LoadAssetData()
+        {
+            if (agoraBaseProfile == null) return;
+            appID = agoraBaseProfile.appID;
+            token = agoraBaseProfile.token;
+            channelName = agoraBaseProfile.channelName;
         }
 
         void CheckAppId()

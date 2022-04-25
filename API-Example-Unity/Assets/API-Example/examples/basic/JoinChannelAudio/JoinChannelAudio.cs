@@ -11,14 +11,18 @@ namespace Agora_Plugin.API_Example.examples.basic.JoinChannelAudio
 {
     public class JoinChannelAudio : MonoBehaviour
     {
+        [FormerlySerializedAs("AgoraBaseProfile")] [SerializeField]
+        private AgoraBaseProfile agoraBaseProfile;
+        
+        [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")] [SerializeField]
-        private string appID = "YOUR_APPID";
+        private string appID = "";
 
         [FormerlySerializedAs("TOKEN")] [SerializeField]
         private string token = "";
 
         [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
-        private string channelName = "YOUR_CHANNEL_NAME";
+        private string channelName = "";
 
         public Text logText;
         internal Logger Logger;
@@ -27,6 +31,7 @@ namespace Agora_Plugin.API_Example.examples.basic.JoinChannelAudio
         // Start is called before the first frame update
         private void Start()
         {
+            LoadAssetData();
             CheckAppId();
             InitRtcEngine();
             JoinChannel();
@@ -41,6 +46,16 @@ namespace Agora_Plugin.API_Example.examples.basic.JoinChannelAudio
         {
             Logger = new Logger(logText);
             Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in Canvas!!!!!");
+        }
+        
+        //Show data in AgoraBasicProfile
+        [ContextMenu("ShowAgoraBasicProfileData")]
+        public void LoadAssetData()
+        {
+            if (agoraBaseProfile == null) return;
+            appID = agoraBaseProfile.appID;
+            token = agoraBaseProfile.token;
+            channelName = agoraBaseProfile.channelName;
         }
 
         private void InitRtcEngine()
