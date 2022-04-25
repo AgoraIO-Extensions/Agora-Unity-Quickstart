@@ -97,6 +97,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
             options1.autoSubscribeAudio = true;
             options1.autoSubscribeVideo = true;
             options1.publishScreenTrack = false;
+            options1.enableAudioRecordingOrPlayout = true;
             options1.clientRoleType = CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER;
             ret = _mRtcEngine.JoinChannel(token, channelName, 123, options1);
             Debug.Log("MainCameraJoinChannel returns: " + ret);
@@ -113,6 +114,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
             options2.publishAudioTrack = false;
             options2.publishCameraTrack = false;
             options2.publishSecondaryCameraTrack = true;
+            options2.enableAudioRecordingOrPlayout = false;
             options2.clientRoleType = CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER;
             ret = _mRtcEngine.JoinChannelEx(token, new RtcConnection(channelName, 456), options2, null);
             Debug.Log("JoinChannelEx returns: " + ret);
