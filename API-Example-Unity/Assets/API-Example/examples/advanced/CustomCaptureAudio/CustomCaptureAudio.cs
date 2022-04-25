@@ -5,17 +5,25 @@ using UnityEngine.UI;
 using agora.rtc;
 using agora.util;
 using RingBuffer;
+using UnityEngine.Serialization;
 using Logger = agora.util.Logger;
 
 namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
 {
     public class CustomCaptureAudio : MonoBehaviour
     {
-        [SerializeField] private string APP_ID = "YOUR_APPID";
+        [FormerlySerializedAs("AgoraBaseProfile")] [SerializeField]
+        private AgoraBaseProfile agoraBaseProfile;
+        
+        [Header("_____________Basic Configuration_____________")]
+        [FormerlySerializedAs("APP_ID")] [SerializeField]
+        private string appID = "";
 
-        [SerializeField] private string token = "";
+        [FormerlySerializedAs("TOKEN")] [SerializeField]
+        private string token = "";
 
-        [SerializeField] private string channelName = "YOUR_CHANNEL_NAME";
+        [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
+        private string channelName = "";
         
         public Text logText;
         internal Logger logger;
@@ -40,6 +48,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
         // Use this for initialization
         void Start()
         {
+            LoadAssetData();
             CheckAppId();
             InitRtcEngine();
             SetExternalAudioSource();
@@ -53,17 +62,27 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
             PermissionHelper.RequestMicrophontPermission();
         }
 
+        //Show data in AgoraBasicProfile
+        [ContextMenu("ShowAgoraBasicProfileData")]
+        public void LoadAssetData()
+        {
+            if (agoraBaseProfile == null) return;
+            appID = agoraBaseProfile.appID;
+            token = agoraBaseProfile.token;
+            channelName = agoraBaseProfile.channelName;
+        }
+        
         void CheckAppId()
         {
             logger = new Logger(logText);
-            logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in Canvas!!!!!");
+            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in Canvas!!!!!");
         }
 
         private void InitRtcEngine()
         {
             AgoraRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
 
-            RtcEngineContext context = new RtcEngineContext(null, APP_ID, null, true,
+            RtcEngineContext context = new RtcEngineContext(null, appID, null, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             AgoraRtcEngine.Initialize(context);

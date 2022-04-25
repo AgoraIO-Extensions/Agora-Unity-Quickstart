@@ -2,17 +2,26 @@
 using UnityEngine.UI;
 using agora.rtc;
 using agora.util;
+using UnityEngine.Serialization;
 using Logger = agora.util.Logger;
 
 namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
 {
     public class SetVideoEncodeConfiguration : MonoBehaviour
     {
-        [SerializeField] private string APP_ID = "";
+        [FormerlySerializedAs("AgoraBaseProfile")] [SerializeField]
+        private AgoraBaseProfile agoraBaseProfile;
+        
+        [Header("_____________Basic Configuration_____________")]
+        [FormerlySerializedAs("APP_ID")] [SerializeField]
+        private string appID = "";
 
-        [SerializeField] private string TOKEN = "";
+        [FormerlySerializedAs("TOKEN")] [SerializeField]
+        private string token = "";
 
-        [SerializeField] private string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
+        [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
+        private string channelName = "";
+        
         public Text logText;
         private Logger logger;
         internal IAgoraRtcEngine mRtcEngine = null;
@@ -29,6 +38,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
         // Start is called before the first frame update
         void Start()
         {
+            LoadAssetData();
             CheckAppId();
             InitEngine();
             JoinChannel();
@@ -44,20 +54,30 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
 
         internal string GetChannelName()
         {
-            return CHANNEL_NAME;
+            return channelName;
         }
 
         void CheckAppId()
         {
             logger = new Logger(logText);
-            logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+        }
+        
+        //Show data in AgoraBasicProfile
+        [ContextMenu("ShowAgoraBasicProfileData")]
+        public void LoadAssetData()
+        {
+            if (agoraBaseProfile == null) return;
+            appID = agoraBaseProfile.appID;
+            token = agoraBaseProfile.token;
+            channelName = agoraBaseProfile.channelName;
         }
 
         void InitEngine()
         {
             mRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(null, APP_ID, null, true,
+            RtcEngineContext context = new RtcEngineContext(null, appID, null, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             mRtcEngine.Initialize(context);
@@ -69,7 +89,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
 
         void JoinChannel()
         {
-            mRtcEngine.JoinChannel(TOKEN, CHANNEL_NAME, "");
+            mRtcEngine.JoinChannel(token, channelName, "");
         }
 
         public void SetVideoEncoderConfiguration(int dim = 0)

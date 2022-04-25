@@ -4,16 +4,24 @@ using UnityEngine.UI;
 using agora.rtc;
 using Logger = agora.util.Logger;
 using agora.util;
+using UnityEngine.Serialization;
 
 namespace Agora_Plugin.API_Example.examples.advanced.SetEncryption
 {
     public class EncryptionSample : MonoBehaviour
     {
-        [SerializeField] private string APP_ID = "YOUR_APPID";
+        [FormerlySerializedAs("AgoraBaseProfile")] [SerializeField]
+        private AgoraBaseProfile agoraBaseProfile;
+        
+        [Header("_____________Basic Configuration_____________")]
+        [FormerlySerializedAs("APP_ID")] [SerializeField]
+        private string appID = "";
 
-        [SerializeField] private string TOKEN = "";
+        [FormerlySerializedAs("TOKEN")] [SerializeField]
+        private string token = "";
 
-        [SerializeField] private string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
+        [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
+        private string channelName = "";
 
         [SerializeField] private ENCRYPTION_MODE ENCRYPTION_MODE = ENCRYPTION_MODE.AES_128_GCM2;
 
@@ -26,6 +34,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetEncryption
         // Start is called before the first frame update
         void Start()
         {
+            LoadAssetData();
             CheckAppId();
             InitRtcEngine();
             SetEncryption();
@@ -40,13 +49,23 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetEncryption
         void CheckAppId()
         {
             logger = new Logger(logText);
-            logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in Canvas!!!!!");
+            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in Canvas!!!!!");
+        }
+        
+        //Show data in AgoraBasicProfile
+        [ContextMenu("ShowAgoraBasicProfileData")]
+        public void LoadAssetData()
+        {
+            if (agoraBaseProfile == null) return;
+            appID = agoraBaseProfile.appID;
+            token = agoraBaseProfile.token;
+            channelName = agoraBaseProfile.channelName;
         }
 
         void InitRtcEngine()
         {
             mRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
-            RtcEngineContext context = new RtcEngineContext(null, APP_ID, null, false,
+            RtcEngineContext context = new RtcEngineContext(null, appID, null, false,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             mRtcEngine.Initialize(context);
@@ -75,7 +94,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetEncryption
 
         void JoinChannel()
         {
-            mRtcEngine.JoinChannel(TOKEN, CHANNEL_NAME, "", 0);
+            mRtcEngine.JoinChannel(token, channelName, "", 0);
         }
 
         void OnLeaveBtnClick()

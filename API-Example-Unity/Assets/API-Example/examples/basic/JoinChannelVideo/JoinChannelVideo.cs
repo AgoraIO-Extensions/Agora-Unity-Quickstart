@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.Serialization;
 using agora.rtc;
 using agora.util;
+using UnityEditor;
 using Logger = agora.util.Logger;
 
 
@@ -10,6 +11,10 @@ namespace Agora_Plugin.API_Example.examples.basic.JoinChannelVideo
 {
     public class JoinChannelVideo : MonoBehaviour
     {
+        [FormerlySerializedAs("AgoraBaseProfile")] [SerializeField]
+        private AgoraBaseProfile agoraBaseProfile;
+        
+        [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")] [SerializeField]
         private string appID = "";
 
@@ -17,7 +22,7 @@ namespace Agora_Plugin.API_Example.examples.basic.JoinChannelVideo
         private string token = "";
 
         [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
-        private string channelName = "YOUR_CHANNEL_NAME";
+        private string channelName = "";
 
         public Text logText;
         internal Logger Logger;
@@ -27,6 +32,7 @@ namespace Agora_Plugin.API_Example.examples.basic.JoinChannelVideo
         // Use this for initialization
         private void Start()
         {
+            LoadAssetData();
             CheckAppId();
             InitEngine();
             JoinChannel();
@@ -37,6 +43,16 @@ namespace Agora_Plugin.API_Example.examples.basic.JoinChannelVideo
         {
             PermissionHelper.RequestMicrophontPermission();
             PermissionHelper.RequestCameraPermission();
+        }
+        
+        //Show data in AgoraBasicProfile
+        [ContextMenu("ShowAgoraBasicProfileData")]
+        public void LoadAssetData()
+        {
+            if (agoraBaseProfile == null) return;
+            appID = agoraBaseProfile.appID;
+            token = agoraBaseProfile.token;
+            channelName = agoraBaseProfile.channelName;
         }
 
         private void CheckAppId()

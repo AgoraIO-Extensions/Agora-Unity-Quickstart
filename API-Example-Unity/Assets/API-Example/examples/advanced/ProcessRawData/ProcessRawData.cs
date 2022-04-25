@@ -11,7 +11,10 @@ namespace Agora_Plugin.API_Example.examples.advanced.ProcessRawData
 {
 	public class ProcessRawData : MonoBehaviour
 	{
-
+		[FormerlySerializedAs("AgoraBaseProfile")] [SerializeField]
+		private AgoraBaseProfile agoraBaseProfile;
+        
+		[Header("_____________Basic Configuration_____________")]
 		[FormerlySerializedAs("APP_ID")] [SerializeField]
 		private string appID = "";
 
@@ -19,7 +22,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ProcessRawData
 		private string token = "";
 
 		[FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
-		private string channelName = "YOUR_CHANNEL_NAME";
+		private string channelName = "";
 
 		public Text logText;
 		private Logger Logger;
@@ -28,6 +31,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ProcessRawData
 		
 		void Start()
 		{
+			LoadAssetData();
 			CheckAppId();
 			InitEngine();
 			JoinChannel();
@@ -44,6 +48,16 @@ namespace Agora_Plugin.API_Example.examples.advanced.ProcessRawData
 		{
 			Logger = new Logger(logText);
 			Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+		}
+		
+		//Show data in AgoraBasicProfile
+		[ContextMenu("ShowAgoraBasicProfileData")]
+		public void LoadAssetData()
+		{
+			if (agoraBaseProfile == null) return;
+			appID = agoraBaseProfile.appID;
+			token = agoraBaseProfile.token;
+			channelName = agoraBaseProfile.channelName;
 		}
 
 		void InitEngine()

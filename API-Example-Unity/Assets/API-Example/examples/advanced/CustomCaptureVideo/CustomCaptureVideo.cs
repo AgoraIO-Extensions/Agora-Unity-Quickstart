@@ -3,17 +3,25 @@ using UnityEngine;
 using agora.rtc;
 using UnityEngine.UI;
 using agora.util;
+using UnityEngine.Serialization;
 using Logger = agora.util.Logger;
 
 namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
 {
     public class CustomCaptureVideo : MonoBehaviour
     {
-        [SerializeField] private string appId = "YOUR_APPID";
+        [FormerlySerializedAs("AgoraBaseProfile")] [SerializeField]
+        private AgoraBaseProfile agoraBaseProfile;
+        
+        [Header("_____________Basic Configuration_____________")]
+        [FormerlySerializedAs("APP_ID")] [SerializeField]
+        private string appID = "";
 
-        [SerializeField] private string token = "";
+        [FormerlySerializedAs("TOKEN")] [SerializeField]
+        private string token = "";
 
-        [SerializeField] private string channelName = "YOUR_CHANNEL_NAME";
+        [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
+        private string channelName = "";
 
         public Text logText;
         private Logger Logger;
@@ -33,6 +41,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
         // Use this for initialization
         void Start()
         {
+            LoadAssetData();
             InitCameraDevice();
             InitTexture();
             CheckAppId();
@@ -45,6 +54,16 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
         {
             PermissionHelper.RequestMicrophontPermission();
             StartCoroutine(ShareScreen());
+        }
+        
+        //Show data in AgoraBasicProfile
+        [ContextMenu("ShowAgoraBasicProfileData")]
+        public void LoadAssetData()
+        {
+            if (agoraBaseProfile == null) return;
+            appID = agoraBaseProfile.appID;
+            token = agoraBaseProfile.token;
+            channelName = agoraBaseProfile.channelName;
         }
 
         private IEnumerator ShareScreen()
@@ -88,7 +107,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
         {
             _mRtcEngine = AgoraRtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(null, appId, null, true,
+            RtcEngineContext context = new RtcEngineContext(null, appID, null, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             _mRtcEngine.Initialize(context);
@@ -113,7 +132,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
         private void CheckAppId()
         {
             Logger = new Logger(logText);
-            Logger.DebugAssert(appId.Length > 10, "Please fill in your appId in Canvas!!!!");
+            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in Canvas!!!!");
         }
 
         private void InitTexture()
