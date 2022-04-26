@@ -102,7 +102,12 @@ namespace Agora_Plugin.API_Example.examples.advanced.StreamMessage
 
         void onSendButtonPress()
         {
-            var text = this.transform.Find("UI/InputField/Text").GetComponent<Text>();
+            var text = this.transform.Find("UI/InputField").GetComponent<InputField>();
+            if (text.text == "")
+            {
+                logger.UpdateLog("Dont send empty message!");
+            }
+
             int streamId = this.CreateDataStreamId();
             if (streamId < 0)
             {
@@ -112,6 +117,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.StreamMessage
             else
             {
                 SendStreamMessage(streamId, text.text);
+                text.text = "";
             }
         }
 
@@ -128,10 +134,21 @@ namespace Agora_Plugin.API_Example.examples.advanced.StreamMessage
         }
 
 
-        void SendStreamMessage(int streamId ,string message)
+        void SendStreamMessage(int streamId, string message)
         {
             byte[] byteArray = System.Text.Encoding.Default.GetBytes(message);
             mRtcEngine.SendStreamMessage(streamId, byteArray, Convert.ToUInt32(byteArray.Length));
+        }
+
+
+        void OnApplicationQuit()
+        {
+            Debug.Log("OnApplicationQuit");
+            if (mRtcEngine != null)
+            {
+                mRtcEngine.LeaveChannel();
+                mRtcEngine.Dispose();
+            }
         }
     }
 
@@ -185,14 +202,14 @@ namespace Agora_Plugin.API_Example.examples.advanced.StreamMessage
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
             _streamMessage.logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-           
+
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
         {
             _streamMessage.logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                 (int)reason));
-        
+
         }
 
         public override void OnStreamMessage(RtcConnection connection, uint remoteUid, int streamId, byte[] data, uint length, ulong sentTs)
@@ -203,7 +220,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.StreamMessage
 
         public override void OnStreamMessageError(RtcConnection connection, uint remoteUid, int streamId, int code, int missed, int cached)
         {
-            _streamMessage.logger.UpdateLog(string.Format("OnStreamMessageError remoteUid: {0}, streamId: {1}, code: {2}, missed: {3}, cached: {4}", remoteUid, streamId, code,missed, cached));
+            _streamMessage.logger.UpdateLog(string.Format("OnStreamMessageError remoteUid: {0}, streamId: {1}, code: {2}, missed: {3}, cached: {4}", remoteUid, streamId, code, missed, cached));
         }
 
     }
