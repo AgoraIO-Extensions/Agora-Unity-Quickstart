@@ -74,7 +74,10 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushVideoImage
             mRtcEngine.EnableVideo();
 
             EncodedVideoTrackOptions encodedVideoTrackOptions = new EncodedVideoTrackOptions();
-            mRtcEngine.SetExternalVideoSource(true,false,EXTERNAL_VIDEO_SOURCE_TYPE.ENCODED_VIDEO_FRAME, encodedVideoTrackOptions);
+            mRtcEngine.SetExternalVideoSource(true, false, EXTERNAL_VIDEO_SOURCE_TYPE.ENCODED_VIDEO_FRAME, encodedVideoTrackOptions);
+
+
+
         }
 
         void JoinChannel()
@@ -144,7 +147,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushVideoImage
 
         public void StartPushEncodeVideoImage()
         {
-            this.Invoke("UpdateForPushEncodeVideoImage",0);
+            this.Invoke("UpdateForPushEncodeVideoImage", 0);
             this.logger.UpdateLog("Start PushEncodeVideoImage in every frame");
         }
 
@@ -202,10 +205,10 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushVideoImage
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));
 
-          
+
             _pushVideoImage.CreateRole(connection.localUid.ToString(), true);
             _pushVideoImage.logger.UpdateLog("you can drag your role to every where");
-            _pushVideoImage.StartPushEncodeVideoImage(); 
+            _pushVideoImage.StartPushEncodeVideoImage();
         }
 
         public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
@@ -229,6 +232,16 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushVideoImage
         {
             _pushVideoImage.logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
             _pushVideoImage.CreateRole(uid.ToString(), false);
+
+
+            //you must set options.encodedFrameOnly = true when you receive other 
+            VideoSubscriptionOptions options = new VideoSubscriptionOptions
+            {
+                type = VIDEO_STREAM_TYPE.VIDEO_STREAM_HIGH,
+                encodedFrameOnly = true
+            };
+            _pushVideoImage.mRtcEngine.SetRemoteVideoSubscriptionOptions(uid, options);
+
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
