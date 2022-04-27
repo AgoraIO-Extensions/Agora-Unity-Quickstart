@@ -73,7 +73,13 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushVideoImage
             mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             mRtcEngine.EnableVideo();
 
-            EncodedVideoTrackOptions encodedVideoTrackOptions = new EncodedVideoTrackOptions();
+            EncodedVideoTrackOptions encodedVideoTrackOptions = new EncodedVideoTrackOptions()
+            {
+                ccMode = TCcMode.CC_DISABLED,
+                codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_GENERIC,
+                
+
+            };
             mRtcEngine.SetExternalVideoSource(true, true, EXTERNAL_VIDEO_SOURCE_TYPE.ENCODED_VIDEO_FRAME, encodedVideoTrackOptions);
 
 
@@ -82,7 +88,25 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushVideoImage
 
         void JoinChannel()
         {
-            mRtcEngine.JoinChannel(token, channelName, "");
+            var option = new ChannelMediaOptions
+            {
+                autoSubscribeVideo = true,
+                autoSubscribeAudio = true,
+                publishAudioTrack = false,
+                publishCameraTrack = false,
+                publishCustomVideoTrack = false,
+                publishEncodedVideoTrack = true,
+                clientRoleType = CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER,
+                channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
+                encodedVideoTrackOption = new EncodedVideoTrackOptions
+                {
+                    ccMode = TCcMode.CC_ENABLED,
+                    codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_GENERIC,
+                    targetBitrate = 6500
+                }
+            };
+
+            mRtcEngine.JoinChannel(token, channelName, 0, option);
         }
 
         void Update()
@@ -116,6 +140,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushVideoImage
                 this.roleLocal = role;
             }
 
+            role.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
             role.transform.SetParent(this.gameObject.transform);
         }
 
@@ -166,7 +191,12 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushVideoImage
                 //in this case, we send pos byte 
                 string json = JsonUtility.ToJson(this.roleLocal.transform.localPosition);
                 byte[] data = System.Text.Encoding.Default.GetBytes(json);
-                EncodedVideoFrameInfo encodedVideoFrameInfo = new EncodedVideoFrameInfo();
+                EncodedVideoFrameInfo encodedVideoFrameInfo = new EncodedVideoFrameInfo()
+                {
+                    framesPerSecond = 60,
+                    codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_GENERIC,
+                    frameType = VIDEO_FRAME_TYPE_NATIVE.VIDEO_FRAME_TYPE_KEY_FRAME
+                };
                 int nRet = this.mRtcEngine.PushEncodedVideoImage(data, Convert.ToUInt32(data.Length), encodedVideoFrameInfo);
                 Debug.Log("PushEncodedVideoImage: " + nRet);
             }
