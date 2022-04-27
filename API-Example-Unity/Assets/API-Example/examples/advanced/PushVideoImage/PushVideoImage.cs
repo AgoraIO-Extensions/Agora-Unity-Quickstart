@@ -69,9 +69,12 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushVideoImage
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
             mRtcEngine.Initialize(context);
             mRtcEngine.InitEventHandler(handler);
+            mRtcEngine.RegisterVideoEncodedImageReceiver(new VideoEncodedImageReceiver(this));
             mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            mRtcEngine.EnableAudio();
             mRtcEngine.EnableVideo();
+
+            EncodedVideoTrackOptions encodedVideoTrackOptions = new EncodedVideoTrackOptions();
+            mRtcEngine.SetExternalVideoSource(true,false,EXTERNAL_VIDEO_SOURCE_TYPE.ENCODED_VIDEO_FRAME, encodedVideoTrackOptions);
         }
 
         void JoinChannel()
@@ -116,7 +119,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushVideoImage
         public void DestroyRole(string uid, bool isLocal)
         {
             var name = "Role" + uid;
-            var role = this.gameObject.transform.Find(name);
+            var role = this.gameObject.transform.Find(name).gameObject;
             if (role)
             {
                 Destroy(role);
