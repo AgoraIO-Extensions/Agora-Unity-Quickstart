@@ -143,10 +143,10 @@ RectTransform:
   m_Father: {fileID: 1027396746}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 250.8, y: 7.3}
-  m_SizeDelta: {x: 325.6, y: 427.5}
+  m_AnchorMin: {x: 1, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: -170.9, y: 0.000011444}
+  m_SizeDelta: {x: 341.8, y: 507}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &269125906
 MonoBehaviour:
@@ -492,14 +492,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1027396745}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4850469e76a0b41bebb038322074edbd, type: 3}
+  m_Script: {fileID: 11500000, guid: d9ca5ff1572d84b0fafd27a976831922, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  appId: 
+  agoraBaseProfile: {fileID: 11400000, guid: 1213b3eb894c348dbbb59da31d2b1c7e, type: 2}
+  appID: 
   token: 
   channelName: 
-  logText: {fileID: 1376281776}
-  rawImage: {fileID: 269125906}
+  logText: {fileID: 0}
+  rawImage: {fileID: 0}
   cameraSize: {x: 640, y: 480}
   cameraFPS: 15
 --- !u!1 &1376281774

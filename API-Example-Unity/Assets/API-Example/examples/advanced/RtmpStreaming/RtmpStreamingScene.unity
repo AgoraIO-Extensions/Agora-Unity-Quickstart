@@ -300,9 +300,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43f5a577f87154f2294650b9f1a341b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  APP_ID: 
-  TOKEN: 
-  CHANNEL_NAME: 
+  agoraBaseProfile: {fileID: 11400000, guid: 1213b3eb894c348dbbb59da31d2b1c7e, type: 2}
+  appID: 
+  token: 
+  channelName: 
   RTMP_URL: 
   logText: {fileID: 1913692626}
 --- !u!1 &1074959119

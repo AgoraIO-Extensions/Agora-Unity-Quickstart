@@ -11,6 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 310468f085ef24732beac714c9bb64fd, type: 3}
   m_Name: AgoraBaseProfile2
   m_EditorClassIdentifier: 
-  appID: Your App Id
-  token: Channel Token
-  channelName: Your Second Channel
+  appID: 
+  token: 
+  channelName: YOUR_CHANNEL_NAME
+  isHomeStart: 0

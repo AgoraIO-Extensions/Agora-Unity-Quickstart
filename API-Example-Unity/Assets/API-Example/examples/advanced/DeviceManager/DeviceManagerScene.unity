@@ -143,6 +143,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fd572ab256084a8bbd8337fb421503b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  agoraBaseProfile: {fileID: 11400000, guid: 1213b3eb894c348dbbb59da31d2b1c7e, type: 2}
   appID: 
   token: 
   channelName: 

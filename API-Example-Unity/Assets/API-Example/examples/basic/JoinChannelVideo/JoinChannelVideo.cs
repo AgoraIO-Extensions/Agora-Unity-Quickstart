@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
+using UnityEngine.SceneManagement;
 using agora.rtc;
 using agora.util;
 using UnityEditor;
@@ -32,6 +33,7 @@ namespace Agora_Plugin.API_Example.examples.basic.JoinChannelVideo
         // Use this for initialization
         private void Start()
         {
+            CheckEnterPoint();
             LoadAssetData();
             CheckAppId();
             InitEngine();
@@ -44,6 +46,16 @@ namespace Agora_Plugin.API_Example.examples.basic.JoinChannelVideo
             PermissionHelper.RequestMicrophontPermission();
             PermissionHelper.RequestCameraPermission();
         }
+
+        public void CheckEnterPoint()
+        {
+            var returnButton = GameObject.Find("Button");
+            if (agoraBaseProfile.isHomeStart == false)
+            {
+                returnButton.SetActive(false);
+            }
+            
+        }
         
         //Show data in AgoraBasicProfile
         [ContextMenu("ShowAgoraBasicProfileData")]
@@ -55,6 +67,7 @@ namespace Agora_Plugin.API_Example.examples.basic.JoinChannelVideo
             channelName = agoraBaseProfile.channelName;
         }
 
+    
         private void CheckAppId()
         {
             Logger = new Logger(logText);
@@ -83,9 +96,18 @@ namespace Agora_Plugin.API_Example.examples.basic.JoinChannelVideo
         private void OnApplicationQuit()
         {
             Debug.Log("OnApplicationQuit");
+            agoraBaseProfile.isHomeStart = false;
             if (_mRtcEngine == null) return;
             _mRtcEngine.LeaveChannel();
             _mRtcEngine.Dispose();
+        }
+
+        public void OnLeaveButtonClicked()
+        {
+            _mRtcEngine.LeaveChannel();
+            _mRtcEngine.Dispose();
+            SceneManager.LoadScene("HomeScene", LoadSceneMode.Single);
+            Destroy(gameObject);
         }
 
         internal string GetChannelName()
