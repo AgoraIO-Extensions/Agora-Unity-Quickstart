@@ -147,9 +147,10 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushVideoImage
 
         public void StartPushEncodeVideoImage()
         {
-            this.Invoke("UpdateForPushEncodeVideoImage", 0);
+            this.InvokeRepeating("UpdateForPushEncodeVideoImage", 0,0.1f);
             this.logger.UpdateLog("Start PushEncodeVideoImage in every frame");
         }
+
 
         public void StopPushEncodeVideoImage()
         {
