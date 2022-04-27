@@ -5,6 +5,7 @@ using agora.util;
 using UnityEngine.Serialization;
 using Logger = agora.util.Logger;
 using System;
+using System.Collections.Generic;
 
 namespace Agora_Plugin.API_Example.examples.advanced.PushVideoImage
 {
@@ -34,7 +35,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushVideoImage
         public Text logText;
         public Logger logger;
         internal IAgoraRtcEngine mRtcEngine = null;
-
+        public Dictionary<string, Vector3> rolePositionDic = new Dictionary<string, Vector3>();
 
 
         void Start()
@@ -104,6 +105,14 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushVideoImage
         {
             PermissionHelper.RequestMicrophontPermission();
             PermissionHelper.RequestCameraPermission();
+
+            lock (this.rolePositionDic)
+            {
+                foreach (var e in this.rolePositionDic)
+                {
+                    this.UpdateRolePositon(e.Key, e.Value);
+                }
+            }
         }
 
         void OnApplicationQuit()
@@ -301,8 +310,20 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushVideoImage
         {
             string str = System.Text.Encoding.Default.GetString(imageBuffer);
             var pos = JsonUtility.FromJson<Vector3>(str);
-            _pushVideoImage.UpdateRolePositon(videoEncodedFrameInfo.uid.ToString(), pos);
+            var uid = videoEncodedFrameInfo.uid.ToString();
 
+            //this called is not in Unity MainThread.we need push data in this dic. And read it in Update()
+            lock (_pushVideoImage.rolePositionDic)
+            {
+                if (_pushVideoImage.rolePositionDic.ContainsKey(uid))
+                {
+                    _pushVideoImage.rolePositionDic[uid] = pos;
+                }
+                else
+                {
+                    _pushVideoImage.rolePositionDic.Add(uid, pos);
+                }
+            }
             return true;
         }
     }
