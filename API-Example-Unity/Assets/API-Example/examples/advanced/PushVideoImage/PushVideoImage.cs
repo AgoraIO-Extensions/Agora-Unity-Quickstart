@@ -74,7 +74,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushVideoImage
             mRtcEngine.EnableVideo();
 
             EncodedVideoTrackOptions encodedVideoTrackOptions = new EncodedVideoTrackOptions();
-            mRtcEngine.SetExternalVideoSource(true, false, EXTERNAL_VIDEO_SOURCE_TYPE.ENCODED_VIDEO_FRAME, encodedVideoTrackOptions);
+            mRtcEngine.SetExternalVideoSource(true, true, EXTERNAL_VIDEO_SOURCE_TYPE.ENCODED_VIDEO_FRAME, encodedVideoTrackOptions);
 
 
 
@@ -116,7 +116,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushVideoImage
                 this.roleLocal = role;
             }
 
-            role.transform.parent = this.gameObject.transform;
+            role.transform.SetParent(this.gameObject.transform);
         }
 
         public void DestroyRole(string uid, bool isLocal)
@@ -147,7 +147,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushVideoImage
 
         public void StartPushEncodeVideoImage()
         {
-            this.InvokeRepeating("UpdateForPushEncodeVideoImage", 0,0.1f);
+            this.InvokeRepeating("UpdateForPushEncodeVideoImage", 0, 0.1f);
             this.logger.UpdateLog("Start PushEncodeVideoImage in every frame");
         }
 
@@ -161,13 +161,14 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushVideoImage
         void UpdateForPushEncodeVideoImage()
         {
             //you can send any data not just  video image byte
-            if (this.roleLocal)
+            if (roleLocal)
             {
                 //in this case, we send pos byte 
                 string json = JsonUtility.ToJson(this.roleLocal.transform.localPosition);
                 byte[] data = System.Text.Encoding.Default.GetBytes(json);
                 EncodedVideoFrameInfo encodedVideoFrameInfo = new EncodedVideoFrameInfo();
-                this.mRtcEngine.PushEncodedVideoImage(data, Convert.ToUInt32(data.Length), encodedVideoFrameInfo);
+                int nRet = this.mRtcEngine.PushEncodedVideoImage(data, Convert.ToUInt32(data.Length), encodedVideoFrameInfo);
+                Debug.Log("PushEncodedVideoImage: " + nRet);
             }
         }
 
@@ -241,8 +242,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushVideoImage
                 type = VIDEO_STREAM_TYPE.VIDEO_STREAM_HIGH,
                 encodedFrameOnly = true
             };
-            _pushVideoImage.mRtcEngine.SetRemoteVideoSubscriptionOptions(uid, options);
-
+            int nRet = _pushVideoImage.mRtcEngine.SetRemoteVideoSubscriptionOptions(uid, options);
+            _pushVideoImage.logger.UpdateLog("SetRemoteVideoSubscriptionOptions nRet:" + nRet);
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
