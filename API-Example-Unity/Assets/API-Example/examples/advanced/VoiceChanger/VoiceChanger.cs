@@ -215,7 +215,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.VoiceChanger
         #region Custom vocal effects
         void OnCustomVocalEffectsButtonPress()
         {
-            mRtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
 
             //Set the tone. It can be set in the range of [0.5, 2.0]. The smaller the value, the lower the tone. The default value is 1.0, which means there is no need to modify the tone.
             int nRet = mRtcEngine.SetLocalVoicePitch(0.5);

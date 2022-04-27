@@ -1013,9 +1013,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f9dbfee6c215400fbdc75b2bc7792f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  APP_ID: 
-  TOKEN: 
-  CHANNEL_NAME: 
+  agoraBaseProfile: {fileID: 11400000, guid: 1213b3eb894c348dbbb59da31d2b1c7e, type: 2}
+  appID: 
+  token: 
+  channelName: 
   logText: {fileID: 634102969}
 --- !u!114 &2114801516
 MonoBehaviour:

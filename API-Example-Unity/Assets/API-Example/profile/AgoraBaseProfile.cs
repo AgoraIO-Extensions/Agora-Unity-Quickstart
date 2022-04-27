@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 using System.Collections;
 using System;
 using UnityEngine.Serialization;
@@ -15,4 +16,6 @@ public class AgoraBaseProfile : ScriptableObject
 
     [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
     public string channelName = "YOUR_CHANNEL_NAME";
+
+    public bool isHomeStart = false;
 }
