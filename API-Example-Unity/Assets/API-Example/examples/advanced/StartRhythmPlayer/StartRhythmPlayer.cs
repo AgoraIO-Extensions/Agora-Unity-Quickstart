@@ -34,22 +34,20 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRhythmPlayer
         public string channelName = "";
 
         public Text logText;
-        internal Logger Logger;
+        internal Logger logger;
         internal IAgoraRtcEngine _mRtcEngine = null;
-        private const float Offset = 100;
-        public uint localUid = 0;
 
         // Use this for initialization
         private void Start()
         {
-#if UNITY_IPHONE || UNITY_ANDROID
-        LoadAssetData();
-        CheckAppId();
-        InitEngine();
-        JoinChannel();
-#else
-            throw new PlatformNotSupportedException();
-#endif
+
+            LoadAssetData();
+            CheckAppId();
+            SetupUI();
+            InitEngine();
+            JoinChannel();
+
+            this.logger.UpdateLog("RhythmPlayer only support in Android ,IOS");
         }
 
         private void Update()
@@ -72,8 +70,21 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRhythmPlayer
 
         private void CheckAppId()
         {
-            Logger = new Logger(logText);
-            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+            logger = new Logger(logText);
+            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+        }
+
+
+        private void SetupUI()
+        {
+            var btn = this.gameObject.transform.Find("StartButton").GetComponent<Button>();
+            btn.onClick.AddListener(OnStartButtonPress);
+
+            btn = this.gameObject.transform.Find("StopButton").GetComponent<Button>();
+            btn.onClick.AddListener(OnStopButtonPress);
+
+            btn = this.gameObject.transform.Find("ConfigButton").GetComponent<Button>();
+            btn.onClick.AddListener(OnConfigButtonPress);
         }
 
         private void InitEngine()
@@ -95,6 +106,37 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRhythmPlayer
             _mRtcEngine.JoinChannel(token, channelName);
         }
 
+        void OnStartButtonPress()
+        {
+            string sound1 = Path.Combine(Application.streamingAssetsPath, "audio/ding.mp3");
+            string sound2 = Path.Combine(Application.streamingAssetsPath, "audio/dang.mp3");
+            AgoraRhythmPlayerConfig config = new AgoraRhythmPlayerConfig()
+            {
+                beatsPerMeasure = 4,
+                beatsPerMinute = 60
+            };
+
+            int nRet = _mRtcEngine.StartRhythmPlayer(sound1, sound2, config);
+            this.logger.UpdateLog("StartRhythmPlayer nRet:" + nRet);
+        }
+
+        void OnStopButtonPress()
+        {
+            int nRet = _mRtcEngine.StopRhythmPlayer();
+            this.logger.UpdateLog("StopRhythmPlayer nRet:" + nRet);
+        }
+
+        void OnConfigButtonPress()
+        {
+            AgoraRhythmPlayerConfig config = new AgoraRhythmPlayerConfig()
+            {
+                beatsPerMeasure = 4,
+                beatsPerMinute = 60
+            };
+            int nRet = _mRtcEngine.ConfigRhythmPlayer(config);
+            this.logger.UpdateLog("ConfigRhythmPlayer nRet:" + nRet);
+        }
+
 
         internal class UserEventHandler : IAgoraRtcEngineEventHandler
         {
@@ -107,56 +149,50 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRhythmPlayer
 
             public override void OnWarning(int warn, string msg)
             {
-                _startRhythmPlayer.Logger.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
+                _startRhythmPlayer.logger.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
             }
 
             public override void OnError(int err, string msg)
             {
-                _startRhythmPlayer.Logger.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+                _startRhythmPlayer.logger.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
             }
 
             public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
             {
                 Debug.Log("Agora: OnJoinChannelSuccess ");
-                _startRhythmPlayer.Logger.UpdateLog(string.Format("sdk version: ${0}",
+                _startRhythmPlayer.logger.UpdateLog(string.Format("sdk version: ${0}",
                     _startRhythmPlayer._mRtcEngine.GetVersion()));
-                _startRhythmPlayer.Logger.UpdateLog(
+                _startRhythmPlayer.logger.UpdateLog(
                     string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                     connection.channelId, connection.localUid, elapsed));
-
-                _startRhythmPlayer.localUid = connection.localUid;
-                _startRhythmPlayer.EnableUI(true);
-                TakeSnapshot.MakeVideoView(0);
             }
 
             public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
             {
-                _startRhythmPlayer.Logger.UpdateLog("OnRejoinChannelSuccess");
+                _startRhythmPlayer.logger.UpdateLog("OnRejoinChannelSuccess");
             }
 
             public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
             {
-                _startRhythmPlayer.Logger.UpdateLog("OnLeaveChannel");
-                TakeSnapshot.DestroyVideoView(0);
+                _startRhythmPlayer.logger.UpdateLog("OnLeaveChannel");
+
             }
 
             public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
             {
-                _startRhythmPlayer.Logger.UpdateLog("OnClientRoleChanged");
+                _startRhythmPlayer.logger.UpdateLog("OnClientRoleChanged");
             }
 
             public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
             {
-                _startRhythmPlayer.Logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-                TakeSnapshot.MakeVideoView(uid, _startRhythmPlayer.channelName);
-                _startRhythmPlayer.EnableUI(true);
+                _startRhythmPlayer.logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+
             }
 
             public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
             {
-                _startRhythmPlayer.Logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+                _startRhythmPlayer.logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                     (int)reason));
-                TakeSnapshot.DestroyVideoView(uid);
             }
 
 
