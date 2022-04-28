@@ -4,7 +4,7 @@ using UnityEngine.Serialization;
 using UnityEngine.SceneManagement;
 using agora.rtc;
 using agora.util;
-using UnityEditor;
+
 using Logger = agora.util.Logger;
 using System.IO;
 using System;
@@ -40,14 +40,11 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRhythmPlayer
         // Use this for initialization
         private void Start()
         {
-
             LoadAssetData();
             CheckAppId();
             SetupUI();
             InitEngine();
             JoinChannel();
-
-            this.logger.UpdateLog("RhythmPlayer only support in Android ,IOS");
         }
 
         private void Update()
@@ -137,6 +134,15 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRhythmPlayer
             this.logger.UpdateLog("ConfigRhythmPlayer nRet:" + nRet);
         }
 
+        private void OnApplicationQuit()
+        {
+            Debug.Log("OnApplicationQuit");
+            agoraBaseProfile.isHomeStart = false;
+            if (_mRtcEngine == null) return;
+            _mRtcEngine.LeaveChannel();
+            _mRtcEngine.Dispose();
+        }
+
 
         internal class UserEventHandler : IAgoraRtcEngineEventHandler
         {
@@ -195,6 +201,10 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRhythmPlayer
                     (int)reason));
             }
 
+            public override void OnRhythmPlayerStateChanged(RHYTHM_PLAYER_STATE_TYPE state, RHYTHM_PLAYER_ERROR_TYPE errorCode)
+            {
+                _startRhythmPlayer.logger.UpdateLog(string.Format("OnRhythmPlayerStateChanged {0},{1}", state, errorCode));
+            }
 
         }
     }

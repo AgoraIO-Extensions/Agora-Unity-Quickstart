@@ -4,7 +4,7 @@ using UnityEngine.Serialization;
 using UnityEngine.SceneManagement;
 using agora.rtc;
 using agora.util;
-using UnityEditor;
+
 using Logger = agora.util.Logger;
 
 

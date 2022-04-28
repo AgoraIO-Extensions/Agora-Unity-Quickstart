@@ -620,7 +620,6 @@ MonoBehaviour:
   token: 
   channelName: 
   logText: {fileID: 1491088203}
-  localUid: 0
 --- !u!1 &1491088202
 GameObject:
   m_ObjectHideFlags: 0
