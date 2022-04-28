@@ -12,9 +12,11 @@ using Logger = agora.util.Logger;
 public class Home : MonoBehaviour
 {
     public AgoraBaseProfile profile;
-    //private IAgoraRtcEngine _mRtcEngine = null;
-
-    private string PlaySceneName = "BasicVideoCall";
+    public GameObject casePanel;
+    public GameObject caseScoller;
+    private string PlaySceneName = "";
+    private string[] PlaySceneNameList = {"BasicVideoCallScene", "BasicAudioCallScene", "AudioMixingScene", "ScreenShareScene", 
+                                            "DeviceManagerScene", "ScreenShareWhileVideoCallScene", "SpatialAudioWithMediaPlayerScene"};
     
     private void Awake()
     {
@@ -22,13 +24,24 @@ public class Home : MonoBehaviour
         PermissionHelper.RequestMicrophontPermission();
         PermissionHelper.RequestCameraPermission();
 #endif
+
+        GameObject content = GameObject.Find("Content");
+        for(int i = 0; i < PlaySceneNameList.Length; i++)
+        {
+            var go = Instantiate(casePanel);
+            go.transform.parent = content.transform;
+            var name = go.transform.Find("Text").gameObject.GetComponent<Text>();
+            name.text = PlaySceneNameList[i];
+            var button = go.transform.Find("Button").gameObject.GetComponent<Button>();
+            button.onClick.AddListener(OnJoinSceneClicked);
+            button.onClick.AddListener(SetScolllerActive);
+        }
     }
 
     // Start is called before the first frame update
     private void Start()
     {
-        profile.isHomeStart = true;
-        //_mRtcEngine = AgoraRtcEngine.CreateAgoraRtcEngine();
+
     }
 
     // Update is called once per frame
@@ -40,49 +53,39 @@ public class Home : MonoBehaviour
     private void OnApplicationQuit()
     {
         Debug.Log("OnApplicationQuit");
-        profile.isHomeStart = false;
-        // if (_mRtcEngine == null) return;
-        // _mRtcEngine.Dispose();
+        IAgoraRtcEngine _mRtcEngine = AgoraRtcEngine.Get();
+        if (_mRtcEngine != null)
+        {
+            _mRtcEngine.Dispose(true);
+        }
     }
 
-
-    public void JoinBasicVideoCallScene()
+    public void OnLeaveButtonClicked()
     {
-        SceneManager.LoadScene("BasicVideoCallScene", LoadSceneMode.Single);
+        StartCoroutine(UnloadSceneAsync());
+        caseScoller.SetActive(true);
     }
 
-    public void JoinBasicAudioCallScene()
+    public IEnumerator UnloadSceneAsync()
     {
-        SceneManager.LoadScene("BasicAudioCallScene", LoadSceneMode.Single);
+        if (this.PlaySceneName!="")
+        {
+            AsyncOperation async = SceneManager.UnloadSceneAsync(PlaySceneName);
+            yield return async;
+        }
     }
 
-    public void JoinAudioMixingScene()
+    public void OnJoinSceneClicked()
     {
-        SceneManager.LoadScene("AudioMixingScene", LoadSceneMode.Single);
+        var button = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
+        var sceneName = button.transform.parent.Find("Text").gameObject.GetComponent<Text>().text;
+
+        SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
+        this.PlaySceneName = sceneName;
     }
 
-    public void JoinScreenShareScene()
+    public void SetScolllerActive()
     {
-        SceneManager.LoadScene("ScreenShareScene", LoadSceneMode.Single);
-    }
-
-    public void JoinMediaPlayerScene()
-    {
-        SceneManager.LoadScene("MediaPlayerScene", LoadSceneMode.Single);
-    }
-
-    public void JoinVoiceChangerScene()
-    {
-        SceneManager.LoadScene("VoiceChangerScene", LoadSceneMode.Single);
-    }
-
-    public void JoinRtmpStreamingScene()
-    {
-        SceneManager.LoadScene("RtmpStreamingScene", LoadSceneMode.Single);
-    }
-
-    public void JoinDeviceManagerScene()
-    {
-        SceneManager.LoadScene("DeviceManagerScene", LoadSceneMode.Single);
+        caseScoller.SetActive(false);
     }
 }

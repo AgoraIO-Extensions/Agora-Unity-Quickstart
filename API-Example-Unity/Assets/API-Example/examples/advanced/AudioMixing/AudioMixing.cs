@@ -139,19 +139,21 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
 
         #endregion
 
-        void OnApplicationQuit()
+        private void OnDestroy()
+        {
+            Debug.Log("OnDestroy");
+            if (_mRtcEngine == null) return;
+            _mRtcEngine.LeaveChannel();
+        }
+
+        private void OnApplicationQuit()
         {
             Debug.Log("OnApplicationQuit");
-            if (manager != null)
-            {
-                // manager.StopAudioPlaybackDeviceTest();
-                // manager.ReleaseAAudioPlaybackDeviceManager();
-            }
-
             if (_mRtcEngine != null)
             {
                 _mRtcEngine.LeaveChannel();
                 _mRtcEngine.Dispose();
+                _mRtcEngine = null;
             }
         }
 

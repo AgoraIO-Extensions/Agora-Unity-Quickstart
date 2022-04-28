@@ -146,12 +146,19 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
             _mRtcEngine.JoinChannel(token, channelName, "");
         }
 
+        private void OnDestroy()
+        {
+            Debug.Log("OnDestroy");
+        }
+
         private void OnApplicationQuit()
         {
             Debug.Log("OnApplicationQuit");
-            if (_mRtcEngine == null) return;
-            //_mRtcEngine.LeaveChannel();
-            _mRtcEngine.Dispose();
+            if (_mRtcEngine != null)
+            {
+                _mRtcEngine.Dispose();
+                _mRtcEngine = null;
+            }
         }
     }
     

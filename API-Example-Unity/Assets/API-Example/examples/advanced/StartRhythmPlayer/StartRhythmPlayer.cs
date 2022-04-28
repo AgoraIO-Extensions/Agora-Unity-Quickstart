@@ -137,7 +137,6 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRhythmPlayer
         private void OnApplicationQuit()
         {
             Debug.Log("OnApplicationQuit");
-            agoraBaseProfile.isHomeStart = false;
             if (_mRtcEngine == null) return;
             _mRtcEngine.LeaveChannel();
             _mRtcEngine.Dispose();
