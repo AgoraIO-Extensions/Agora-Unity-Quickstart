@@ -26,15 +26,19 @@ public class Home : MonoBehaviour
 #endif
 
         GameObject content = GameObject.Find("Content");
+        var contentRectTrans = content.GetComponent<RectTransform>();
+        //contentRectTrans.SetSizeWithCurrentAnchors();
         for(int i = 0; i < PlaySceneNameList.Length; i++)
         {
-            var go = Instantiate(casePanel);
-            go.transform.parent = content.transform;
+            var go = Instantiate(casePanel, content.transform);
             var name = go.transform.Find("Text").gameObject.GetComponent<Text>();
             name.text = PlaySceneNameList[i];
             var button = go.transform.Find("Button").gameObject.GetComponent<Button>();
             button.onClick.AddListener(OnJoinSceneClicked);
             button.onClick.AddListener(SetScolllerActive);
+
+            //var rectTrans = go.GetComponent<RectTransform>();
+            //rectTrans.anchoredPosition = new Vector2(0, i * (-100));
         }
     }
 
