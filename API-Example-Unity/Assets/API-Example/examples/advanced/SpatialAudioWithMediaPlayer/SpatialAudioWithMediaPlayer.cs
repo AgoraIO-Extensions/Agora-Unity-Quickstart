@@ -182,12 +182,22 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
             _mediaPlayer.AdjustPlayoutVolume(playerId, 0);
         }
 
+        private void OnDestroy()
+        {
+            Debug.Log("OnDestroy");
+            if (_mRtcEngine == null) return;
+            _mRtcEngine.LeaveChannel();
+        }
+
         private void OnApplicationQuit()
         {
             Debug.Log("OnApplicationQuit");
-            if (_mRtcEngine == null) return;
-            _mRtcEngine.LeaveChannel();
-            _mRtcEngine.Dispose();
+            if (_mRtcEngine != null)
+            {
+                _mRtcEngine.LeaveChannel();
+                _mRtcEngine.Dispose();
+                _mRtcEngine = null;
+            }
         }
 
         internal string GetChannelName()

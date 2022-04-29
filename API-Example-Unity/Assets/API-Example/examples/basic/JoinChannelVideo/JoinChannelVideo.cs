@@ -4,6 +4,7 @@ using UnityEngine.Serialization;
 using UnityEngine.SceneManagement;
 using agora.rtc;
 using agora.util;
+using UnityEditor;
 using Logger = agora.util.Logger;
 
 
@@ -32,7 +33,6 @@ namespace Agora_Plugin.API_Example.examples.basic.JoinChannelVideo
         // Use this for initialization
         private void Start()
         {
-            CheckEnterPoint();
             LoadAssetData();
             CheckAppId();
             InitEngine();
@@ -44,16 +44,6 @@ namespace Agora_Plugin.API_Example.examples.basic.JoinChannelVideo
         {
             PermissionHelper.RequestMicrophontPermission();
             PermissionHelper.RequestCameraPermission();
-        }
-
-        public void CheckEnterPoint()
-        {
-            var returnButton = GameObject.Find("Button");
-            if (agoraBaseProfile.isHomeStart == false)
-            {
-                returnButton.SetActive(false);
-            }
-            
         }
         
         //Show data in AgoraBasicProfile
@@ -92,21 +82,22 @@ namespace Agora_Plugin.API_Example.examples.basic.JoinChannelVideo
             _mRtcEngine.JoinChannel(token, channelName);
         }
 
+        private void OnDestroy()
+        {
+            Debug.Log("OnDestroy");
+            if (_mRtcEngine == null) return;
+            _mRtcEngine.LeaveChannel();
+        }
+
         private void OnApplicationQuit()
         {
             Debug.Log("OnApplicationQuit");
-            agoraBaseProfile.isHomeStart = false;
-            if (_mRtcEngine == null) return;
-            _mRtcEngine.LeaveChannel();
-            _mRtcEngine.Dispose();
-        }
-
-        public void OnLeaveButtonClicked()
-        {
-            _mRtcEngine.LeaveChannel();
-            _mRtcEngine.Dispose();
-            SceneManager.LoadScene("HomeScene", LoadSceneMode.Single);
-            Destroy(gameObject);
+            if (_mRtcEngine != null)
+            {
+                _mRtcEngine.LeaveChannel();
+                _mRtcEngine.Dispose();
+                _mRtcEngine = null;
+            }
         }
 
         internal string GetChannelName()
