@@ -11,6 +11,11 @@ using Logger = agora.util.Logger;
 
 public class Home : MonoBehaviour
 {
+    public InputField appIdInupt;
+    public InputField channelInput;
+    public InputField tokenInput;
+
+
     public AgoraBaseProfile profile;
     public GameObject casePanel;
     public GameObject caseScoller;
@@ -40,6 +45,14 @@ public class Home : MonoBehaviour
             //var rectTrans = go.GetComponent<RectTransform>();
             //rectTrans.anchoredPosition = new Vector2(0, i * (-100));
         }
+
+        if (this.profile)
+        {
+            this.appIdInupt.text = this.profile.appID;
+            this.channelInput.text = this.profile.channelName;
+            this.tokenInput.text = this.profile.token;
+        }
+
     }
 
     // Start is called before the first frame update
@@ -81,6 +94,10 @@ public class Home : MonoBehaviour
 
     public void OnJoinSceneClicked()
     {
+        this.profile.appID = this.appIdInupt.text;
+        this.profile.channelName = this.channelInput.text;
+        this.profile.token = this.tokenInput.text;
+
         var button = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
         var sceneName = button.transform.parent.Find("Text").gameObject.GetComponent<Text>().text;
 
