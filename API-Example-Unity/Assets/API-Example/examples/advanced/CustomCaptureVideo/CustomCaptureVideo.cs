@@ -6,6 +6,10 @@ using agora.util;
 using UnityEngine.Serialization;
 using Logger = agora.util.Logger;
 
+#if UNITY_2018_1_OR_NEWER
+using Unity.Collections;
+#endif
+
 namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
 {
     public class CustomCaptureVideo : MonoBehaviour
