@@ -296,7 +296,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0.000030517578, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -0.000061035, y: 12.96}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &512630800
@@ -488,7 +488,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   agoraBaseProfile: {fileID: 11400000, guid: 1213b3eb894c348dbbb59da31d2b1c7e, type: 2}
-  agoraBaseProfile2: {fileID: 11400000, guid: 624ad8459e56c4dfbb13aad3366ee8fd, type: 2}
+  agoraBaseProfile2: {fileID: 0}
   appID: 
   token: 
   channelName: 
@@ -763,10 +763,10 @@ RectTransform:
   m_Father: {fileID: 556069812}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.5}
-  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 96}
-  m_SizeDelta: {x: 486.9, y: 521.2}
+  m_SizeDelta: {x: -248.5, y: -198.79999}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!1 &892345470
 GameObject:

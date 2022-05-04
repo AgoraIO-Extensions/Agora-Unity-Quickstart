@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
-using UnityEngine.SceneManagement;
 using agora.rtc;
 using agora.util;
-using UnityEditor;
 using Logger = agora.util.Logger;
 
 
@@ -181,7 +179,7 @@ namespace Agora_Plugin.API_Example.examples.basic.JoinChannelVideo
             //var xPos = Random.Range(Offset - Screen.width / 2f, Screen.width / 2f - Offset);
             //var yPos = Random.Range(Offset, Screen.height / 2f - Offset);
             //Debug.Log("position x " + xPos + " y: " + yPos);
-            go.transform.localPosition = new Vector3(Screen.width / 2f - Offset, Screen.height / 2f - Offset, 0f);
+            go.transform.localPosition = Vector3.zero;//new Vector3(Screen.width / 2f - Offset, Screen.height / 2f - Offset, 0f);
             go.transform.localScale = new Vector3(2f, 3f, 1f);
 
             // configure videoSurface
