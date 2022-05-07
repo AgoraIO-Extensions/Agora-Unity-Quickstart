@@ -29,7 +29,7 @@ public class CommandBuild : MonoBehaviour
             "Assets/API-Example/examples/advanced/JoinChannelWithUserAccount/StringUidScene.unity",
             "Assets/API-Example/examples/advanced/MediaPlayer/MediaPlayerScene.unity",
             "Assets/API-Example/examples/advanced/ProcessRawData/ProcessRawDataScene.unity",
-            "Assets/API-Example/examples/advanced/PushVideoImage/PushVideoImageScene.unity",
+            "Assets/API-Example/examples/advanced/PushEncodedVideoImage/PushEncodedVideoImageScene.unity",
             "Assets/API-Example/examples/advanced/RtmpStreaming/RtmpStreamingScene.unity",
             "Assets/API-Example/examples/advanced/ScreenShare/ScreenShareScene.unity",
             "Assets/API-Example/examples/advanced/ScreenShareWhileVideoCall/ScreenShareWhileVideoCallScene.unity",

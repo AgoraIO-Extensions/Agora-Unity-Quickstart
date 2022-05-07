@@ -352,7 +352,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1136039617}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d47874c382c7f42728e0defaf171289b, type: 3}
+  m_Script: {fileID: 11500000, guid: f0b155aeab44f48dfa41533c4fd66d04, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   agoraBaseProfile: {fileID: 11400000, guid: 1213b3eb894c348dbbb59da31d2b1c7e, type: 2}
