@@ -300,7 +300,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.RtmpStreaming
                 _rtmpStreaming.StartTranscoding(true);
                 _rtmpStreaming.Logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}",
                     connection.localUid, elapsed));
-                _rtmpStreaming.MakeVideoView(connection.localUid, _rtmpStreaming.GetChannelName());
+                _rtmpStreaming.MakeVideoView(remoteUid, _rtmpStreaming.GetChannelName());
             }
 
             public override void OnUserOffline(RtcConnection connection, uint remoteUid,

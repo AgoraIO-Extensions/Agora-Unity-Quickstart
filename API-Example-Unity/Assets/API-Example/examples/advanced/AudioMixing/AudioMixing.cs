@@ -87,9 +87,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
 
 #if UNITY_ANDROID && !UNITY_EDITOR
         // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
-        localPath = "/assets/audio/DESERTMUSIC.wav";
+        localPath = "/assets/audio/Agora.io-Interactions.mp3";
 #else
-            localPath = Application.streamingAssetsPath + "/audio/" + "DESERTMUSIC.wav";
+            localPath = Application.streamingAssetsPath + "/audio/" + "Agora.io-Interactions.mp3";
 #endif
             Logger.UpdateLog(string.Format("the audio file path: {0}", localPath));
 
