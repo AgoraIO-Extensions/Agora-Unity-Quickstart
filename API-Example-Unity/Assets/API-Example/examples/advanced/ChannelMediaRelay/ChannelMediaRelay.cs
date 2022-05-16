@@ -142,7 +142,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
             };
             config.destCount = 1;
 
-            mRtcEngine.StartChannelMediaRelay(config);
+            var nRet = mRtcEngine.StartChannelMediaRelay(config);
+            this.logger.UpdateLog("StartChannelMediaRelay nRet:" + nRet);
 
         }
 
@@ -172,24 +173,26 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
             config.destCount = 1;
 
             //after StartChannelMediaRelay you can use StartChannelMediaRelay to remove or relay to anthoner channel
-            mRtcEngine.UpdateChannelMediaRelay(config);
-
-
+            var nRet = mRtcEngine.UpdateChannelMediaRelay(config);
+            this.logger.UpdateLog("UpdateChannelMediaRelay nRet:" + nRet);
         }
 
         void onPauseAllButtonClick()
         {
-            mRtcEngine.PauseAllChannelMediaRelay();
+            var nRet = mRtcEngine.PauseAllChannelMediaRelay();
+            this.logger.UpdateLog("UpdateChannelMediaRelay nRet:" + nRet);
         }
 
         void OnResumeAllButtonClick()
         {
-            mRtcEngine.ResumeAllChannelMediaRelay();
+            var nRet = mRtcEngine.ResumeAllChannelMediaRelay();
+            this.logger.UpdateLog("UpdateChannelMediaRelay nRet:" + nRet);
         }
 
         void OnStopButtonClick()
         {
-            mRtcEngine.StopChannelMediaRelay();
+            var nRet = mRtcEngine.StopChannelMediaRelay();
+            this.logger.UpdateLog("UpdateChannelMediaRelay nRet:" + nRet);
         }
 
         void OnApplicationQuit()
@@ -344,7 +347,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
 
         public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
         {
-            _channelMediaRelay.logger.UpdateLog("OnClientRoleChanged");
+            _channelMediaRelay.logger.UpdateLog(string.Format("OnClientRoleChanged {0}, {1}", oldRole, newRole));
         }
 
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
@@ -363,12 +366,12 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
         public override void OnChannelMediaRelayEvent(int code)
         {
             _channelMediaRelay.logger.UpdateLog(string.Format("OnChannelMediaRelayEvent: {0}", code));
-                
+
         }
 
         public override void OnChannelMediaRelayStateChanged(int state, int code)
         {
-            _channelMediaRelay.logger.UpdateLog(string.Format("OnChannelMediaRelayStateChanged state: {0}, code: {1}", state,code));
+            _channelMediaRelay.logger.UpdateLog(string.Format("OnChannelMediaRelayStateChanged state: {0}, code: {1}", state, code));
         }
     }
 }

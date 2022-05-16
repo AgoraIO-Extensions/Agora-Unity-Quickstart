@@ -89,7 +89,8 @@ namespace CustomRenderAudio
         void InitRtcEngine()
         {
             AgoraRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
-            AgoraRtcEngine.SetExternalAudioSink(SAMPLE_RATE, CHANNEL);
+            var nRet = AgoraRtcEngine.SetExternalAudioSink(SAMPLE_RATE, CHANNEL);
+            this.Logger.UpdateLog("SetExternalAudioSink ret:" + nRet);
 
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(handler, appID, null, true,

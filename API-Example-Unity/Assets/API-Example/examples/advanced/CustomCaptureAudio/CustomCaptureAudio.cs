@@ -90,12 +90,14 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
             AgoraRtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             AgoraRtcEngine.EnableAudio();
-            AgoraRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            var nRet = AgoraRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            this.logger.UpdateLog("SetClientRole nRet:" + nRet);
         }
 
         private void SetExternalAudioSource()
         {
-            AgoraRtcEngine.SetExternalAudioSource(true, SAMPLE_RATE, CHANNEL, 1);
+            var nRet = AgoraRtcEngine.SetExternalAudioSource(true, SAMPLE_RATE, CHANNEL, 1);
+            this.logger.UpdateLog("SetExternalAudioSource nRet:" + nRet);
         }
 
         void StartPushAudioFrame()

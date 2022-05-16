@@ -488,7 +488,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   agoraBaseProfile: {fileID: 11400000, guid: 1213b3eb894c348dbbb59da31d2b1c7e, type: 2}
-  agoraBaseProfile2: {fileID: 0}
+  agoraBaseProfile2: {fileID: 11400000, guid: 4fd6463f50aad4ab4a65de33e3bbd460, type: 2}
   appID: 
   token: 
   channelName: 

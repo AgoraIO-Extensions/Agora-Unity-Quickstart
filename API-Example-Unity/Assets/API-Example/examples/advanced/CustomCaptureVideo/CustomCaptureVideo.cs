@@ -125,7 +125,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
         {
             var ret = _mRtcEngine.SetExternalVideoSource(true, false, EXTERNAL_VIDEO_SOURCE_TYPE.VIDEO_FRAME,
                 new EncodedVideoTrackOptions());
-            Debug.Log("SetExternalVideoSource returns:" + ret);
+            this.Logger.UpdateLog("SetExternalVideoSource returns:" + ret);
         }
 
         private void JoinChannel()
