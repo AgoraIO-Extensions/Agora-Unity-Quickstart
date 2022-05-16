@@ -90,12 +90,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
                 publishEncodedVideoTrack = true,
                 clientRoleType = CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER,
                 channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
-                encodedVideoTrackOption = new EncodedVideoTrackOptions
-                {
-                    ccMode = TCcMode.CC_ENABLED,
-                    codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_GENERIC,
-                    targetBitrate = 6500
-                }
             };
 
             mRtcEngine.JoinChannel(token, channelName, 0, option);
@@ -268,8 +262,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
                 type = VIDEO_STREAM_TYPE.VIDEO_STREAM_HIGH,
                 encodedFrameOnly = true
             };
-            int nRet = _pushEncodedVideoImage.mRtcEngine.SetRemoteVideoSubscriptionOptions(uid, options);
-            _pushEncodedVideoImage.logger.UpdateLog("SetRemoteVideoSubscriptionOptions nRet:" + nRet);
+            //int nRet = _pushEncodedVideoImage.mRtcEngine.SetRemoteVideoSubscriptionOptions(uid, options);
+            //_pushEncodedVideoImage.logger.UpdateLog("SetRemoteVideoSubscriptionOptions nRet:" + nRet);
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)

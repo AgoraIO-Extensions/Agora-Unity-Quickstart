@@ -115,7 +115,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             _mRtcEngine.Initialize(context);
-            _mRtcEngine.InitEventHandler(new UserEventHandler(this));
+            _mRtcEngine.InitEventHandler(handler);
             _mRtcEngine.EnableAudio();
             _mRtcEngine.EnableVideo();
             _mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);

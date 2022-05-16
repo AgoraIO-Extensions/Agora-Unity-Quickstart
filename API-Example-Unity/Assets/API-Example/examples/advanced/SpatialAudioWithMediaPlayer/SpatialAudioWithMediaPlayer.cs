@@ -129,7 +129,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
             options.publishMediaPlayerId = playerId;
             options.enableAudioRecordingOrPlayout = false;
             options.clientRoleType = CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER;
-            var ret = _mRtcEngine.JoinChannelEx("", connection, options, null);
+            var ret = _mRtcEngine.JoinChannelEx("", connection, options);
             _mRtcEngine.UpdateChannelMediaOptionsEx(options, connection);
             Debug.Log("RtcEngineController JoinChannelEx_MPK returns: " + ret);
         }
@@ -146,7 +146,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
             options.publishCameraTrack = false;
             options.enableAudioRecordingOrPlayout = true;
             options.clientRoleType = CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER;
-            var ret = _mRtcEngine.JoinChannelEx("", connection, options, null);
+            var ret = _mRtcEngine.JoinChannelEx("", connection, options);
             Debug.Log("RtcEngineController JoinChannelEx returns: " + ret);
         }
 

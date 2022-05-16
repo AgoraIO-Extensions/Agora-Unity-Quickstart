@@ -88,7 +88,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShareWhileVideoCall
             options.publishScreenTrack = true;
             options.enableAudioRecordingOrPlayout = false;
             options.clientRoleType = CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER;
-            var ret = _mRtcEngine.JoinChannelEx(token, new RtcConnection(channelName, 456), options, null);
+            var ret = _mRtcEngine.JoinChannelEx(token, new RtcConnection(channelName, 456), options);
             Debug.Log("JoinChannelEx returns: " + ret);
         }
 

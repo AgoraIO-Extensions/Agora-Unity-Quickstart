@@ -116,7 +116,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
             options2.publishSecondaryCameraTrack = true;
             options2.enableAudioRecordingOrPlayout = false;
             options2.clientRoleType = CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER;
-            ret = _mRtcEngine.JoinChannelEx(token, new RtcConnection(channelName, 456), options2, null);
+            ret = _mRtcEngine.JoinChannelEx(token, new RtcConnection(channelName, 456), options2);
             Debug.Log("JoinChannelEx returns: " + ret);
         }
         

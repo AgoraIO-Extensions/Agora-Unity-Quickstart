@@ -332,12 +332,10 @@ namespace Agora_Plugin.API_Example.examples.advanced.RtmpStreaming
                 _rtmpStreaming.Logger.UpdateLog(string.Format("OnStreamPublished url: {0}, error : {1}", url, error));
             }
 
-            public override void OnRtmpStreamingStateChanged(string url, RTMP_STREAM_PUBLISH_STATE state,
-                RTMP_STREAM_PUBLISH_ERROR code)
+            public override void OnRtmpStreamingStateChanged(string url, RTMP_STREAM_PUBLISH_STATE state, RTMP_STREAM_PUBLISH_ERROR_TYPE errCode)
             {
                 _rtmpStreaming.Logger.UpdateLog(string.Format(
-                    "OnRtmpStreamingStateChanged url: {0}, state: {1}, code: {2}", url, state,
-                    code));
+                    "OnRtmpStreamingStateChanged url: {0}, state:{1} code: {2}", url, state, errCode));
             }
 
             // public override void OnRtmpStreamingEvent(string url, RTMP_STREAMING_EVENT code)

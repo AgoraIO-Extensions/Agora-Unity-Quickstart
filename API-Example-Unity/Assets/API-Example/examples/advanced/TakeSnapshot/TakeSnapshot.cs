@@ -109,7 +109,13 @@ namespace Agora_Plugin.API_Example.examples.basic.TakeSnapshot
             //uid 0 means self. you can get other user uid in OnUserJoined()
             uint uid = 0;
             string filePath =  Path.Combine(Application.persistentDataPath,"takeSnapshot.jpg");
-            int nRet = _mRtcEngine.TakeSnapshot(this.channelName, uid, filePath);
+            var config = new SnapShotConfig()
+            {
+                channel = this.channelName,
+                uid = uid,
+                filePath = filePath
+            };
+            int nRet = _mRtcEngine.TakeSnapshot(config);
             this.Logger.UpdateLog("TakeSnapshot nRet: " + nRet);
             this.Logger.UpdateLog("TakeSnapshot in " + filePath);
         }

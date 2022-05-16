@@ -128,7 +128,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.StreamMessage
                 var config = new DataStreamConfig();
                 config.syncWithAudio = false;
                 config.ordered = true;
-                streamId = mRtcEngine.CreateDataStream(config);
+                mRtcEngine.CreateDataStream(ref this.streamId, config);
             }
             return streamId;
         }
