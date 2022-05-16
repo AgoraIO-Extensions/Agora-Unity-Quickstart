@@ -86,6 +86,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
 
         private void GetAudioRecordingDevice()
         {
+          
             _audioRecordingDeviceManager = _mRtcEngine.GetAgoraRtcAudioRecordingDeviceManager();
             _audioRecordingDeviceInfos = _audioRecordingDeviceManager.EnumerateRecordingDevices();
             Logger.UpdateLog(string.Format("AudioRecordingDevice count: {0}", _audioRecordingDeviceInfos.Length));
@@ -110,7 +111,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
 
         private void GetVideoDeviceManager()
         {
-            _mRtcEngine.StartPreview();
+            var nRet = _mRtcEngine.StartPreview();
+            this.Logger.UpdateLog("StartPreview: nRet" + nRet);
             _videoDeviceManager = _mRtcEngine.GetAgoraRtcVideoDeviceManager();
             _videoDeviceInfos = _videoDeviceManager.EnumerateVideoDevices();
             Logger.UpdateLog(string.Format("VideoDeviceManager count: {0}", _videoDeviceInfos.Length));
