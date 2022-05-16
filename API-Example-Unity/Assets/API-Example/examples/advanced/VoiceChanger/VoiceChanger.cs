@@ -85,6 +85,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.VoiceChanger
         void SetupUI()
         {
             Transform content = GameObject.Find("Canvas/Scroll View/Viewport/Content").transform;
+
             Button but = content.Find("ChatBeautifierButton").GetComponent<Button>();
             but.onClick.AddListener(OnChatBeautifierButtonPress);
 
@@ -97,10 +98,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.VoiceChanger
             but = content.Find("OffVoiceBeautifierButton").GetComponent<Button>();
             but.onClick.AddListener(OnOffVoiceBeautifierButtonPress);
 
-            but = content.Find("OffVoiceBeautifierButton").GetComponent<Button>();
-            but.onClick.AddListener(OnOffVoiceBeautifierButtonPress);
-
-
+          
             but = content.Find("StyleTransformationButton").GetComponent<Button>();
             but.onClick.AddListener(OnStyleTransformationButtonPress);
 
