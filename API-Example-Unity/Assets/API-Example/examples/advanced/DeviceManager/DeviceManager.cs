@@ -5,18 +5,22 @@ using agora.util;
 using UnityEngine.Serialization;
 using Logger = agora.util.Logger;
 
-namespace DeviceManager
+namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
 {
     public class DeviceManager : MonoBehaviour
     {
+        [FormerlySerializedAs("AgoraBaseProfile")] [SerializeField]
+        private AgoraBaseProfile agoraBaseProfile;
+        
+        [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")] [SerializeField]
-        private string appID = "YOUR_APPID";
+        private string appID = "";
 
         [FormerlySerializedAs("TOKEN")] [SerializeField]
         private string token = "";
 
         [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
-        private string channelName = "YOUR_CHANNEL_NAME";
+        private string channelName = "";
 
         public Text logText;
         internal Logger Logger;
@@ -32,6 +36,7 @@ namespace DeviceManager
         // Start is called before the first frame update
         private void Start()
         {
+            LoadAssetData();
             CheckAppId();
             InitRtcEngine();
             CallDeviceManagerApi();
@@ -47,6 +52,16 @@ namespace DeviceManager
         {
             Logger = new Logger(logText);
             Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in Canvas!!!!!");
+        }
+        
+        //Show data in AgoraBasicProfile
+        [ContextMenu("ShowAgoraBasicProfileData")]
+        public void LoadAssetData()
+        {
+            if (agoraBaseProfile == null) return;
+            appID = agoraBaseProfile.appID;
+            token = agoraBaseProfile.token;
+            channelName = agoraBaseProfile.channelName;
         }
 
         private void InitRtcEngine()
@@ -131,12 +146,19 @@ namespace DeviceManager
             _mRtcEngine.JoinChannel(token, channelName, "");
         }
 
+        private void OnDestroy()
+        {
+            Debug.Log("OnDestroy");
+        }
+
         private void OnApplicationQuit()
         {
             Debug.Log("OnApplicationQuit");
-            if (_mRtcEngine == null) return;
-            _mRtcEngine.LeaveChannel();
-            _mRtcEngine.Dispose();
+            if (_mRtcEngine != null)
+            {
+                _mRtcEngine.Dispose();
+                _mRtcEngine = null;
+            }
         }
     }
     
@@ -161,8 +183,8 @@ namespace DeviceManager
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            // _deviceManagerSample.Logger.UpdateLog(string.Format("sdk version: ${0}",
-            //     _deviceManagerSample.AgoraRtcEngine.GetVersion()));
+            _deviceManagerSample.Logger.UpdateLog(string.Format("sdk version: ${0}",
+                _deviceManagerSample._mRtcEngine.GetVersion()));
             _deviceManagerSample.Logger.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", 
                                 connection.channelId, connection.localUid, elapsed));

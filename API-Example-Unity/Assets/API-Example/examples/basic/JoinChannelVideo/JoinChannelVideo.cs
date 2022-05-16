@@ -6,10 +6,14 @@ using agora.util;
 using Logger = agora.util.Logger;
 
 
-namespace JoinChannelVideo
+namespace Agora_Plugin.API_Example.examples.basic.JoinChannelVideo
 {
     public class JoinChannelVideo : MonoBehaviour
     {
+        [FormerlySerializedAs("AgoraBaseProfile")] [SerializeField]
+        private AgoraBaseProfile agoraBaseProfile;
+        
+        [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")] [SerializeField]
         private string appID = "";
 
@@ -17,7 +21,7 @@ namespace JoinChannelVideo
         private string token = "";
 
         [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
-        private string channelName = "YOUR_CHANNEL_NAME";
+        private string channelName = "";
 
         public Text logText;
         internal Logger Logger;
@@ -27,6 +31,7 @@ namespace JoinChannelVideo
         // Use this for initialization
         private void Start()
         {
+            LoadAssetData();
             CheckAppId();
             InitEngine();
             JoinChannel();
@@ -38,7 +43,18 @@ namespace JoinChannelVideo
             PermissionHelper.RequestMicrophontPermission();
             PermissionHelper.RequestCameraPermission();
         }
+        
+        //Show data in AgoraBasicProfile
+        [ContextMenu("ShowAgoraBasicProfileData")]
+        public void LoadAssetData()
+        {
+            if (agoraBaseProfile == null) return;
+            appID = agoraBaseProfile.appID;
+            token = agoraBaseProfile.token;
+            channelName = agoraBaseProfile.channelName;
+        }
 
+    
         private void CheckAppId()
         {
             Logger = new Logger(logText);
@@ -49,31 +65,37 @@ namespace JoinChannelVideo
         {
             _mRtcEngine = AgoraRtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(handler, appID, null, true, 
+            RtcEngineContext context = new RtcEngineContext(null, appID, null, true, 
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            var ret = _mRtcEngine.Initialize(context);
-            Debug.Log("Agora: Initialize " + ret);
+            _mRtcEngine.Initialize(context);
             _mRtcEngine.InitEventHandler(handler);
-            //_mRtcEngine.SetLogFile("./log.txt");
+            _mRtcEngine.EnableAudio();
+            _mRtcEngine.EnableVideo();
+            _mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
         }
 
         private void JoinChannel()
         {
-            _mRtcEngine.EnableAudio();
-            _mRtcEngine.EnableVideo();
-            _mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            var ret = _mRtcEngine.SetVideoEncoderConfiguration(new VideoEncoderConfiguration { dimensions = new VideoDimensions { height = 2160, width = 4096} });
-            ret = _mRtcEngine.JoinChannel(token, channelName);
-            Debug.Log("Agora: JoinChannel " + ret);
+            _mRtcEngine.JoinChannel(token, channelName);
+        }
+
+        private void OnDestroy()
+        {
+            Debug.Log("OnDestroy");
+            if (_mRtcEngine == null) return;
+            _mRtcEngine.LeaveChannel();
         }
 
         private void OnApplicationQuit()
         {
             Debug.Log("OnApplicationQuit");
-            if (_mRtcEngine == null) return;
-            _mRtcEngine.LeaveChannel();
-            _mRtcEngine.Dispose();
+            if (_mRtcEngine != null)
+            {
+                _mRtcEngine.LeaveChannel();
+                _mRtcEngine.Dispose();
+                _mRtcEngine = null;
+            }
         }
 
         internal string GetChannelName()
@@ -157,7 +179,7 @@ namespace JoinChannelVideo
             //var xPos = Random.Range(Offset - Screen.width / 2f, Screen.width / 2f - Offset);
             //var yPos = Random.Range(Offset, Screen.height / 2f - Offset);
             //Debug.Log("position x " + xPos + " y: " + yPos);
-            go.transform.localPosition = new Vector3(Screen.width / 2f - Offset, Screen.height / 2f - Offset, 0f);
+            go.transform.localPosition = Vector3.zero;//new Vector3(Screen.width / 2f - Offset, Screen.height / 2f - Offset, 0f);
             go.transform.localScale = new Vector3(2f, 3f, 1f);
 
             // configure videoSurface
@@ -197,8 +219,8 @@ namespace JoinChannelVideo
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
             Debug.Log("Agora: OnJoinChannelSuccess ");
-            // _videoSample.Logger.UpdateLog(string.Format("sdk version: ${0}",
-            //     _videoSample.AgoraRtcEngine.GetVersion()));
+            _videoSample.Logger.UpdateLog(string.Format("sdk version: ${0}",
+                _videoSample._mRtcEngine.GetVersion()));
             _videoSample.Logger.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", 
                                 connection.channelId, connection.localUid, elapsed));
