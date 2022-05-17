@@ -74,8 +74,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
             mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             mRtcEngine.EnableVideo();
 
-            EncodedVideoTrackOptions encodedVideoTrackOptions = new EncodedVideoTrackOptions();
-            mRtcEngine.SetExternalVideoSource(true, true, EXTERNAL_VIDEO_SOURCE_TYPE.ENCODED_VIDEO_FRAME, encodedVideoTrackOptions);
+            mRtcEngine.SetExternalVideoSource(true, true, EXTERNAL_VIDEO_SOURCE_TYPE.ENCODED_VIDEO_FRAME);
         }
 
         void JoinChannel()

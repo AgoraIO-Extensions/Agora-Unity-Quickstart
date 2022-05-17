@@ -123,8 +123,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
 
         private void SetExternalVideoSource()
         {
-            var ret = _mRtcEngine.SetExternalVideoSource(true, false, EXTERNAL_VIDEO_SOURCE_TYPE.VIDEO_FRAME,
-                new EncodedVideoTrackOptions());
+            var ret = _mRtcEngine.SetExternalVideoSource(true, false, EXTERNAL_VIDEO_SOURCE_TYPE.VIDEO_FRAME);
             this.Logger.UpdateLog("SetExternalVideoSource returns:" + ret);
         }
 

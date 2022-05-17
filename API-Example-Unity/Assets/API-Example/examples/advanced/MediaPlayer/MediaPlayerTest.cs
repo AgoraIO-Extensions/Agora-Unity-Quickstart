@@ -192,10 +192,10 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
 
         private void OnDestroy()
         {
-            Debug.Log("OnDestroy");
-            _mediaPlayer.DestroyMediaPlayer(playerId);
-            if (_mRtcEngine == null) return;
-            _mRtcEngine.LeaveChannel();
+            // Debug.Log("OnDestroy");
+            // _mediaPlayer.DestroyMediaPlayer(playerId);
+            // if (_mRtcEngine == null) return;
+            // _mRtcEngine.LeaveChannel();
         }
 
         private void OnApplicationQuit()
