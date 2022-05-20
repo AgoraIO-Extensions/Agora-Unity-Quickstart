@@ -10,17 +10,21 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
 {
     public class SpatialAudioWithMediaPlayer : MonoBehaviour
     {
-        [FormerlySerializedAs("AgoraBaseProfile")] [SerializeField]
+        [FormerlySerializedAs("AgoraBaseProfile")]
+        [SerializeField]
         private AgoraBaseProfile agoraBaseProfile;
-        
+
         [Header("_____________Basic Configuration_____________")]
-        [FormerlySerializedAs("APP_ID")] [SerializeField]
+        [FormerlySerializedAs("APP_ID")]
+        [SerializeField]
         private string appID = "";
 
-        [FormerlySerializedAs("TOKEN")] [SerializeField]
+        [FormerlySerializedAs("TOKEN")]
+        [SerializeField]
         private string token = "";
 
-        [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
+        [FormerlySerializedAs("CHANNEL_NAME")]
+        [SerializeField]
         private string channelName = "";
 
         public Text logText;
@@ -58,7 +62,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
             PermissionHelper.RequestMicrophontPermission();
             PermissionHelper.RequestCameraPermission();
         }
-        
+
         //Show data in AgoraBasicProfile
         [ContextMenu("ShowAgoraBasicProfileData")]
         public void LoadAssetData()
@@ -79,7 +83,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
         {
             _mRtcEngine = AgoraRtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(appID, null, true,
+            RtcEngineContext context = new RtcEngineContext(appID, 0, true,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             var ret = _mRtcEngine.Initialize(context);
@@ -120,15 +124,15 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
             connection.channelId = channelName;
             connection.localUid = uid;
             ChannelMediaOptions options = new ChannelMediaOptions();
-            options.autoSubscribeAudio = false;
-            options.autoSubscribeVideo = false;
-            options.publishAudioTrack = false;
-            options.publishCameraTrack = false;
-            options.publishMediaPlayerAudioTrack = true;
-            options.publishMediaPlayerVideoTrack = true;
-            options.publishMediaPlayerId = playerId;
-            options.enableAudioRecordingOrPlayout = false;
-            options.clientRoleType = CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER;
+            options.autoSubscribeAudio.SetValue(false);
+            options.autoSubscribeVideo.SetValue(false);
+            options.publishAudioTrack.SetValue(false);
+            options.publishCameraTrack.SetValue(false);
+            options.publishMediaPlayerAudioTrack.SetValue(true);
+            options.publishMediaPlayerVideoTrack.SetValue(true);
+            options.publishMediaPlayerId.SetValue(playerId);
+            options.enableAudioRecordingOrPlayout.SetValue(false);
+            options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             var ret = _mRtcEngine.JoinChannelEx("", connection, options);
             _mRtcEngine.UpdateChannelMediaOptionsEx(options, connection);
             Debug.Log("RtcEngineController JoinChannelEx_MPK returns: " + ret);
@@ -140,12 +144,12 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
             connection.channelId = channelName;
             connection.localUid = uid;
             ChannelMediaOptions options = new ChannelMediaOptions();
-            options.autoSubscribeAudio = true;
-            options.autoSubscribeVideo = true;
-            options.publishAudioTrack = true;
-            options.publishCameraTrack = false;
-            options.enableAudioRecordingOrPlayout = true;
-            options.clientRoleType = CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER;
+            options.autoSubscribeAudio.SetValue(true);
+            options.autoSubscribeVideo.SetValue(true);
+            options.publishAudioTrack.SetValue(true);
+            options.publishCameraTrack.SetValue(false);
+            options.enableAudioRecordingOrPlayout.SetValue(true);
+            options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             var ret = _mRtcEngine.JoinChannelEx("", connection, options);
             Debug.Log("RtcEngineController JoinChannelEx returns: " + ret);
         }
@@ -162,23 +166,23 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
 
         private void onLeftLocationPress()
         {
-            float[] f1 = {0.0f, 1.0f, 0.0f};
-            var ret = _spatialAudioEngine.UpdateRemotePositionEx(67890, f1, new float[] { 0,0,0}, new RtcConnection(channelName, 123));
-            Debug.Log("_spatialAudio.UpdateRemotePosition returns: " + ret);   
+            float[] f1 = { 0.0f, 1.0f, 0.0f };
+            var ret = _spatialAudioEngine.UpdateRemotePositionEx(67890, f1, new float[] { 0, 0, 0 }, new RtcConnection(channelName, 123));
+            Debug.Log("_spatialAudio.UpdateRemotePosition returns: " + ret);
         }
 
         private void onRightLocationPress()
         {
-            float[] f1 = {0.0f, -1.0f, 0.0f};
-            var ret = _spatialAudioEngine.UpdateRemotePositionEx(67890, f1, new float[] { 0,0,0}, new RtcConnection(channelName, 123));
-            Debug.Log("_spatialAudio.UpdateRemotePosition returns: " + ret);   
+            float[] f1 = { 0.0f, -1.0f, 0.0f };
+            var ret = _spatialAudioEngine.UpdateRemotePositionEx(67890, f1, new float[] { 0, 0, 0 }, new RtcConnection(channelName, 123));
+            Debug.Log("_spatialAudio.UpdateRemotePosition returns: " + ret);
         }
 
         private void onOpenButtonPress()
         {
             var ret = _mediaPlayer.Open(playerId, MPK_URL, 0);
             Debug.Log("_mediaPlayer.Open returns: " + ret);
-            
+
             _mediaPlayer.AdjustPlayoutVolume(playerId, 0);
         }
 

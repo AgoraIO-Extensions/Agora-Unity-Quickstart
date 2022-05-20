@@ -68,26 +68,26 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShareWhileVideoCall
         private void JoinChannel()
         {
             ChannelMediaOptions options = new ChannelMediaOptions();
-            options.autoSubscribeAudio = true;
-            options.autoSubscribeVideo = true;
-            options.publishAudioTrack = true;
-            options.publishCameraTrack = true;
-            options.publishScreenTrack = false;
-            options.enableAudioRecordingOrPlayout = true;
-            options.clientRoleType = CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER;
+            options.autoSubscribeAudio.SetValue(true);
+            options.autoSubscribeVideo.SetValue(true);
+            options.publishAudioTrack.SetValue(true);
+            options.publishCameraTrack.SetValue(true);
+            options.publishScreenTrack.SetValue(false);
+            options.enableAudioRecordingOrPlayout.SetValue(true);
+            options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             _mRtcEngine.JoinChannel(token, channelName, 123, options);
         }
 
         private void ScreenShareJoinChannel()
         {
             ChannelMediaOptions options = new ChannelMediaOptions();
-            options.autoSubscribeAudio = false;
-            options.autoSubscribeVideo = false;
-            options.publishAudioTrack = false;
-            options.publishCameraTrack = false;
-            options.publishScreenTrack = true;
-            options.enableAudioRecordingOrPlayout = false;
-            options.clientRoleType = CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER;
+            options.autoSubscribeAudio.SetValue(false);
+            options.autoSubscribeVideo.SetValue(false);
+            options.publishAudioTrack.SetValue(false);
+            options.publishCameraTrack.SetValue(false);
+            options.publishScreenTrack.SetValue(true);
+            options.enableAudioRecordingOrPlayout.SetValue(false);
+            options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             var ret = _mRtcEngine.JoinChannelEx(token, new RtcConnection(channelName, 456), options);
             Debug.Log("JoinChannelEx returns: " + ret);
         }
@@ -101,7 +101,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShareWhileVideoCall
         {
             _mRtcEngine = AgoraRtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(appID, null, true, 
+            RtcEngineContext context = new RtcEngineContext(appID, 0, true, 
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             _mRtcEngine.Initialize(context);

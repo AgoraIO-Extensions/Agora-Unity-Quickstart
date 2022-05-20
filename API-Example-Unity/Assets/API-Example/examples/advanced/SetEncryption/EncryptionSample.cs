@@ -65,7 +65,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetEncryption
         void InitRtcEngine()
         {
             mRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
-            RtcEngineContext context = new RtcEngineContext(appID, null, false,
+            RtcEngineContext context = new RtcEngineContext(appID, 0, false,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             mRtcEngine.Initialize(context);

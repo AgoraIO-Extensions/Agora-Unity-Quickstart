@@ -65,7 +65,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
         {
             mRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(appID, null, true,
+            RtcEngineContext context = new RtcEngineContext(appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
             mRtcEngine.Initialize(context);
@@ -81,15 +81,25 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
         {
             var option = new ChannelMediaOptions
             {
-                autoSubscribeVideo = true,
-                autoSubscribeAudio = true,
-                publishAudioTrack = false,
-                publishCameraTrack = false,
-                publishCustomVideoTrack = false,
-                publishEncodedVideoTrack = true,
-                clientRoleType = CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER,
-                channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
+                //    autoSubscribeVideo .SetValue( true);
+                //autoSubscribeAudio.SetValue(true);
+                //publishAudioTrack.SetValue(false);
+                //publishCameraTrack.SetValue(false;
+                //publishCustomVideoTrack.SetValue(false;
+                //publishEncodedVideoTrack.SetValue(true;
+                //clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+                //channelProfile.SetValue(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING);
             };
+
+            option.autoSubscribeVideo.SetValue(true);
+            option.autoSubscribeAudio.SetValue(true);
+            option.publishAudioTrack.SetValue(false);
+            option.publishCameraTrack.SetValue(false);
+            option.publishCustomVideoTrack.SetValue(false);
+            option.publishEncodedVideoTrack.SetValue(true);
+            option.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            option.channelProfile.SetValue(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING);
+
 
             mRtcEngine.JoinChannel(token, channelName, 0, option);
         }
@@ -121,7 +131,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
 
         public void CreateRole(string uid, bool isLocal)
         {
-            var role = Instantiate(this.rolePrefab,this.transform);
+            var role = Instantiate(this.rolePrefab, this.transform);
             role.name = "Role" + uid;
             var text = role.transform.Find("Text").GetComponent<Text>();
             text.text = uid;
