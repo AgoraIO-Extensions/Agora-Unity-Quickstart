@@ -37,6 +37,8 @@ Any scene of this project can run successfully alone.
 | [PlaybackAudioFrame](https://github.com/AgoraIO/Agora-Unity-Quickstart/tree/master/API-Example-Unity/Assets/API-Example/examples/advanced/PlaybackAudioFrame) | playback single user's audio frame on an AudioSource object  | RegisterAudioRawDataObserver, SetOnPlaybackAudioFrameBeforeMixingCallback, OnPlaybackAudioFrameBeforeMixingHandler |
 | [SetVideoEncoderConfiguration](https://github.com/AgoraIO/Agora-Unity-Quickstart/tree/master/API-Example-Unity/Assets/API-Example/examples/advanced/SetVideoEncoderConfiguration) | video demo with multiple encoding dimension choice           | SetVideoEncoderConfiguration                                 |
 | [SendStreamMessage](https://github.com/AgoraIO/Agora-Unity-Quickstart/tree/master/API-Example-Unity/Assets/API-Example/examples/advanced/SendStreamMessage) | Send Messages to other users in channel          | SendStreamMessage                                 |
+|[Echo Test](Assets/API-Example/examples/advanced/EchoTest)| Speak and get echo back | StartEchoTest, StopEchoTest|
+
 
 
 ## How to run the sample project
@@ -58,7 +60,7 @@ Then do the following:
 3. You may download the SDK package in either of the following two ways:
 
     a. From Unity Asset Store download and import [the Agora Video SDK](https://assetstore.unity.com/packages/tools/video/agora-video-chat-sdk-for-unity-134502)
-    
+
     b. Download the ******Agora Video SDK****** from [Agora.io SDK](https://docs.agora.io/en/Video/downloads?platform=Unity). Unzip the downloaded SDK package and copy the files from ******samples/Hello-Video-Unity-Agora/Assets/AgoraEngine/****** in SDK to ******API-Example-Unity/Assets/****** in project
 
 4.  Choose one of the scene that you want to run
