@@ -191,7 +191,7 @@ public class RtmpStreaming : MonoBehaviour
         logger.UpdateLog(string.Format("OnStreamPublished url: {0}, error : {1}", url, error));
     }
 
-    void OnRtmpStreamingStateChangedHandler(string url, RTMP_STREAM_PUBLISH_STATE state, RTMP_STREAM_PUBLISH_ERROR code)
+    void OnRtmpStreamingStateChangedHandler(string url, RTMP_STREAM_PUBLISH_STATE state, RTMP_STREAM_PUBLISH_ERROR_TYPE code)
     {
         logger.UpdateLog(string.Format("OnRtmpStreamingStateChanged url: {0}, state: {1}, code: {2}", url, state,
             code));
