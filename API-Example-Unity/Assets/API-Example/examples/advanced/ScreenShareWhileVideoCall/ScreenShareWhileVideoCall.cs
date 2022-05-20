@@ -120,15 +120,22 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShareWhileVideoCall
 
             _winIdSelect.ClearOptions();
 
-            var displayInfos = _mRtcEngine.GetDisplayInfos();
-            var windowInfos = _mRtcEngine.GetWindowInfos();
+           // var displayInfos = _mRtcEngine.GetDisplayInfos();
+           // var windowInfos = _mRtcEngine.GetWindowInfos();
+            SIZE t = new SIZE();
+            t.width = 360;
+            t.height = 240;
+            SIZE s = new SIZE();
+            s.width = 360;
+            s.height = 240;
+            var info = _mRtcEngine.GetScreenCaptureSources(t, s, true);
 
-            _winIdSelect.AddOptions(displayInfos.Select(w =>
-                new Dropdown.OptionData(
-                    string.Format("Display {0}", w.DisplayId))).ToList());
-            _winIdSelect.AddOptions(windowInfos.Select(w =>
+            //_winIdSelect.AddOptions(info.Select(w =>
+            //    new Dropdown.OptionData(
+            //        string.Format("Display {0}", w.sourceId))).ToList());
+            _winIdSelect.AddOptions(info.Select(w =>
                     new Dropdown.OptionData(
-                        string.Format("{0}-{1} | {2}", w.AppName, w.WindowName, w.WindowId)))
+                        string.Format("{0}-{1} | {2}", w.sourceName, w.sourceTitle, w.sourceId)))
                 .ToList());
             _startShareBtn = GameObject.Find("startShareBtn").GetComponent<Button>();
             _stopShareBtn = GameObject.Find("stopShareBtn").GetComponent<Button>();
