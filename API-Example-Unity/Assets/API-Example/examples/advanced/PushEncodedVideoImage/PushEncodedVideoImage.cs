@@ -65,7 +65,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
         {
             mRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(null, appID, null, true,
+            RtcEngineContext context = new RtcEngineContext(appID, null, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
             mRtcEngine.Initialize(context);
@@ -256,11 +256,11 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
 
 
             //you must set options.encodedFrameOnly = true when you receive other 
-            VideoSubscriptionOptions options = new VideoSubscriptionOptions
-            {
-                type = VIDEO_STREAM_TYPE.VIDEO_STREAM_HIGH,
-                encodedFrameOnly = true
-            };
+            // VideoSubscriptionOptions options = new VideoSubscriptionOptions
+            // {
+            //     type = VIDEO_STREAM_TYPE.VIDEO_STREAM_HIGH,
+            //     encodedFrameOnly = true
+            // };
             //int nRet = _pushEncodedVideoImage.mRtcEngine.SetRemoteVideoSubscriptionOptions(uid, options);
             //_pushEncodedVideoImage.logger.UpdateLog("SetRemoteVideoSubscriptionOptions nRet:" + nRet);
         }

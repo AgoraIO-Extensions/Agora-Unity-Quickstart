@@ -94,7 +94,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
         {
             _mRtcEngine = AgoraRtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(handler, appID, null, true,
+            RtcEngineContext context = new RtcEngineContext(appID, null, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
             _mRtcEngine.Initialize(context);

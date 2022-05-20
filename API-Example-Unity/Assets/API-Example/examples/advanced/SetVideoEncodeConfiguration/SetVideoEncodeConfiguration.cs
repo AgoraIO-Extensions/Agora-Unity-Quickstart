@@ -77,7 +77,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
         {
             mRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(null, appID, null, true,
+            RtcEngineContext context = new RtcEngineContext(appID, null, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             mRtcEngine.Initialize(context);
@@ -103,7 +103,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
             VideoEncoderConfiguration config = new VideoEncoderConfiguration
             {
                 dimensions = dimensions[dim],
-                frameRate = FRAME_RATE.FRAME_RATE_FPS_15,
+                frameRate = 15,
                 codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_GENERIC_H264,
                 bitrate = 0,
                 minBitrate = 1,

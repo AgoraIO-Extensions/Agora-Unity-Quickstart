@@ -90,7 +90,7 @@ namespace CustomRenderAudio
         {
             AgoraRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(handler, appID, null, true,
+            RtcEngineContext context = new RtcEngineContext(appID, null, true,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             var ret = AgoraRtcEngine.Initialize(context);
@@ -145,7 +145,7 @@ namespace CustomRenderAudio
 
             var tic = new TimeSpan(DateTime.Now.Ticks);
 
-            AudioFrame audioFrame = new AudioFrame(type, samples, bytesPerSample, channels, samplesPerSec, buffer, 0, avsync_type);
+            AudioFrame audioFrame = new AudioFrame(type, samples, BYTES_PER_SAMPLE.TWO_BYTES_PER_SAMPLE, channels, samplesPerSec, buffer, 0, avsync_type);
             while (_pullAudioFrameThreadSignal)
             {
                 var toc = new TimeSpan(DateTime.Now.Ticks);

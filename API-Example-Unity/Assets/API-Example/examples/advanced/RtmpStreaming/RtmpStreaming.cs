@@ -70,7 +70,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.RtmpStreaming
         {
             _mRtcEngine = AgoraRtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(handler, appID, null, true,
+            RtcEngineContext context = new RtcEngineContext(appID, null, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             _mRtcEngine.Initialize(context);
@@ -82,7 +82,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.RtmpStreaming
             _mRtcEngine.SetVideoEncoderConfiguration(new VideoEncoderConfiguration
             {
                 dimensions = new VideoDimensions {width = 720, height = 640},
-                frameRate = FRAME_RATE.FRAME_RATE_FPS_24
+                frameRate = 24
             });
             _mRtcEngine.EnableAudio();
             _mRtcEngine.EnableVideo();
