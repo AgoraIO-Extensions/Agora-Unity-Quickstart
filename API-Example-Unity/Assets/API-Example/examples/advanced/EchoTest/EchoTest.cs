@@ -23,9 +23,10 @@ public class EchoTest : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        CheckAppId();
-        InitEngine();
-        // JoinChannel();
+        if (CheckAppId())
+        {
+            InitEngine();
+        }
     }
 
     // Update is called once per frame
@@ -35,10 +36,10 @@ public class EchoTest : MonoBehaviour
         PermissionHelper.RequestCameraPermission();
     }
 
-    void CheckAppId()
+    bool CheckAppId()
     {
         logger = new Logger(logText);
-        logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+        return logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
     }
 
     void InitEngine()
