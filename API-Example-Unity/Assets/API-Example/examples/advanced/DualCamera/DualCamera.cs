@@ -37,7 +37,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
 
         internal bool isJoinChannel = false;
 
-        private IAgoraRtcVideoDeviceManager _videoDeviceManager;
+        private IVideoDeviceManager _videoDeviceManager;
         internal DeviceInfo[] _videoDeviceInfos;
         internal CameraCapturerConfiguration config1;
         internal CameraCapturerConfiguration config2;
@@ -126,7 +126,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
 
         private void GetVideoDeviceManager()
         {
-            _videoDeviceManager = _mRtcEngine.GetAgoraRtcVideoDeviceManager();
+            _videoDeviceManager = _mRtcEngine.GetVideoDeviceManager();
             _videoDeviceInfos = _videoDeviceManager.EnumerateVideoDevices();
             Logger.UpdateLog(string.Format("VideoDeviceManager count: {0}", _videoDeviceInfos.Length));
             for (var i = 0; i < _videoDeviceInfos.Length; i++)

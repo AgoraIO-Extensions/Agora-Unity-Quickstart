@@ -29,7 +29,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
         public Text logText;
         internal Logger Logger;
         private IAgoraRtcEngine _mRtcEngine = null;
-        private IAgoraRtcAudioPlaybackDeviceManager manager = null;
 
         // Start is called before the first frame update
         void Start()
@@ -116,13 +115,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
             var ret = _mRtcEngine.StartAudioMixing(_useURL ? Sound_URL : localPath, true, false, -1);
             Debug.Log("StartAudioMixing returns: " + ret);
         }
-
-        // void StartAudioPlaybackTest()
-        // {
-        //     manager = _mRtcEngine.GetAudioPlaybackDeviceManager();
-        //     manager.CreateAAudioPlaybackDeviceManager();
-        //     manager.StartAudioPlaybackDeviceTest(localPath);
-        // }
 
         void PlayEffectTest()
         {

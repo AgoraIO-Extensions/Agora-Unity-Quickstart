@@ -25,9 +25,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
         public Text logText;
         internal Logger Logger;
         internal IAgoraRtcEngine _mRtcEngine;
-        private IAgoraRtcAudioRecordingDeviceManager _audioRecordingDeviceManager;
-        private IAgoraRtcAudioPlaybackDeviceManager _audioPlaybackDeviceManager;
-        private IAgoraRtcVideoDeviceManager _videoDeviceManager;
+        private IAudioDeviceManager _audioDeviceManager;
+        private IVideoDeviceManager _videoDeviceManager;
         private DeviceInfo[] _audioRecordingDeviceInfos;
         private DeviceInfo[] _audioPlaybackDeviceInfos;
         private DeviceInfo[] _videoDeviceInfos;
@@ -86,9 +85,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
 
         private void GetAudioRecordingDevice()
         {
-          
-            _audioRecordingDeviceManager = _mRtcEngine.GetAgoraRtcAudioRecordingDeviceManager();
-            _audioRecordingDeviceInfos = _audioRecordingDeviceManager.EnumerateRecordingDevices();
+            _audioDeviceManager = _mRtcEngine.GetAudioDeviceManager();
+            _audioRecordingDeviceInfos = _audioDeviceManager.EnumerateRecordingDevices();
             Logger.UpdateLog(string.Format("AudioRecordingDevice count: {0}", _audioRecordingDeviceInfos.Length));
             for (var i = 0; i < _audioRecordingDeviceInfos.Length; i++)
             {
@@ -99,8 +97,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
 
         private void GetAudioPlaybackDevice()
         {
-            _audioPlaybackDeviceManager = _mRtcEngine.GetAgoraRtcAudioPlaybackDeviceManager();
-            _audioPlaybackDeviceInfos = _audioPlaybackDeviceManager.EnumeratePlaybackDevices();
+            _audioDeviceManager = _mRtcEngine.GetAudioDeviceManager();
+            _audioPlaybackDeviceInfos = _audioDeviceManager.EnumeratePlaybackDevices();
             Logger.UpdateLog(string.Format("AudioPlaybackDevice count: {0}", _audioPlaybackDeviceInfos.Length));
             for (var i = 0; i < _audioPlaybackDeviceInfos.Length; i++)
             {
@@ -113,7 +111,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
         {
             var nRet = _mRtcEngine.StartPreview();
             this.Logger.UpdateLog("StartPreview: nRet" + nRet);
-            _videoDeviceManager = _mRtcEngine.GetAgoraRtcVideoDeviceManager();
+            _videoDeviceManager = _mRtcEngine.GetVideoDeviceManager();
             _videoDeviceInfos = _videoDeviceManager.EnumerateVideoDevices();
             Logger.UpdateLog(string.Format("VideoDeviceManager count: {0}", _videoDeviceInfos.Length));
             for (var i = 0; i < _videoDeviceInfos.Length; i++)
@@ -125,10 +123,10 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
 
         private void SetCurrentDevice()
         {
-            if (_audioRecordingDeviceManager != null && _audioRecordingDeviceInfos.Length > 0)
-                _audioRecordingDeviceManager.SetRecordingDevice(_audioRecordingDeviceInfos[DeviceIndex].deviceId);
-            if (_audioPlaybackDeviceManager != null && _audioPlaybackDeviceInfos.Length > 0)
-                _audioPlaybackDeviceManager.SetPlaybackDevice(_audioPlaybackDeviceInfos[DeviceIndex].deviceId);
+            if (_audioDeviceManager != null && _audioRecordingDeviceInfos.Length > 0)
+                _audioDeviceManager.SetRecordingDevice(_audioRecordingDeviceInfos[DeviceIndex].deviceId);
+            if (_audioDeviceManager != null && _audioPlaybackDeviceInfos.Length > 0)
+                _audioDeviceManager.SetPlaybackDevice(_audioPlaybackDeviceInfos[DeviceIndex].deviceId);
             if (_videoDeviceManager != null && _videoDeviceInfos.Length > 0)
             {
                 var ret = _videoDeviceManager.SetDevice(_videoDeviceInfos[DeviceIndex].deviceId);
@@ -139,8 +137,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
 
         private void SetCurrentDeviceVolume()
         {
-            if (_audioRecordingDeviceManager != null) _audioRecordingDeviceManager.SetRecordingDeviceVolume(100);
-            if (_audioPlaybackDeviceManager != null) _audioPlaybackDeviceManager.SetPlaybackDeviceVolume(100);
+            if (_audioDeviceManager != null) _audioDeviceManager.SetRecordingDeviceVolume(100);
+            if (_audioDeviceManager != null) _audioDeviceManager.SetPlaybackDeviceVolume(100);
         }
 
         private void JoinChannel()

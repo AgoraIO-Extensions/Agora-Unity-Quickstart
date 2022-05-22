@@ -73,7 +73,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ProcessRawData
 
 		void JoinChannel()
 		{
-			_mRtcEngine.RegisterVideoFrameObserver(new VideoFrameObserver(this));
+			_mRtcEngine.RegisterVideoFrameObserver(new VideoFrameObserver(this), OBSERVER_MODE.RAW_DATA);
 			_mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
 			_mRtcEngine.EnableAudio();
 			_mRtcEngine.EnableVideo();
