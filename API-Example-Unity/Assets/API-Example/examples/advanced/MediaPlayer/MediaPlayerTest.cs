@@ -29,7 +29,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
         public Text logText;
         internal Logger Logger;
         internal IAgoraRtcEngine _mRtcEngine = null;
-        internal IAgoraRtcMediaPlayer _mediaPlayer = null;
+        internal IAgoraMediaPlayer _mediaPlayer = null;
         internal int playerId = 0;
         
         private const float Offset = 100;
@@ -153,7 +153,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
         
         private void InitMediaPlayer()
         {
-            _mediaPlayer = _mRtcEngine.GetAgoraRtcMediaPlayer();
+            _mediaPlayer = _mRtcEngine.GetAgoraMediaPlayer();
             if (_mediaPlayer == null)
             {
                 Debug.Log("GetAgoraRtcMediaPlayer failed!");
@@ -302,7 +302,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
         }
     }
 
-    internal class MpkEventHandler : IAgoraRtcMediaPlayerEventHandler
+    internal class MpkEventHandler : IMediaPlayerSourceObserver
     {
         private readonly MediaPlayerTest _mediaPlayerTest;
 

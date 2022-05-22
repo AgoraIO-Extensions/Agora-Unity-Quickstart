@@ -30,7 +30,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
         public Text logText;
         internal Logger Logger;
         internal IAgoraRtcEngine _mRtcEngine = null;
-        internal IAgoraRtcMediaPlayer _mediaPlayer = null;
+        internal IAgoraMediaPlayer _mediaPlayer = null;
 
         private const float Offset = 100;
         public int playerId = 0;
@@ -41,7 +41,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
         private Button button2;
         private Button button3;
 
-        public IAgoraRtcSpatialAudioEngine _spatialAudioEngine;
+        public IAgoraLocalSpatialAudioEngine _spatialAudioEngine;
         public int x = 0;
         // Use this for initialization
         private void Start()
@@ -97,7 +97,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
 
         private void InitSpatialAudioEngine()
         {
-            _spatialAudioEngine = _mRtcEngine.GetAgoraRtcSpatialAudioEngine();
+            _spatialAudioEngine = _mRtcEngine.GetAgoraLocalSpatialAudioEngine();
             var ret = _spatialAudioEngine.Initialize();
             Debug.Log("_spatialAudioEngine: Initialize " + ret);
             _spatialAudioEngine.SetAudioRecvRange(30);
@@ -105,7 +105,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
 
         private void InitMediaPlayer()
         {
-            _mediaPlayer = _mRtcEngine.GetAgoraRtcMediaPlayer();
+            _mediaPlayer = _mRtcEngine.GetAgoraMediaPlayer();
             if (_mediaPlayer == null)
             {
                 Debug.Log("GetAgoraRtcMediaPlayer failed!");
@@ -298,7 +298,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
         }
     }
 
-    internal class MpkEventHandler : IAgoraRtcMediaPlayerEventHandler
+    internal class MpkEventHandler : IMediaPlayerSourceObserver
     {
         private readonly SpatialAudioWithMediaPlayer _spatialAudio;
 
