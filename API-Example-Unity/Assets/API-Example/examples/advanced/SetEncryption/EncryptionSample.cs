@@ -29,7 +29,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetEncryption
 
         public Text logText;
         private Logger logger;
-        private IRtcEngine mRtcEngine = null;
+        private IAgoraRtcEngine mRtcEngine = null;
 
         // Start is called before the first frame update
         void Start()
