@@ -26,7 +26,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ProcessRawData
 
 		public Text logText;
 		private Logger Logger;
-		private IAgoraRtcEngine _mRtcEngine;
+		private IRtcEngine mRtcEngine;
 		private const float Offset = 100;
 		
 		void Start()
@@ -47,7 +47,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ProcessRawData
 		void CheckAppId()
 		{
 			Logger = new Logger(logText);
-			Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+			Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/AgoraBaseProfile.asset");
 		}
 		
 		//Show data in AgoraBasicProfile
@@ -62,38 +62,39 @@ namespace Agora_Plugin.API_Example.examples.advanced.ProcessRawData
 
 		void InitEngine()
 		{
-			_mRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
+			mRtcEngine = RtcEngineImpl.CreateAgoraRtcEngine();
 			UserEventHandler handler = new UserEventHandler(this);
 			RtcEngineContext context = new RtcEngineContext(appID, 0, true,
 				CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
 				AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-			_mRtcEngine.Initialize(context);
-			_mRtcEngine.InitEventHandler(handler);
+			mRtcEngine.Initialize(context);
+			mRtcEngine.InitEventHandler(handler);
 		}
 
 		void JoinChannel()
 		{
-			_mRtcEngine.RegisterVideoFrameObserver(new VideoFrameObserver(this), OBSERVER_MODE.RAW_DATA);
-			_mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-			_mRtcEngine.EnableAudio();
-			_mRtcEngine.EnableVideo();
-			_mRtcEngine.JoinChannel(token, channelName, "");
+			mRtcEngine.RegisterVideoFrameObserver(new VideoFrameObserver(this), OBSERVER_MODE.RAW_DATA);
+			mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+			mRtcEngine.EnableAudio();
+			mRtcEngine.EnableVideo();
+			mRtcEngine.JoinChannel(token, channelName, "");
 		}
 
 		void OnApplicationQuit()
 		{
 			Debug.Log("OnApplicationQuit1");
-			if (_mRtcEngine != null)
+			if (mRtcEngine != null)
 			{
-				_mRtcEngine.UnRegisterVideoFrameObserver();
-				_mRtcEngine.LeaveChannel();
-				_mRtcEngine.Dispose();
+				mRtcEngine.UnRegisterVideoFrameObserver();
+				mRtcEngine.InitEventHandler(null);
+            mRtcEngine.LeaveChannel();
+				mRtcEngine.Dispose();
 			}
 
 			Debug.Log("OnApplicationQuit2");
 		}
 
-		internal class UserEventHandler : IAgoraRtcEngineEventHandler
+		internal class UserEventHandler : IRtcEngineEventHandler
 		{
 			private readonly ProcessRawData _agoraVideoRawData;
 
@@ -115,7 +116,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ProcessRawData
 			public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
 			{
 				_agoraVideoRawData.Logger.UpdateLog(string.Format("sdk version: ${0}",
-					_agoraVideoRawData._mRtcEngine.GetVersion()));
+					_agoraVideoRawData.mRtcEngine.GetVersion()));
 				_agoraVideoRawData.Logger.UpdateLog(
 					string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
 						connection.channelId, connection.localUid, elapsed));
@@ -150,7 +151,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ProcessRawData
 			}
 		}
 
-		internal class VideoFrameObserver : IAgoraRtcVideoFrameObserver
+		internal class VideoFrameObserver : IVideoFrameObserver
 		{
 			private readonly ProcessRawData _agoraVideoRawData;
 

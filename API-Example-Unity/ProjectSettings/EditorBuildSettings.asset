@@ -27,7 +27,7 @@ EditorBuildSettings:
     path: Assets/API-Example/examples/advanced/CustomCaptureVideo/CustomCaptureVideoScene.unity
     guid: fe8f82a41e3634955919d48ad07fbe8e
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/CustomRenderAudio/MainScene.unity
+    path: Assets/API-Example/examples/advanced/CustomRenderAudio/CustomRenderAudioScene.unity
     guid: 41608019a4839450bbb216fbcfcf92e3
   - enabled: 1
     path: Assets/API-Example/examples/advanced/DeviceManager/DeviceManagerScene.unity
@@ -36,10 +36,10 @@ EditorBuildSettings:
     path: Assets/API-Example/examples/advanced/DualCamera/DualCameraScene.unity
     guid: ac201fe1bea7741e99a36ffc2f2685f6
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/JoinChannelVideoToken/MainScene.unity
+    path: Assets/API-Example/examples/advanced/JoinChannelVideoToken/JoinChannelVideoTokenScene.unity
     guid: 84f4d732120eb41a4934ec95f53c58d7
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/JoinChannelWithUserAccount/StringUidScene.unity
+    path: Assets/API-Example/examples/advanced/JoinChannelWithUserAccount/JoinChannelWithUserAccountScene.unity
     guid: 502801de36f36427db552a920ec9ebe1
   - enabled: 1
     path: Assets/API-Example/examples/advanced/MediaPlayer/MediaPlayerScene.unity
@@ -80,3 +80,4 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/API-Example/examples/advanced/VoiceChanger/VoiceChangerScene.unity
     guid: 5e00dd36388ca4686be1bdf82e52b79d
+  m_configObjects: {}

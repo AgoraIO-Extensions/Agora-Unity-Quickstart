@@ -30,7 +30,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.VoiceChanger
 
         public Text logText;
         private Logger logger;
-        internal IAgoraRtcEngine mRtcEngine = null;
+        internal IRtcEngine mRtcEngine = null;
 
 
         void Start()
@@ -55,12 +55,12 @@ namespace Agora_Plugin.API_Example.examples.advanced.VoiceChanger
         void CheckAppId()
         {
             logger = new Logger(logText);
-            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/AgoraBaseProfile.asset");
         }
 
         void InitEngine()
         {
-            mRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
+            mRtcEngine = RtcEngineImpl.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
@@ -121,6 +121,14 @@ namespace Agora_Plugin.API_Example.examples.advanced.VoiceChanger
 
             but = content.Find("CustomVocalEffectsButton").GetComponent<Button>();
             but.onClick.AddListener(OnCustomVocalEffectsButtonPress);
+        }
+
+        private void OnDestroy()
+        {
+            Debug.Log("OnDestroy");
+            if (mRtcEngine == null) return;
+            mRtcEngine.InitEventHandler(null);
+            mRtcEngine.LeaveChannel();
         }
 
         void OnApplicationQuit()
@@ -259,7 +267,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.VoiceChanger
         #endregion
 
 
-        internal class UserEventHandler : IAgoraRtcEngineEventHandler
+        internal class UserEventHandler : IRtcEngineEventHandler
         {
             private readonly VoiceChanger _voiceChanger;
 

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using agora.rtc;
@@ -28,7 +28,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
 
         public Text logText;
         internal Logger Logger;
-        internal IAgoraRtcEngine _mRtcEngine = null;
+        internal IRtcEngine mRtcEngine = null;
         private const float Offset = 100;
 
         private Button _JoinChannelbutton;
@@ -61,7 +61,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
         private void CheckAppId()
         {
             Logger = new Logger(logText);
-            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/AgoraBaseProfile.asset");
         }
 
         //Show data in AgoraBasicProfile
@@ -76,23 +76,23 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
 
         private void InitEngine()
         {
-            _mRtcEngine = AgoraRtcEngine.CreateAgoraRtcEngine();
+            mRtcEngine = RtcEngineImpl.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            _mRtcEngine.Initialize(context);
-            _mRtcEngine.InitEventHandler(handler);
-            _mRtcEngine.SetLogFile("./log.txt");
-            _mRtcEngine.StartPreview();
-            _mRtcEngine.EnableAudio();
-            _mRtcEngine.EnableVideo();
-            _mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            mRtcEngine.Initialize(context);
+            mRtcEngine.InitEventHandler(handler);
+            mRtcEngine.SetLogFile("./log.txt");
+            mRtcEngine.StartPreview();
+            mRtcEngine.EnableAudio();
+            mRtcEngine.EnableVideo();
+            mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
         }
 
         public void MainCameraJoinChannel()
         {
-            var ret = _mRtcEngine.StartPrimaryCameraCapture(config1);
+            var ret = mRtcEngine.StartPrimaryCameraCapture(config1);
             Logger.UpdateLog(
                 string.Format("StartPrimaryCameraCapture returns: {0}", ret));
             ChannelMediaOptions options1 = new ChannelMediaOptions();
@@ -103,13 +103,13 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
             options1.publishScreenTrack.SetValue(false);
             options1.enableAudioRecordingOrPlayout.SetValue(true);
             options1.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            ret = _mRtcEngine.JoinChannel(token, channelName, 123, options1);
+            ret = mRtcEngine.JoinChannel(token, channelName, 123, options1);
             Debug.Log("MainCameraJoinChannel returns: " + ret);
         }
 
         public void SecondCameraJoinChannel()
         {
-            var ret = _mRtcEngine.StartSecondaryCameraCapture(config2);
+            var ret = mRtcEngine.StartSecondaryCameraCapture(config2);
             Logger.UpdateLog(
                 string.Format("StartSecondaryCameraCapture returns: {0}", ret));
             ChannelMediaOptions options2 = new ChannelMediaOptions();
@@ -120,13 +120,13 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
             options2.publishSecondaryCameraTrack.SetValue(true);
             options2.enableAudioRecordingOrPlayout.SetValue(false);
             options2.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            ret = _mRtcEngine.JoinChannelEx(token, new RtcConnection(channelName, 456), options2);
+            ret = mRtcEngine.JoinChannelEx(token, new RtcConnection(channelName, 456), options2);
             Debug.Log("JoinChannelEx returns: " + ret);
         }
 
         private void GetVideoDeviceManager()
         {
-            _videoDeviceManager = _mRtcEngine.GetVideoDeviceManager();
+            _videoDeviceManager = mRtcEngine.GetVideoDeviceManager();
             _videoDeviceInfos = _videoDeviceManager.EnumerateVideoDevices();
             Logger.UpdateLog(string.Format("VideoDeviceManager count: {0}", _videoDeviceInfos.Length));
             for (var i = 0; i < _videoDeviceInfos.Length; i++)
@@ -149,15 +149,24 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
             }
         }
 
+        private void OnDestroy()
+        {
+            Debug.Log("OnDestroy");
+            if (mRtcEngine == null) return;
+            mRtcEngine.InitEventHandler(null);
+            mRtcEngine.LeaveChannel();
+        }
+
         private void OnApplicationQuit()
         {
             Debug.Log("OnApplicationQuit");
-            if (_mRtcEngine == null) return;
-            _mRtcEngine.StopSecondaryCameraCapture();
-            _mRtcEngine.StopPrimaryCameraCapture();
-            _mRtcEngine.LeaveChannelEx(new RtcConnection(channelName, 456));
-            _mRtcEngine.LeaveChannel();
-            _mRtcEngine.Dispose();
+            if (mRtcEngine == null) return;
+            mRtcEngine.StopSecondaryCameraCapture();
+            mRtcEngine.StopPrimaryCameraCapture();
+            mRtcEngine.LeaveChannelEx(new RtcConnection(channelName, 456));
+            mRtcEngine.InitEventHandler(null);
+            mRtcEngine.LeaveChannel();
+            mRtcEngine.Dispose();
         }
 
         internal string GetChannelName()
@@ -174,7 +183,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
             }
 
             // create a GameObject and assign to this new user
-            AgoraVideoSurface videoSurface = new AgoraVideoSurface();
+            VideoSurface videoSurface = new VideoSurface();
 
             if (videoSourceType == VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA)
             {
@@ -196,7 +205,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
         }
 
         // VIDEO TYPE 1: 3D Object
-        private AgoraVideoSurface MakePlaneSurface(string goName)
+        private VideoSurface MakePlaneSurface(string goName)
         {
             var go = GameObject.Find(goName);
             if (!ReferenceEquals(go, null))
@@ -214,18 +223,16 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
             go.name = goName;
             // set up transform
             go.transform.Rotate(-90.0f, 0.0f, 0.0f);
-            var yPos = Random.Range(3.0f, 5.0f);
-            var xPos = Random.Range(-2.0f, 2.0f);
-            go.transform.position = new Vector3(xPos, yPos, 0f);
+            go.transform.position = Vector3.zero;
             go.transform.localScale = new Vector3(0.25f, 0.5f, 0.5f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<AgoraVideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurface>();
             return videoSurface;
         }
 
         // Video TYPE 2: RawImage
-        private static AgoraVideoSurface MakeImageSurface(string goName)
+        private static VideoSurface MakeImageSurface(string goName)
         {
             GameObject go = new GameObject();
 
@@ -252,14 +259,11 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
 
             // set up transform
             go.transform.Rotate(0f, 0.0f, 180.0f);
-            var xPos = Random.Range(Offset - Screen.width / 2f, Screen.width / 2f - Offset);
-            var yPos = Random.Range(Offset, Screen.height / 2f - Offset);
-            Debug.Log("position x " + xPos + " y: " + yPos);
-            go.transform.localPosition = new Vector3(xPos, yPos, 0f);
+            go.transform.localPosition = Vector3.zero;
             go.transform.localScale = new Vector3(2f, 3f, 1f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<AgoraVideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurface>();
             return videoSurface;
         }
 
@@ -273,7 +277,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
         }
     }
 
-    internal class UserEventHandler : IAgoraRtcEngineEventHandler
+    internal class UserEventHandler : IRtcEngineEventHandler
     {
         private readonly DualCamera _videoSample;
 
@@ -296,7 +300,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
         {
             _videoSample.isJoinChannel = true;
             _videoSample.Logger.UpdateLog(string.Format("sdk version: ${0}",
-                _videoSample._mRtcEngine.GetVersion()));
+                _videoSample.mRtcEngine.GetVersion()));
             _videoSample.Logger.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                     connection.channelId, connection.localUid, elapsed));

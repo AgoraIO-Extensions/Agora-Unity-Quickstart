@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 310468f085ef24732beac714c9bb64fd, type: 3}
   m_Name: AgoraBaseProfile
   m_EditorClassIdentifier: 
-  appID: 
+  appID: 6bb480f77c6c458696eadb61dfc6fb76
   token: 
-  channelName: 
+  channelName: xiayangqun
   isHomeStart: 0

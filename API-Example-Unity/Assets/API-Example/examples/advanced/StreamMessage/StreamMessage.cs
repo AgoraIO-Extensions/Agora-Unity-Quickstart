@@ -33,7 +33,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.StreamMessage
         int streamId = -1;
         public Text logText;
         public Logger logger;
-        internal IAgoraRtcEngine mRtcEngine = null;
+        internal IRtcEngine mRtcEngine = null;
 
 
         void Start()
@@ -58,12 +58,12 @@ namespace Agora_Plugin.API_Example.examples.advanced.StreamMessage
         void CheckAppId()
         {
             logger = new Logger(logText);
-            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/AgoraBaseProfile.asset");
         }
 
         void InitEngine()
         {
-            mRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
+            mRtcEngine = RtcEngineImpl.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
@@ -142,6 +142,14 @@ namespace Agora_Plugin.API_Example.examples.advanced.StreamMessage
         }
 
 
+        private void OnDestroy()
+        {
+            Debug.Log("OnDestroy");
+            if (mRtcEngine == null) return;
+            mRtcEngine.InitEventHandler(null);
+            mRtcEngine.LeaveChannel();
+        }
+
         void OnApplicationQuit()
         {
             Debug.Log("OnApplicationQuit");
@@ -154,7 +162,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.StreamMessage
     }
 
 
-    internal class UserEventHandler : IAgoraRtcEngineEventHandler
+    internal class UserEventHandler : IRtcEngineEventHandler
     {
         private readonly StreamMessage _streamMessage;
 

@@ -10,15 +10,10 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
 
     public class ChannelMediaRelay : MonoBehaviour
     {
-
-
         [FormerlySerializedAs("AgoraBaseProfile")]
         [SerializeField]
         private AgoraBaseProfile agoraBaseProfile;
 
-        [FormerlySerializedAs("AgoraBaseProfile2")]
-        [SerializeField]
-        private AgoraBaseProfile agoraBaseProfile2;
 
         [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")]
@@ -35,7 +30,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
 
         public Text logText;
         public Logger logger;
-        internal IAgoraRtcEngine mRtcEngine = null;
+        internal IRtcEngine mRtcEngine = null;
 
 
         void Start()
@@ -60,12 +55,12 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
         void CheckAppId()
         {
             logger = new Logger(logText);
-            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/AgoraBaseProfile.asset");
         }
 
         void InitEngine()
         {
-            mRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
+            mRtcEngine = RtcEngineImpl.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
@@ -118,11 +113,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
 
         void OnStartButtonClick()
         {
-            if (this.agoraBaseProfile2 == null)
-            {
-                this.logger.UpdateLog("you must set second channel first!!");
-                return;
-            }
+           
 
             ChannelMediaRelayConfiguration config = new ChannelMediaRelayConfiguration();
             config.srcInfo = new ChannelMediaInfo
@@ -136,9 +127,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
             config.destInfos = new ChannelMediaInfo[1];
             config.destInfos[0] = new ChannelMediaInfo
             {
-                channelName = this.agoraBaseProfile2.channelName,
+                channelName = this.agoraBaseProfile.channelName + "_second" ,
                 uid = 0,
-                token = this.agoraBaseProfile2.token
+                token = this.agoraBaseProfile.token
             };
             config.destCount = 1;
 
@@ -149,11 +140,11 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
 
         void onUpdateButtonClick()
         {
-            if (this.agoraBaseProfile2 == null)
-            {
-                this.logger.UpdateLog("you must set second channel first!!");
-                return;
-            }
+            //if (this.agoraBaseProfile2 == null)
+            //{
+            //    this.logger.UpdateLog("you must set second channel first!!");
+            //    return;
+            //}
 
             ChannelMediaRelayConfiguration config = new ChannelMediaRelayConfiguration();
             config.srcInfo = new ChannelMediaInfo
@@ -166,9 +157,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
             config.destInfos = new ChannelMediaInfo[1];
             config.destInfos[0] = new ChannelMediaInfo
             {
-                channelName = this.agoraBaseProfile2.channelName,
+                channelName = this.agoraBaseProfile.channelName + "_second",
                 uid = 0,
-                token = this.agoraBaseProfile2.token
+                token = this.agoraBaseProfile.token
             };
             config.destCount = 1;
 
@@ -195,6 +186,14 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
             this.logger.UpdateLog("UpdateChannelMediaRelay nRet:" + nRet);
         }
 
+        private void OnDestroy()
+        {
+            Debug.Log("OnDestroy");
+            if (mRtcEngine == null) return;
+            mRtcEngine.InitEventHandler(null);
+            mRtcEngine.LeaveChannel();
+        }
+
         void OnApplicationQuit()
         {
             Debug.Log("OnApplicationQuit");
@@ -214,7 +213,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
             }
 
             // create a GameObject and assign to this new user
-            var videoSurface = MakePlaneSurface(uid.ToString());//MakeImageSurface(uid.ToString());
+            var videoSurface = MakeImageSurface(uid.ToString());
             if (ReferenceEquals(videoSurface, null)) return;
             // configure videoSurface
             if (uid == 0)
@@ -229,7 +228,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
         }
 
         // VIDEO TYPE 1: 3D Object
-        private static AgoraVideoSurface MakePlaneSurface(string goName)
+        private static VideoSurface MakePlaneSurface(string goName)
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
@@ -241,18 +240,17 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
             go.name = goName;
             // set up transform
             go.transform.Rotate(-90.0f, 0.0f, 0.0f);
-            var yPos = Random.Range(3.0f, 5.0f);
-            var xPos = Random.Range(-2.0f, 2.0f);
-            go.transform.position = new Vector3(xPos, yPos, 0f);
+
+            go.transform.position = Vector3.zero;
             go.transform.localScale = new Vector3(0.25f, 0.5f, 0.5f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<AgoraVideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurface>();
             return videoSurface;
         }
 
         // Video TYPE 2: RawImage
-        private static AgoraVideoSurface MakeImageSurface(string goName)
+        private static VideoSurface MakeImageSurface(string goName)
         {
             GameObject go = new GameObject();
 
@@ -279,14 +277,11 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
 
             // set up transform
             go.transform.Rotate(0f, 0.0f, 180.0f);
-            //var xPos = Random.Range(Offset - Screen.width / 2f, Screen.width / 2f - Offset);
-            //var yPos = Random.Range(Offset, Screen.height / 2f - Offset);
-            //Debug.Log("position x " + xPos + " y: " + yPos);
-            go.transform.localPosition = new Vector3(Screen.width / 2f - 100, Screen.height / 2f - 100, 0f);
+            go.transform.localPosition = Vector3.zero;
             go.transform.localScale = new Vector3(2f, 3f, 1f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<AgoraVideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurface>();
             return videoSurface;
         }
 
@@ -301,7 +296,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
 
     }
 
-    internal class UserEventHandler : IAgoraRtcEngineEventHandler
+    internal class UserEventHandler : IRtcEngineEventHandler
     {
         private readonly ChannelMediaRelay _channelMediaRelay;
 

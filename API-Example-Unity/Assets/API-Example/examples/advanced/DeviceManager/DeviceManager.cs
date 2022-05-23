@@ -24,7 +24,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
 
         public Text logText;
         internal Logger Logger;
-        internal IAgoraRtcEngine _mRtcEngine;
+        internal IRtcEngine mRtcEngine;
         private IAudioDeviceManager _audioDeviceManager;
         private IVideoDeviceManager _videoDeviceManager;
         private DeviceInfo[] _audioRecordingDeviceInfos;
@@ -50,7 +50,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
         private void CheckAppId()
         {
             Logger = new Logger(logText);
-            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in Canvas!!!!!");
+            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/AgoraBaseProfile.asset");
         }
         
         //Show data in AgoraBasicProfile
@@ -65,13 +65,13 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
 
         private void InitRtcEngine()
         {
-            _mRtcEngine = AgoraRtcEngine.CreateAgoraRtcEngine();
+            mRtcEngine = RtcEngineImpl.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(appID, 0, true, 
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            _mRtcEngine.Initialize(context);
-            _mRtcEngine.InitEventHandler(handler);
+            mRtcEngine.Initialize(context);
+            mRtcEngine.InitEventHandler(handler);
         }
 
         private void CallDeviceManagerApi()
@@ -85,7 +85,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
 
         private void GetAudioRecordingDevice()
         {
-            _audioDeviceManager = _mRtcEngine.GetAudioDeviceManager();
+            _audioDeviceManager = mRtcEngine.GetAudioDeviceManager();
             _audioRecordingDeviceInfos = _audioDeviceManager.EnumerateRecordingDevices();
             Logger.UpdateLog(string.Format("AudioRecordingDevice count: {0}", _audioRecordingDeviceInfos.Length));
             for (var i = 0; i < _audioRecordingDeviceInfos.Length; i++)
@@ -97,7 +97,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
 
         private void GetAudioPlaybackDevice()
         {
-            _audioDeviceManager = _mRtcEngine.GetAudioDeviceManager();
+            _audioDeviceManager = mRtcEngine.GetAudioDeviceManager();
             _audioPlaybackDeviceInfos = _audioDeviceManager.EnumeratePlaybackDevices();
             Logger.UpdateLog(string.Format("AudioPlaybackDevice count: {0}", _audioPlaybackDeviceInfos.Length));
             for (var i = 0; i < _audioPlaybackDeviceInfos.Length; i++)
@@ -109,9 +109,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
 
         private void GetVideoDeviceManager()
         {
-            var nRet = _mRtcEngine.StartPreview();
+            var nRet = mRtcEngine.StartPreview();
             this.Logger.UpdateLog("StartPreview: nRet" + nRet);
-            _videoDeviceManager = _mRtcEngine.GetVideoDeviceManager();
+            _videoDeviceManager = mRtcEngine.GetVideoDeviceManager();
             _videoDeviceInfos = _videoDeviceManager.EnumerateVideoDevices();
             Logger.UpdateLog(string.Format("VideoDeviceManager count: {0}", _videoDeviceInfos.Length));
             for (var i = 0; i < _videoDeviceInfos.Length; i++)
@@ -143,26 +143,29 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
 
         private void JoinChannel()
         {
-            _mRtcEngine.JoinChannel(token, channelName, "");
+            mRtcEngine.JoinChannel(token, channelName, "");
         }
 
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
+            if (mRtcEngine == null) return;
+            mRtcEngine.InitEventHandler(null);
+            mRtcEngine.LeaveChannel();
         }
 
         private void OnApplicationQuit()
         {
             Debug.Log("OnApplicationQuit");
-            if (_mRtcEngine != null)
+            if (mRtcEngine != null)
             {
-                _mRtcEngine.Dispose();
-                _mRtcEngine = null;
+                mRtcEngine.Dispose();
+                mRtcEngine = null;
             }
         }
     }
     
-    internal class UserEventHandler : IAgoraRtcEngineEventHandler
+    internal class UserEventHandler : IRtcEngineEventHandler
     {
         private readonly DeviceManager _deviceManagerSample;
 
@@ -184,7 +187,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
             _deviceManagerSample.Logger.UpdateLog(string.Format("sdk version: ${0}",
-                _deviceManagerSample._mRtcEngine.GetVersion()));
+                _deviceManagerSample.mRtcEngine.GetVersion()));
             _deviceManagerSample.Logger.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", 
                                 connection.channelId, connection.localUid, elapsed));

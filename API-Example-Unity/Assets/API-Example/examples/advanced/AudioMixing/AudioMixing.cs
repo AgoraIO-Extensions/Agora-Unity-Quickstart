@@ -9,17 +9,21 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
 {
     public class AudioMixing : MonoBehaviour
     {
-        [FormerlySerializedAs("AgoraBaseProfile")] [SerializeField]
+        [FormerlySerializedAs("AgoraBaseProfile")]
+        [SerializeField]
         private AgoraBaseProfile agoraBaseProfile;
-        
+
         [Header("_____________Basic Configuration_____________")]
-        [FormerlySerializedAs("APP_ID")] [SerializeField]
+        [FormerlySerializedAs("APP_ID")]
+        [SerializeField]
         private string appID = "";
 
-        [FormerlySerializedAs("TOKEN")] [SerializeField]
+        [FormerlySerializedAs("TOKEN")]
+        [SerializeField]
         private string token = "";
 
-        [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
+        [FormerlySerializedAs("CHANNEL_NAME")]
+        [SerializeField]
         private string channelName = "";
 
         [SerializeField] string Sound_URL = "";
@@ -28,7 +32,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
 
         public Text logText;
         internal Logger Logger;
-        private IAgoraRtcEngine _mRtcEngine = null;
+        private IRtcEngine mRtcEngine = null;
 
         // Start is called before the first frame update
         void Start()
@@ -45,7 +49,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
         {
             PermissionHelper.RequestMicrophontPermission();
         }
-        
+
         //Show data in AgoraBasicProfile
         [ContextMenu("ShowAgoraBasicProfileData")]
         public void LoadAssetData()
@@ -59,19 +63,19 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
         void CheckAppId()
         {
             Logger = new Logger(logText);
-            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in Canvas!!!!!");
+            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/AgoraBaseProfile.asset");
         }
 
         void InitRtcEngine()
         {
-            _mRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
+            mRtcEngine = RtcEngineImpl.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            var ret = _mRtcEngine.Initialize(context);
-            _mRtcEngine.InitEventHandler(handler);
-            _mRtcEngine.EnableAudio();
+            var ret = mRtcEngine.Initialize(context);
+            mRtcEngine.InitEventHandler(handler);
+            mRtcEngine.EnableAudio();
         }
 
         void SetupUI()
@@ -103,7 +107,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
 
         void JoinChannel()
         {
-            _mRtcEngine.JoinChannel(token, channelName);
+            mRtcEngine.JoinChannel(token, channelName);
         }
 
         #region -- Test Control logic ---
@@ -112,21 +116,21 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
         {
             Debug.Log("Playing with " + (_useURL ? "URL" : "local file"));
 
-            var ret = _mRtcEngine.StartAudioMixing(_useURL ? Sound_URL : localPath, true, false, -1);
+            var ret = mRtcEngine.StartAudioMixing(_useURL ? Sound_URL : localPath, true, false, -1);
             Debug.Log("StartAudioMixing returns: " + ret);
         }
 
         void PlayEffectTest()
         {
             Debug.Log("Playing with " + (_useURL ? "URL" : "local file"));
-            //IAudioEffectManager effectManager = _mRtcEngine.GetAudioEffectManager();
-            _mRtcEngine.PlayEffect(1, _useURL ? Sound_URL : localPath, 1, 1.0, 0, 100, true);
+            //IAudioEffectManager effectManager = mRtcEngine.GetAudioEffectManager();
+            mRtcEngine.PlayEffect(1, _useURL ? Sound_URL : localPath, 1, 1.0, 0, 100, true);
         }
 
         void StopEffectTest()
         {
-            //IAudioEffectManager effectManager = _mRtcEngine.GetAudioEffectManager();
-            _mRtcEngine.StopAllEffects();
+            //IAudioEffectManager effectManager = mRtcEngine.GetAudioEffectManager();
+            mRtcEngine.StopAllEffects();
         }
 
         #endregion
@@ -134,18 +138,20 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
-            if (_mRtcEngine == null) return;
-            _mRtcEngine.LeaveChannel();
+            if (mRtcEngine == null) return;
+            mRtcEngine.InitEventHandler(null);
+            mRtcEngine.LeaveChannel();
         }
 
         private void OnApplicationQuit()
         {
             Debug.Log("OnApplicationQuit");
-            if (_mRtcEngine != null)
+            if (mRtcEngine != null)
             {
-                _mRtcEngine.LeaveChannel();
-                _mRtcEngine.Dispose();
-                _mRtcEngine = null;
+                mRtcEngine.InitEventHandler(null);
+                mRtcEngine.LeaveChannel();
+                mRtcEngine.Dispose();
+                mRtcEngine = null;
             }
         }
 
@@ -164,7 +170,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
 
             if (_isMixing)
             {
-                _mRtcEngine.StopAudioMixing();
+                mRtcEngine.StopAudioMixing();
             }
             else
             {
@@ -211,7 +217,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
         #endregion
     }
 
-    internal class UserEventHandler : IAgoraRtcEngineEventHandler
+    internal class UserEventHandler : IRtcEngineEventHandler
     {
         private readonly AudioMixing _audioMixing;
 
@@ -264,7 +270,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
         {
             _audioMixing.Logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
-                (int) reason));
+                (int)reason));
         }
 
         public override void OnAudioMixingStateChanged(AUDIO_MIXING_STATE_TYPE state, AUDIO_MIXING_ERROR_TYPE errorCode)

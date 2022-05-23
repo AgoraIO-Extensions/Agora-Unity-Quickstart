@@ -20,9 +20,40 @@ public class Home : MonoBehaviour
     public GameObject casePanel;
     public GameObject caseScoller;
     private string PlaySceneName = "";
-    private string[] PlaySceneNameList = {"BasicVideoCallScene", "BasicAudioCallScene", "AudioMixingScene", "ScreenShareScene", 
-                                            "DeviceManagerScene", "ScreenShareWhileVideoCallScene", "SpatialAudioWithMediaPlayerScene"};
-    
+
+
+    private string[] baseSceneNameList = {
+        "BasicAudioCallScene",
+        "BasicVideoCallScene"
+    };
+
+    private string[] advancedNameList = {
+        "AudioMixingScene",
+        "ChannelMediaRelayScene",
+        "CustomCaptureAudioScene",
+        "CustomCaptureVideoScene",
+        "CustomRenderAudioScene",
+        "DeviceManagerScene",
+            "DualCameraScene",
+             "JoinChannelVideoTokenScene",
+        "JoinChannelWithUserAccountScene",
+        "MediaPlayerScene",
+        "ProcessRawDataScene",
+            "PushEncodedVideoImageScene",
+             "RtmpStreamingScene",
+        "ScreenShareScene",
+        "ScreenShareWhileVideoCallScene",
+        "SetEncryptionScene",
+            "SetVideoEncodeConfigurationScene",
+             "SpatialAudioWithMediaPlayerScene",
+        "StartRhythmPlayerScene",
+        "StreamMessageScene",
+        "TakeSnapshotScene",
+            "VoiceChangerScene"
+    };
+
+
+
     private void Awake()
     {
 #if (UNITY_2018_3_OR_NEWER && UNITY_ANDROID)
@@ -32,19 +63,27 @@ public class Home : MonoBehaviour
 
         GameObject content = GameObject.Find("Content");
         var contentRectTrans = content.GetComponent<RectTransform>();
-        //contentRectTrans.SetSizeWithCurrentAnchors();
-        for(int i = 0; i < PlaySceneNameList.Length; i++)
+
+        for (int i = 0; i < baseSceneNameList.Length; i++)
         {
             var go = Instantiate(casePanel, content.transform);
             var name = go.transform.Find("Text").gameObject.GetComponent<Text>();
-            name.text = PlaySceneNameList[i];
+            name.text = baseSceneNameList[i];
             var button = go.transform.Find("Button").gameObject.GetComponent<Button>();
             button.onClick.AddListener(OnJoinSceneClicked);
             button.onClick.AddListener(SetScolllerActive);
-
-            //var rectTrans = go.GetComponent<RectTransform>();
-            //rectTrans.anchoredPosition = new Vector2(0, i * (-100));
         }
+
+        for (int i = 0; i < advancedNameList.Length; i++)
+        {
+            var go = Instantiate(casePanel, content.transform);
+            var name = go.transform.Find("Text").gameObject.GetComponent<Text>();
+            name.text = advancedNameList[i];
+            var button = go.transform.Find("Button").gameObject.GetComponent<Button>();
+            button.onClick.AddListener(OnJoinSceneClicked);
+            button.onClick.AddListener(SetScolllerActive);
+        }
+
 
         if (this.profile)
         {
@@ -64,16 +103,16 @@ public class Home : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        
+
     }
 
     private void OnApplicationQuit()
     {
         Debug.Log("OnApplicationQuit");
-        IAgoraRtcEngine _mRtcEngine = AgoraRtcEngine.Get();
-        if (_mRtcEngine != null)
+        IRtcEngine mRtcEngine = RtcEngineImpl.Get();
+        if (mRtcEngine != null)
         {
-            _mRtcEngine.Dispose(true);
+            mRtcEngine.Dispose(true);
         }
     }
 
@@ -85,7 +124,7 @@ public class Home : MonoBehaviour
 
     public IEnumerator UnloadSceneAsync()
     {
-        if (this.PlaySceneName!="")
+        if (this.PlaySceneName != "")
         {
             AsyncOperation async = SceneManager.UnloadSceneAsync(PlaySceneName);
             yield return async;

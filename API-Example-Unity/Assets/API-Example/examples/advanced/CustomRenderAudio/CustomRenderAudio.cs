@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,7 +27,7 @@ namespace CustomRenderAudio
 
         public Text logText;
         internal Logger Logger;
-        internal IAgoraRtcEngine AgoraRtcEngine;
+        internal IRtcEngine mRtcEngine;
         //private IAudioRawDataManager _audioRawDataManager;
 
         private int CHANNEL = 1;
@@ -73,7 +73,7 @@ namespace CustomRenderAudio
         bool CheckAppId()
         {
             Logger = new Logger(logText);
-            return Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in Canvas!!!!!");
+            return Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/AgoraBaseProfile.asset");
         }
         
         //Show data in AgoraBasicProfile
@@ -88,27 +88,26 @@ namespace CustomRenderAudio
 
         void InitRtcEngine()
         {
-            AgoraRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
+            mRtcEngine = RtcEngineImpl.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(appID, 0, true,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            var ret = AgoraRtcEngine.Initialize(context);
-            AgoraRtcEngine.InitEventHandler(handler);
-            var nRet = AgoraRtcEngine.SetExternalAudioSink(SAMPLE_RATE, CHANNEL);
+            var ret = mRtcEngine.Initialize(context);
+            mRtcEngine.InitEventHandler(handler);
+            var nRet = mRtcEngine.SetExternalAudioSink(SAMPLE_RATE, CHANNEL);
             this.Logger.UpdateLog("SetExternalAudioSink ret:" + nRet);
         }
 
         void JoinChannel()
         {
-            AgoraRtcEngine.JoinChannel(token, channelName, "");
+            mRtcEngine.JoinChannel(token, channelName, "");
         }
 
         void StartPullAudioFrame(AudioSource aud, string clipName)
         {
-            //_audioRawDataManager = AudioRawDataManager.GetInstance(AgoraRtcEngine);
-
-            var bufferLength = SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL * 1000; // 10-sec-length buffer
+            // 10-sec-length buffer
+            var bufferLength = SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL * 1000;
             audioBuffer = new RingBuffer<float>(bufferLength);
 
             _pullAudioFrameThread = new Thread(PullAudioFrameThread);
@@ -122,14 +121,22 @@ namespace CustomRenderAudio
             aud.Play();
         }
 
+        private void OnDestroy()
+        {
+            Debug.Log("OnDestroy");
+            if (mRtcEngine == null) return;
+            mRtcEngine.InitEventHandler(null);
+            mRtcEngine.LeaveChannel();
+        }
+
         void OnApplicationQuit()
         {
             Debug.Log("OnApplicationQuit");
             _pullAudioFrameThreadSignal = false;
             _pullAudioFrameThread.Abort();
-            if (AgoraRtcEngine == null) return;
-            AgoraRtcEngine.LeaveChannel();
-            AgoraRtcEngine.Dispose();
+            if (mRtcEngine == null) return;
+            mRtcEngine.LeaveChannel();
+            mRtcEngine.Dispose();
         }
 
         private void PullAudioFrameThread()
@@ -152,7 +159,7 @@ namespace CustomRenderAudio
                 if (toc.Subtract(tic).Duration().Milliseconds >= freq)
                 {
                     tic = new TimeSpan(DateTime.Now.Ticks);
-                    var ret = AgoraRtcEngine.PullAudioFrame(audioFrame);
+                    var ret = mRtcEngine.PullAudioFrame(audioFrame);
                     Debug.Log("PullAudioFrame returns: " + ret);
 
                     var byteArray = buffer;
@@ -206,7 +213,7 @@ namespace CustomRenderAudio
         }
     }
 
-    internal class UserEventHandler : IAgoraRtcEngineEventHandler
+    internal class UserEventHandler : IRtcEngineEventHandler
     {
         private readonly CustomRenderAudio _customAudioSinkSample;
 
@@ -217,7 +224,7 @@ namespace CustomRenderAudio
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            _customAudioSinkSample.Logger.UpdateLog(string.Format("sdk version: {0}", _customAudioSinkSample.AgoraRtcEngine.GetVersion()));
+            _customAudioSinkSample.Logger.UpdateLog(string.Format("sdk version: {0}", _customAudioSinkSample.mRtcEngine.GetVersion()));
             _customAudioSinkSample.Logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
                 connection.localUid, elapsed));
         }

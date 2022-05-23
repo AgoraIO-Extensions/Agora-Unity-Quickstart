@@ -29,7 +29,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.RtmpStreaming
 
         public Text logText;
         internal Logger Logger;
-        internal IAgoraRtcEngine _mRtcEngine = null;
+        internal IRtcEngine mRtcEngine = null;
         private const float Offset = 100;
         private uint remoteUid = 0;
         private bool isStreaming = false;
@@ -53,7 +53,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.RtmpStreaming
         private void CheckAppId()
         {
             Logger = new Logger(logText);
-            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/AgoraBaseProfile.asset");
         }
         
         //Show data in AgoraBasicProfile
@@ -68,24 +68,24 @@ namespace Agora_Plugin.API_Example.examples.advanced.RtmpStreaming
 
         private void InitEngine()
         {
-            _mRtcEngine = AgoraRtcEngine.CreateAgoraRtcEngine();
+            mRtcEngine = RtcEngineImpl.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            _mRtcEngine.Initialize(context);
-            _mRtcEngine.InitEventHandler(new UserEventHandler(this));
-            _mRtcEngine.SetLogFile("./log.txt");
+            mRtcEngine.Initialize(context);
+            mRtcEngine.InitEventHandler(new UserEventHandler(this));
+            mRtcEngine.SetLogFile("./log.txt");
 
-            _mRtcEngine.SetChannelProfile(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING);
-            _mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            _mRtcEngine.SetVideoEncoderConfiguration(new VideoEncoderConfiguration
+            mRtcEngine.SetChannelProfile(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING);
+            mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            mRtcEngine.SetVideoEncoderConfiguration(new VideoEncoderConfiguration
             {
                 dimensions = new VideoDimensions {width = 720, height = 640},
                 frameRate = 24
             });
-            _mRtcEngine.EnableAudio();
-            _mRtcEngine.EnableVideo();
+            mRtcEngine.EnableAudio();
+            mRtcEngine.EnableVideo();
         }
 
         private void StartTranscoding(bool ifRemoteUser = false)
@@ -93,7 +93,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.RtmpStreaming
             if (isStreaming && !ifRemoteUser) return;
             if (isStreaming && ifRemoteUser)
             {
-                _mRtcEngine.RemovePublishStreamUrl(RTMP_URL);
+                mRtcEngine.RemovePublishStreamUrl(RTMP_URL);
             }
 
             var lt = new LiveTranscoding();
@@ -144,25 +144,34 @@ namespace Agora_Plugin.API_Example.examples.advanced.RtmpStreaming
                 lt.transcodingUsers = new[] {localUesr};
             }
 
-            _mRtcEngine.SetLiveTranscoding(lt);
+            mRtcEngine.SetLiveTranscoding(lt);
 
-            var rc = _mRtcEngine.AddPublishStreamUrl(RTMP_URL, true);
+            var rc = mRtcEngine.AddPublishStreamUrl(RTMP_URL, true);
             if (rc == 0) Logger.UpdateLog(string.Format("Error in AddPublishStreamUrl: {0}", RTMP_URL));
         }
 
         private void JoinChannel()
         {
-            _mRtcEngine.JoinChannel(token, channelName, "");
+            mRtcEngine.JoinChannel(token, channelName, "");
+        }
+
+        private void OnDestroy()
+        {
+            Debug.Log("OnDestroy");
+            if (mRtcEngine == null) return;
+            mRtcEngine.InitEventHandler(null);
+            mRtcEngine.LeaveChannel();
         }
 
         private void OnApplicationQuit()
         {
             Debug.Log("OnApplicationQuit");
-            if (_mRtcEngine != null)
+            if (mRtcEngine != null)
             {
-                _mRtcEngine.RemovePublishStreamUrl(RTMP_URL);
-                _mRtcEngine.LeaveChannel();
-                _mRtcEngine.Dispose();
+                mRtcEngine.RemovePublishStreamUrl(RTMP_URL);
+                mRtcEngine.InitEventHandler(null);
+            mRtcEngine.LeaveChannel();
+                mRtcEngine.Dispose();
             }
         }
 
@@ -189,7 +198,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.RtmpStreaming
             }
 
             // create a GameObject and assign to this new user
-            AgoraVideoSurface videoSurface = makeImageSurface(uid.ToString());
+            VideoSurface videoSurface = makeImageSurface(uid.ToString());
             if (!ReferenceEquals(videoSurface, null))
             {
                 // configure videoSurface
@@ -207,7 +216,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.RtmpStreaming
         }
 
         // VIDEO TYPE 1: 3D Object
-        public AgoraVideoSurface makePlaneSurface(string goName)
+        public VideoSurface makePlaneSurface(string goName)
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
@@ -225,12 +234,12 @@ namespace Agora_Plugin.API_Example.examples.advanced.RtmpStreaming
             go.transform.localScale = new Vector3(0.25f, 0.5f, .5f);
 
             // configure videoSurface
-            AgoraVideoSurface videoSurface = go.AddComponent<AgoraVideoSurface>();
+            VideoSurface videoSurface = go.AddComponent<VideoSurface>();
             return videoSurface;
         }
 
         // Video TYPE 2: RawImage
-        public AgoraVideoSurface makeImageSurface(string goName)
+        public VideoSurface makeImageSurface(string goName)
         {
             GameObject go = new GameObject();
 
@@ -264,11 +273,11 @@ namespace Agora_Plugin.API_Example.examples.advanced.RtmpStreaming
             go.transform.localScale = new Vector3(3f, 4f, 1f);
 
             // configure videoSurface
-            AgoraVideoSurface videoSurface = go.AddComponent<AgoraVideoSurface>();
+            VideoSurface videoSurface = go.AddComponent<VideoSurface>();
             return videoSurface;
         }
 
-        internal class UserEventHandler : IAgoraRtcEngineEventHandler
+        internal class UserEventHandler : IRtcEngineEventHandler
         {
             private readonly RtmpStreaming _rtmpStreaming;
 
@@ -280,7 +289,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.RtmpStreaming
             public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
             {
                 _rtmpStreaming.Logger.UpdateLog(string.Format("sdk version: ${0}",
-                    _rtmpStreaming._mRtcEngine.GetVersion()));
+                    _rtmpStreaming.mRtcEngine.GetVersion()));
                 _rtmpStreaming.Logger.UpdateLog(string.Format(
                     "onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
                     connection.localUid, elapsed));

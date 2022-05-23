@@ -34,7 +34,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
 
         public Text logText;
         public Logger logger;
-        internal IAgoraRtcEngine mRtcEngine = null;
+        internal IRtcEngine mRtcEngine = null;
         public Dictionary<string, Vector3> rolePositionDic = new Dictionary<string, Vector3>();
 
 
@@ -58,19 +58,19 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
         void CheckAppId()
         {
             logger = new Logger(logText);
-            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/AgoraBaseProfile.asset");
         }
 
         void InitEngine()
         {
-            mRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
+            mRtcEngine = RtcEngineImpl.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
             mRtcEngine.Initialize(context);
             mRtcEngine.InitEventHandler(handler);
-            mRtcEngine.RegisterVideoEncodedImageReceiver(new VideoEncodedImageReceiver(this));
+            mRtcEngine.RegisterVideoEncodedImageReceiver(new VideoEncodedImageReceiver(this),OBSERVER_MODE.RAW_DATA);
             mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             mRtcEngine.EnableVideo();
 
@@ -81,14 +81,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
         {
             var option = new ChannelMediaOptions
             {
-                //    autoSubscribeVideo .SetValue( true);
-                //autoSubscribeAudio.SetValue(true);
-                //publishAudioTrack.SetValue(false);
-                //publishCameraTrack.SetValue(false;
-                //publishCustomVideoTrack.SetValue(false;
-                //publishEncodedVideoTrack.SetValue(true;
-                //clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-                //channelProfile.SetValue(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING);
+             
             };
 
             option.autoSubscribeVideo.SetValue(true);
@@ -99,7 +92,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
             option.publishEncodedVideoTrack.SetValue(true);
             option.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             option.channelProfile.SetValue(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING);
-
 
             mRtcEngine.JoinChannel(token, channelName, 0, option);
         }
@@ -116,6 +108,14 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
                     this.UpdateRolePositon(e.Key, e.Value);
                 }
             }
+        }
+
+        private void OnDestroy()
+        {
+            Debug.Log("OnDestroy");
+            if (mRtcEngine == null) return;
+            mRtcEngine.InitEventHandler(null);
+            mRtcEngine.LeaveChannel();
         }
 
         void OnApplicationQuit()
@@ -208,7 +208,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
 
 
 
-    internal class UserEventHandler : IAgoraRtcEngineEventHandler
+    internal class UserEventHandler : IRtcEngineEventHandler
     {
         private readonly PushEncodedVideoImage _pushEncodedVideoImage;
 
@@ -295,7 +295,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
     }
 
 
-    internal class VideoEncodedImageReceiver : IAgoraRtcVideoEncodedImageReceiver
+    internal class VideoEncodedImageReceiver : IVideoEncodedImageReceiver
     {
 
         private readonly PushEncodedVideoImage _pushEncodedVideoImage;
@@ -305,7 +305,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
             _pushEncodedVideoImage = videoSample;
         }
 
-        public override bool OnEncodedVideoImageReceived(byte[] imageBuffer, UInt64 length, EncodedVideoFrameInfo videoEncodedFrameInfo)
+        public override bool OnEncodedVideoImageReceived(IntPtr imageBufferPtr, byte[] imageBuffer, UInt64 length, EncodedVideoFrameInfo videoEncodedFrameInfo)
         {
             string str = System.Text.Encoding.Default.GetString(imageBuffer);
             var pos = JsonUtility.FromJson<Vector3>(str);

@@ -29,7 +29,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetEncryption
 
         public Text logText;
         private Logger logger;
-        private IAgoraRtcEngine mRtcEngine = null;
+        private IRtcEngine mRtcEngine = null;
 
         // Start is called before the first frame update
         void Start()
@@ -49,7 +49,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetEncryption
         void CheckAppId()
         {
             logger = new Logger(logText);
-            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in Canvas!!!!!");
+            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/AgoraBaseProfile.asset");
         }
         
         //Show data in AgoraBasicProfile
@@ -64,7 +64,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetEncryption
 
         void InitRtcEngine()
         {
-            mRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
+            mRtcEngine = RtcEngineImpl.CreateAgoraRtcEngine();
             RtcEngineContext context = new RtcEngineContext(appID, 0, false,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
@@ -102,6 +102,14 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetEncryption
             mRtcEngine.LeaveChannel();
         }
 
+        private void OnDestroy()
+        {
+            Debug.Log("OnDestroy");
+            if (mRtcEngine == null) return;
+            mRtcEngine.InitEventHandler(null);
+            mRtcEngine.LeaveChannel();
+        }
+
         void OnApplicationQuit()
         {
             Debug.Log("OnApplicationQuit");
@@ -113,7 +121,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetEncryption
         }
 
 
-        internal class UserEventHandler : IAgoraRtcEngineEventHandler
+        internal class UserEventHandler : IRtcEngineEventHandler
         {
             private readonly EncryptionSample _encryptionSample;
 

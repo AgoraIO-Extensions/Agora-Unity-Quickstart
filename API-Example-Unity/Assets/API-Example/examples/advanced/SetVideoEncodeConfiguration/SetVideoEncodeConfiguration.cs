@@ -24,7 +24,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
         
         public Text logText;
         private Logger logger;
-        internal IAgoraRtcEngine mRtcEngine = null;
+        internal IRtcEngine mRtcEngine = null;
         private const float Offset = 100;
 
         // A list of dimensions for swithching
@@ -60,7 +60,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
         void CheckAppId()
         {
             logger = new Logger(logText);
-            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/AgoraBaseProfile.asset");
         }
         
         //Show data in AgoraBasicProfile
@@ -75,7 +75,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
 
         void InitEngine()
         {
-            mRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
+            mRtcEngine = RtcEngineImpl.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
@@ -114,6 +114,14 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
             mRtcEngine.SetVideoEncoderConfiguration(config);
         }
 
+        private void OnDestroy()
+        {
+            Debug.Log("OnDestroy");
+            if (mRtcEngine == null) return;
+            mRtcEngine.InitEventHandler(null);
+            mRtcEngine.LeaveChannel();
+        }
+
         void OnApplicationQuit()
         {
             Debug.Log("OnApplicationQuit");
@@ -150,7 +158,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
         }
 
         // VIDEO TYPE 1: 3D Object
-        private AgoraVideoSurface MakePlaneSurface(string goName)
+        private VideoSurface MakePlaneSurface(string goName)
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
@@ -162,18 +170,16 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
             go.name = goName;
             // set up transform
             go.transform.Rotate(-90.0f, 0.0f, 0.0f);
-            var yPos = Random.Range(3.0f, 5.0f);
-            var xPos = Random.Range(-2.0f, 2.0f);
-            go.transform.position = new Vector3(xPos, yPos, 0f);
+            go.transform.position = Vector3.zero;
             go.transform.localScale = new Vector3(0.25f, 0.5f, 0.5f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<AgoraVideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurface>();
             return videoSurface;
         }
 
         // Video TYPE 2: RawImage
-        private static AgoraVideoSurface MakeImageSurface(string goName)
+        private static VideoSurface MakeImageSurface(string goName)
         {
             GameObject go = new GameObject();
 
@@ -200,14 +206,11 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
 
             // set up transform
             go.transform.Rotate(0f, 0.0f, 180.0f);
-            //var xPos = Random.Range(Offset - Screen.width / 2f, Screen.width / 2f - Offset);
-            //var yPos = Random.Range(Offset, Screen.height / 2f - Offset);
-            //Debug.Log("position x " + xPos + " y: " + yPos);
-            go.transform.localPosition = new Vector3(Screen.width / 2f - Offset, Screen.height / 2f - Offset, 0f);
+            go.transform.localPosition = Vector3.zero;
             go.transform.localScale = new Vector3(2f, 3f, 1f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<AgoraVideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurface>();
             return videoSurface;
         }
 
@@ -221,7 +224,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
         }
 
 
-        internal class UserEventHandler : IAgoraRtcEngineEventHandler
+        internal class UserEventHandler : IRtcEngineEventHandler
         {
             private readonly SetVideoEncodeConfiguration _videoEncoderConfiguration;
 

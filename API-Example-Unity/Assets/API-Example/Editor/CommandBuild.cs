@@ -14,7 +14,7 @@ public class CommandBuild : MonoBehaviour
     private static string[] GetAllScenes()
     {
         string[] scenes = new string[] {
-            "Assets/API-Example/home/HomeScene.unity",
+            "Assets/API-Example/HomeScene.unity",
             "Assets/API-Example/examples/basic/JoinChannelVideo/BasicVideoCallScene.unity",
             "Assets/API-Example/examples/basic/JoinChannelAudio/BasicAudioCallScene.unity",
             "Assets/API-Example/examples/advanced/StartRhythmPlayer/StartRhythmPlayerScene.unity",

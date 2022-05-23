@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
@@ -28,8 +28,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
 
         public Text logText;
         internal Logger Logger;
-        internal IAgoraRtcEngine _mRtcEngine = null;
-        internal IAgoraMediaPlayer _mediaPlayer = null;
+        internal IRtcEngine mRtcEngine = null;
+        internal IMediaPlayer _mediaPlayer = null;
         internal int playerId = 0;
         
         private const float Offset = 100;
@@ -77,7 +77,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
         private void CheckAppId()
         {
             Logger = new Logger(logText);
-            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/AgoraBaseProfile.asset");
         }
         
         //Show data in AgoraBasicProfile
@@ -92,16 +92,16 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
 
         private void InitEngine()
         {
-            _mRtcEngine = AgoraRtcEngine.CreateAgoraRtcEngine();
+            mRtcEngine = RtcEngineImpl.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
-            _mRtcEngine.Initialize(context);
-            _mRtcEngine.InitEventHandler(handler);
-            _mRtcEngine.EnableAudio();
-            _mRtcEngine.EnableVideo();
-            _mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            mRtcEngine.Initialize(context);
+            mRtcEngine.InitEventHandler(handler);
+            mRtcEngine.EnableAudio();
+            mRtcEngine.EnableVideo();
+            mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
         }
 
         private void JoinChannel_MPK()
@@ -116,7 +116,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
             options.publishMediaPlayerId.SetValue (playerId);
             options.enableAudioRecordingOrPlayout.SetValue (true);
             options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            var ret = _mRtcEngine.JoinChannel(token, channelName, 0, options);
+            var ret = mRtcEngine.JoinChannel(token, channelName, 0, options);
             Debug.Log("RtcEngineController JoinChannel_MPK returns: " + ret);
         }
 
@@ -153,7 +153,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
         
         private void InitMediaPlayer()
         {
-            _mediaPlayer = _mRtcEngine.GetAgoraMediaPlayer();
+            _mediaPlayer = mRtcEngine.GetMediaPlayer();
             if (_mediaPlayer == null)
             {
                 Debug.Log("GetAgoraRtcMediaPlayer failed!");
@@ -194,8 +194,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
         {
             // Debug.Log("OnDestroy");
             // _mediaPlayer.DestroyMediaPlayer(playerId);
-            // if (_mRtcEngine == null) return;
-            // _mRtcEngine.LeaveChannel();
+            // if (mRtcEngine == null) return;
+            // mRtcEngine.InitEventHandler(null);
+            mRtcEngine.LeaveChannel();
         }
 
         private void OnApplicationQuit()
@@ -203,9 +204,10 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
             Debug.Log("OnApplicationQuit");
             _mediaPlayer.DestroyMediaPlayer(playerId);
 
-            if (_mRtcEngine == null) return;
-            _mRtcEngine.LeaveChannel();
-            _mRtcEngine.Dispose(true);
+            if (mRtcEngine == null) return;
+            mRtcEngine.InitEventHandler(null);
+            mRtcEngine.LeaveChannel();
+            mRtcEngine.Dispose(true);
         }
 
         internal string GetChannelName()
@@ -231,7 +233,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
         }
 
         // VIDEO TYPE 1: 3D Object
-        private AgoraVideoSurface MakePlaneSurface(string goName)
+        private VideoSurface MakePlaneSurface(string goName)
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
@@ -243,18 +245,16 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
             go.name = goName;
             // set up transform
             go.transform.Rotate(-90.0f, 0.0f, 0.0f);
-            var yPos = Random.Range(3.0f, 5.0f);
-            var xPos = Random.Range(-2.0f, 2.0f);
-            go.transform.position = new Vector3(xPos, yPos, 0f);
+            go.transform.position = Vector3.zero;
             go.transform.localScale = new Vector3(1.0f, 1.333f, 0.5f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<AgoraVideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurface>();
             return videoSurface;
         }
 
         // Video TYPE 2: RawImage
-        private static AgoraVideoSurface MakeImageSurface(string goName)
+        private static VideoSurface MakeImageSurface(string goName)
         {
             GameObject go = new GameObject();
 
@@ -281,14 +281,11 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
 
             // set up transform
             go.transform.Rotate(0f, 0.0f, 180.0f);
-            //var xPos = Random.Range(Offset - Screen.width / 2f, Screen.width / 2f - Offset);
-            //var yPos = Random.Range(Offset, Screen.height / 2f - Offset);
-            //Debug.Log("position x " + xPos + " y: " + yPos);
-            go.transform.localPosition = new Vector3(Screen.width / 2f - Offset, Screen.height / 2f - Offset, 0f);
+            go.transform.localPosition = Vector3.zero;
             go.transform.localScale = new Vector3(4.5f, 3f, 1f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<AgoraVideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurface>();
             return videoSurface;
         }
 
@@ -335,7 +332,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
         }
     }
 
-    internal class UserEventHandler : IAgoraRtcEngineEventHandler
+    internal class UserEventHandler : IRtcEngineEventHandler
     {
         private readonly MediaPlayerTest _mediaPlayerTest;
 
@@ -357,7 +354,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
             _mediaPlayerTest.Logger.UpdateLog(string.Format("sdk version: ${0}",
-                _mediaPlayerTest._mRtcEngine.GetVersion()));
+                _mediaPlayerTest.mRtcEngine.GetVersion()));
             _mediaPlayerTest.Logger.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                     connection.channelId, connection.localUid, elapsed));
@@ -384,7 +381,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
         {
             if (uid == 67890)
             {
-                _mediaPlayerTest._mRtcEngine.EnableSpatialAudio(true);
+                _mediaPlayerTest.mRtcEngine.EnableSpatialAudio(true);
                 _mediaPlayerTest.Logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
                 //MediaPlayerTest.MakeVideoView(uid, "asdf");
             }
