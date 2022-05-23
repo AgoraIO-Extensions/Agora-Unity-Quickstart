@@ -34,22 +34,22 @@ public class Home : MonoBehaviour
         "CustomCaptureVideoScene",
         "CustomRenderAudioScene",
         "DeviceManagerScene",
-            "DualCameraScene",
-             "JoinChannelVideoTokenScene",
+        "DualCameraScene",
+        "JoinChannelVideoTokenScene",
         "JoinChannelWithUserAccountScene",
         "MediaPlayerScene",
         "ProcessRawDataScene",
-            "PushEncodedVideoImageScene",
-             "RtmpStreamingScene",
+        "PushEncodedVideoImageScene",
+        "RtmpStreamingScene",
         "ScreenShareScene",
         "ScreenShareWhileVideoCallScene",
         "SetEncryptionScene",
-            "SetVideoEncodeConfigurationScene",
-             "SpatialAudioWithMediaPlayerScene",
+        "SetVideoEncodeConfigurationScene",
+        "SpatialAudioWithMediaPlayerScene",
         "StartRhythmPlayerScene",
         "StreamMessageScene",
         "TakeSnapshotScene",
-            "VoiceChangerScene"
+        "VoiceChangerScene"
     };
 
 

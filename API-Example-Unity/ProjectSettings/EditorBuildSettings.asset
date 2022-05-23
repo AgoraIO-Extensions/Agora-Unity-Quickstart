@@ -6,7 +6,7 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/API-Example/home/HomeScene.unity
+    path: Assets/API-Example/HomeScene.unity
     guid: afbde366e660d4272b8d45e2d7d96f50
   - enabled: 1
     path: Assets/API-Example/examples/basic/JoinChannelAudio/BasicAudioCallScene.unity

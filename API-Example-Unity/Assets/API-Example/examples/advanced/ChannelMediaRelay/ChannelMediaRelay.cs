@@ -110,11 +110,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
             ui.gameObject.SetActive(visible);
         }
 
-
         void OnStartButtonClick()
         {
-           
-
             ChannelMediaRelayConfiguration config = new ChannelMediaRelayConfiguration();
             config.srcInfo = new ChannelMediaInfo
             {
@@ -127,7 +124,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
             config.destInfos = new ChannelMediaInfo[1];
             config.destInfos[0] = new ChannelMediaInfo
             {
-                channelName = this.agoraBaseProfile.channelName + "_second" ,
+                channelName = this.agoraBaseProfile.channelName + "_2",
                 uid = 0,
                 token = this.agoraBaseProfile.token
             };
@@ -135,17 +132,10 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
 
             var nRet = mRtcEngine.StartChannelMediaRelay(config);
             this.logger.UpdateLog("StartChannelMediaRelay nRet:" + nRet);
-
         }
 
         void onUpdateButtonClick()
         {
-            //if (this.agoraBaseProfile2 == null)
-            //{
-            //    this.logger.UpdateLog("you must set second channel first!!");
-            //    return;
-            //}
-
             ChannelMediaRelayConfiguration config = new ChannelMediaRelayConfiguration();
             config.srcInfo = new ChannelMediaInfo
             {
@@ -157,7 +147,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
             config.destInfos = new ChannelMediaInfo[1];
             config.destInfos[0] = new ChannelMediaInfo
             {
-                channelName = this.agoraBaseProfile.channelName + "_second",
+                channelName = this.agoraBaseProfile.channelName + "_3",
                 uid = 0,
                 token = this.agoraBaseProfile.token
             };

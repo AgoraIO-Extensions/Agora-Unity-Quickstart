@@ -6,6 +6,7 @@ using UnityEngine.Serialization;
 using Logger = agora.util.Logger;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
 {
@@ -305,8 +306,10 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
             _pushEncodedVideoImage = videoSample;
         }
 
-        public override bool OnEncodedVideoImageReceived(IntPtr imageBufferPtr, byte[] imageBuffer, UInt64 length, EncodedVideoFrameInfo videoEncodedFrameInfo)
+        public override bool OnEncodedVideoImageReceived(IntPtr imageBufferPtr, UInt64 length, EncodedVideoFrameInfo videoEncodedFrameInfo)
         {
+            byte[] imageBuffer = new byte[length];
+            Marshal.Copy(imageBuffer, 0, imageBufferPtr, (int)length);
             string str = System.Text.Encoding.Default.GetString(imageBuffer);
             var pos = JsonUtility.FromJson<Vector3>(str);
             var uid = videoEncodedFrameInfo.uid.ToString();
