@@ -9,9 +9,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
 {
     public class AudioMixing : MonoBehaviour
     {
-        [FormerlySerializedAs("AgoraBaseProfile")]
+        [FormerlySerializedAs("AppIdInput")]
         [SerializeField]
-        private AgoraBaseProfile agoraBaseProfile;
+        private AppIdInput appIdInput;
 
         [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")]
@@ -54,16 +54,16 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
         [ContextMenu("ShowAgoraBasicProfileData")]
         public void LoadAssetData()
         {
-            if (agoraBaseProfile == null) return;
-            appID = agoraBaseProfile.appID;
-            token = agoraBaseProfile.token;
-            channelName = agoraBaseProfile.channelName;
+            if (appIdInput == null) return;
+            appID = appIdInput.appID;
+            token = appIdInput.token;
+            channelName = appIdInput.channelName;
         }
 
         void CheckAppId()
         {
             Logger = new Logger(logText);
-            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/AgoraBaseProfile.asset");
+            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
         void InitRtcEngine()

@@ -12,8 +12,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
 {
     public class CustomCaptureAudio : MonoBehaviour
     {
-        [FormerlySerializedAs("AgoraBaseProfile")] [SerializeField]
-        private AgoraBaseProfile agoraBaseProfile;
+        [FormerlySerializedAs("appIdInput")] [SerializeField]
+        private AppIdInput appIdInput;
         
         [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")] [SerializeField]
@@ -66,16 +66,16 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
         [ContextMenu("ShowAgoraBasicProfileData")]
         public void LoadAssetData()
         {
-            if (agoraBaseProfile == null) return;
-            appID = agoraBaseProfile.appID;
-            token = agoraBaseProfile.token;
-            channelName = agoraBaseProfile.channelName;
+            if (appIdInput == null) return;
+            appID = appIdInput.appID;
+            token = appIdInput.token;
+            channelName = appIdInput.channelName;
         }
         
         void CheckAppId()
         {
             logger = new Logger(logText);
-            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/AgoraBaseProfile.asset");
+            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
         private void InitRtcEngine()

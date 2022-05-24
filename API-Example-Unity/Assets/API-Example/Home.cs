@@ -16,7 +16,7 @@ public class Home : MonoBehaviour
     public InputField tokenInput;
 
 
-    public AgoraBaseProfile profile;
+    public AppIdInput appIdInput;
     public GameObject casePanel;
     public GameObject caseScoller;
     private string PlaySceneName = "";
@@ -85,11 +85,11 @@ public class Home : MonoBehaviour
         }
 
 
-        if (this.profile)
+        if (this.appIdInput)
         {
-            this.appIdInupt.text = this.profile.appID;
-            this.channelInput.text = this.profile.channelName;
-            this.tokenInput.text = this.profile.token;
+            this.appIdInupt.text = this.appIdInput.appID;
+            this.channelInput.text = this.appIdInput.channelName;
+            this.tokenInput.text = this.appIdInput.token;
         }
 
     }
@@ -133,9 +133,9 @@ public class Home : MonoBehaviour
 
     public void OnJoinSceneClicked()
     {
-        this.profile.appID = this.appIdInupt.text;
-        this.profile.channelName = this.channelInput.text;
-        this.profile.token = this.tokenInput.text;
+        this.appIdInput.appID = this.appIdInupt.text;
+        this.appIdInput.channelName = this.channelInput.text;
+        this.appIdInput.token = this.tokenInput.text;
 
         var button = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
         var sceneName = button.transform.parent.Find("Text").gameObject.GetComponent<Text>().text;

@@ -316,7 +316,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2508774b095c40389aa042284a7e789, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agoraBaseProfile: {fileID: 11400000, guid: 1213b3eb894c348dbbb59da31d2b1c7e, type: 2}
+  appIdInput: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
   appID: 
   token: 
   channelName: 
@@ -2003,7 +2003,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1249499264}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.9999999
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3832,7 +3832,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1285373778}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.2954
+  m_Size: 0.29540002
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
