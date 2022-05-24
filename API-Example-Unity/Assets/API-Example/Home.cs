@@ -109,7 +109,7 @@ public class Home : MonoBehaviour
     private void OnApplicationQuit()
     {
         Debug.Log("OnApplicationQuit");
-        IRtcEngine mRtcEngine = RtcEngineImpl.Get();
+        IRtcEngine mRtcEngine = RtcEngine.Get();
         if (mRtcEngine != null)
         {
             mRtcEngine.Dispose(true);

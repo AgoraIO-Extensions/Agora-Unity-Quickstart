@@ -64,7 +64,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
 
         void InitEngine()
         {
-            mRtcEngine = RtcEngineImpl.CreateAgoraRtcEngine();
+            mRtcEngine = RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,

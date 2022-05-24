@@ -77,7 +77,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
         private IEnumerator ShareScreen()
         {
             yield return new WaitForEndOfFrame();
-            IRtcEngine rtc = RtcEngineImpl.Get();
+            IRtcEngine rtc = RtcEngine.Get();
             if (rtc != null)
             {
                 mTexture.ReadPixels(mRect, 0, 0);
@@ -113,7 +113,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
 
         private void InitEngine()
         {
-            mRtcEngine = RtcEngineImpl.CreateAgoraRtcEngine();
+            mRtcEngine = RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
