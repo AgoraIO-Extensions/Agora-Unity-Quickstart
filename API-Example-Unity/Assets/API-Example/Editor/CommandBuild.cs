@@ -45,6 +45,7 @@ public class CommandBuild : MonoBehaviour
     [MenuItem("Build/Android")]
     public static void BuildAndrod()
     {
+
         BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
         buildPlayerOptions.scenes = GetAllScenes();
         buildPlayerOptions.locationPathName = "../Build/Android.apk";

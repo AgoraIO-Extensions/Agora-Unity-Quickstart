@@ -188,7 +188,7 @@ public class StartLocalVideoTranscoder : MonoBehaviour
 
         if (this.togglePng.isOn)
         {
-            var filePath = Path.Combine(Application.streamingAssetsPath + "img/plugin.png");
+            var filePath = Path.Combine(Application.streamingAssetsPath + "img/png.png");
             list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.RTC_IMAGE_PNG_SOURCE, 0, filePath, 360, 240, 360, 240, 1, 1, false));
         }
 
@@ -201,7 +201,7 @@ public class StartLocalVideoTranscoder : MonoBehaviour
 
         if (this.toggleJif.isOn)
         {
-            var filePath = Path.Combine(Application.streamingAssetsPath + "img/gif.jpg");
+            var filePath = Path.Combine(Application.streamingAssetsPath + "img/gif.jif");
             list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.RTC_IMAGE_GIF_SOURCE, 0, filePath, 360, 0, 360, 240, 1, 1, false));
         }
 
