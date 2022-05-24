@@ -60,6 +60,9 @@ EditorBuildSettings:
     path: Assets/API-Example/examples/advanced/ScreenShareWhileVideoCall/ScreenShareWhileVideoCallScene.unity
     guid: fe14a5ceabe1e471c9bdef42d8069bc8
   - enabled: 1
+    path: Assets/API-Example/examples/advanced/SetBeautyEffectOptions/SetBeautyEffectOptionsScene.unity
+    guid: 36fd8120d7d7e48abaddc96da3a6cbff
+  - enabled: 1
     path: Assets/API-Example/examples/advanced/SetEncryption/SetEncryptionScene.unity
     guid: ad19d2d806ae74e639ef435f7861382a
   - enabled: 1
@@ -69,8 +72,14 @@ EditorBuildSettings:
     path: Assets/API-Example/examples/advanced/SpatialAudioWithMediaPlayer/SpatialAudioWithMediaPlayerScene.unity
     guid: 86cef631ac3c244318f423dd6eaf47d3
   - enabled: 1
+    path: Assets/API-Example/examples/advanced/StartLocalVideoTranscoder/StartLocalVideoTranscoderScene.unity
+    guid: 48d77a7c2db3043fab75e6063f691cde
+  - enabled: 1
     path: Assets/API-Example/examples/advanced/StartRhythmPlayer/StartRhythmPlayerScene.unity
     guid: 346412a7123af442c980f394327ebb7f
+  - enabled: 1
+    path: Assets/API-Example/examples/advanced/StartRtmpStreamWithTranscoding/StartRtmpStreamWithTranscodingScene.unity
+    guid: c5fb0859bf77346a5ab0a0af50a14231
   - enabled: 1
     path: Assets/API-Example/examples/advanced/StreamMessage/StreamMessageScene.unity
     guid: e5426a5a947d64c998eccdf724c9973e

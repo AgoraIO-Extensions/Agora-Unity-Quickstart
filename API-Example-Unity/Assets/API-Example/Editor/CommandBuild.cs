@@ -17,7 +17,7 @@ public class CommandBuild : MonoBehaviour
             "Assets/API-Example/HomeScene.unity",
             "Assets/API-Example/examples/basic/JoinChannelVideo/BasicVideoCallScene.unity",
             "Assets/API-Example/examples/basic/JoinChannelAudio/BasicAudioCallScene.unity",
-            "Assets/API-Example/examples/advanced/StartRhythmPlayer/StartRhythmPlayerScene.unity",
+
             "Assets/API-Example/examples/advanced/AudioMixing/AudioMixingScene.unity",
             "Assets/API-Example/examples/advanced/ChannelMediaRelay/ChannelMediaRelayScene.unity",
             "Assets/API-Example/examples/advanced/CustomCaptureAudio/CustomCaptureAudioScene.unity",
@@ -33,8 +33,13 @@ public class CommandBuild : MonoBehaviour
             "Assets/API-Example/examples/advanced/RtmpStreaming/RtmpStreamingScene.unity",
             "Assets/API-Example/examples/advanced/ScreenShare/ScreenShareScene.unity",
             "Assets/API-Example/examples/advanced/ScreenShareWhileVideoCall/ScreenShareWhileVideoCallScene.unity",
+            "Assets/API-Example/examples/advanced/SetBeautyEffectOptions/SetBeautyEffectOptionsScene.unity",
             "Assets/API-Example/examples/advanced/SetEncryption/SetEncryptionScene.unity",
+            "Assets/API-Example/examples/advanced/SetVideoEncodeConfiguration/SetVideoEncodeConfigurationScene.unity",
             "Assets/API-Example/examples/advanced/SpatialAudioWithMediaPlayer/SpatialAudioWithMediaPlayerScene.unity",
+            "Assets/API-Example/examples/advanced/StartLocalVideoTranscoder/StartLocalVideoTranscoderScene.unity",
+            "Assets/API-Example/examples/advanced/StartRhythmPlayer/StartRhythmPlayerScene.unity",
+            "Assets/API-Example/examples/advanced/StartRtmpStreamWithTranscoding/StartRtmpStreamWithTranscodingScene.unity",
             "Assets/API-Example/examples/advanced/StreamMessage/StreamMessageScene.unity",
             "Assets/API-Example/examples/advanced/TakeSnapshot/TakeSnapshotScene.unity",
             "Assets/API-Example/examples/advanced/VoiceChanger/VoiceChangerScene.unity"
@@ -45,6 +50,7 @@ public class CommandBuild : MonoBehaviour
     [MenuItem("Build/Android")]
     public static void BuildAndrod()
     {
+
         BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
         buildPlayerOptions.scenes = GetAllScenes();
         buildPlayerOptions.locationPathName = "../Build/Android.apk";

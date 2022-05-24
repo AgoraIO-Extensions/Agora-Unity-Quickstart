@@ -12,8 +12,8 @@ namespace CustomRenderAudio
 {
     public class CustomRenderAudio : MonoBehaviour
     {
-        [FormerlySerializedAs("AgoraBaseProfile")] [SerializeField]
-        private AgoraBaseProfile agoraBaseProfile;
+        [FormerlySerializedAs("appIdInput")] [SerializeField]
+        private AppIdInput appIdInput;
         
         [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")] [SerializeField]
@@ -73,17 +73,17 @@ namespace CustomRenderAudio
         bool CheckAppId()
         {
             Logger = new Logger(logText);
-            return Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/AgoraBaseProfile.asset");
+            return Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
         
         //Show data in AgoraBasicProfile
         [ContextMenu("ShowAgoraBasicProfileData")]
         public void LoadAssetData()
         {
-            if (agoraBaseProfile == null) return;
-            appID = agoraBaseProfile.appID;
-            token = agoraBaseProfile.token;
-            channelName = agoraBaseProfile.channelName;
+            if (appIdInput == null) return;
+            appID = appIdInput.appID;
+            token = appIdInput.token;
+            channelName = appIdInput.channelName;
         }
 
         void InitRtcEngine()

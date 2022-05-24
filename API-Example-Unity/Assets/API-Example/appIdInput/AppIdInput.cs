@@ -4,9 +4,9 @@ using System.Collections;
 using System;
 using UnityEngine.Serialization;
 
-[CreateAssetMenu(menuName = "Agora Profiles/Agora Basic Profile", fileName = "AgoraBaseProfile", order = 1)]
+[CreateAssetMenu(menuName = "Agora/AppIdInput", fileName = "AppIdInput", order = 1)]
 [Serializable]
-public class AgoraBaseProfile : ScriptableObject
+public class AppIdInput : ScriptableObject
 {
     [FormerlySerializedAs("APP_ID")] [SerializeField]
     public string appID = "";
