@@ -90,7 +90,7 @@ namespace Agora_Plugin.API_Example.examples.basic.SetBeautyEffectOptions
             mRtcEngine.InitEventHandler(handler);
             mRtcEngine.EnableAudio();
             mRtcEngine.EnableVideo();
-            var nRet = mRtcEngine.EnableExtension("agora", "beauty", true);
+            var nRet = mRtcEngine.EnableExtension("agora", "beauty", true, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
             this.Logger.UpdateLog("EnableExtension:" + nRet);
             mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
         }

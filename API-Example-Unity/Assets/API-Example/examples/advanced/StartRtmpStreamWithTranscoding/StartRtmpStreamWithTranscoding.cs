@@ -30,7 +30,7 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRtmpStreamWithTranscoding
         public Text logText;
         internal Logger Logger;
         internal IRtcEngine mRtcEngine = null;
-        private const float Offset = 100;
+        public uint uid = 0;
 
         // Use this for initialization
         private void Start()
@@ -82,6 +82,9 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRtmpStreamWithTranscoding
 
         private void JoinChannel()
         {
+            //var options = new ChannelMediaOptions();
+            //options.
+
             mRtcEngine.JoinChannel(token, channelName);
         }
 
@@ -100,13 +103,42 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRtmpStreamWithTranscoding
 
         void OnStartButtonPress()
         {
+            if (this.uid == 0)
+            {
+                this.Logger.UpdateLog("your must join channel.");
+                return;
+            }
+
             var liveTranscoding = new LiveTranscoding();
-            var nRet= mRtcEngine.StartRtmpStreamWithTranscoding("rtmp://push.alexmk.name/live/agora_rtc_unity_" + this.channelName, liveTranscoding);
+            liveTranscoding.userCount = 1;
+            liveTranscoding.transcodingUsers = new TranscodingUser[1];
+            liveTranscoding.transcodingUsers[0] = new TranscodingUser()
+            {
+                uid = this.uid,
+                x = 0,
+                y = 0,
+                width = 360,
+                height = 640,
+                alpha = 1,
+                zOrder = 1,
+                audioChannel = 0
+            };
+
+            var nRet = mRtcEngine.StartRtmpStreamWithTranscoding("rtmp://push.alexmk.name/live/agora_rtc_unity_" + this.channelName, liveTranscoding);
             this.Logger.UpdateLog("StartRtmpStreamWithTranscoding:" + nRet);
             if (nRet == 0)
             {
                 this.Logger.UpdateLog("pushing stream to rtmp://push.alexmk.name/live/agora_rtc_unity_" + this.channelName);
+                /* 
+                    Verify remote
+                    1.install ffmpeg(brew install ffmpeg)
+                    2.ffplay rtmp://play.alexmk.name/live/agora_rtc_unity_+this.channelName
+                 */
             }
+
+
+
+
         }
 
         void OnUpdateButtonPress()
@@ -114,13 +146,28 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRtmpStreamWithTranscoding
             var liveTranscoding = new LiveTranscoding();
             liveTranscoding.width = 640;
             liveTranscoding.height = 960;
+            liveTranscoding.userCount = 1;
+            liveTranscoding.transcodingUsers = new TranscodingUser[1];
+            liveTranscoding.transcodingUsers[0] = new TranscodingUser()
+            {
+                uid = this.uid,
+                x = 100,
+                y = 100,
+                width = 360,
+                height = 640,
+                alpha = 1,
+                zOrder = 1,
+                audioChannel = 0
+            };
+
+         
             var nRet = mRtcEngine.UpdateRtmpTranscoding(liveTranscoding);
             this.Logger.UpdateLog("UpdateRtmpTranscoding:" + nRet);
         }
 
         void OnStopButtonPress()
         {
-            var nRet = mRtcEngine.StopRtmpStream("rtmp://push.alexmk.name/live/agora_rtc_unity_"+ this.channelName);
+            var nRet = mRtcEngine.StopRtmpStream("rtmp://push.alexmk.name/live/agora_rtc_unity_" + this.channelName);
             this.Logger.UpdateLog("StopRtmpStream:" + nRet);
         }
 
@@ -269,7 +316,7 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRtmpStreamWithTranscoding
             _sample.Logger.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));
-
+            _sample.uid = connection.localUid;
             StartRtmpStreamWithTranscoding.MakeVideoView(0);
         }
 
@@ -304,7 +351,7 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRtmpStreamWithTranscoding
 
         public override void OnRtmpStreamingStateChanged(string url, RTMP_STREAM_PUBLISH_STATE state, RTMP_STREAM_PUBLISH_ERROR_TYPE errCode)
         {
-            _sample.Logger.UpdateLog(string.Format("OnRtmpStreamingStateChanged url:{1}, state:{1}, errCode:{2}", url, state, errCode));
+            _sample.Logger.UpdateLog(string.Format("OnRtmpStreamingStateChanged url:{0},  state:{1},  errCode:{2}", url, state, errCode));
         }
 
         public override void OnTranscodingUpdated()
