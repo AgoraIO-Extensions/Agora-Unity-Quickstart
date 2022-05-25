@@ -85,7 +85,7 @@ namespace Agora_Plugin.API_Example.examples.basic.JoinChannelWithUserAccount
         public void GetUserInfoByUserAccount()
         {
             UserInfo info = new UserInfo();
-            mRtcEngine.GetUserInfoByUserAccount(userAccount, out info);
+            mRtcEngine.GetUserInfoByUserAccount(userAccount, ref info);
             Logger.UpdateLog(string.Format("GetUserInfoByUserAccount account: {0}, uid: {1}", info.userAccount, info.uid));
         }
 

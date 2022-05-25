@@ -11,17 +11,21 @@ namespace Agora_Plugin.API_Example.examples.basic.JoinChannelAudio
 {
     public class JoinChannelAudio : MonoBehaviour
     {
-        [FormerlySerializedAs("appIdInput")] [SerializeField]
+        [FormerlySerializedAs("appIdInput")]
+        [SerializeField]
         private AppIdInput appIdInput;
-        
+
         [Header("_____________Basic Configuration_____________")]
-        [FormerlySerializedAs("APP_ID")] [SerializeField]
+        [FormerlySerializedAs("APP_ID")]
+        [SerializeField]
         private string appID = "";
 
-        [FormerlySerializedAs("TOKEN")] [SerializeField]
+        [FormerlySerializedAs("TOKEN")]
+        [SerializeField]
         private string token = "";
 
-        [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
+        [FormerlySerializedAs("CHANNEL_NAME")]
+        [SerializeField]
         private string channelName = "";
 
         public Text logText;
@@ -47,7 +51,7 @@ namespace Agora_Plugin.API_Example.examples.basic.JoinChannelAudio
             Logger = new Logger(logText);
             Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset!!!!!");
         }
-        
+
         //Show data in AgoraBasicProfile
         [ContextMenu("ShowAgoraBasicProfileData")]
         public void LoadAssetData()
@@ -62,7 +66,7 @@ namespace Agora_Plugin.API_Example.examples.basic.JoinChannelAudio
         {
             mRtcEngine = RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(appID, 0, true, 
+            RtcEngineContext context = new RtcEngineContext(appID, 0, true,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             mRtcEngine.Initialize(context);
@@ -96,7 +100,7 @@ namespace Agora_Plugin.API_Example.examples.basic.JoinChannelAudio
             if (mRtcEngine != null)
             {
                 mRtcEngine.InitEventHandler(null);
-            mRtcEngine.LeaveChannel();
+                mRtcEngine.LeaveChannel();
                 mRtcEngine.Dispose();
                 mRtcEngine = null;
             }
@@ -127,7 +131,7 @@ namespace Agora_Plugin.API_Example.examples.basic.JoinChannelAudio
             _audioSample.Logger.UpdateLog(string.Format("sdk version: ${0}",
                 _audioSample.mRtcEngine.GetVersion()));
             _audioSample.Logger.UpdateLog(
-                string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", 
+                string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));
         }
 
@@ -154,7 +158,7 @@ namespace Agora_Plugin.API_Example.examples.basic.JoinChannelAudio
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
         {
             _audioSample.Logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
-                (int) reason));
+                (int)reason));
         }
     }
 }
