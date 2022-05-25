@@ -131,7 +131,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
 
         private void JoinChannel()
         {
-            mRtcEngine.JoinChannel(token, channelName);
+            var options = new ChannelMediaOptions();
+            options.publishTrancodedVideoTrack.SetValue(true);
+            mRtcEngine.JoinChannel(token, channelName, 0, options);
         }
 
         LocalTranscoderConfiguration GenerateLocalTranscoderConfiguration()
@@ -249,19 +251,22 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
         void OnStartButtonPress()
         {
             var conf = this.GenerateLocalTranscoderConfiguration();
-            mRtcEngine.StartLocalVideoTranscoder(conf);
+            var nRet= mRtcEngine.StartLocalVideoTranscoder(conf);
+            this.Logger.UpdateLog("StartLocalVideoTranscoder:" + nRet);
         }
 
 
         void OnUpdateButtonPress()
         {
             var conf = this.GenerateLocalTranscoderConfiguration();
-            mRtcEngine.UpdateLocalTranscoderConfiguration(conf);
+            var nRet = mRtcEngine.UpdateLocalTranscoderConfiguration(conf);
+            this.Logger.UpdateLog("UpdateLocalTranscoderConfiguration:" + nRet);
         }
 
         void OnStopButtonPress()
         {
-            mRtcEngine.StopLocalVideoTranscoder();
+            var nRet = mRtcEngine.StopLocalVideoTranscoder();
+            this.Logger.UpdateLog("StopLocalVideoTranscoder:" + nRet);
         }
 
         private void OnDestroy()

@@ -107,7 +107,10 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
 
         void JoinChannel()
         {
-            mRtcEngine.JoinChannel(token, channelName);
+            var options = new ChannelMediaOptions();
+            options.publishCustomAudioTrack.SetValue(true);
+
+            mRtcEngine.JoinChannel(token, channelName,0, options);
         }
 
         #region -- Test Control logic ---

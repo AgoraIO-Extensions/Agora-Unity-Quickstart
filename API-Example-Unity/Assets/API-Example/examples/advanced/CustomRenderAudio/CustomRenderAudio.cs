@@ -90,6 +90,7 @@ namespace CustomRenderAudio
         {
             mRtcEngine = RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
+            //be care, enableAudioDevice need be false
             RtcEngineContext context = new RtcEngineContext(appID, 0, true,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
