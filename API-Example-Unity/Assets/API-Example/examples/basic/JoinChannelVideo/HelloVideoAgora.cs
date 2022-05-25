@@ -1,12 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using agora_gaming_rtc;
 using agora_utilities;
 
-public class HelloVideoAgora : MonoBehaviour {
-	
+public class HelloVideoAgora : MonoBehaviour
+{
+
     [SerializeField]
     private string APP_ID = "";
 
@@ -15,40 +14,51 @@ public class HelloVideoAgora : MonoBehaviour {
 
     [SerializeField]
     private string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
+
+
     public Text logText;
-	private Logger logger;
-	private IRtcEngine mRtcEngine = null;
+    public bool UseCustomSink = false;
+
+    private Logger logger;
+    private IRtcEngine mRtcEngine = null;
     private const float Offset = 100;
-    private static string channelName = "Agora_Channel";
 
-	// Use this for initialization
-	void Start () {
-		CheckAppId();
-        InitEngine();
-        JoinChannel();
-	}
-
-	// Update is called once per frame
-	void Update () {
-		PermissionHelper.RequestMicrophontPermission();
-		PermissionHelper.RequestCameraPermission();
-	}
-	
-	void CheckAppId()
+    // Use this for initialization
+    void Start()
     {
-        logger = new Logger(logText);
-        logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+        if (CheckAppId())
+        {
+            InitEngine();
+            JoinChannel();
+        }
     }
 
-	void InitEngine()
-	{
+    // Update is called once per frame
+    void Update()
+    {
+        PermissionHelper.RequestMicrophontPermission();
+        PermissionHelper.RequestCameraPermission();
+    }
+
+    bool CheckAppId()
+    {
+        logger = new Logger(logText);
+        return logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+    }
+
+    void InitEngine()
+    {
         mRtcEngine = IRtcEngine.GetEngine(APP_ID);
-		mRtcEngine.SetLogFile("log.txt");
-		mRtcEngine.SetChannelProfile(CHANNEL_PROFILE.CHANNEL_PROFILE_LIVE_BROADCASTING);
-		mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-		mRtcEngine.EnableAudio();
-		mRtcEngine.EnableVideo();
-		mRtcEngine.EnableVideoObserver();
+        mRtcEngine.SetLogFile("log.txt");
+        mRtcEngine.SetChannelProfile(CHANNEL_PROFILE.CHANNEL_PROFILE_LIVE_BROADCASTING);
+        mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+        if (UseCustomSink)
+        {
+            mRtcEngine.SetExternalAudioSink(true, 44100, 1);
+        }
+        mRtcEngine.EnableAudio();
+        mRtcEngine.EnableVideo();
+        mRtcEngine.EnableVideoObserver();
         mRtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
         mRtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
         mRtcEngine.OnWarning += OnSDKWarningHandler;
@@ -56,14 +66,14 @@ public class HelloVideoAgora : MonoBehaviour {
         mRtcEngine.OnConnectionLost += OnConnectionLostHandler;
         mRtcEngine.OnUserJoined += OnUserJoinedHandler;
         mRtcEngine.OnUserOffline += OnUserOfflineHandler;
-	}
+    }
 
     void JoinChannel()
     {
         mRtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
     }
 
-	void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
+    void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
     {
         logger.UpdateLog(string.Format("sdk version: ${0}", IRtcEngine.GetSdkVersion()));
         logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName, uid, elapsed));
@@ -92,12 +102,12 @@ public class HelloVideoAgora : MonoBehaviour {
     {
         logger.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
     }
-    
+
     void OnSDKErrorHandler(int error, string msg)
     {
         logger.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
     }
-    
+
     void OnConnectionLostHandler()
     {
         logger.UpdateLog(string.Format("OnConnectionLost "));
@@ -108,8 +118,8 @@ public class HelloVideoAgora : MonoBehaviour {
         Debug.Log("OnApplicationQuit");
         if (mRtcEngine != null)
         {
-			mRtcEngine.LeaveChannel();
-			mRtcEngine.DisableVideoObserver();
+            mRtcEngine.LeaveChannel();
+            mRtcEngine.DisableVideoObserver();
             IRtcEngine.Destroy();
         }
     }
@@ -139,7 +149,6 @@ public class HelloVideoAgora : MonoBehaviour {
             videoSurface.SetForUser(uid);
             videoSurface.SetEnable(true);
             videoSurface.SetVideoSurfaceType(AgoraVideoSurfaceType.RawImage);
-            videoSurface.SetGameFps(30);
         }
     }
 
@@ -183,7 +192,7 @@ public class HelloVideoAgora : MonoBehaviour {
         GameObject canvas = GameObject.Find("VideoCanvas");
         if (canvas != null)
         {
-            go.transform.parent = canvas.transform;
+            go.transform.SetParent(canvas.transform);
             Debug.Log("add video view");
         }
         else

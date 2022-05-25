@@ -93,7 +93,12 @@ public class FileCustomAudioSource : MonoBehaviour
         var bufferLength = SAMPLE_RATE / PUSH_FREQ_PER_SEC * CHANNEL * 10000;
         audioBuffer = new RingBuffer<byte>(bufferLength);
 
+#if UNITY_ANDROID && !UNITY_EDITOR
+        // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
+        string fileStreamName = "/assets/" + MyPCMByteFile;
+#else
         string fileStreamName = Application.streamingAssetsPath + "/" + MyPCMByteFile;
+#endif
         MediaBuffer = File.ReadAllBytes(fileStreamName);
         logger.UpdateLog("Read " + MediaBuffer.Length + " bytes from " + fileStreamName);
         AppendRingBuffer();
@@ -205,11 +210,11 @@ public class FileCustomAudioSource : MonoBehaviour
     }
 
     private void AppendRingBuffer()
-    { 
-        foreach(var s in MediaBuffer)
+    {
+        foreach (var s in MediaBuffer)
         {
-            audioBuffer.Put(s);  
-	    }
+            audioBuffer.Put(s);
+        }
         _startSignal = true;
     }
 }

@@ -19,18 +19,18 @@ namespace CustomAudioSink
         private IAudioRawDataManager _audioRawDataManager;
 
         private int CHANNEL = 1;
-        private int PULL_FREQ_PER_SEC = 100;
+        private int PULL_FREQ_PER_SEC = 100;  // i.e.  10ms frequency
         public int SAMPLE_RATE = 32000; // this should = CLIP_SAMPLES x PULL_FREQ_PER_SEC
         public int CLIP_SAMPLES = 320;
+        public int COUNT_TO_SIGNAL_START = 100;
 
         private int count;
-
         private int writeCount;
         private int readCount;
 
         private RingBuffer<float> audioBuffer;
         private AudioClip _audioClip;
-        
+
         private bool _startSignal;
 
         // Start is called before the first frame update
@@ -45,11 +45,11 @@ namespace CustomAudioSink
             var aud = GetComponent<AudioSource>();
             if (aud == null)
             {
-                gameObject.AddComponent<AudioSource>(); 
-	        }
+                gameObject.AddComponent<AudioSource>();
+            }
             SetupAudio(aud, "externalClip");
         }
-        
+
         void Update()
         {
             PermissionHelper.RequestMicrophontPermission();
@@ -69,8 +69,8 @@ namespace CustomAudioSink
             {
                 logger.UpdateLog("Engine creation failure!!!! App not running");
                 return;
-	        }
-                
+            }
+
             mRtcEngine.SetLogFile("log.txt");
             mRtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
             mRtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
@@ -88,14 +88,15 @@ namespace CustomAudioSink
         {
             _audioRawDataManager = AudioRawDataManager.GetInstance(mRtcEngine);
             Debug.Assert(_audioRawDataManager.RegisterAudioRawDataObserver() == 0, "Error registering audio rawdata observer!");
-            mRtcEngine.SetParameter("che.audio.external_render", true);
+
+            mRtcEngine.SetExternalAudioSink(true, SAMPLE_RATE, CHANNEL);
 
             var bufferLength = SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL * 1000; // 10-sec-length buffer
             audioBuffer = new RingBuffer<float>(bufferLength);
-            
+
             _audioClip = AudioClip.Create(clipName,
                 CLIP_SAMPLES,
-		        CHANNEL, SAMPLE_RATE, true,
+                CHANNEL, SAMPLE_RATE, true,
                 OnAudioRead);
             aud.clip = _audioClip;
             aud.loop = true;
@@ -107,13 +108,16 @@ namespace CustomAudioSink
             if (pause)
             {
                 _startSignal = false;
-                if (audioBuffer != null) {
-		            audioBuffer.Clear();
+                if (audioBuffer != null)
+                {
+                    audioBuffer.Clear();
                 }
                 count = 0;
-	        } else {
+            }
+            else
+            {
                 Debug.Log("Application resumed.");
-	        }
+            }
         }
 
         void OnApplicationQuit()
@@ -169,7 +173,7 @@ namespace CustomAudioSink
         {
             if (count == 1)
             {
-                Debug.LogWarning("audioFrame = "+ audioFrame);
+                Debug.LogWarning("audioFrame = " + audioFrame);
             }
             var floatArray = ConvertByteToFloat16(audioFrame.buffer);
             lock (audioBuffer)
@@ -179,7 +183,7 @@ namespace CustomAudioSink
                 count++;
             }
 
-            if (count == 100)
+            if (count == COUNT_TO_SIGNAL_START)
             {
                 _startSignal = true;
             }
