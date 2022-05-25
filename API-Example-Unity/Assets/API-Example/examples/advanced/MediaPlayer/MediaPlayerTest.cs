@@ -13,17 +13,21 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
 {
     public class MediaPlayerTest : MonoBehaviour
     {
-        [FormerlySerializedAs("appIdInput")] [SerializeField]
+        [FormerlySerializedAs("appIdInput")]
+        [SerializeField]
         private AppIdInput appIdInput;
-        
+
         [Header("_____________Basic Configuration_____________")]
-        [FormerlySerializedAs("APP_ID")] [SerializeField]
+        [FormerlySerializedAs("APP_ID")]
+        [SerializeField]
         private string appID = "";
 
-        [FormerlySerializedAs("TOKEN")] [SerializeField]
+        [FormerlySerializedAs("TOKEN")]
+        [SerializeField]
         private string token = "";
 
-        [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
+        [FormerlySerializedAs("CHANNEL_NAME")]
+        [SerializeField]
         private string channelName = "";
 
         public Text logText;
@@ -31,7 +35,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
         internal IRtcEngine mRtcEngine = null;
         internal IMediaPlayer _mediaPlayer = null;
         internal int playerId = 0;
-        
+
         private const float Offset = 100;
         private const string MPK_URL =
             "https://agora-adc-artifacts.oss-cn-beijing.aliyuncs.com/video/meta_live_mpk.mov";
@@ -41,13 +45,14 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
         private Button button3;
         private Button button4;
         private Button button5;
-        
+
         // Use this for initialization
         private void Start()
         {
             LoadAssetData();
             CheckAppId();
-            SetUpUI();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+            SetUpUI();
+            EnableUI(false);
             InitEngine();
             InitMediaPlayer();
             JoinChannel_MPK();
@@ -74,12 +79,27 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
             button5.onClick.AddListener(onOpenButtonPress);
         }
 
+        public void EnableUI(bool val)
+        {
+            var obj= this.transform.Find("Button1").gameObject;
+            obj.SetActive ( val);
+
+            obj = this.transform.Find("Button2").gameObject;
+            obj.SetActive(val);
+
+            obj = this.transform.Find("Button3").gameObject;
+            obj.SetActive(val);
+
+            obj = this.transform.Find("Button4").gameObject;
+            obj.SetActive(val);
+        }
+
         private void CheckAppId()
         {
             Logger = new Logger(logText);
             Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
-        
+
         //Show data in AgoraBasicProfile
         [ContextMenu("ShowAgoraBasicProfileData")]
         public void LoadAssetData()
@@ -107,63 +127,64 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
         private void JoinChannel_MPK()
         {
             ChannelMediaOptions options = new ChannelMediaOptions();
-            options.autoSubscribeAudio .SetValue(true);
-            options.autoSubscribeVideo.SetValue (true);
-            options.publishAudioTrack.SetValue (false);
-            options.publishCameraTrack.SetValue (false);
-            options.publishMediaPlayerAudioTrack.SetValue (true);
-            options.publishMediaPlayerVideoTrack.SetValue (true);
-            options.publishMediaPlayerId.SetValue (playerId);
-            options.enableAudioRecordingOrPlayout.SetValue (true);
+            options.autoSubscribeAudio.SetValue(true);
+            options.autoSubscribeVideo.SetValue(true);
+            options.publishAudioTrack.SetValue(false);
+            options.publishCameraTrack.SetValue(false);
+            options.publishMediaPlayerAudioTrack.SetValue(true);
+            options.publishMediaPlayerVideoTrack.SetValue(true);
+            options.publishMediaPlayerId.SetValue(playerId);
+            options.enableAudioRecordingOrPlayout.SetValue(true);
             options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             var ret = mRtcEngine.JoinChannel(token, channelName, 0, options);
-            Debug.Log("RtcEngineController JoinChannel_MPK returns: " + ret);
+            this.Logger.UpdateLog("RtcEngineController JoinChannel_MPK returns: " + ret);
         }
 
         private void onPlayButtonPress()
         {
             var ret = _mediaPlayer.Play(playerId);
-            Debug.Log("Play return" + ret);
+            this.Logger.UpdateLog("Play return" + ret);
+            this.TestMediaPlayer();
         }
-        
+
         private void onStopButtonPress()
         {
             var ret = _mediaPlayer.Stop(playerId);
-            Debug.Log("Stop return" + ret);
+            this.Logger.UpdateLog("Stop return" + ret);
         }
-        
+
         private void onPauseButtonPress()
         {
             var ret = _mediaPlayer.Pause(playerId);
-            Debug.Log("Pause return" + ret);
+            this.Logger.UpdateLog("Pause return" + ret);
         }
-        
+
         private void onResumeButtonPress()
         {
             var ret = _mediaPlayer.Resume(playerId);
 
-            Debug.Log("Resume returns: " + ret);
+            this.Logger.UpdateLog("Resume returns: " + ret);
         }
-        
+
         private void onOpenButtonPress()
         {
             var ret = _mediaPlayer.Open(playerId, MPK_URL, 0);
-            Debug.Log("Open returns: " + ret);
+            this.Logger.UpdateLog("Open returns: " + ret);
         }
-        
+
         private void InitMediaPlayer()
         {
             _mediaPlayer = mRtcEngine.GetMediaPlayer();
             if (_mediaPlayer == null)
             {
-                Debug.Log("GetAgoraRtcMediaPlayer failed!");
+                this.Logger.UpdateLog("GetAgoraRtcMediaPlayer failed!");
                 return;
             }
             playerId = _mediaPlayer.CreateMediaPlayer();
 
             MpkEventHandler handler = new MpkEventHandler(this);
             _mediaPlayer.InitEventHandler(handler);
-            Debug.Log("playerId id: " + playerId);
+            this.Logger.UpdateLog("playerId id: " + playerId);
         }
 
         public void TestMediaPlayer()
@@ -171,7 +192,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
             long duration = 0;
             var ret = _mediaPlayer.GetDuration(playerId, ref duration);
             Debug.Log("_mediaPlayer.GetDuration returns: " + ret + "duration: " + duration);
-            
+
             long pos = 0;
             ret = _mediaPlayer.GetPlayPosition(playerId, ref pos);
             Debug.Log("_mediaPlayer.GetPlayPosition returns: " + ret + "position: " + pos);
@@ -181,11 +202,11 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
             bool mute = true;
             ret = _mediaPlayer.GetMute(playerId, ref mute);
             Debug.Log("_mediaPlayer.GetMute returns: " + ret + "mute: " + mute);
-            
+
             int volume = 0;
             ret = _mediaPlayer.GetPlayoutVolume(playerId, ref volume);
             Debug.Log("_mediaPlayer.GetPlayoutVolume returns: " + ret + "volume: " + volume);
-            
+
             Debug.Log("SDK Version:" + _mediaPlayer.GetPlayerSdkVersion(playerId));
             Debug.Log("GetPlaySrc:" + _mediaPlayer.GetPlaySrc(playerId));
         }
@@ -315,14 +336,14 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
             Debug.Log("OnPlayerSourceStateChanged");
             if (state == MEDIA_PLAYER_STATE.PLAYER_STATE_OPEN_COMPLETED)
             {
-                var ret = _mediaPlayerTest._mediaPlayer.Play(playerId);
-                Debug.Log("Play return" + ret);
-                _mediaPlayerTest.TestMediaPlayer();
                 MediaPlayerTest.MakeVideoView((uint)_mediaPlayerTest.playerId, "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_MEDIA_PLAYER);
+                _mediaPlayerTest.EnableUI(true);
+                _mediaPlayerTest.Logger.UpdateLog("Open Complete. Click start to play media");
             }
             else if (state == MEDIA_PLAYER_STATE.PLAYER_STATE_STOPPED)
             {
                 MediaPlayerTest.DestroyVideoView((uint)_mediaPlayerTest.playerId);
+                _mediaPlayerTest.EnableUI(false);
             }
         }
 
@@ -396,7 +417,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
         {
             _mediaPlayerTest.Logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
-                (int) reason));
+                (int)reason));
             MediaPlayerTest.DestroyVideoView(uid);
         }
     }
