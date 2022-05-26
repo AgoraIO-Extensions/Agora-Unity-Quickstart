@@ -109,11 +109,11 @@ public class Home : MonoBehaviour
     private void OnApplicationQuit()
     {
         Debug.Log("OnApplicationQuit");
-        IRtcEngine mRtcEngine = RtcEngine.Get();
-        if (mRtcEngine != null)
-        {
-            mRtcEngine.Dispose(true);
-        }
+        //IRtcEngine mRtcEngine = RtcEngine.Get();
+        //if (mRtcEngine != null)
+        //{
+        //    mRtcEngine.Dispose(true);
+        //}
     }
 
     public void OnLeaveButtonClicked()

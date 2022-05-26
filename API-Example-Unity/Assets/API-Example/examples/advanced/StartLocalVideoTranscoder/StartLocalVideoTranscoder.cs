@@ -275,19 +275,20 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
             if (mRtcEngine == null) return;
             mRtcEngine.InitEventHandler(null);
             mRtcEngine.LeaveChannel();
+            mRtcEngine.Dispose();
         }
 
-        private void OnApplicationQuit()
-        {
-            Debug.Log("OnApplicationQuit");
-            if (mRtcEngine != null)
-            {
-                mRtcEngine.InitEventHandler(null);
-                mRtcEngine.LeaveChannel();
-                mRtcEngine.Dispose();
-                mRtcEngine = null;
-            }
-        }
+        //private void OnApplicationQuit()
+        //{
+        //    Debug.Log("OnApplicationQuit");
+        //    if (mRtcEngine != null)
+        //    {
+        //        mRtcEngine.InitEventHandler(null);
+        //        mRtcEngine.LeaveChannel();
+        //        mRtcEngine.Dispose();
+        //        mRtcEngine = null;
+        //    }
+        //}
 
         internal static void MakeVideoView(uint uid, string channelId = "")
         {

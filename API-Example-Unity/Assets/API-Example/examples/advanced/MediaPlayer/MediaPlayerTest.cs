@@ -213,23 +213,23 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
 
         private void OnDestroy()
         {
-            // Debug.Log("OnDestroy");
-            // _mediaPlayer.DestroyMediaPlayer(playerId);
-            // if (mRtcEngine == null) return;
-            // mRtcEngine.InitEventHandler(null);
-            mRtcEngine.LeaveChannel();
-        }
-
-        private void OnApplicationQuit()
-        {
-            Debug.Log("OnApplicationQuit");
+            Debug.Log("OnDestroy");
             _mediaPlayer.DestroyMediaPlayer(playerId);
-
             if (mRtcEngine == null) return;
             mRtcEngine.InitEventHandler(null);
             mRtcEngine.LeaveChannel();
-            mRtcEngine.Dispose(true);
         }
+
+        //private void OnApplicationQuit()
+        //{
+        //    Debug.Log("OnApplicationQuit");
+        //    _mediaPlayer.DestroyMediaPlayer(playerId);
+
+        //    if (mRtcEngine == null) return;
+        //    mRtcEngine.InitEventHandler(null);
+        //    mRtcEngine.LeaveChannel();
+        //    mRtcEngine.Dispose(true);
+        //}
 
         internal string GetChannelName()
         {

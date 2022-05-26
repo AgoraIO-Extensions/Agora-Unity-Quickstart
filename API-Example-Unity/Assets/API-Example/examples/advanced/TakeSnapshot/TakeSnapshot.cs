@@ -126,16 +126,17 @@ namespace Agora_Plugin.API_Example.examples.basic.TakeSnapshot
             if (mRtcEngine == null) return;
             mRtcEngine.InitEventHandler(null);
             mRtcEngine.LeaveChannel();
-        }
-
-        private void OnApplicationQuit()
-        {
-            Debug.Log("OnApplicationQuit");
-            if (mRtcEngine == null) return;
-            mRtcEngine.InitEventHandler(null);
-            mRtcEngine.LeaveChannel();
             mRtcEngine.Dispose();
         }
+
+        //private void OnApplicationQuit()
+        //{
+        //    Debug.Log("OnApplicationQuit");
+        //    if (mRtcEngine == null) return;
+        //    mRtcEngine.InitEventHandler(null);
+        //    mRtcEngine.LeaveChannel();
+        //    mRtcEngine.Dispose();
+        //}
 
         internal static void MakeVideoView(uint uid, string channelId = "")
         {
