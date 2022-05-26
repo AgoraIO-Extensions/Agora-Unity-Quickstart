@@ -117,17 +117,18 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
             if (mRtcEngine == null) return;
             mRtcEngine.InitEventHandler(null);
             mRtcEngine.LeaveChannel();
+            mRtcEngine.Dispose();
         }
 
-        void OnApplicationQuit()
-        {
-            Debug.Log("OnApplicationQuit");
-            if (mRtcEngine != null)
-            {
-                mRtcEngine.LeaveChannel();
-                mRtcEngine.Dispose();
-            }
-        }
+        //void OnApplicationQuit()
+        //{
+        //    Debug.Log("OnApplicationQuit");
+        //    if (mRtcEngine != null)
+        //    {
+        //        mRtcEngine.LeaveChannel();
+        //        mRtcEngine.Dispose();
+        //    }
+        //}
 
 
         public void CreateRole(string uid, bool isLocal)
@@ -197,7 +198,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
                 EncodedVideoFrameInfo encodedVideoFrameInfo = new EncodedVideoFrameInfo()
                 {
                     framesPerSecond = 60,
-                    //dont set codecType = VIDEO_CODEC_GENERIC
+                    //dont set codecType = VIDEO_CODEC_GENERIC will crash
                     codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_GENERIC_H264,
                     frameType = VIDEO_FRAME_TYPE_NATIVE.VIDEO_FRAME_TYPE_KEY_FRAME
                 };

@@ -80,19 +80,31 @@ namespace Agora_Plugin.API_Example.examples.advanced.ProcessRawData
 			mRtcEngine.JoinChannel(token, channelName, "");
 		}
 
-		void OnApplicationQuit()
-		{
-			Debug.Log("OnApplicationQuit1");
-			if (mRtcEngine != null)
-			{
-				mRtcEngine.UnRegisterVideoFrameObserver();
-				mRtcEngine.InitEventHandler(null);
-            mRtcEngine.LeaveChannel();
-				mRtcEngine.Dispose();
-			}
+        private void OnDestroy()
+        {
+			Debug.Log("OnDestroy");
+            if (mRtcEngine != null)
+            {
+                mRtcEngine.UnRegisterVideoFrameObserver();
+                mRtcEngine.InitEventHandler(null);
+                mRtcEngine.LeaveChannel();
+                mRtcEngine.Dispose();
+            }
+        }
 
-			Debug.Log("OnApplicationQuit2");
-		}
+		//void OnApplicationQuit()
+		//{
+		//	Debug.Log("OnApplicationQuit1");
+		//	if (mRtcEngine != null)
+		//	{
+		//		mRtcEngine.UnRegisterVideoFrameObserver();
+		//		mRtcEngine.InitEventHandler(null);
+		//          mRtcEngine.LeaveChannel();
+		//		mRtcEngine.Dispose();
+		//	}
+
+		//	Debug.Log("OnApplicationQuit2");
+		//}
 
 		internal class UserEventHandler : IRtcEngineEventHandler
 		{

@@ -91,7 +91,7 @@ namespace Agora_Plugin.API_Example.examples.basic.JoinChannelWithUserAccount
 
         private void OnDestroy()
         {
-            Debug.Log("OnApplicationQuit");
+            Debug.Log("OnDestroy");
             if (mRtcEngine == null) return;
             mRtcEngine.InitEventHandler(null);
             mRtcEngine.LeaveChannel();

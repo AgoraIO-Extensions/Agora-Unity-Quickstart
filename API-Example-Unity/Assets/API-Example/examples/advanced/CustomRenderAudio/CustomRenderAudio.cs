@@ -128,17 +128,18 @@ namespace CustomRenderAudio
             if (mRtcEngine == null) return;
             mRtcEngine.InitEventHandler(null);
             mRtcEngine.LeaveChannel();
-        }
-
-        void OnApplicationQuit()
-        {
-            Debug.Log("OnApplicationQuit");
-            _pullAudioFrameThreadSignal = false;
-            _pullAudioFrameThread.Abort();
-            if (mRtcEngine == null) return;
-            mRtcEngine.LeaveChannel();
             mRtcEngine.Dispose();
         }
+
+        //void OnApplicationQuit()
+        //{
+        //    Debug.Log("OnApplicationQuit");
+        //    _pullAudioFrameThreadSignal = false;
+        //    _pullAudioFrameThread.Abort();
+        //    if (mRtcEngine == null) return;
+        //    mRtcEngine.LeaveChannel();
+        //    mRtcEngine.Dispose();
+        //}
 
         private void PullAudioFrameThread()
         {

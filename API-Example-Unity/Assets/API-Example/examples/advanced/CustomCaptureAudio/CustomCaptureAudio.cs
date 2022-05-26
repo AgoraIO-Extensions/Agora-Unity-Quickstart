@@ -127,18 +127,19 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
             if (mRtcEngine == null) return;
             mRtcEngine.InitEventHandler(null);
             mRtcEngine.LeaveChannel();
-        }
-
-
-        void OnApplicationQuit()
-        {
-            Debug.Log("OnApplicationQuit");
-            _pushAudioFrameThreadSignal = false;
-            Debug.Log("OnApplicationQuit");
-            if (mRtcEngine == null) return;
-            mRtcEngine.LeaveChannel();
             mRtcEngine.Dispose();
         }
+
+
+        //void OnApplicationQuit()
+        //{
+        //    Debug.Log("OnApplicationQuit");
+        //    _pushAudioFrameThreadSignal = false;
+        //    Debug.Log("OnApplicationQuit");
+        //    if (mRtcEngine == null) return;
+        //    mRtcEngine.LeaveChannel();
+        //    mRtcEngine.Dispose();
+        //}
 
         void PushAudioFrameThread()
         {

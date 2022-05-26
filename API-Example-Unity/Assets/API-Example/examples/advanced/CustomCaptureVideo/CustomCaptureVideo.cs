@@ -160,26 +160,31 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
-            if (mRtcEngine == null) return;
-            mRtcEngine.InitEventHandler(null);
-            mRtcEngine.LeaveChannel();
-        }
-
-        private void OnApplicationQuit()
-        {
             if (webCameraTexture)
             {
                 webCameraTexture.Stop();
             }
-
-            if (mRtcEngine != null)
-            {
-                mRtcEngine.InitEventHandler(null);
+            if (mRtcEngine == null) return;
+            mRtcEngine.InitEventHandler(null);
             mRtcEngine.LeaveChannel();
-                mRtcEngine.Dispose();
-                mRtcEngine = null;
-            }
+            mRtcEngine.Dispose();
         }
+
+        //private void OnApplicationQuit()
+        //{
+        //    if (webCameraTexture)
+        //    {
+        //        webCameraTexture.Stop();
+        //    }
+
+        //    if (mRtcEngine != null)
+        //    {
+        //        mRtcEngine.InitEventHandler(null);
+        //    mRtcEngine.LeaveChannel();
+        //        mRtcEngine.Dispose();
+        //        mRtcEngine = null;
+        //    }
+        //}
 
         internal string GetChannelName()
         {

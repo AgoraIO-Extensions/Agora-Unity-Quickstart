@@ -155,19 +155,23 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
             if (mRtcEngine == null) return;
             mRtcEngine.InitEventHandler(null);
             mRtcEngine.LeaveChannel();
-        }
-
-        private void OnApplicationQuit()
-        {
-            Debug.Log("OnApplicationQuit");
-            if (mRtcEngine == null) return;
             mRtcEngine.StopSecondaryCameraCapture();
             mRtcEngine.StopPrimaryCameraCapture();
             mRtcEngine.LeaveChannelEx(new RtcConnection(channelName, 456));
-            mRtcEngine.InitEventHandler(null);
-            mRtcEngine.LeaveChannel();
             mRtcEngine.Dispose();
         }
+
+        //private void OnApplicationQuit()
+        //{
+        //    Debug.Log("OnApplicationQuit");
+        //    if (mRtcEngine == null) return;
+        //    mRtcEngine.StopSecondaryCameraCapture();
+        //    mRtcEngine.StopPrimaryCameraCapture();
+        //    mRtcEngine.LeaveChannelEx(new RtcConnection(channelName, 456));
+        //    mRtcEngine.InitEventHandler(null);
+        //    mRtcEngine.LeaveChannel();
+        //    mRtcEngine.Dispose();
+        //}
 
         internal string GetChannelName()
         {

@@ -108,17 +108,18 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetEncryption
             if (mRtcEngine == null) return;
             mRtcEngine.InitEventHandler(null);
             mRtcEngine.LeaveChannel();
+            mRtcEngine.Dispose();
         }
 
-        void OnApplicationQuit()
-        {
-            Debug.Log("OnApplicationQuit");
-            if (mRtcEngine != null)
-            {
-                mRtcEngine.LeaveChannel();
-                mRtcEngine.Dispose();
-            }
-        }
+        //void OnApplicationQuit()
+        //{
+        //    Debug.Log("OnApplicationQuit");
+        //    if (mRtcEngine != null)
+        //    {
+        //        mRtcEngine.LeaveChannel();
+        //        mRtcEngine.Dispose();
+        //    }
+        //}
 
 
         internal class UserEventHandler : IRtcEngineEventHandler

@@ -161,19 +161,20 @@ namespace Agora_Plugin.API_Example.examples.advanced.RtmpStreaming
             if (mRtcEngine == null) return;
             mRtcEngine.InitEventHandler(null);
             mRtcEngine.LeaveChannel();
+            mRtcEngine.Dispose();
         }
 
-        private void OnApplicationQuit()
-        {
-            Debug.Log("OnApplicationQuit");
-            if (mRtcEngine != null)
-            {
-                mRtcEngine.RemovePublishStreamUrl(RTMP_URL);
-                mRtcEngine.InitEventHandler(null);
-            mRtcEngine.LeaveChannel();
-                mRtcEngine.Dispose();
-            }
-        }
+        //private void OnApplicationQuit()
+        //{
+        //    Debug.Log("OnApplicationQuit");
+        //    if (mRtcEngine != null)
+        //    {
+        //        mRtcEngine.RemovePublishStreamUrl(RTMP_URL);
+        //        mRtcEngine.InitEventHandler(null);
+        //    mRtcEngine.LeaveChannel();
+        //        mRtcEngine.Dispose();
+        //    }
+        //}
 
         internal string GetChannelName()
         {

@@ -140,16 +140,17 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRhythmPlayer
             if (mRtcEngine == null) return;
             mRtcEngine.InitEventHandler(null);
             mRtcEngine.LeaveChannel();
-        }
-
-        private void OnApplicationQuit()
-        {
-            Debug.Log("OnApplicationQuit");
-            if (mRtcEngine == null) return;
-            mRtcEngine.InitEventHandler(null);
-            mRtcEngine.LeaveChannel();
             mRtcEngine.Dispose();
         }
+
+        //private void OnApplicationQuit()
+        //{
+        //    Debug.Log("OnApplicationQuit");
+        //    if (mRtcEngine == null) return;
+        //    mRtcEngine.InitEventHandler(null);
+        //    mRtcEngine.LeaveChannel();
+        //    mRtcEngine.Dispose();
+        //}
 
 
         internal class UserEventHandler : IRtcEngineEventHandler

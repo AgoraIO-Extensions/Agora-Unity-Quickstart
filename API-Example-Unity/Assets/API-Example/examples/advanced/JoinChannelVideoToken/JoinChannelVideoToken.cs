@@ -9,17 +9,21 @@ namespace Agora_Plugin.API_Example.examples.advanced.JoinChannelVideoToken
 {
     public class JoinChannelVideoToken : MonoBehaviour
     {
-        [FormerlySerializedAs("appIdInput")] [SerializeField]
+        [FormerlySerializedAs("appIdInput")]
+        [SerializeField]
         private AppIdInput appIdInput;
 
-        [Header("_____________Basic Configuration_____________")] 
-        [FormerlySerializedAs("APP_ID")] [SerializeField]
+        [Header("_____________Basic Configuration_____________")]
+        [FormerlySerializedAs("APP_ID")]
+        [SerializeField]
         private string appID = "";
 
-        [FormerlySerializedAs("TOKEN")] [SerializeField]
+        [FormerlySerializedAs("TOKEN")]
+        [SerializeField]
         private string token = "";
 
-        [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
+        [FormerlySerializedAs("CHANNEL_NAME")]
+        [SerializeField]
         private string channelName = "";
 
         public Text logText;
@@ -119,18 +123,19 @@ namespace Agora_Plugin.API_Example.examples.advanced.JoinChannelVideoToken
             if (mRtcEngine == null) return;
             mRtcEngine.InitEventHandler(null);
             mRtcEngine.LeaveChannel();
+            mRtcEngine.Dispose();
         }
 
-        void OnApplicationQuit()
-        {
-            Debug.Log("OnApplicationQuit");
-            if (mRtcEngine != null)
-            {
-                mRtcEngine.InitEventHandler(null);
-            mRtcEngine.LeaveChannel();
-                mRtcEngine.Dispose();
-            }
-        }
+        //void OnApplicationQuit()
+        //{
+        //    Debug.Log("OnApplicationQuit");
+        //    if (mRtcEngine != null)
+        //    {
+        //        mRtcEngine.InitEventHandler(null);
+        //        mRtcEngine.LeaveChannel();
+        //        mRtcEngine.Dispose();
+        //    }
+        //}
 
         internal string GetChannelName()
         {
@@ -288,7 +293,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.JoinChannelVideoToken
             public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
             {
                 _helloVideoTokenAgora.Logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
-                    (int) reason));
+                    (int)reason));
                 _helloVideoTokenAgora.DestroyVideoView(uid);
             }
 
