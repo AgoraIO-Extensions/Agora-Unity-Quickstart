@@ -87,7 +87,9 @@ namespace CustomAudioSink
         void SetupAudio(AudioSource aud, string clipName)
         {
             _audioRawDataManager = AudioRawDataManager.GetInstance(mRtcEngine);
-            Debug.Assert(_audioRawDataManager.RegisterAudioRawDataObserver() == 0, "Error registering audio rawdata observer!");
+            var nRet = _audioRawDataManager.RegisterAudioRawDataObserver();
+            this.logger.UpdateLog("RegisterAudioRawDataObserver: +" + nRet);
+
             mRtcEngine.SetParameter("che.audio.external_render", true);
 
             // //The larger the buffer, the higher the delay
