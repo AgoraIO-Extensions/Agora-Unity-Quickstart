@@ -12,17 +12,21 @@ namespace CustomRenderAudio
 {
     public class CustomRenderAudio : MonoBehaviour
     {
-        [FormerlySerializedAs("appIdInput")] [SerializeField]
+        [FormerlySerializedAs("appIdInput")]
+        [SerializeField]
         private AppIdInput appIdInput;
-        
+
         [Header("_____________Basic Configuration_____________")]
-        [FormerlySerializedAs("APP_ID")] [SerializeField]
+        [FormerlySerializedAs("APP_ID")]
+        [SerializeField]
         private string appID = "";
 
-        [FormerlySerializedAs("TOKEN")] [SerializeField]
+        [FormerlySerializedAs("TOKEN")]
+        [SerializeField]
         private string token = "";
 
-        [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
+        [FormerlySerializedAs("CHANNEL_NAME")]
+        [SerializeField]
         private string channelName = "";
 
         public Text logText;
@@ -75,7 +79,7 @@ namespace CustomRenderAudio
             Logger = new Logger(logText);
             return Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
-        
+
         //Show data in AgoraBasicProfile
         [ContextMenu("ShowAgoraBasicProfileData")]
         public void LoadAssetData()
@@ -91,7 +95,7 @@ namespace CustomRenderAudio
             mRtcEngine = RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             //be care, enableAudioDevice need be false
-            RtcEngineContext context = new RtcEngineContext(appID, 0,false,
+            RtcEngineContext context = new RtcEngineContext(appID, 0, false,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             var ret = mRtcEngine.Initialize(context);
@@ -108,9 +112,9 @@ namespace CustomRenderAudio
 
         void StartPullAudioFrame(AudioSource aud, string clipName)
         {
-            // 10-sec-length buffer
-            var bufferLength = SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL * 1000;
-            audioBuffer = new RingBuffer<float>(bufferLength);
+            // 1-sec-length buffer
+            var bufferLength = SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL * 100;
+            audioBuffer = new RingBuffer<float>(bufferLength, true);
 
             _pullAudioFrameThread = new Thread(PullAudioFrameThread);
             _pullAudioFrameThread.Start();
@@ -177,7 +181,7 @@ namespace CustomRenderAudio
                         writeCount += floatArray.Length;
                         count += 1;
                     }
-                   
+
                 }
 
                 //if (count == 100)
