@@ -90,7 +90,7 @@ namespace CustomAudioSink
 
             //The larger the buffer, the higher the delay
             var bufferLength = SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL * 100; // 1-sec-length buffer 
-            audioBuffer = new RingBuffer<float>(bufferLength,true);
+            audioBuffer = new RingBuffer<float>(bufferLength, true);
 
             _pullAudioFrameThread = new Thread(PullAudioFrameThread);
             _pullAudioFrameThread.Start();
