@@ -94,9 +94,10 @@ namespace agora_sample_code
         {
             _audioRawDataManager = AudioRawDataManager.GetInstance(mRtcEngine);
             _audioRawDataManager.RegisterAudioRawDataObserver();
-
+            mRtcEngine.SetDefaultAudioRouteToSpeakerphone(true);
             mRtcEngine.SetParameter("che.audio.external_render", true);
             mRtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
+            
         }
         void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
         {

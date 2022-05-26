@@ -70,8 +70,8 @@ namespace CustomAudioSink
                 logger.UpdateLog("Engine creation failure!!!! App not running");
                 return;
 	        }
-                
             mRtcEngine.SetLogFile("log.txt");
+            mRtcEngine.SetDefaultAudioRouteToSpeakerphone(true);
             mRtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
             mRtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
             mRtcEngine.OnWarning += OnSDKWarningHandler;
@@ -90,8 +90,9 @@ namespace CustomAudioSink
             Debug.Assert(_audioRawDataManager.RegisterAudioRawDataObserver() == 0, "Error registering audio rawdata observer!");
             mRtcEngine.SetParameter("che.audio.external_render", true);
 
-            var bufferLength = SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL * 1000; // 10-sec-length buffer
-            audioBuffer = new RingBuffer<float>(bufferLength);
+            // //The larger the buffer, the higher the delay
+            var bufferLength = SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL * 100; // 1-sec-length buffer
+            audioBuffer = new RingBuffer<float>(bufferLength,true);
             
             _audioClip = AudioClip.Create(clipName,
                 CLIP_SAMPLES,
@@ -172,28 +173,27 @@ namespace CustomAudioSink
                 Debug.LogWarning("audioFrame = "+ audioFrame);
             }
             var floatArray = ConvertByteToFloat16(audioFrame.buffer);
+
             lock (audioBuffer)
             {
                 audioBuffer.Put(floatArray);
                 writeCount += floatArray.Length;
                 count++;
             }
-
-            if (count == 100)
-            {
-                _startSignal = true;
-            }
         }
 
         private void OnAudioRead(float[] data)
         {
-            if (!_startSignal) return;
+           
             for (var i = 0; i < data.Length; i++)
             {
                 lock (audioBuffer)
                 {
-                    data[i] = audioBuffer.Get();
-                    readCount += 1;
+                    if (audioBuffer.Count > 0)
+                    {
+                        data[i] = audioBuffer.Get();
+                        readCount += 1;
+                    }
                 }
             }
 
