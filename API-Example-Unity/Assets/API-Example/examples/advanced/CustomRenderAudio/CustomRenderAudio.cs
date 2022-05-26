@@ -91,18 +91,19 @@ namespace CustomRenderAudio
             mRtcEngine = RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             //be care, enableAudioDevice need be false
-            RtcEngineContext context = new RtcEngineContext(appID, 0, true,
+            RtcEngineContext context = new RtcEngineContext(appID, 0,false,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             var ret = mRtcEngine.Initialize(context);
             mRtcEngine.InitEventHandler(handler);
+            mRtcEngine.EnableAudio();
             var nRet = mRtcEngine.SetExternalAudioSink(SAMPLE_RATE, CHANNEL);
             this.Logger.UpdateLog("SetExternalAudioSink ret:" + nRet);
         }
 
         void JoinChannel()
         {
-            mRtcEngine.JoinChannel(token, channelName, "");
+            mRtcEngine.JoinChannel(token, channelName);
         }
 
         void StartPullAudioFrame(AudioSource aud, string clipName)
@@ -162,25 +163,27 @@ namespace CustomRenderAudio
                 {
                     tic = new TimeSpan(DateTime.Now.Ticks);
                     var ret = mRtcEngine.PullAudioFrame(audioFrame);
+
                     Debug.Log("PullAudioFrame returns: " + ret);
 
-                    var byteArray = buffer;
-                    //Marshal.Copy(buffer, byteArray, 0, samples * bytesPerSample);
-
-                    var floatArray = ConvertByteToFloat16(byteArray);
-                    lock (audioBuffer)
+                    if (ret == 0)
                     {
-                        audioBuffer.Put(floatArray);
+                        var floatArray = ConvertByteToFloat16(audioFrame.buffer);
+                        lock (audioBuffer)
+                        {
+                            audioBuffer.Put(floatArray);
+                        }
+
+                        writeCount += floatArray.Length;
+                        count += 1;
                     }
-
-                    writeCount += floatArray.Length;
-                    count += 1;
+                   
                 }
 
-                if (count == 100)
-                {
-                    _startSignal = true;
-                }
+                //if (count == 100)
+                //{
+                //    _startSignal = true;
+                //}
             }
 
             //Marshal.FreeHGlobal(buffer);
@@ -200,12 +203,19 @@ namespace CustomRenderAudio
 
         private void OnAudioRead(float[] data)
         {
-            if (!_startSignal) return;
+            //if (!_startSignal) return;
             for (var i = 0; i < data.Length; i++)
             {
                 lock (audioBuffer)
                 {
-                    data[i] = audioBuffer.Get();
+                    if (audioBuffer.Count > 0)
+                    {
+                        data[i] = audioBuffer.Get();
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
 
                 readCount += 1;
