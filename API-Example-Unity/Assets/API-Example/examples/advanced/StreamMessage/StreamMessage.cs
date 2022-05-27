@@ -5,6 +5,7 @@ using agora.util;
 using UnityEngine.Serialization;
 using Logger = agora.util.Logger;
 using System;
+using System.Runtime.InteropServices;
 
 namespace Agora_Plugin.API_Example.examples.advanced.StreamMessage
 {
@@ -222,9 +223,14 @@ namespace Agora_Plugin.API_Example.examples.advanced.StreamMessage
 
         }
 
-        public override void OnStreamMessage(RtcConnection connection, uint remoteUid, int streamId, byte[] data, uint length, ulong sentTs)
+        public override void OnStreamMessage(RtcConnection connection, uint remoteUid, int streamId, IntPtr data, uint length, ulong sentTs)
         {
-            string streamMessage = System.Text.Encoding.Default.GetString(data);
+            byte[] buffer = new byte[length];
+            if (data != IntPtr.Zero)
+            {
+                Marshal.Copy(data, buffer, 0, (int)length);
+            }
+            string streamMessage = System.Text.Encoding.Default.GetString(buffer);
             _streamMessage.logger.UpdateLog(string.Format("OnStreamMessage remoteUid: {0}, stream message: {1}", remoteUid, streamMessage));
         }
 

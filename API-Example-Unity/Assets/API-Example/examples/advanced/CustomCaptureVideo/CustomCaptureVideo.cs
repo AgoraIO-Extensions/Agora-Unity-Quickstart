@@ -77,7 +77,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
         private IEnumerator ShareScreen()
         {
             yield return new WaitForEndOfFrame();
-            IRtcEngine rtc = RtcEngine.Get();
+            IRtcEngine rtc = RtcEngine.Instance;
             if (rtc != null)
             {
                 mTexture.ReadPixels(mRect, 0, 0);
