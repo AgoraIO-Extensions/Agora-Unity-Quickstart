@@ -16,7 +16,7 @@ public class Home : MonoBehaviour
     public InputField tokenInput;
 
 
-    public AppIdInput appIdInputConfig;
+    public AppIdInput appInputConfig;
     public GameObject casePanel;
     public GameObject caseScoller;
     private string PlaySceneName = "";
@@ -85,11 +85,11 @@ public class Home : MonoBehaviour
         }
 
 
-        if (this.appIdInputConfig)
+        if (this.appInputConfig)
         {
-            this.appIdInupt.text = this.appIdInputConfig.appID;
-            this.channelInput.text = this.appIdInputConfig.channelName;
-            this.tokenInput.text = this.appIdInputConfig.token;
+            this.appIdInupt.text = this.appInputConfig.appID;
+            this.channelInput.text = this.appInputConfig.channelName;
+            this.tokenInput.text = this.appInputConfig.token;
         }
 
     }
@@ -133,9 +133,9 @@ public class Home : MonoBehaviour
 
     public void OnJoinSceneClicked()
     {
-        this.appIdInputConfig.appID = this.appIdInupt.text;
-        this.appIdInputConfig.channelName = this.channelInput.text;
-        this.appIdInputConfig.token = this.tokenInput.text;
+        this.appInputConfig.appID = this.appIdInupt.text;
+        this.appInputConfig.channelName = this.channelInput.text;
+        this.appInputConfig.token = this.tokenInput.text;
 
         var button = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
         var sceneName = button.transform.parent.Find("Text").gameObject.GetComponent<Text>().text;

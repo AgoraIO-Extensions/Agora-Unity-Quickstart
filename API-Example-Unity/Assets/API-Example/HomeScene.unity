@@ -396,7 +396,7 @@ MonoBehaviour:
   appIdInupt: {fileID: 958552242}
   channelInput: {fileID: 1085297498}
   tokenInput: {fileID: 444718502}
-  appIdInputConfig: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
+  appInputConfig: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
   casePanel: {fileID: 1036881438794844, guid: 2496050ad79454c69b7285bad8bdc7d5, type: 3}
   caseScoller: {fileID: 1783804913}
 --- !u!1 &237592858
