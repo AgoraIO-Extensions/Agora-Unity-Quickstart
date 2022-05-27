@@ -161,19 +161,19 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
         void onPauseAllButtonClick()
         {
             var nRet = mRtcEngine.PauseAllChannelMediaRelay();
-            this.logger.UpdateLog("UpdateChannelMediaRelay nRet:" + nRet);
+            this.logger.UpdateLog("onPauseAllButtonClick nRet:" + nRet);
         }
 
         void OnResumeAllButtonClick()
         {
             var nRet = mRtcEngine.ResumeAllChannelMediaRelay();
-            this.logger.UpdateLog("UpdateChannelMediaRelay nRet:" + nRet);
+            this.logger.UpdateLog("OnResumeAllButtonClick nRet:" + nRet);
         }
 
         void OnStopButtonClick()
         {
             var nRet = mRtcEngine.StopChannelMediaRelay();
-            this.logger.UpdateLog("UpdateChannelMediaRelay nRet:" + nRet);
+            this.logger.UpdateLog("OnStopButtonClick nRet:" + nRet);
         }
 
         private void OnDestroy()

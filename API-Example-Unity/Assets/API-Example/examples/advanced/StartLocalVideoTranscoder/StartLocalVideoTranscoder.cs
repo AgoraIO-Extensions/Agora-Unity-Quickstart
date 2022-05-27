@@ -57,8 +57,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
             CheckAppId();
             SetUpUI();
             InitEngine();
-            InitMediaPlayer();
-            JoinChannel();
+            //InitMediaPlayer();
+            //JoinChannel();
         }
 
 
@@ -113,8 +113,13 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
             mRtcEngine.InitEventHandler(handler);
             mRtcEngine.EnableAudio();
             mRtcEngine.EnableVideo();
-            mRtcEngine.EnableSpatialAudio(true);
+        
+            //var videoCanvas = new VideoCanvas();
+            //videoCanvas.sourceType = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_TRANSCODED;
+            //mRtcEngine.SetupLocalVideo(videoCanvas);
             mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            mRtcEngine.StartPreview(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_TRANSCODED);
+            MakeVideoView(0, "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_TRANSCODED);
         }
 
         private void InitMediaPlayer()
@@ -132,6 +137,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
         private void JoinChannel()
         {
             var options = new ChannelMediaOptions();
+            options.publishCameraTrack.SetValue(false);
+            options.publishSecondaryCameraTrack.SetValue(false);
             options.publishTrancodedVideoTrack.SetValue(true);
             mRtcEngine.JoinChannel(token, channelName, 0, options);
         }
@@ -153,15 +160,14 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
 
                 if (devices.Length >= 1)
                 {
-                    this.mRtcEngine.SetCameraDeviceOrientation(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_PRIMARY, VIDEO_ORIENTATION.VIDEO_ORIENTATION_90);
-                    var configuration = new CameraCapturerConfiguration()
+                     var configuration = new CameraCapturerConfiguration()
                     {
                         format = new VideoFormat(640, 320, 30),
                         deviceId = devices[0].deviceId
                     };
-                    this.mRtcEngine.StartPrimaryCameraCapture(configuration);
-
-                    list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE, 0, "", 0, 0, 360, 240, 1, 1, false));
+                    var nRet= this.mRtcEngine.StartPrimaryCameraCapture(configuration);
+                    this.Logger.UpdateLog("StartPrimaryCameraCapture :" + nRet);
+                    list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE, 0, "", 0, 0, 640, 320, 1, 1, false));
                 }
                 else
                 {
@@ -193,20 +199,20 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
 
             if (this.togglePng.isOn)
             {
-                var filePath = Path.Combine(Application.streamingAssetsPath + "img/png.png");
-                list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.RTC_IMAGE_PNG_SOURCE, 0, filePath, 360, 240, 360, 240, 1, 1, false));
+                var filePath = Path.Combine(Application.streamingAssetsPath, "img/png.png");
+                list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.RTC_IMAGE_PNG_SOURCE, 0, filePath, 0, 0, 640, 360, 1, 1, false));
             }
 
             if (this.toggleJpg.isOn)
             {
-                var filePath = Path.Combine(Application.streamingAssetsPath + "img/jpg.jpg");
+                var filePath = Path.Combine(Application.streamingAssetsPath, "img/jpg.jpg");
                 list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.RTC_IMAGE_JPEG_SOURCE, 0, filePath, 360, 240, 360, 240, 1, 1, false));
             }
 
 
             if (this.toggleJif.isOn)
             {
-                var filePath = Path.Combine(Application.streamingAssetsPath + "img/gif.jif");
+                var filePath = Path.Combine(Application.streamingAssetsPath, "img/gif.git");
                 list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.RTC_IMAGE_GIF_SOURCE, 0, filePath, 360, 0, 360, 240, 1, 1, false));
             }
 
@@ -244,6 +250,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
             {
                 conf.VideoInputStreams[i] = list[i];
             }
+            conf.videoOutputConfiguration.dimensions.width = 1080;
+            conf.videoOutputConfiguration.dimensions.height = 960;
 
             return conf;
         }
@@ -251,7 +259,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
         void OnStartButtonPress()
         {
             var conf = this.GenerateLocalTranscoderConfiguration();
-            var nRet= mRtcEngine.StartLocalVideoTranscoder(conf);
+            var nRet = mRtcEngine.StartLocalVideoTranscoder(conf);
             this.Logger.UpdateLog("StartLocalVideoTranscoder:" + nRet);
         }
 
@@ -290,27 +298,28 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
         //    }
         //}
 
-        internal static void MakeVideoView(uint uid, string channelId = "")
+        internal static VideoSurface MakeVideoView(uint uid, string channelId = "", VIDEO_SOURCE_TYPE source = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA)
         {
             var go = GameObject.Find(uid.ToString());
             if (!ReferenceEquals(go, null))
             {
-                return; // reuse
+                return null;
             }
 
             // create a GameObject and assign to this new user
             var videoSurface = MakeImageSurface(uid.ToString());
-            if (ReferenceEquals(videoSurface, null)) return;
+            if (ReferenceEquals(videoSurface, null)) return null;
             // configure videoSurface
             if (uid == 0)
             {
-                videoSurface.SetForUser(uid, channelId);
+                videoSurface.SetForUser(uid, channelId, source);
             }
             else
             {
                 videoSurface.SetForUser(uid, channelId, VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE);
             }
             videoSurface.SetEnable(true);
+            return videoSurface;
         }
 
         // VIDEO TYPE 1: 3D Object
