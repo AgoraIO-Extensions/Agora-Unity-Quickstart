@@ -88,15 +88,16 @@ namespace agora_sample_code
             mRtcEngine.OnConnectionLost += OnConnectionLostHandler;
             mRtcEngine.OnUserJoined += OnUserJoinedHandler;
             mRtcEngine.OnUserOffline += OnUserOfflineHandler;
+            _audioRawDataManager = AudioRawDataManager.GetInstance(mRtcEngine);
+            _audioRawDataManager.RegisterAudioRawDataObserver();
+            mRtcEngine.SetDefaultAudioRouteToSpeakerphone(true);
+            mRtcEngine.SetParameter("che.audio.external_render", true);
         }
 
         void JoinChannel()
         {
-            _audioRawDataManager = AudioRawDataManager.GetInstance(mRtcEngine);
-            _audioRawDataManager.RegisterAudioRawDataObserver();
-
-            mRtcEngine.SetParameter("che.audio.external_render", true);
             mRtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
+            
         }
         void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
         {

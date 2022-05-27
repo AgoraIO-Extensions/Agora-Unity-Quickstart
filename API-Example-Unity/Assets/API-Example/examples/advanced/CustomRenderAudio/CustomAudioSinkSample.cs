@@ -68,8 +68,10 @@ namespace CustomAudioSink
         void InitRtcEngine()
         {
             mRtcEngine = IRtcEngine.GetEngine(APP_ID);
-            mRtcEngine.SetExternalAudioSink(true, SAMPLE_RATE, CHANNEL);
+            var nRet = mRtcEngine.SetExternalAudioSink(true, SAMPLE_RATE, CHANNEL);
+            this.logger.UpdateLog("SetExternalAudioSink:nRet" + nRet);
             mRtcEngine.SetLogFile("log.txt");
+            mRtcEngine.SetDefaultAudioRouteToSpeakerphone(true);
             mRtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
             mRtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
             mRtcEngine.OnWarning += OnSDKWarningHandler;
@@ -86,8 +88,9 @@ namespace CustomAudioSink
         {
             _audioRawDataManager = AudioRawDataManager.GetInstance(mRtcEngine);
 
-            var bufferLength = SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL * 1000; // 10-sec-length buffer
-            audioBuffer = new RingBuffer<float>(bufferLength);
+            //The larger the buffer, the higher the delay
+            var bufferLength = SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL * 100; // 1-sec-length buffer 
+            audioBuffer = new RingBuffer<float>(bufferLength, true);
 
             _pullAudioFrameThread = new Thread(PullAudioFrameThread);
             _pullAudioFrameThread.Start();
@@ -157,25 +160,24 @@ namespace CustomAudioSink
                 if (toc.Subtract(tic).Duration().Milliseconds >= freq)
                 {
                     tic = new TimeSpan(DateTime.Now.Ticks);
-                    _audioRawDataManager.PullAudioFrame(buffer, (int) type, samples, bytesPerSample, channels,
+                    var nRet = _audioRawDataManager.PullAudioFrame(buffer, (int)type, samples, bytesPerSample, channels,
                         samplesPerSec, 0, avsync_type);
+                    Debug.Log("PullAudioFrame:nRet" + nRet);
 
-                    var byteArray = new byte[samples * bytesPerSample];
-                    Marshal.Copy(buffer, byteArray, 0, samples * bytesPerSample);
-
-                    var floatArray = ConvertByteToFloat16(byteArray);
-                    lock (audioBuffer)
+                    if (nRet == 0)
                     {
-                        audioBuffer.Put(floatArray);
+                        var byteArray = new byte[samples * bytesPerSample];
+                        Marshal.Copy(buffer, byteArray, 0, samples * bytesPerSample);
+
+                        var floatArray = ConvertByteToFloat16(byteArray);
+                        lock (audioBuffer)
+                        {
+                            audioBuffer.Put(floatArray);
+                        }
+
+                        writeCount += floatArray.Length;
+                        count += 1;
                     }
-
-                    writeCount += floatArray.Length;
-                    count += 1;
-                }
-
-                if (count == 100)
-                {
-                    _startSignal = true;
                 }
             }
 
@@ -196,15 +198,16 @@ namespace CustomAudioSink
 
         private void OnAudioRead(float[] data)
         {
-            if (!_startSignal) return;
             for (var i = 0; i < data.Length; i++)
             {
                 lock (audioBuffer)
                 {
-                    data[i] = audioBuffer.Get();
+                    if (audioBuffer.Count > 0)
+                    {
+                        data[i] = audioBuffer.Get();
+                        readCount += 1;
+                    }
                 }
-
-                readCount += 1;
             }
 
             Debug.LogFormat("buffer length remains: {0}", writeCount - readCount);
