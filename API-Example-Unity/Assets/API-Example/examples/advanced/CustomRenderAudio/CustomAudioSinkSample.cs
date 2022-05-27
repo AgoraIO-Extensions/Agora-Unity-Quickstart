@@ -81,8 +81,10 @@ namespace CustomAudioSink
         void InitRtcEngine()
         {
             mRtcEngine = IRtcEngine.GetEngine(APP_ID);
-            mRtcEngine.SetExternalAudioSink(true, SAMPLE_RATE, CHANNEL);
+            var nRet = mRtcEngine.SetExternalAudioSink(true, SAMPLE_RATE, CHANNEL);
+            this.logger.UpdateLog("SetExternalAudioSink:nRet" + nRet);
             mRtcEngine.SetLogFile("log.txt");
+            mRtcEngine.SetDefaultAudioRouteToSpeakerphone(true);
             mRtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
             mRtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
             mRtcEngine.OnWarning += OnSDKWarningHandler;

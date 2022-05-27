@@ -55,9 +55,11 @@ public class UserAudioFrameHandler : MonoBehaviour {
 
     void SetupAudio(AudioSource aud, string clipName)
     {
-        if (_audioClip != null) return; 
-        var bufferLength = SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL * 1000; // 10-sec-length buffer
-        audioBuffer = new RingBuffer<float>(bufferLength);
+        if (_audioClip != null) return;
+
+        //The larger the buffer, the higher the delay
+        var bufferLength = SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL * 100; // 1-sec-length buffer
+        audioBuffer = new RingBuffer<float>(bufferLength,true);
         // Debug.Log($"{UID} Created clip for SAMPLE_RATE:" + SAMPLE_RATE + " CLIP_SAMPLES:" + CLIP_SAMPLES + " channel:" + CHANNEL + " => bufferLength = " + bufferLength);
         _audioClip = AudioClip.Create(clipName,
             CLIP_SAMPLES,
@@ -102,22 +104,19 @@ public class UserAudioFrameHandler : MonoBehaviour {
             writeCount += floatArray.Length;
             count++;
         }
-
-        if (count == 100)
-        {
-            _startSignal = true;
-        }
     }
 
     private void OnAudioRead(float[] data)
     {
-        if (!_startSignal) return;
+     
         for (var i = 0; i < data.Length; i++)
         {
             lock (audioBuffer)
-            {
-                data[i] = audioBuffer.Get();
-                readCount += 1;
+            {   if (audioBuffer.Count > 0)
+                {
+                    data[i] = audioBuffer.Get();
+                    readCount += 1;
+                }
             }
         }
        // Debug.Log("buffer length remains: {0}", writeCount - readCount);
