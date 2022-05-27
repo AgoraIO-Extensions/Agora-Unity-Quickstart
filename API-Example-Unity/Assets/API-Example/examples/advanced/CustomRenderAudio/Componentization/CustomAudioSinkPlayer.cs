@@ -2,7 +2,6 @@
 using System.Runtime.InteropServices;
 using System.Threading;
 using UnityEngine;
-using UnityEngine.UI;
 using agora_gaming_rtc;
 using RingBuffer;
 
@@ -41,8 +40,6 @@ namespace agora_sample
         // Start is called before the first frame update
         void Start()
         {
-
-
             SAMPLES = SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL;
             FREQ = 1000 / PULL_FREQ_PER_SEC;
             BUFFER_SIZE = SAMPLES * BYTES_PER_SAMPLE;
@@ -93,7 +90,8 @@ namespace agora_sample
             }
 
             _pullAudioFrameThread = new Thread(PullAudioFrameThread);
-            _pullAudioFrameThread.Start("pullAudio" + writeCount);
+            //_pullAudioFrameThread.Start("pullAudio" + writeCount);
+            _pullAudioFrameThread.Start();
         }
 
         bool _paused = false;
@@ -101,9 +99,13 @@ namespace agora_sample
         {
             if (pause)
             {
-                Debug.LogWarning("Application paused. AudioBuffer length = " + audioBuffer.Size);
+                if (DebugFlag)
+                {
+                    Debug.Log("Application paused. AudioBuffer length = " + audioBuffer.Size);
+                    Debug.Log("PullAudioFrameThread state = " + _pullAudioFrameThread.ThreadState + " signal =" + _pullAudioFrameThreadSignal);
+                }
+
                 // Invalidate the buffer
-                Debug.LogWarning("PullAudioFrameThread state = " + _pullAudioFrameThread.ThreadState + " signal =" + _pullAudioFrameThreadSignal);
                 _pullAudioFrameThread.Abort();
                 _pullAudioFrameThread = null;
                 _paused = true;
@@ -112,7 +114,7 @@ namespace agora_sample
             {
                 if (_paused) // had been paused, not from starting up
                 {
-                    Debug.LogWarning("Resuming Thread");
+                    Debug.Log("Resuming PullAudioThread");
                     audioBuffer.Clear();
                     StartPullAudioThread();
                 }
