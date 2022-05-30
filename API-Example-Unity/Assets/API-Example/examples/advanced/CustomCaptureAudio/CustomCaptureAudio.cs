@@ -6,25 +6,30 @@ using agora.rtc;
 using agora.util;
 using RingBuffer;
 using UnityEngine.Serialization;
+using System.Runtime.InteropServices;
 using Logger = agora.util.Logger;
 
 namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
 {
     public class CustomCaptureAudio : MonoBehaviour
     {
-        [FormerlySerializedAs("appIdInput")] [SerializeField]
+        [FormerlySerializedAs("appIdInput")]
+        [SerializeField]
         private AppIdInput appIdInput;
-        
+
         [Header("_____________Basic Configuration_____________")]
-        [FormerlySerializedAs("APP_ID")] [SerializeField]
+        [FormerlySerializedAs("APP_ID")]
+        [SerializeField]
         private string appID = "";
 
-        [FormerlySerializedAs("TOKEN")] [SerializeField]
+        [FormerlySerializedAs("TOKEN")]
+        [SerializeField]
         private string token = "";
 
-        [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
+        [FormerlySerializedAs("CHANNEL_NAME")]
+        [SerializeField]
         private string channelName = "";
-        
+
         public Text logText;
         internal Logger logger;
         internal IRtcEngine mRtcEngine = null;
@@ -71,7 +76,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
             token = appIdInput.token;
             channelName = appIdInput.channelName;
         }
-        
+
         void CheckAppId()
         {
             logger = new Logger(logText);
@@ -153,6 +158,22 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
 
             var tic = new TimeSpan(DateTime.Now.Ticks);
 
+
+            IntPtr audioFrameBuffer = Marshal.AllocHGlobal(buffer.Length);
+            var audioFrame = new AudioFrame
+            {
+                bytesPerSample = BYTES_PER_SAMPLE.TWO_BYTES_PER_SAMPLE,
+                type = type,
+                samplesPerChannel = samples,
+                samplesPerSec = samplesPerSec,
+                channels = channels,
+                buffer = (UInt64)audioFrameBuffer,
+                bufferPtr = audioFrameBuffer,
+                RawBuffer = buffer,
+                renderTimeMs = freq
+            };
+
+
             while (_pushAudioFrameThreadSignal)
             {
                 if (!_startSignal)
@@ -177,16 +198,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
                                     buffer[j] = audioBuffer.Get();
                                 }
 
-                                var audioFrame = new AudioFrame
-                                {
-                                    bytesPerSample = BYTES_PER_SAMPLE.TWO_BYTES_PER_SAMPLE,
-                                    type = type,
-                                    samplesPerChannel = samples,
-                                    samplesPerSec = samplesPerSec,
-                                    channels = channels,
-                                    buffer = buffer,
-                                    renderTimeMs = freq
-                                };
+                                Marshal.Copy(buffer, 0, audioFrame.bufferPtr, buffer.Length);
                                 var ret = mRtcEngine.PushAudioFrame(MEDIA_SOURCE_TYPE.AUDIO_PLAYOUT_SOURCE, audioFrame);
                                 Debug.Log("PushAudioFrame returns: " + ret);
                             }
@@ -194,6 +206,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
                     }
                 }
             }
+
+            Marshal.FreeHGlobal(audioFrameBuffer);
         }
 
         private void OnAudioFilterRead(float[] data, int channels)
@@ -206,7 +220,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
                 if (sample > 1) sample = 1;
                 else if (sample < -1) sample = -1;
 
-                var shortData = (short) (sample * rescaleFactor);
+                var shortData = (short)(sample * rescaleFactor);
                 var byteArr = new byte[2];
                 byteArr = BitConverter.GetBytes(shortData);
                 lock (audioBuffer)

@@ -6,6 +6,7 @@ using RingBuffer;
 using UnityEngine.Serialization;
 using agora.rtc;
 using agora.util;
+using System.Runtime.InteropServices;
 using Logger = agora.util.Logger;
 
 namespace CustomRenderAudio
@@ -113,7 +114,7 @@ namespace CustomRenderAudio
         void StartPullAudioFrame(AudioSource aud, string clipName)
         {
             // 1-sec-length buffer
-            var bufferLength = SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL * 100;
+            var bufferLength = SAMPLE_RATE * CHANNEL;
             audioBuffer = new RingBuffer<float>(bufferLength, true);
 
             _pullAudioFrameThread = new Thread(PullAudioFrameThread);
@@ -160,6 +161,8 @@ namespace CustomRenderAudio
             var tic = new TimeSpan(DateTime.Now.Ticks);
 
             AudioFrame audioFrame = new AudioFrame(type, samples, BYTES_PER_SAMPLE.TWO_BYTES_PER_SAMPLE, channels, samplesPerSec, buffer, 0, avsync_type);
+            IntPtr audioFrameBuffer = Marshal.AllocHGlobal(samples * bytesPerSample * channels);
+            audioFrame.buffer = (UInt64)audioFrameBuffer;
             while (_pullAudioFrameThreadSignal)
             {
                 var toc = new TimeSpan(DateTime.Now.Ticks);
@@ -172,7 +175,9 @@ namespace CustomRenderAudio
 
                     if (ret == 0)
                     {
-                        var floatArray = ConvertByteToFloat16(audioFrame.buffer);
+
+                        Marshal.Copy((IntPtr)audioFrame.buffer, audioFrame.RawBuffer, 0, audioFrame.RawBuffer.Length);
+                        var floatArray = ConvertByteToFloat16(audioFrame.RawBuffer);
                         lock (audioBuffer)
                         {
                             audioBuffer.Put(floatArray);
@@ -190,7 +195,7 @@ namespace CustomRenderAudio
                 //}
             }
 
-            //Marshal.FreeHGlobal(buffer);
+            Marshal.FreeHGlobal(audioFrameBuffer);
         }
 
         private static float[] ConvertByteToFloat16(byte[] byteArray)
