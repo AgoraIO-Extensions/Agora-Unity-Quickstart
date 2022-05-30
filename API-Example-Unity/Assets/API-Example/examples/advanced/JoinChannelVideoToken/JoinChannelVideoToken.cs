@@ -11,46 +11,46 @@ namespace Agora_Plugin.API_Example.examples.advanced.JoinChannelVideoToken
     {
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
-        private AppIdInput appIdInput;
+        private AppIdInput _appIdInput;
 
         [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")]
         [SerializeField]
-        private string appID = "";
+        private string _appID = "";
 
         [FormerlySerializedAs("TOKEN")]
         [SerializeField]
-        private string token = "";
+        private string _token = "";
 
         [FormerlySerializedAs("CHANNEL_NAME")]
         [SerializeField]
-        private string channelName = "";
+        private string _channelName = "";
 
-        public Text logText;
-        private Logger Logger;
-        private const float Offset = 100;
+        public Text LogText;
+        private Logger Log;
+        internal IRtcEngine RtcEngine = null;
 
-        private static string channelToken = "";
-        private static string tokenBase = "http://localhost:8080";
-        private CONNECTION_STATE_TYPE state = CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED;
-
-        internal IRtcEngine mRtcEngine = null;
+        private static string _channelToken = "";
+        private static string _tokenBase = "http://localhost:8080";
+        private CONNECTION_STATE_TYPE _state = CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED;
 
         // Use this for initialization
-        void Start()
+        private void Start()
         {
             LoadAssetData();
-            CheckAppId();
-            InitEngine();
-            JoinChannel();
+            if (CheckAppId())
+            {
+                InitEngine();
+                JoinChannel();
+            }
         }
 
-        void RenewOrJoinToken(string newToken)
+        private void RenewOrJoinToken(string newToken)
         {
-            JoinChannelVideoToken.channelToken = newToken;
-            if (state == CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED
-                || state == CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED
-                || state == CONNECTION_STATE_TYPE.CONNECTION_STATE_FAILED
+            JoinChannelVideoToken._channelToken = newToken;
+            if (_state == CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED
+                || _state == CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED
+                || _state == CONNECTION_STATE_TYPE.CONNECTION_STATE_FAILED
             )
             {
                 // If we are not connected yet, connect to the channel as normal
@@ -64,82 +64,71 @@ namespace Agora_Plugin.API_Example.examples.advanced.JoinChannelVideoToken
         }
 
         // Update is called once per frame
-        void Update()
+        private void Update()
         {
             PermissionHelper.RequestMicrophontPermission();
             PermissionHelper.RequestCameraPermission();
         }
 
-        void UpdateToken()
+        private void UpdateToken()
         {
-            mRtcEngine.RenewToken(JoinChannelVideoToken.channelToken);
+            RtcEngine.RenewToken(JoinChannelVideoToken._channelToken);
         }
 
-        void CheckAppId()
+        private bool CheckAppId()
         {
-            Logger = new Logger(logText);
-            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
+            Log = new Logger(LogText);
+            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
         //Show data in AgoraBasicProfile
         [ContextMenu("ShowAgoraBasicProfileData")]
-        public void LoadAssetData()
+        private void LoadAssetData()
         {
-            if (appIdInput == null) return;
-            appID = appIdInput.appID;
-            token = appIdInput.token;
-            channelToken = appIdInput.token;
-            channelName = appIdInput.channelName;
+            if (_appIdInput == null) return;
+            _appID = _appIdInput.appID;
+            _token = _appIdInput.token;
+            _channelToken = _appIdInput.token;
+            _channelName = _appIdInput.channelName;
         }
 
-        void InitEngine()
+        private void InitEngine()
         {
-            mRtcEngine = RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(appID, 0, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            mRtcEngine.Initialize(context);
-            mRtcEngine.InitEventHandler(handler);
-            mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            mRtcEngine.EnableAudio();
-            mRtcEngine.EnableVideo();
+            RtcEngine.Initialize(context);
+            RtcEngine.InitEventHandler(handler);
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.EnableAudio();
+            RtcEngine.EnableVideo();
         }
 
-        void JoinChannel()
+        private void JoinChannel()
         {
-            if (channelToken.Length == 0)
+            if (_channelToken.Length == 0)
             {
-                StartCoroutine(HelperClass.FetchToken(tokenBase, channelName, 0, this.RenewOrJoinToken));
+                StartCoroutine(HelperClass.FetchToken(_tokenBase, _channelName, 0, this.RenewOrJoinToken));
                 return;
             }
 
-            mRtcEngine.JoinChannel(channelToken, channelName, "");
+            RtcEngine.JoinChannel(_channelToken, _channelName, "");
         }
 
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
-            if (mRtcEngine == null) return;
-            mRtcEngine.InitEventHandler(null);
-            mRtcEngine.LeaveChannel();
-            mRtcEngine.Dispose();
+            if (RtcEngine == null) return;
+            RtcEngine.InitEventHandler(null);
+            RtcEngine.LeaveChannel();
+            RtcEngine.Dispose();
         }
-
-        //void OnApplicationQuit()
-        //{
-        //    Debug.Log("OnApplicationQuit");
-        //    if (mRtcEngine != null)
-        //    {
-        //        mRtcEngine.InitEventHandler(null);
-        //        mRtcEngine.LeaveChannel();
-        //        mRtcEngine.Dispose();
-        //    }
-        //}
 
         internal string GetChannelName()
         {
-            return channelName;
+            return _channelName;
         }
 
         private void DestroyVideoView(uint uid)
@@ -178,7 +167,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.JoinChannelVideoToken
         }
 
         // VIDEO TYPE 1: 3D Object
-        public VideoSurface MakePlaneSurface(string goName)
+        public static VideoSurface MakePlaneSurface(string goName)
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
@@ -199,7 +188,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.JoinChannelVideoToken
         }
 
         // Video TYPE 2: RawImage
-        public VideoSurface MakeImageSurface(string goName)
+        public static VideoSurface MakeImageSurface(string goName)
         {
             GameObject go = new GameObject();
 
@@ -245,73 +234,73 @@ namespace Agora_Plugin.API_Example.examples.advanced.JoinChannelVideoToken
 
             public override void OnWarning(int warn, string msg)
             {
-                _helloVideoTokenAgora.Logger.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
+                _helloVideoTokenAgora.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
             }
 
             public override void OnError(int err, string msg)
             {
-                _helloVideoTokenAgora.Logger.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+                _helloVideoTokenAgora.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
             }
 
             public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
             {
-                _helloVideoTokenAgora.Logger.UpdateLog(string.Format("sdk version: ${0}",
-                    _helloVideoTokenAgora.mRtcEngine.GetVersion()));
-                _helloVideoTokenAgora.Logger.UpdateLog(
+                _helloVideoTokenAgora.Log.UpdateLog(string.Format("sdk version: ${0}",
+                    _helloVideoTokenAgora.RtcEngine.GetVersion()));
+                _helloVideoTokenAgora.Log.UpdateLog(
                     string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                         connection.channelId, connection.localUid, elapsed));
-                _helloVideoTokenAgora.Logger.UpdateLog(string.Format("New Token: {0}",
-                    JoinChannelVideoToken.channelToken));
+                _helloVideoTokenAgora.Log.UpdateLog(string.Format("New Token: {0}",
+                    JoinChannelVideoToken._channelToken));
                 // HelperClass.FetchToken(tokenBase, channelName, 0, this.RenewOrJoinToken);
                 _helloVideoTokenAgora.MakeVideoView(0);
             }
 
             public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
             {
-                _helloVideoTokenAgora.Logger.UpdateLog("OnRejoinChannelSuccess");
+                _helloVideoTokenAgora.Log.UpdateLog("OnRejoinChannelSuccess");
             }
 
             public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
             {
-                _helloVideoTokenAgora.Logger.UpdateLog("OnLeaveChannel");
+                _helloVideoTokenAgora.Log.UpdateLog("OnLeaveChannel");
                 _helloVideoTokenAgora.DestroyVideoView(0);
             }
 
             public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole,
                 CLIENT_ROLE_TYPE newRole)
             {
-                _helloVideoTokenAgora.Logger.UpdateLog("OnClientRoleChanged");
+                _helloVideoTokenAgora.Log.UpdateLog("OnClientRoleChanged");
             }
 
             public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
             {
-                _helloVideoTokenAgora.Logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid,
+                _helloVideoTokenAgora.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid,
                     elapsed));
                 _helloVideoTokenAgora.MakeVideoView(uid, _helloVideoTokenAgora.GetChannelName());
             }
 
             public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
             {
-                _helloVideoTokenAgora.Logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+                _helloVideoTokenAgora.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                     (int)reason));
                 _helloVideoTokenAgora.DestroyVideoView(uid);
             }
 
             public override void OnTokenPrivilegeWillExpire(RtcConnection connection, string token)
             {
-                _helloVideoTokenAgora.StartCoroutine(HelperClass.FetchToken(tokenBase,
-                    _helloVideoTokenAgora.channelName, 0, _helloVideoTokenAgora.RenewOrJoinToken));
+                _helloVideoTokenAgora.StartCoroutine(HelperClass.FetchToken(_tokenBase,
+                    _helloVideoTokenAgora._channelName, 0, _helloVideoTokenAgora.RenewOrJoinToken));
             }
 
             public override void OnConnectionStateChanged(RtcConnection connection, CONNECTION_STATE_TYPE state,
                 CONNECTION_CHANGED_REASON_TYPE reason)
             {
-                _helloVideoTokenAgora.state = state;
+                _helloVideoTokenAgora._state = state;
             }
 
             public override void OnConnectionLost(RtcConnection connection)
             {
-                _helloVideoTokenAgora.Logger.UpdateLog(string.Format("OnConnectionLost "));
+                _helloVideoTokenAgora.Log.UpdateLog(string.Format("OnConnectionLost "));
             }
         }
     }

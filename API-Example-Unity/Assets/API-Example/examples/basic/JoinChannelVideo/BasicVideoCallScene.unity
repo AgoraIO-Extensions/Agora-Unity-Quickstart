@@ -261,7 +261,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: New Text
+  m_Text: Log
 --- !u!222 &962585303
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -439,11 +439,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f7058e2e0cdc4fb5b653ebd2cdbdab6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  appIdInput: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
-  appID: 
-  token: 
-  channelName: 
-  logText: {fileID: 962585302}
+  _appIdInput: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
+  _appID: 
+  _token: 
+  _channelName: 
+  LogText: {fileID: 962585302}
 --- !u!1 &1630986681
 GameObject:
   m_ObjectHideFlags: 0

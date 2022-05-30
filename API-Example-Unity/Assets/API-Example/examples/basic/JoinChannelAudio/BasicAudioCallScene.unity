@@ -315,7 +315,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: New Text
+  m_Text: Log
 --- !u!222 &1032453669
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -428,8 +428,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51684c34d5d52411f905a5ba6aa4562e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  appIdInput: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
-  appID: YOUR_APPID
-  token: 
-  channelName: YOUR_CHANNEL_NAME
-  logText: {fileID: 1032453668}
+  _appIdInput: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
+  _appID: 
+  _token: 
+  _channelName: 
+  LogText: {fileID: 1032453668}

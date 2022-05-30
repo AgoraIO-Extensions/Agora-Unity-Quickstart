@@ -12,78 +12,80 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
     {
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
-        private AppIdInput appIdInput;
+        private AppIdInput _appIdInput;
 
 
         [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")]
         [SerializeField]
-        public string appID = "";
+        public string _appID = "";
 
         [FormerlySerializedAs("TOKEN")]
         [SerializeField]
-        public string token = "";
+        public string _token = "";
 
         [FormerlySerializedAs("CHANNEL_NAME")]
         [SerializeField]
-        public string channelName = "";
+        public string _channelName = "";
 
-        public Text logText;
-        public Logger logger;
-        internal IRtcEngine mRtcEngine = null;
+        public Text LogText;
+        internal Logger Log;
+        internal IRtcEngine RtcEngine = null;
 
 
-        void Start()
+        private void Start()
         {
             LoadAssetData();
-            CheckAppId();
-            InitEngine();
-            SetupUI();
-            EnableUI(false);
-            JoinChannel();
+            if (CheckAppId())
+            {
+                InitEngine();
+                SetupUI();
+                EnableUI(false);
+                JoinChannel();
+            }
         }
 
         [ContextMenu("ShowAgoraBasicProfileData")]
-        public void LoadAssetData()
+        private void LoadAssetData()
         {
-            if (appIdInput == null) return;
-            appID = appIdInput.appID;
-            token = appIdInput.token;
-            channelName = appIdInput.channelName;
+            if (_appIdInput == null) return;
+            _appID = _appIdInput.appID;
+            _token = _appIdInput.token;
+            _channelName = _appIdInput.channelName;
         }
 
-        void CheckAppId()
+        private bool CheckAppId()
         {
-            logger = new Logger(logText);
-            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
+            Log = new Logger(LogText);
+            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
-        void InitEngine()
+        private void InitEngine()
         {
-            mRtcEngine = RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(appID, 0, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
-            mRtcEngine.Initialize(context);
-            mRtcEngine.InitEventHandler(handler);
-            mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            mRtcEngine.EnableAudio();
-            mRtcEngine.EnableVideo();
+            RtcEngine.Initialize(context);
+            RtcEngine.InitEventHandler(handler);
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.EnableAudio();
+            RtcEngine.EnableVideo();
         }
 
-        void JoinChannel()
+        private void JoinChannel()
         {
-            mRtcEngine.JoinChannel(token, channelName, "");
+            RtcEngine.JoinChannel(_token, _channelName, "");
         }
 
-        void Update()
+        private void Update()
         {
             PermissionHelper.RequestMicrophontPermission();
             PermissionHelper.RequestCameraPermission();
         }
 
-        public void SetupUI()
+        private void SetupUI()
         {
             var ui = this.transform.Find("UI");
 
@@ -110,90 +112,80 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
             ui.gameObject.SetActive(visible);
         }
 
-        void OnStartButtonClick()
+        private void OnStartButtonClick()
         {
             ChannelMediaRelayConfiguration config = new ChannelMediaRelayConfiguration();
             config.srcInfo = new ChannelMediaInfo
             {
-                channelName = this.appIdInput.channelName,
+                channelName = this._appIdInput.channelName,
                 uid = 0,
-                token = this.appIdInput.token
+                token = this._appIdInput.token
             };
 
             //you can relay to another channels (limit max is 4)
             config.destInfos = new ChannelMediaInfo[1];
             config.destInfos[0] = new ChannelMediaInfo
             {
-                channelName = this.appIdInput.channelName + "_2",
+                channelName = this._appIdInput.channelName + "_2",
                 uid = 0,
-                token = this.appIdInput.token
+                token = this._appIdInput.token
             };
             config.destCount = 1;
 
-            var nRet = mRtcEngine.StartChannelMediaRelay(config);
-            this.logger.UpdateLog("StartChannelMediaRelay nRet:" + nRet);
+            var nRet = RtcEngine.StartChannelMediaRelay(config);
+            this.Log.UpdateLog("StartChannelMediaRelay nRet:" + nRet);
         }
 
-        void onUpdateButtonClick()
+        private void onUpdateButtonClick()
         {
             ChannelMediaRelayConfiguration config = new ChannelMediaRelayConfiguration();
             config.srcInfo = new ChannelMediaInfo
             {
-                channelName = this.appIdInput.channelName,
+                channelName = this._appIdInput.channelName,
                 uid = 0,
-                token = this.appIdInput.token
+                token = this._appIdInput.token
             };
 
             config.destInfos = new ChannelMediaInfo[1];
             config.destInfos[0] = new ChannelMediaInfo
             {
-                channelName = this.appIdInput.channelName + "_3",
+                channelName = this._appIdInput.channelName + "_3",
                 uid = 0,
-                token = this.appIdInput.token
+                token = this._appIdInput.token
             };
             config.destCount = 1;
 
             //after StartChannelMediaRelay you can use StartChannelMediaRelay to remove or relay to anthoner channel
-            var nRet = mRtcEngine.UpdateChannelMediaRelay(config);
-            this.logger.UpdateLog("UpdateChannelMediaRelay nRet:" + nRet);
+            var nRet = RtcEngine.UpdateChannelMediaRelay(config);
+            this.Log.UpdateLog("UpdateChannelMediaRelay nRet:" + nRet);
         }
 
-        void onPauseAllButtonClick()
+        private void onPauseAllButtonClick()
         {
-            var nRet = mRtcEngine.PauseAllChannelMediaRelay();
-            this.logger.UpdateLog("onPauseAllButtonClick nRet:" + nRet);
+            var nRet = RtcEngine.PauseAllChannelMediaRelay();
+            this.Log.UpdateLog("onPauseAllButtonClick nRet:" + nRet);
         }
 
-        void OnResumeAllButtonClick()
+        private void OnResumeAllButtonClick()
         {
-            var nRet = mRtcEngine.ResumeAllChannelMediaRelay();
-            this.logger.UpdateLog("OnResumeAllButtonClick nRet:" + nRet);
+            var nRet = RtcEngine.ResumeAllChannelMediaRelay();
+            this.Log.UpdateLog("OnResumeAllButtonClick nRet:" + nRet);
         }
 
-        void OnStopButtonClick()
+        private void OnStopButtonClick()
         {
-            var nRet = mRtcEngine.StopChannelMediaRelay();
-            this.logger.UpdateLog("OnStopButtonClick nRet:" + nRet);
+            var nRet = RtcEngine.StopChannelMediaRelay();
+            this.Log.UpdateLog("OnStopButtonClick nRet:" + nRet);
         }
 
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
-            if (mRtcEngine == null) return;
-            mRtcEngine.InitEventHandler(null);
-            mRtcEngine.LeaveChannel();
-            mRtcEngine.Dispose();
+            if (RtcEngine == null) return;
+            RtcEngine.InitEventHandler(null);
+            RtcEngine.LeaveChannel();
+            RtcEngine.Dispose();
         }
-
-        //void OnApplicationQuit()
-        //{
-        //    Debug.Log("OnApplicationQuit");
-        //    if (mRtcEngine != null)
-        //    {
-        //        mRtcEngine.LeaveChannel();
-        //        mRtcEngine.Dispose();
-        //    }
-        //}
 
         internal static void MakeVideoView(uint uid, string channelId = "")
         {
@@ -298,20 +290,20 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
 
         public override void OnWarning(int warn, string msg)
         {
-            _channelMediaRelay.logger.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
+            _channelMediaRelay.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
         }
 
         public override void OnError(int err, string msg)
         {
-            _channelMediaRelay.logger.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+            _channelMediaRelay.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
         }
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
             Debug.Log("Agora: OnJoinChannelSuccess ");
-            _channelMediaRelay.logger.UpdateLog(string.Format("sdk version: ${0}",
-                _channelMediaRelay.mRtcEngine.GetVersion()));
-            _channelMediaRelay.logger.UpdateLog(
+            _channelMediaRelay.Log.UpdateLog(string.Format("sdk version: ${0}",
+                _channelMediaRelay.RtcEngine.GetVersion()));
+            _channelMediaRelay.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));
             _channelMediaRelay.EnableUI(true);
@@ -321,43 +313,43 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
 
         public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            _channelMediaRelay.logger.UpdateLog("OnRejoinChannelSuccess");
+            _channelMediaRelay.Log.UpdateLog("OnRejoinChannelSuccess");
         }
 
         public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
         {
-            _channelMediaRelay.logger.UpdateLog("OnLeaveChannel");
+            _channelMediaRelay.Log.UpdateLog("OnLeaveChannel");
             _channelMediaRelay.EnableUI(false);
             ChannelMediaRelay.DestroyVideoView(0);
         }
 
         public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
         {
-            _channelMediaRelay.logger.UpdateLog(string.Format("OnClientRoleChanged {0}, {1}", oldRole, newRole));
+            _channelMediaRelay.Log.UpdateLog(string.Format("OnClientRoleChanged {0}, {1}", oldRole, newRole));
         }
 
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
-            _channelMediaRelay.logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-            ChannelMediaRelay.MakeVideoView(uid, _channelMediaRelay.channelName);
+            _channelMediaRelay.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+            ChannelMediaRelay.MakeVideoView(uid, _channelMediaRelay._channelName);
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
         {
-            _channelMediaRelay.logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+            _channelMediaRelay.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                 (int)reason));
             ChannelMediaRelay.DestroyVideoView(uid);
         }
 
         public override void OnChannelMediaRelayEvent(int code)
         {
-            _channelMediaRelay.logger.UpdateLog(string.Format("OnChannelMediaRelayEvent: {0}", code));
+            _channelMediaRelay.Log.UpdateLog(string.Format("OnChannelMediaRelayEvent: {0}", code));
 
         }
 
         public override void OnChannelMediaRelayStateChanged(int state, int code)
         {
-            _channelMediaRelay.logger.UpdateLog(string.Format("OnChannelMediaRelayStateChanged state: {0}, code: {1}", state, code));
+            _channelMediaRelay.Log.UpdateLog(string.Format("OnChannelMediaRelayStateChanged state: {0}, code: {1}", state, code));
         }
     }
 }

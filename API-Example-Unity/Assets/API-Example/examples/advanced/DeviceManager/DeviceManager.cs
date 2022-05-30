@@ -9,37 +9,47 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
 {
     public class DeviceManager : MonoBehaviour
     {
-        [FormerlySerializedAs("appIdInput")] [SerializeField]
-        private AppIdInput appIdInput;
-        
+        [FormerlySerializedAs("appIdInput")]
+        [SerializeField]
+        private AppIdInput _appIdInput;
+
         [Header("_____________Basic Configuration_____________")]
-        [FormerlySerializedAs("APP_ID")] [SerializeField]
-        private string appID = "";
+        [FormerlySerializedAs("APP_ID")]
+        [SerializeField]
+        private string _appID = "";
 
-        [FormerlySerializedAs("TOKEN")] [SerializeField]
-        private string token = "";
+        [FormerlySerializedAs("TOKEN")]
+        [SerializeField]
+        private string _token = "";
 
-        [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
-        private string channelName = "";
+        [FormerlySerializedAs("CHANNEL_NAME")]
+        [SerializeField]
+        private string _channelName = "";
 
-        public Text logText;
-        internal Logger Logger;
-        internal IRtcEngine mRtcEngine;
+        public Text LogText;
+        internal Logger Log;
+        internal IRtcEngine RtcEngine;
+
+
         private IAudioDeviceManager _audioDeviceManager;
         private IVideoDeviceManager _videoDeviceManager;
         private DeviceInfo[] _audioRecordingDeviceInfos;
         private DeviceInfo[] _audioPlaybackDeviceInfos;
         private DeviceInfo[] _videoDeviceInfos;
-        private const int DeviceIndex = 0;
+        private const int DEVICE_INDEX = 0;
 
         // Start is called before the first frame update
         private void Start()
         {
             LoadAssetData();
-            CheckAppId();
-            InitRtcEngine();
-            CallDeviceManagerApi();
-            //JoinChannel();
+            if (CheckAppId())
+            {
+                CheckAppId();
+                InitRtcEngine();
+                CallDeviceManagerApi();
+                //JoinChannel();
+            }
+
         }
 
         private void Update()
@@ -47,31 +57,31 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
             PermissionHelper.RequestMicrophontPermission();
         }
 
-        private void CheckAppId()
+        private bool CheckAppId()
         {
-            Logger = new Logger(logText);
-            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
+            Log = new Logger(LogText);
+            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
-        
+
         //Show data in AgoraBasicProfile
         [ContextMenu("ShowAgoraBasicProfileData")]
-        public void LoadAssetData()
+        private void LoadAssetData()
         {
-            if (appIdInput == null) return;
-            appID = appIdInput.appID;
-            token = appIdInput.token;
-            channelName = appIdInput.channelName;
+            if (_appIdInput == null) return;
+            _appID = _appIdInput.appID;
+            _token = _appIdInput.token;
+            _channelName = _appIdInput.channelName;
         }
 
         private void InitRtcEngine()
         {
-            mRtcEngine = RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(appID, 0, true, 
+            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            mRtcEngine.Initialize(context);
-            mRtcEngine.InitEventHandler(handler);
+            RtcEngine.Initialize(context);
+            RtcEngine.InitEventHandler(handler);
         }
 
         private void CallDeviceManagerApi()
@@ -85,38 +95,38 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
 
         private void GetAudioRecordingDevice()
         {
-            _audioDeviceManager = mRtcEngine.GetAudioDeviceManager();
+            _audioDeviceManager = RtcEngine.GetAudioDeviceManager();
             _audioRecordingDeviceInfos = _audioDeviceManager.EnumerateRecordingDevices();
-            Logger.UpdateLog(string.Format("AudioRecordingDevice count: {0}", _audioRecordingDeviceInfos.Length));
+            Log.UpdateLog(string.Format("AudioRecordingDevice count: {0}", _audioRecordingDeviceInfos.Length));
             for (var i = 0; i < _audioRecordingDeviceInfos.Length; i++)
             {
-                Logger.UpdateLog(string.Format("AudioRecordingDevice device index: {0}, name: {1}, id: {2}", i,
+                Log.UpdateLog(string.Format("AudioRecordingDevice device index: {0}, name: {1}, id: {2}", i,
                     _audioRecordingDeviceInfos[i].deviceName, _audioRecordingDeviceInfos[i].deviceId));
             }
         }
 
         private void GetAudioPlaybackDevice()
         {
-            _audioDeviceManager = mRtcEngine.GetAudioDeviceManager();
+            _audioDeviceManager = RtcEngine.GetAudioDeviceManager();
             _audioPlaybackDeviceInfos = _audioDeviceManager.EnumeratePlaybackDevices();
-            Logger.UpdateLog(string.Format("AudioPlaybackDevice count: {0}", _audioPlaybackDeviceInfos.Length));
+            Log.UpdateLog(string.Format("AudioPlaybackDevice count: {0}", _audioPlaybackDeviceInfos.Length));
             for (var i = 0; i < _audioPlaybackDeviceInfos.Length; i++)
             {
-                Logger.UpdateLog(string.Format("AudioPlaybackDevice device index: {0}, name: {1}, id: {2}", i,
+                Log.UpdateLog(string.Format("AudioPlaybackDevice device index: {0}, name: {1}, id: {2}", i,
                     _audioPlaybackDeviceInfos[i].deviceName, _audioPlaybackDeviceInfos[i].deviceId));
             }
         }
 
         private void GetVideoDeviceManager()
         {
-            var nRet = mRtcEngine.StartPreview();
-            this.Logger.UpdateLog("StartPreview: nRet" + nRet);
-            _videoDeviceManager = mRtcEngine.GetVideoDeviceManager();
+            var nRet = RtcEngine.StartPreview();
+            this.Log.UpdateLog("StartPreview: nRet" + nRet);
+            _videoDeviceManager = RtcEngine.GetVideoDeviceManager();
             _videoDeviceInfos = _videoDeviceManager.EnumerateVideoDevices();
-            Logger.UpdateLog(string.Format("VideoDeviceManager count: {0}", _videoDeviceInfos.Length));
+            Log.UpdateLog(string.Format("VideoDeviceManager count: {0}", _videoDeviceInfos.Length));
             for (var i = 0; i < _videoDeviceInfos.Length; i++)
             {
-                Logger.UpdateLog(string.Format("VideoDeviceManager device index: {0}, name: {1}, id: {2}", i,
+                Log.UpdateLog(string.Format("VideoDeviceManager device index: {0}, name: {1}, id: {2}", i,
                     _videoDeviceInfos[i].deviceName, _videoDeviceInfos[i].deviceId));
             }
         }
@@ -124,15 +134,15 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
         private void SetCurrentDevice()
         {
             if (_audioDeviceManager != null && _audioRecordingDeviceInfos.Length > 0)
-                _audioDeviceManager.SetRecordingDevice(_audioRecordingDeviceInfos[DeviceIndex].deviceId);
+                _audioDeviceManager.SetRecordingDevice(_audioRecordingDeviceInfos[DEVICE_INDEX].deviceId);
             if (_audioDeviceManager != null && _audioPlaybackDeviceInfos.Length > 0)
-                _audioDeviceManager.SetPlaybackDevice(_audioPlaybackDeviceInfos[DeviceIndex].deviceId);
+                _audioDeviceManager.SetPlaybackDevice(_audioPlaybackDeviceInfos[DEVICE_INDEX].deviceId);
             if (_videoDeviceManager != null && _videoDeviceInfos.Length > 0)
             {
-                var ret = _videoDeviceManager.SetDevice(_videoDeviceInfos[DeviceIndex].deviceId);
+                var ret = _videoDeviceManager.SetDevice(_videoDeviceInfos[DEVICE_INDEX].deviceId);
                 Debug.Log("SetDevice returns: " + ret);
             }
-                
+
         }
 
         private void SetCurrentDeviceVolume()
@@ -143,29 +153,19 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
 
         private void JoinChannel()
         {
-            mRtcEngine.JoinChannel(token, channelName, "");
+            RtcEngine.JoinChannel(_token, _channelName, "");
         }
 
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
-            if (mRtcEngine == null) return;
-            mRtcEngine.InitEventHandler(null);
-            mRtcEngine.LeaveChannel();
-            mRtcEngine.Dispose();
+            if (RtcEngine == null) return;
+            RtcEngine.InitEventHandler(null);
+            RtcEngine.LeaveChannel();
+            RtcEngine.Dispose();
         }
-
-        //private void OnApplicationQuit()
-        //{
-        //    Debug.Log("OnApplicationQuit");
-        //    if (mRtcEngine != null)
-        //    {
-        //        mRtcEngine.Dispose();
-        //        mRtcEngine = null;
-        //    }
-        //}
     }
-    
+
     internal class UserEventHandler : IRtcEngineEventHandler
     {
         private readonly DeviceManager _deviceManagerSample;
@@ -177,47 +177,47 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
 
         public override void OnWarning(int warn, string msg)
         {
-            _deviceManagerSample.Logger.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
+            _deviceManagerSample.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
         }
 
         public override void OnError(int err, string msg)
         {
-            _deviceManagerSample.Logger.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+            _deviceManagerSample.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
         }
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            _deviceManagerSample.Logger.UpdateLog(string.Format("sdk version: ${0}",
-                _deviceManagerSample.mRtcEngine.GetVersion()));
-            _deviceManagerSample.Logger.UpdateLog(
-                string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", 
+            _deviceManagerSample.Log.UpdateLog(string.Format("sdk version: ${0}",
+                _deviceManagerSample.RtcEngine.GetVersion()));
+            _deviceManagerSample.Log.UpdateLog(
+                string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));
         }
 
         public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            _deviceManagerSample.Logger.UpdateLog("OnRejoinChannelSuccess");
+            _deviceManagerSample.Log.UpdateLog("OnRejoinChannelSuccess");
         }
 
         public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
         {
-            _deviceManagerSample.Logger.UpdateLog("OnLeaveChannel");
+            _deviceManagerSample.Log.UpdateLog("OnLeaveChannel");
         }
 
         public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
         {
-            _deviceManagerSample.Logger.UpdateLog("OnClientRoleChanged");
+            _deviceManagerSample.Log.UpdateLog("OnClientRoleChanged");
         }
 
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
-            _deviceManagerSample.Logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+            _deviceManagerSample.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
         {
-            _deviceManagerSample.Logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
-                (int) reason));
+            _deviceManagerSample.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+                (int)reason));
         }
     }
 }

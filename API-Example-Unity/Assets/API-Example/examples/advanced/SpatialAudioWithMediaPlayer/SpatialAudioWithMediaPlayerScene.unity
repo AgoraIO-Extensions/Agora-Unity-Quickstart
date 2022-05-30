@@ -772,12 +772,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3f046281ab464c22afb0035b3f2d15e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  appIdInput: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
-  appID: 
-  token: 
-  channelName: 
-  logText: {fileID: 1444145488}
-  playerId: 0
+  _appIdInput: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
+  _appID: 
+  _token: 
+  _channelName: 
+  LogText: {fileID: 1444145488}
+  PlayerId: 0
   x: 0
 --- !u!1 &1849429302
 GameObject:

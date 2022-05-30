@@ -1013,11 +1013,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f9dbfee6c215400fbdc75b2bc7792f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  appIdInput: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
-  appID: 
-  token: 
-  channelName: 
-  logText: {fileID: 634102969}
+  _appIdInput: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
+  _appID: 
+  _token: 
+  _channelName: 
+  LogText: {fileID: 634102969}
 --- !u!114 &2114801516
 MonoBehaviour:
   m_ObjectHideFlags: 0

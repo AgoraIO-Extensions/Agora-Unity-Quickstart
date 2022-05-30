@@ -14,77 +14,74 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
     {
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
-        private AppIdInput appIdInput;
-
+        private AppIdInput _appIdInput;
 
         [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")]
         [SerializeField]
-        public string appID = "";
+        public string _appID = "";
 
         [FormerlySerializedAs("TOKEN")]
         [SerializeField]
-        public string token = "";
+        public string _token = "";
 
         [FormerlySerializedAs("CHANNEL_NAME")]
         [SerializeField]
-        public string channelName = "";
+        public string _channelName = "";
 
-        public GameObject rolePrefab;
-        private GameObject roleLocal;
+        public GameObject RolePrefab;
+        private GameObject _roleLocal;
 
-        public Text logText;
-        public Logger logger;
-        internal IRtcEngine mRtcEngine = null;
-        public Dictionary<string, Vector3> rolePositionDic = new Dictionary<string, Vector3>();
+        public Text LogText;
+        internal Logger Log;
+        internal IRtcEngine RtcEngine = null;
 
+        public Dictionary<string, Vector3> RolePositionDic = new Dictionary<string, Vector3>();
 
-        void Start()
+        private void Start()
         {
             LoadAssetData();
-            CheckAppId();
-            InitEngine();
-            JoinChannel();
+            if (CheckAppId())
+            {
+                InitEngine();
+                JoinChannel();
+            }
         }
 
         [ContextMenu("ShowAgoraBasicProfileData")]
-        public void LoadAssetData()
+        private void LoadAssetData()
         {
-            if (appIdInput == null) return;
-            appID = appIdInput.appID;
-            token = appIdInput.token;
-            channelName = appIdInput.channelName;
+            if (_appIdInput == null) return;
+            _appID = _appIdInput.appID;
+            _token = _appIdInput.token;
+            _channelName = _appIdInput.channelName;
         }
 
-        void CheckAppId()
+        private bool CheckAppId()
         {
-            logger = new Logger(logText);
-            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
+            Log = new Logger(LogText);
+            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
-        void InitEngine()
+        private void InitEngine()
         {
-            mRtcEngine = RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(appID, 0, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
-            mRtcEngine.Initialize(context);
-            mRtcEngine.InitEventHandler(handler);
-            mRtcEngine.RegisterVideoEncodedImageReceiver(new VideoEncodedImageReceiver(this),OBSERVER_MODE.RAW_DATA);
-            mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            mRtcEngine.EnableVideo();
+            RtcEngine.Initialize(context);
+            RtcEngine.InitEventHandler(handler);
+            RtcEngine.RegisterVideoEncodedImageReceiver(new VideoEncodedImageReceiver(this), OBSERVER_MODE.RAW_DATA);
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.EnableVideo();
 
-            mRtcEngine.SetExternalVideoSource(true, true, EXTERNAL_VIDEO_SOURCE_TYPE.ENCODED_VIDEO_FRAME);
+            RtcEngine.SetExternalVideoSource(true, true, EXTERNAL_VIDEO_SOURCE_TYPE.ENCODED_VIDEO_FRAME);
         }
 
-        void JoinChannel()
+        private void JoinChannel()
         {
-            var option = new ChannelMediaOptions
-            {
-             
-            };
-
+            var option = new ChannelMediaOptions();
             option.autoSubscribeVideo.SetValue(true);
             option.autoSubscribeAudio.SetValue(true);
             option.publishAudioTrack.SetValue(false);
@@ -94,17 +91,17 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
             option.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             option.channelProfile.SetValue(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING);
 
-            mRtcEngine.JoinChannel(token, channelName, 0, option);
+            RtcEngine.JoinChannel(_token, _channelName, 0, option);
         }
 
-        void Update()
+        private void Update()
         {
             PermissionHelper.RequestMicrophontPermission();
             PermissionHelper.RequestCameraPermission();
 
-            lock (this.rolePositionDic)
+            lock (this.RolePositionDic)
             {
-                foreach (var e in this.rolePositionDic)
+                foreach (var e in this.RolePositionDic)
                 {
                     this.UpdateRolePositon(e.Key, e.Value);
                 }
@@ -114,26 +111,16 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
-            if (mRtcEngine == null) return;
-            mRtcEngine.InitEventHandler(null);
-            mRtcEngine.LeaveChannel();
-            mRtcEngine.Dispose();
+            if (RtcEngine == null) return;
+            RtcEngine.InitEventHandler(null);
+            RtcEngine.LeaveChannel();
+            RtcEngine.Dispose();
         }
-
-        //void OnApplicationQuit()
-        //{
-        //    Debug.Log("OnApplicationQuit");
-        //    if (mRtcEngine != null)
-        //    {
-        //        mRtcEngine.LeaveChannel();
-        //        mRtcEngine.Dispose();
-        //    }
-        //}
 
 
         public void CreateRole(string uid, bool isLocal)
         {
-            var role = Instantiate(this.rolePrefab, this.transform);
+            var role = Instantiate(this.RolePrefab, this.transform);
             role.name = "Role" + uid;
             var text = role.transform.Find("Text").GetComponent<Text>();
             text.text = uid;
@@ -142,7 +129,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
             {
                 text.text += "\n(Local)";
                 role.AddComponent<UIElementDrag>();
-                this.roleLocal = role;
+                this._roleLocal = role;
             }
 
             role.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
@@ -159,11 +146,11 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
 
             if (isLocal)
             {
-                this.roleLocal = null;
+                this._roleLocal = null;
             }
         }
 
-        public void UpdateRolePositon(string uid, Vector3 pos)
+        private void UpdateRolePositon(string uid, Vector3 pos)
         {
             var name = "Role" + uid;
             var role = this.gameObject.transform.Find(name);
@@ -177,23 +164,23 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
         public void StartPushEncodeVideoImage()
         {
             this.InvokeRepeating("UpdateForPushEncodeVideoImage", 0, 0.1f);
-            this.logger.UpdateLog("Start PushEncodeVideoImage in every frame");
+            this.Log.UpdateLog("Start PushEncodeVideoImage in every frame");
         }
 
 
         public void StopPushEncodeVideoImage()
         {
             this.CancelInvoke("UpdateForPushEncodeVideoImage");
-            this.logger.UpdateLog("Stop PushEncodeVideoImage");
+            this.Log.UpdateLog("Stop PushEncodeVideoImage");
         }
 
-        void UpdateForPushEncodeVideoImage()
+        private void UpdateForPushEncodeVideoImage()
         {
             //you can send any data not just  video image byte
-            if (roleLocal)
+            if (_roleLocal)
             {
                 //in this case, we send pos byte 
-                string json = JsonUtility.ToJson(this.roleLocal.transform.localPosition);
+                string json = JsonUtility.ToJson(this._roleLocal.transform.localPosition);
                 byte[] data = System.Text.Encoding.Default.GetBytes(json);
                 EncodedVideoFrameInfo encodedVideoFrameInfo = new EncodedVideoFrameInfo()
                 {
@@ -202,7 +189,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
                     codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_GENERIC_H264,
                     frameType = VIDEO_FRAME_TYPE_NATIVE.VIDEO_FRAME_TYPE_KEY_FRAME
                 };
-                int nRet = this.mRtcEngine.PushEncodedVideoImage(data, Convert.ToUInt32(data.Length), encodedVideoFrameInfo);
+                int nRet = this.RtcEngine.PushEncodedVideoImage(data, Convert.ToUInt32(data.Length), encodedVideoFrameInfo);
                 Debug.Log("PushEncodedVideoImage: " + nRet);
             }
         }
@@ -222,49 +209,49 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
 
         public override void OnWarning(int warn, string msg)
         {
-            _pushEncodedVideoImage.logger.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
+            _pushEncodedVideoImage.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
         }
 
         public override void OnError(int err, string msg)
         {
-            _pushEncodedVideoImage.logger.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+            _pushEncodedVideoImage.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
         }
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
             Debug.Log("Agora: OnJoinChannelSuccess ");
-            _pushEncodedVideoImage.logger.UpdateLog(string.Format("sdk version: ${0}",
-                _pushEncodedVideoImage.mRtcEngine.GetVersion()));
-            _pushEncodedVideoImage.logger.UpdateLog(
+            _pushEncodedVideoImage.Log.UpdateLog(string.Format("sdk version: ${0}",
+                _pushEncodedVideoImage.RtcEngine.GetVersion()));
+            _pushEncodedVideoImage.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));
 
 
             _pushEncodedVideoImage.CreateRole(connection.localUid.ToString(), true);
-            _pushEncodedVideoImage.logger.UpdateLog("you can drag your role to every where");
+            _pushEncodedVideoImage.Log.UpdateLog("you can drag your role to every where");
             _pushEncodedVideoImage.StartPushEncodeVideoImage();
         }
 
         public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            _pushEncodedVideoImage.logger.UpdateLog("OnRejoinChannelSuccess");
+            _pushEncodedVideoImage.Log.UpdateLog("OnRejoinChannelSuccess");
         }
 
         public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
         {
-            _pushEncodedVideoImage.logger.UpdateLog("OnLeaveChannel");
+            _pushEncodedVideoImage.Log.UpdateLog("OnLeaveChannel");
             _pushEncodedVideoImage.DestroyRole(connection.localUid.ToString(), true);
             _pushEncodedVideoImage.StopPushEncodeVideoImage();
         }
 
         public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
         {
-            _pushEncodedVideoImage.logger.UpdateLog("OnClientRoleChanged");
+            _pushEncodedVideoImage.Log.UpdateLog("OnClientRoleChanged");
         }
 
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
-            _pushEncodedVideoImage.logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+            _pushEncodedVideoImage.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
             _pushEncodedVideoImage.CreateRole(uid.ToString(), false);
 
 
@@ -280,20 +267,20 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
         {
-            _pushEncodedVideoImage.logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+            _pushEncodedVideoImage.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                 (int)reason));
             _pushEncodedVideoImage.DestroyRole(uid.ToString(), false);
         }
 
         public override void OnChannelMediaRelayEvent(int code)
         {
-            _pushEncodedVideoImage.logger.UpdateLog(string.Format("OnChannelMediaRelayEvent: {0}", code));
+            _pushEncodedVideoImage.Log.UpdateLog(string.Format("OnChannelMediaRelayEvent: {0}", code));
 
         }
 
         public override void OnChannelMediaRelayStateChanged(int state, int code)
         {
-            _pushEncodedVideoImage.logger.UpdateLog(string.Format("OnChannelMediaRelayStateChanged state: {0}, code: {1}", state, code));
+            _pushEncodedVideoImage.Log.UpdateLog(string.Format("OnChannelMediaRelayStateChanged state: {0}, code: {1}", state, code));
         }
     }
 
@@ -317,15 +304,15 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
             var uid = videoEncodedFrameInfo.uid.ToString();
 
             //this called is not in Unity MainThread.we need push data in this dic. And read it in Update()
-            lock (_pushEncodedVideoImage.rolePositionDic)
+            lock (_pushEncodedVideoImage.RolePositionDic)
             {
-                if (_pushEncodedVideoImage.rolePositionDic.ContainsKey(uid))
+                if (_pushEncodedVideoImage.RolePositionDic.ContainsKey(uid))
                 {
-                    _pushEncodedVideoImage.rolePositionDic[uid] = pos;
+                    _pushEncodedVideoImage.RolePositionDic[uid] = pos;
                 }
                 else
                 {
-                    _pushEncodedVideoImage.rolePositionDic.Add(uid, pos);
+                    _pushEncodedVideoImage.RolePositionDic.Add(uid, pos);
                 }
             }
             return true;

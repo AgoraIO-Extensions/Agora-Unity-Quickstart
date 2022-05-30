@@ -1568,9 +1568,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57cd6320e47d7411ab4e5461a6d705db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  appIdInput: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
-  appID: 
-  token: 
-  channelName: 
+  _appIdInput: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
+  _appID: 
+  _token: 
+  _channelName: 
   Sound_URL: https://agoracdn.s3.us-west-1.amazonaws.com/videos/Agora+Online+Learning+Engagement+Platform.mp3
-  logText: {fileID: 634102969}
+  LogText: {fileID: 634102969}

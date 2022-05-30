@@ -16,49 +16,52 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
     {
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
-        private AppIdInput appIdInput;
+        private AppIdInput _appIdInput;
 
         [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")]
         [SerializeField]
-        private string appID = "";
+        private string _appID = "";
 
         [FormerlySerializedAs("TOKEN")]
         [SerializeField]
-        private string token = "";
+        private string _token = "";
 
         [FormerlySerializedAs("CHANNEL_NAME")]
         [SerializeField]
-        private string channelName = "";
+        private string _channelName = "";
 
-        public Text logText;
-        private Logger Logger;
-        private const float Offset = 100;
+        public Text LogText;
+        internal Logger Log;
+        internal IRtcEngine RtcEngine = null;
 
-        private Texture2D mTexture;
-        private Rect mRect;
+       
+        private Texture2D _texture;
+        private Rect _rect;
         private int i = 0;
-        private WebCamTexture webCameraTexture;
-        public RawImage rawImage;
-        public Vector2 cameraSize = new Vector2(640, 480);
-        public int cameraFPS = 15;
-        private byte[] shareData;
+        private WebCamTexture _webCameraTexture;
+        public RawImage RawImage;
+        public Vector2 CameraSize = new Vector2(640, 480);
+        public int CameraFPS = 15;
+        private byte[] _shareData;
 
-        private IRtcEngine mRtcEngine = null;
+
 
         // Use this for initialization
-        void Start()
+        private void Start()
         {
             LoadAssetData();
-            InitCameraDevice();
-            InitTexture();
-            CheckAppId();
-            InitEngine();
-            SetExternalVideoSource();
-            JoinChannel();
+            if (CheckAppId())
+            {
+                InitCameraDevice();
+                InitTexture();
+                InitEngine();
+                SetExternalVideoSource();
+                JoinChannel();
+            }
         }
 
-        void Update()
+        private void Update()
         {
             PermissionHelper.RequestMicrophontPermission();
             StartCoroutine(ShareScreen());
@@ -66,22 +69,22 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
 
         //Show data in AgoraBasicProfile
         [ContextMenu("ShowAgoraBasicProfileData")]
-        public void LoadAssetData()
+        private void LoadAssetData()
         {
-            if (appIdInput == null) return;
-            appID = appIdInput.appID;
-            token = appIdInput.token;
-            channelName = appIdInput.channelName;
+            if (_appIdInput == null) return;
+            _appID = _appIdInput.appID;
+            _token = _appIdInput.token;
+            _channelName = _appIdInput.channelName;
         }
 
         private IEnumerator ShareScreen()
         {
             yield return new WaitForEndOfFrame();
-            IRtcEngine rtc = RtcEngine.Instance;
+            IRtcEngine rtc = agora.rtc.RtcEngine.Instance;
             if (rtc != null)
             {
-                mTexture.ReadPixels(mRect, 0, 0);
-                mTexture.Apply();
+                _texture.ReadPixels(_rect, 0, 0);
+                _texture.Apply();
 
 #if UNITY_2018_1_OR_NEWER
                 NativeArray<byte> nativeByteArray = mTexture.GetRawTextureData<byte>();
@@ -91,15 +94,15 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
                 }
                 nativeByteArray.CopyTo(shareData);
 #else
-                shareData = mTexture.GetRawTextureData();
+                _shareData = _texture.GetRawTextureData();
 #endif
 
                 ExternalVideoFrame externalVideoFrame = new ExternalVideoFrame();
                 externalVideoFrame.type = VIDEO_BUFFER_TYPE.VIDEO_BUFFER_RAW_DATA;
                 externalVideoFrame.format = VIDEO_PIXEL_FORMAT.VIDEO_PIXEL_RGBA;
-                externalVideoFrame.buffer = shareData;
-                externalVideoFrame.stride = (int)mRect.width;
-                externalVideoFrame.height = (int)mRect.height;
+                externalVideoFrame.buffer = _shareData;
+                externalVideoFrame.stride = (int)_rect.width;
+                externalVideoFrame.height = (int)_rect.height;
                 externalVideoFrame.cropLeft = 10;
                 externalVideoFrame.cropTop = 10;
                 externalVideoFrame.cropRight = 10;
@@ -113,82 +116,66 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
 
         private void InitEngine()
         {
-            mRtcEngine = RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(appID, 0, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            mRtcEngine.Initialize(context);
-            mRtcEngine.InitEventHandler(handler);
-            mRtcEngine.EnableAudio();
-            mRtcEngine.EnableVideo();
-            mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.Initialize(context);
+            RtcEngine.InitEventHandler(handler);
+            RtcEngine.EnableAudio();
+            RtcEngine.EnableVideo();
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
         }
 
         private void SetExternalVideoSource()
         {
-            var ret = mRtcEngine.SetExternalVideoSource(true, false, EXTERNAL_VIDEO_SOURCE_TYPE.VIDEO_FRAME);
-            this.Logger.UpdateLog("SetExternalVideoSource returns:" + ret);
+            var ret = RtcEngine.SetExternalVideoSource(true, false, EXTERNAL_VIDEO_SOURCE_TYPE.VIDEO_FRAME);
+            this.Log.UpdateLog("SetExternalVideoSource returns:" + ret);
         }
 
         private void JoinChannel()
         {
-            mRtcEngine.JoinChannel(token, channelName);
+            RtcEngine.JoinChannel(_token, _channelName);
         }
 
-        private void CheckAppId()
+        private bool CheckAppId()
         {
-            Logger = new Logger(logText);
-            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in Canvas!!!!");
+            Log = new Logger(LogText);
+            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in Canvas!!!!");
         }
 
         private void InitTexture()
         {
-            mRect = new UnityEngine.Rect(0, 0, Screen.width, Screen.height);
-            mTexture = new Texture2D((int)mRect.width, (int)mRect.height, TextureFormat.RGBA32, false);
+            _rect = new UnityEngine.Rect(0, 0, Screen.width, Screen.height);
+            _texture = new Texture2D((int)_rect.width, (int)_rect.height, TextureFormat.RGBA32, false);
         }
 
         private void InitCameraDevice()
         {
 
             WebCamDevice[] devices = WebCamTexture.devices;
-            webCameraTexture = new WebCamTexture(devices[0].name, (int)cameraSize.x, (int)cameraSize.y, cameraFPS);
-            rawImage.texture = webCameraTexture;
-            webCameraTexture.Play();
+            _webCameraTexture = new WebCamTexture(devices[0].name, (int)CameraSize.x, (int)CameraSize.y, CameraFPS);
+            RawImage.texture = _webCameraTexture;
+            _webCameraTexture.Play();
         }
 
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
-            if (webCameraTexture)
+            if (_webCameraTexture)
             {
-                webCameraTexture.Stop();
+                _webCameraTexture.Stop();
             }
-            if (mRtcEngine == null) return;
-            mRtcEngine.InitEventHandler(null);
-            mRtcEngine.LeaveChannel();
-            mRtcEngine.Dispose();
+            if (RtcEngine == null) return;
+            RtcEngine.InitEventHandler(null);
+            RtcEngine.LeaveChannel();
+            RtcEngine.Dispose();
         }
-
-        //private void OnApplicationQuit()
-        //{
-        //    if (webCameraTexture)
-        //    {
-        //        webCameraTexture.Stop();
-        //    }
-
-        //    if (mRtcEngine != null)
-        //    {
-        //        mRtcEngine.InitEventHandler(null);
-        //    mRtcEngine.LeaveChannel();
-        //        mRtcEngine.Dispose();
-        //        mRtcEngine = null;
-        //    }
-        //}
 
         internal string GetChannelName()
         {
-            return channelName;
+            return _channelName;
         }
 
         private void DestroyVideoView(uint uid)
@@ -200,7 +187,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
             }
         }
 
-        private void MakeVideoView(uint uid, string channelId = "")
+        public void MakeVideoView(uint uid, string channelId = "")
         {
             GameObject go = GameObject.Find(uid.ToString());
             if (!ReferenceEquals(go, null))
@@ -227,7 +214,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
         }
 
         // VIDEO TYPE 1: 3D Object
-        public VideoSurface MakePlaneSurface(string goName)
+        private static VideoSurface MakePlaneSurface(string goName)
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
@@ -248,7 +235,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
         }
 
         // Video TYPE 2: RawImage
-        public VideoSurface makeImageSurface(string goName)
+        private static VideoSurface makeImageSurface(string goName)
         {
             GameObject go = new GameObject();
 
@@ -294,49 +281,49 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
 
             public override void OnWarning(int warn, string msg)
             {
-                _customCaptureVideo.Logger.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
+                _customCaptureVideo.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
             }
 
             public override void OnError(int err, string msg)
             {
-                _customCaptureVideo.Logger.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+                _customCaptureVideo.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
             }
 
             public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
             {
-                _customCaptureVideo.Logger.UpdateLog(string.Format("sdk version: ${0}",
-                    _customCaptureVideo.mRtcEngine.GetVersion()));
-                _customCaptureVideo.Logger.UpdateLog(
+                _customCaptureVideo.Log.UpdateLog(string.Format("sdk version: ${0}",
+                    _customCaptureVideo.RtcEngine.GetVersion()));
+                _customCaptureVideo.Log.UpdateLog(
                     string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                         connection.channelId, connection.localUid, elapsed));
             }
 
             public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
             {
-                _customCaptureVideo.Logger.UpdateLog("OnRejoinChannelSuccess");
+                _customCaptureVideo.Log.UpdateLog("OnRejoinChannelSuccess");
             }
 
             public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
             {
-                _customCaptureVideo.Logger.UpdateLog("OnLeaveChannel");
+                _customCaptureVideo.Log.UpdateLog("OnLeaveChannel");
             }
 
             public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole,
                 CLIENT_ROLE_TYPE newRole)
             {
-                _customCaptureVideo.Logger.UpdateLog("OnClientRoleChanged");
+                _customCaptureVideo.Log.UpdateLog("OnClientRoleChanged");
             }
 
             public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
             {
-                _customCaptureVideo.Logger.UpdateLog(
+                _customCaptureVideo.Log.UpdateLog(
                     string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
                 _customCaptureVideo.MakeVideoView(uid, _customCaptureVideo.GetChannelName());
             }
 
             public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
             {
-                _customCaptureVideo.Logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+                _customCaptureVideo.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                     (int)reason));
                 _customCaptureVideo.DestroyVideoView(uid);
             }

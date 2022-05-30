@@ -12,34 +12,36 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRtmpStreamWithTranscoding
     {
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
-        private AppIdInput appIdInput;
+        private AppIdInput _appIdInput;
 
         [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")]
         [SerializeField]
-        private string appID = "";
+        private string _appID = "";
 
         [FormerlySerializedAs("TOKEN")]
         [SerializeField]
-        private string token = "";
+        private string _token = "";
 
         [FormerlySerializedAs("CHANNEL_NAME")]
         [SerializeField]
-        private string channelName = "";
+        private string _channelName = "";
 
-        public Text logText;
-        internal Logger Logger;
-        internal IRtcEngine mRtcEngine = null;
-        public uint uid = 0;
+        public Text LogText;
+        internal Logger Log;
+        internal IRtcEngine RtcEngine = null;
+        public uint Uid = 0;
 
         // Use this for initialization
         private void Start()
         {
             LoadAssetData();
-            CheckAppId();
-            InitEngine();
-            SetUpUI();
-            JoinChannel();
+            if (CheckAppId())
+            {
+                InitEngine();
+                SetUpUI();
+                JoinChannel();
+            }
         }
 
         // Update is called once per frame
@@ -53,43 +55,40 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRtmpStreamWithTranscoding
         [ContextMenu("ShowAgoraBasicProfileData")]
         public void LoadAssetData()
         {
-            if (appIdInput == null) return;
-            appID = appIdInput.appID;
-            token = appIdInput.token;
-            channelName = appIdInput.channelName;
+            if (_appIdInput == null) return;
+            _appID = _appIdInput.appID;
+            _token = _appIdInput.token;
+            _channelName = _appIdInput.channelName;
         }
 
 
-        private void CheckAppId()
+        private bool CheckAppId()
         {
-            Logger = new Logger(logText);
-            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
+            Log = new Logger(LogText);
+            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
         private void InitEngine()
         {
-            mRtcEngine = RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(appID, 0, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            mRtcEngine.Initialize(context);
-            mRtcEngine.InitEventHandler(handler);
-            mRtcEngine.EnableAudio();
-            mRtcEngine.EnableVideo();
-            mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.Initialize(context);
+            RtcEngine.InitEventHandler(handler);
+            RtcEngine.EnableAudio();
+            RtcEngine.EnableVideo();
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
         }
 
         private void JoinChannel()
         {
-            //var options = new ChannelMediaOptions();
-            //options.
-
-            mRtcEngine.JoinChannel(token, channelName);
+            RtcEngine.JoinChannel(_token, _channelName);
         }
 
 
-        void SetUpUI()
+        private void SetUpUI()
         {
             var btn = this.transform.Find("StartButton").GetComponent<Button>();
             btn.onClick.AddListener(this.OnStartButtonPress);
@@ -101,11 +100,11 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRtmpStreamWithTranscoding
             btn.onClick.AddListener(this.OnStopButtonPress);
         }
 
-        void OnStartButtonPress()
+        private void OnStartButtonPress()
         {
-            if (this.uid == 0)
+            if (this.Uid == 0)
             {
-                this.Logger.UpdateLog("your must join channel.");
+                this.Log.UpdateLog("your must join channel.");
                 return;
             }
 
@@ -114,7 +113,7 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRtmpStreamWithTranscoding
             liveTranscoding.transcodingUsers = new TranscodingUser[1];
             liveTranscoding.transcodingUsers[0] = new TranscodingUser()
             {
-                uid = this.uid,
+                uid = this.Uid,
                 x = 0,
                 y = 0,
                 width = 360,
@@ -124,24 +123,20 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRtmpStreamWithTranscoding
                 audioChannel = 0
             };
 
-            var nRet = mRtcEngine.StartRtmpStreamWithTranscoding("rtmp://push.alexmk.name/live/agora_rtc_unity_" + this.channelName, liveTranscoding);
-            this.Logger.UpdateLog("StartRtmpStreamWithTranscoding:" + nRet);
+            var nRet = RtcEngine.StartRtmpStreamWithTranscoding("rtmp://push.alexmk.name/live/agora_rtc_unity_" + this._channelName, liveTranscoding);
+            this.Log.UpdateLog("StartRtmpStreamWithTranscoding:" + nRet);
             if (nRet == 0)
             {
-                this.Logger.UpdateLog("pushing stream to rtmp://push.alexmk.name/live/agora_rtc_unity_" + this.channelName);
+                this.Log.UpdateLog("pushing stream to rtmp://push.alexmk.name/live/agora_rtc_unity_" + this._channelName);
                 /* 
                     Verify remote
                     1.install ffmpeg(brew install ffmpeg)
                     2.ffplay rtmp://play.alexmk.name/live/agora_rtc_unity_+this.channelName
                  */
             }
-
-
-
-
         }
 
-        void OnUpdateButtonPress()
+        private void OnUpdateButtonPress()
         {
             var liveTranscoding = new LiveTranscoding();
             liveTranscoding.width = 640;
@@ -150,7 +145,7 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRtmpStreamWithTranscoding
             liveTranscoding.transcodingUsers = new TranscodingUser[1];
             liveTranscoding.transcodingUsers[0] = new TranscodingUser()
             {
-                uid = this.uid,
+                uid = this.Uid,
                 x = 100,
                 y = 100,
                 width = 360,
@@ -160,42 +155,31 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRtmpStreamWithTranscoding
                 audioChannel = 0
             };
 
-         
-            var nRet = mRtcEngine.UpdateRtmpTranscoding(liveTranscoding);
-            this.Logger.UpdateLog("UpdateRtmpTranscoding:" + nRet);
+
+            var nRet = RtcEngine.UpdateRtmpTranscoding(liveTranscoding);
+            this.Log.UpdateLog("UpdateRtmpTranscoding:" + nRet);
         }
 
-        void OnStopButtonPress()
+        private void OnStopButtonPress()
         {
-            var nRet = mRtcEngine.StopRtmpStream("rtmp://push.alexmk.name/live/agora_rtc_unity_" + this.channelName);
-            this.Logger.UpdateLog("StopRtmpStream:" + nRet);
+            var nRet = RtcEngine.StopRtmpStream("rtmp://push.alexmk.name/live/agora_rtc_unity_" + this._channelName);
+            this.Log.UpdateLog("StopRtmpStream:" + nRet);
         }
 
 
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
-            if (mRtcEngine == null) return;
-            mRtcEngine.InitEventHandler(null);
-            mRtcEngine.LeaveChannel();
-            mRtcEngine.Dispose();
+            if (RtcEngine == null) return;
+            RtcEngine.InitEventHandler(null);
+            RtcEngine.LeaveChannel();
+            RtcEngine.Dispose();
         }
 
-        //private void OnApplicationQuit()
-        //{
-        //    Debug.Log("OnApplicationQuit");
-        //    if (mRtcEngine != null)
-        //    {
-        //        mRtcEngine.InitEventHandler(null);
-        //        mRtcEngine.LeaveChannel();
-        //        mRtcEngine.Dispose();
-        //        mRtcEngine = null;
-        //    }
-        //}
-
+        
         internal string GetChannelName()
         {
-            return channelName;
+            return _channelName;
         }
 
         internal static void MakeVideoView(uint uid, string channelId = "")
@@ -222,7 +206,7 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRtmpStreamWithTranscoding
         }
 
         // VIDEO TYPE 1: 3D Object
-        private VideoSurface MakePlaneSurface(string goName)
+        private static VideoSurface MakePlaneSurface(string goName)
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
@@ -301,63 +285,63 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRtmpStreamWithTranscoding
 
         public override void OnWarning(int warn, string msg)
         {
-            _sample.Logger.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
+            _sample.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
         }
 
         public override void OnError(int err, string msg)
         {
-            _sample.Logger.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+            _sample.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
         }
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
             Debug.Log("Agora: OnJoinChannelSuccess ");
-            _sample.Logger.UpdateLog(string.Format("sdk version: ${0}",
-                _sample.mRtcEngine.GetVersion()));
-            _sample.Logger.UpdateLog(
+            _sample.Log.UpdateLog(string.Format("sdk version: ${0}",
+                _sample.RtcEngine.GetVersion()));
+            _sample.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));
-            _sample.uid = connection.localUid;
+            _sample.Uid = connection.localUid;
             StartRtmpStreamWithTranscoding.MakeVideoView(0);
         }
 
         public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            _sample.Logger.UpdateLog("OnRejoinChannelSuccess");
+            _sample.Log.UpdateLog("OnRejoinChannelSuccess");
         }
 
         public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
         {
-            _sample.Logger.UpdateLog("OnLeaveChannel");
+            _sample.Log.UpdateLog("OnLeaveChannel");
             StartRtmpStreamWithTranscoding.DestroyVideoView(0);
         }
 
         public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
         {
-            _sample.Logger.UpdateLog("OnClientRoleChanged");
+            _sample.Log.UpdateLog("OnClientRoleChanged");
         }
 
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
-            _sample.Logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+            _sample.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
             StartRtmpStreamWithTranscoding.MakeVideoView(uid, _sample.GetChannelName());
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
         {
-            _sample.Logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+            _sample.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                 (int)reason));
             StartRtmpStreamWithTranscoding.DestroyVideoView(uid);
         }
 
         public override void OnRtmpStreamingStateChanged(string url, RTMP_STREAM_PUBLISH_STATE state, RTMP_STREAM_PUBLISH_ERROR_TYPE errCode)
         {
-            _sample.Logger.UpdateLog(string.Format("OnRtmpStreamingStateChanged url:{0},  state:{1},  errCode:{2}", url, state, errCode));
+            _sample.Log.UpdateLog(string.Format("OnRtmpStreamingStateChanged url:{0},  state:{1},  errCode:{2}", url, state, errCode));
         }
 
         public override void OnTranscodingUpdated()
         {
-            _sample.Logger.UpdateLog(string.Format("OnTranscodingUpdated"));
+            _sample.Log.UpdateLog(string.Format("OnTranscodingUpdated"));
         }
     }
 }

@@ -15,107 +15,110 @@ namespace CustomRenderAudio
     {
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
-        private AppIdInput appIdInput;
+        private AppIdInput _appIdInput;
 
         [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")]
         [SerializeField]
-        private string appID = "";
+        private string _appID = "";
 
         [FormerlySerializedAs("TOKEN")]
         [SerializeField]
-        private string token = "";
+        private string _token = "";
 
         [FormerlySerializedAs("CHANNEL_NAME")]
         [SerializeField]
-        private string channelName = "";
+        private string _channelName = "";
 
-        public Text logText;
-        internal Logger Logger;
-        internal IRtcEngine mRtcEngine;
-        //private IAudioRawDataManager _audioRawDataManager;
+        public Text LogText;
+        internal Logger Log;
+        internal IRtcEngine RtcEngine;
 
-        private int CHANNEL = 1;
-        private int SAMPLE_RATE = 44100;
-        private int PULL_FREQ_PER_SEC = 100;
 
-        private int count;
+        private const int CHANNEL = 1;
+        private const int SAMPLE_RATE = 44100;
+        private const int PULL_FREQ_PER_SEC = 100;
 
-        private int writeCount;
-        private int readCount;
 
-        private RingBuffer<float> audioBuffer;
+        private RingBuffer<float> _audioBuffer;
         private AudioClip _audioClip;
 
 
         private Thread _pullAudioFrameThread;
         private bool _pullAudioFrameThreadSignal = true;
 
-        private bool _startSignal;
+        private int _writeCount;
+        private int _readCount;
 
-        // Start is called before the first frame update
-        void Start()
+        private void Start()
         {
             LoadAssetData();
-            var ifValid = CheckAppId();
-            InitRtcEngine();
-            JoinChannel();
-
-            var aud = GetComponent<AudioSource>();
-            if (aud == null)
+            if (CheckAppId())
             {
-                gameObject.AddComponent<AudioSource>();
+                InitRtcEngine();
+                JoinChannel();
+                var aud = InitAudioSource();
+                StartPullAudioFrame(aud, "externalClip");
             }
-
-            if (ifValid) StartPullAudioFrame(aud, "externalClip");
         }
 
-        void Update()
+        private void Update()
         {
             PermissionHelper.RequestMicrophontPermission();
         }
 
-        bool CheckAppId()
+        private bool CheckAppId()
         {
-            Logger = new Logger(logText);
-            return Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
+            Log = new Logger(LogText);
+            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
         //Show data in AgoraBasicProfile
         [ContextMenu("ShowAgoraBasicProfileData")]
-        public void LoadAssetData()
+        private void LoadAssetData()
         {
-            if (appIdInput == null) return;
-            appID = appIdInput.appID;
-            token = appIdInput.token;
-            channelName = appIdInput.channelName;
+            if (_appIdInput == null) return;
+            _appID = _appIdInput.appID;
+            _token = _appIdInput.token;
+            _channelName = _appIdInput.channelName;
         }
 
-        void InitRtcEngine()
+        private void InitRtcEngine()
         {
-            mRtcEngine = RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             //be care, enableAudioDevice need be false
-            RtcEngineContext context = new RtcEngineContext(appID, 0, false,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0, false,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            var ret = mRtcEngine.Initialize(context);
-            mRtcEngine.InitEventHandler(handler);
-            mRtcEngine.EnableAudio();
-            var nRet = mRtcEngine.SetExternalAudioSink(SAMPLE_RATE, CHANNEL);
-            this.Logger.UpdateLog("SetExternalAudioSink ret:" + nRet);
+            var ret = RtcEngine.Initialize(context);
+            RtcEngine.InitEventHandler(handler);
+            RtcEngine.EnableAudio();
+            var nRet = RtcEngine.SetExternalAudioSink(SAMPLE_RATE, CHANNEL);
+            this.Log.UpdateLog("SetExternalAudioSink ret:" + nRet);
         }
 
-        void JoinChannel()
+        private void JoinChannel()
         {
-            mRtcEngine.JoinChannel(token, channelName);
+            RtcEngine.JoinChannel(_token, _channelName);
         }
 
-        void StartPullAudioFrame(AudioSource aud, string clipName)
+        private AudioSource InitAudioSource()
         {
+            var aud = GetComponent<AudioSource>();
+            if (aud == null)
+            {
+                aud = gameObject.AddComponent<AudioSource>();
+            }
+            return aud;
+        }
+
+        private void StartPullAudioFrame(AudioSource aud, string clipName)
+        {
+
             // 1-sec-length buffer
             var bufferLength = SAMPLE_RATE * CHANNEL;
-            audioBuffer = new RingBuffer<float>(bufferLength, true);
+            _audioBuffer = new RingBuffer<float>(bufferLength, true);
 
             _pullAudioFrameThread = new Thread(PullAudioFrameThread);
             _pullAudioFrameThread.Start();
@@ -131,21 +134,12 @@ namespace CustomRenderAudio
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
-            if (mRtcEngine == null) return;
-            mRtcEngine.InitEventHandler(null);
-            mRtcEngine.LeaveChannel();
-            mRtcEngine.Dispose();
+            if (RtcEngine == null) return;
+            RtcEngine.InitEventHandler(null);
+            RtcEngine.LeaveChannel();
+            RtcEngine.Dispose();
         }
 
-        //void OnApplicationQuit()
-        //{
-        //    Debug.Log("OnApplicationQuit");
-        //    _pullAudioFrameThreadSignal = false;
-        //    _pullAudioFrameThread.Abort();
-        //    if (mRtcEngine == null) return;
-        //    mRtcEngine.LeaveChannel();
-        //    mRtcEngine.Dispose();
-        //}
 
         private void PullAudioFrameThread()
         {
@@ -169,7 +163,7 @@ namespace CustomRenderAudio
                 if (toc.Subtract(tic).Duration().Milliseconds >= freq)
                 {
                     tic = new TimeSpan(DateTime.Now.Ticks);
-                    var ret = mRtcEngine.PullAudioFrame(audioFrame);
+                    var ret = RtcEngine.PullAudioFrame(audioFrame);
 
                     Debug.Log("PullAudioFrame returns: " + ret);
 
@@ -178,21 +172,15 @@ namespace CustomRenderAudio
 
                         Marshal.Copy((IntPtr)audioFrame.buffer, audioFrame.RawBuffer, 0, audioFrame.RawBuffer.Length);
                         var floatArray = ConvertByteToFloat16(audioFrame.RawBuffer);
-                        lock (audioBuffer)
+                        lock (_audioBuffer)
                         {
-                            audioBuffer.Put(floatArray);
+                            _audioBuffer.Put(floatArray);
                         }
 
-                        writeCount += floatArray.Length;
-                        count += 1;
+                        _writeCount += floatArray.Length;
+
                     }
-
                 }
-
-                //if (count == 100)
-                //{
-                //    _startSignal = true;
-                //}
             }
 
             Marshal.FreeHGlobal(audioFrameBuffer);
@@ -215,11 +203,11 @@ namespace CustomRenderAudio
             //if (!_startSignal) return;
             for (var i = 0; i < data.Length; i++)
             {
-                lock (audioBuffer)
+                lock (_audioBuffer)
                 {
-                    if (audioBuffer.Count > 0)
+                    if (_audioBuffer.Count > 0)
                     {
-                        data[i] = audioBuffer.Get();
+                        data[i] = _audioBuffer.Get();
                     }
                     else
                     {
@@ -227,10 +215,10 @@ namespace CustomRenderAudio
                     }
                 }
 
-                readCount += 1;
+                //readCount += 1;
             }
 
-            //Debug.LogFormat("buffer length remains: {0}", writeCount - readCount);
+            Debug.LogFormat("buffer length remains: {0}", _writeCount - _readCount);
         }
     }
 
@@ -245,29 +233,29 @@ namespace CustomRenderAudio
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            _customAudioSinkSample.Logger.UpdateLog(string.Format("sdk version: {0}", _customAudioSinkSample.mRtcEngine.GetVersion()));
-            _customAudioSinkSample.Logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
+            _customAudioSinkSample.Log.UpdateLog(string.Format("sdk version: {0}", _customAudioSinkSample.RtcEngine.GetVersion()));
+            _customAudioSinkSample.Log.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
                 connection.localUid, elapsed));
         }
 
         public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
         {
-            _customAudioSinkSample.Logger.UpdateLog("OnLeaveChannelSuccess");
+            _customAudioSinkSample.Log.UpdateLog("OnLeaveChannelSuccess");
         }
 
         public override void OnWarning(int warn, string msg)
         {
-            _customAudioSinkSample.Logger.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
+            _customAudioSinkSample.Log.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
         }
 
         public override void OnError(int error, string msg)
         {
-            _customAudioSinkSample.Logger.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
+            _customAudioSinkSample.Log.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
         }
 
         public override void OnConnectionLost(RtcConnection connection)
         {
-            _customAudioSinkSample.Logger.UpdateLog(string.Format("OnConnectionLost "));
+            _customAudioSinkSample.Log.UpdateLog(string.Format("OnConnectionLost "));
         }
     }
 }

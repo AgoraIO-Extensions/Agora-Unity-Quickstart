@@ -14,45 +14,46 @@ namespace Agora_Plugin.API_Example.examples.basic.SetBeautyEffectOptions
 
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
-        private AppIdInput appIdInput;
+        private AppIdInput _appIdInput;
 
         [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")]
         [SerializeField]
-        private string appID = "";
+        private string _appID = "";
 
         [FormerlySerializedAs("TOKEN")]
         [SerializeField]
-        private string token = "";
+        private string _token = "";
 
         [FormerlySerializedAs("CHANNEL_NAME")]
         [SerializeField]
-        private string channelName = "";
+        private string _channelName = "";
 
-        public Text logText;
-        internal Logger Logger;
-        internal IRtcEngine mRtcEngine = null;
-
-
-        public Text textLighteningLevel;
-        public Text textSmoothnessLevel;
-        public Text textRednessLevel;
-        public Text textSharpnessLevel;
-
-        public Slider sliderLighteningLevel;
-        public Slider sliderSmoothnessLevel;
-        public Slider sliderRednessLevel;
-        public Slider sliderSharpnessLevel;
+        public Text LogText;
+        internal Logger Log;
+        internal IRtcEngine RtcEngine = null;
 
 
-        // Use this for initialization
+        public Text TextLighteningLevel;
+        public Text TextSmoothnessLevel;
+        public Text TextRednessLevel;
+        public Text TextSharpnessLevel;
+
+        public Slider SliderLighteningLevel;
+        public Slider SliderSmoothnessLevel;
+        public Slider SliderRednessLevel;
+        public Slider SliderSharpnessLevel;
+
+
         private void Start()
         {
             LoadAssetData();
-            CheckAppId();
-            SetUpUI();
-            InitEngine();
-            JoinChannel();
+            if (CheckAppId())
+            {
+                SetUpUI();
+                InitEngine();
+                JoinChannel();
+            }
 
         }
 
@@ -65,57 +66,61 @@ namespace Agora_Plugin.API_Example.examples.basic.SetBeautyEffectOptions
 
         //Show data in AgoraBasicProfile
         [ContextMenu("ShowAgoraBasicProfileData")]
-        public void LoadAssetData()
+        private void LoadAssetData()
         {
-            if (appIdInput == null) return;
-            appID = appIdInput.appID;
-            token = appIdInput.token;
-            channelName = appIdInput.channelName;
+            if (_appIdInput == null) return;
+            _appID = _appIdInput.appID;
+            _token = _appIdInput.token;
+            _channelName = _appIdInput.channelName;
         }
 
-        private void CheckAppId()
+        private bool CheckAppId()
         {
-            Logger = new Logger(logText);
-            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
+            Log = new Logger(LogText);
+            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
         private void InitEngine()
         {
-            mRtcEngine = RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(appID, 0, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            mRtcEngine.Initialize(context);
-            mRtcEngine.InitEventHandler(handler);
-            mRtcEngine.EnableAudio();
-            mRtcEngine.EnableVideo();
-            var nRet = mRtcEngine.EnableExtension("agora", "beauty", true, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
-            this.Logger.UpdateLog("EnableExtension:" + nRet);
-            mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.Initialize(context);
+            RtcEngine.InitEventHandler(handler);
+            RtcEngine.EnableAudio();
+            RtcEngine.EnableVideo();
+            var nRet = RtcEngine.EnableExtension("agora", "beauty", true, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
+            this.Log.UpdateLog("EnableExtension:" + nRet);
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
         }
 
         private void JoinChannel()
         {
-            mRtcEngine.JoinChannel(token, channelName);
+            RtcEngine.JoinChannel(_token, _channelName);
         }
 
-        void SetUpUI()
+        private void SetUpUI()
         {
-            this.sliderLighteningLevel.onValueChanged.AddListener( (float value)=> {
-                this.textLighteningLevel.text = "lighteningLevel:" + value; 
+            this.SliderLighteningLevel.onValueChanged.AddListener((float value) =>
+            {
+                this.TextLighteningLevel.text = "lighteningLevel:" + value;
             });
 
-            this.sliderSmoothnessLevel.onValueChanged.AddListener((float value) => {
-                this.textSmoothnessLevel.text = "smoothnessLevel:" + value;
+            this.SliderSmoothnessLevel.onValueChanged.AddListener((float value) =>
+            {
+                this.TextSmoothnessLevel.text = "smoothnessLevel:" + value;
             });
 
-            this.sliderRednessLevel.onValueChanged.AddListener((float value) => {
-                this.textRednessLevel.text = "rednessLevel:" + value;
+            this.SliderRednessLevel.onValueChanged.AddListener((float value) =>
+            {
+                this.TextRednessLevel.text = "rednessLevel:" + value;
             });
 
-            this.sliderSharpnessLevel.onValueChanged.AddListener((float value) => {
-                this.textSharpnessLevel.text = "sharpnessLevel:" + value;
+            this.SliderSharpnessLevel.onValueChanged.AddListener((float value) =>
+            {
+                this.TextSharpnessLevel.text = "sharpnessLevel:" + value;
             });
 
             var btn = this.transform.Find("UI/StartButton").GetComponent<Button>();
@@ -125,60 +130,47 @@ namespace Agora_Plugin.API_Example.examples.basic.SetBeautyEffectOptions
             btn.onClick.AddListener(this.OnStopButtonPress);
         }
 
-        void OnStartButtonPress()
-        {
-            var beautyOptions= new BeautyOptions();
-            beautyOptions.lighteningContrastLevel = LIGHTENING_CONTRAST_LEVEL.LIGHTENING_CONTRAST_HIGH;
-
-            beautyOptions.lighteningLevel = this.sliderLighteningLevel.value;
-            beautyOptions.smoothnessLevel = this.sliderSmoothnessLevel.value;
-            beautyOptions.rednessLevel = this.sliderRednessLevel.value;
-            beautyOptions.sharpnessLevel = this.sliderSharpnessLevel.value;
-
-             var nRet= mRtcEngine.SetBeautyEffectOptions(true, beautyOptions/*, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE*/);
-            this.Logger.UpdateLog("Start SetBeautyEffectOptions:" + nRet);
-        }
-
-        void OnStopButtonPress()
+        private void OnStartButtonPress()
         {
             var beautyOptions = new BeautyOptions();
             beautyOptions.lighteningContrastLevel = LIGHTENING_CONTRAST_LEVEL.LIGHTENING_CONTRAST_HIGH;
 
-            beautyOptions.lighteningLevel = this.sliderLighteningLevel.value;
-            beautyOptions.smoothnessLevel = this.sliderSmoothnessLevel.value;
-            beautyOptions.rednessLevel = this.sliderRednessLevel.value;
-            beautyOptions.sharpnessLevel = this.sliderSharpnessLevel.value;
+            beautyOptions.lighteningLevel = this.SliderLighteningLevel.value;
+            beautyOptions.smoothnessLevel = this.SliderSmoothnessLevel.value;
+            beautyOptions.rednessLevel = this.SliderRednessLevel.value;
+            beautyOptions.sharpnessLevel = this.SliderSharpnessLevel.value;
 
-            var nRet = mRtcEngine.SetBeautyEffectOptions(false, beautyOptions/*, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE*/);
-            this.Logger.UpdateLog("Stop SetBeautyEffectOptions:" + nRet);
+            var nRet = RtcEngine.SetBeautyEffectOptions(true, beautyOptions/*, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE*/);
+            this.Log.UpdateLog("Start SetBeautyEffectOptions:" + nRet);
         }
 
+        private void OnStopButtonPress()
+        {
+            var beautyOptions = new BeautyOptions();
+            beautyOptions.lighteningContrastLevel = LIGHTENING_CONTRAST_LEVEL.LIGHTENING_CONTRAST_HIGH;
 
+            beautyOptions.lighteningLevel = this.SliderLighteningLevel.value;
+            beautyOptions.smoothnessLevel = this.SliderSmoothnessLevel.value;
+            beautyOptions.rednessLevel = this.SliderRednessLevel.value;
+            beautyOptions.sharpnessLevel = this.SliderSharpnessLevel.value;
+
+            var nRet = RtcEngine.SetBeautyEffectOptions(false, beautyOptions/*, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE*/);
+            this.Log.UpdateLog("Stop SetBeautyEffectOptions:" + nRet);
+        }
 
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
-            if (mRtcEngine == null) return;
-            mRtcEngine.InitEventHandler(null);
-            mRtcEngine.LeaveChannel();
-            mRtcEngine.Dispose();
+            if (RtcEngine == null) return;
+            RtcEngine.InitEventHandler(null);
+            RtcEngine.LeaveChannel();
+            RtcEngine.Dispose();
         }
 
-        //private void OnApplicationQuit()
-        //{
-        //    Debug.Log("OnApplicationQuit");
-        //    if (mRtcEngine != null)
-        //    {
-        //        mRtcEngine.InitEventHandler(null);
-        //        mRtcEngine.LeaveChannel();
-        //        mRtcEngine.Dispose();
-        //        mRtcEngine = null;
-        //    }
-        //}
 
         internal string GetChannelName()
         {
-            return channelName;
+            return _channelName;
         }
 
         internal static void MakeVideoView(uint uid, string channelId = "")
@@ -205,7 +197,7 @@ namespace Agora_Plugin.API_Example.examples.basic.SetBeautyEffectOptions
         }
 
         // VIDEO TYPE 1: 3D Object
-        private VideoSurface MakePlaneSurface(string goName)
+        private static VideoSurface MakePlaneSurface(string goName)
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
@@ -284,51 +276,51 @@ namespace Agora_Plugin.API_Example.examples.basic.SetBeautyEffectOptions
 
         public override void OnWarning(int warn, string msg)
         {
-            _sample.Logger.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
+            _sample.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
         }
 
         public override void OnError(int err, string msg)
         {
-            _sample.Logger.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+            _sample.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
         }
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
             Debug.Log("Agora: OnJoinChannelSuccess ");
-            _sample.Logger.UpdateLog(string.Format("sdk version: ${0}",
-                _sample.mRtcEngine.GetVersion()));
-            _sample.Logger.UpdateLog(
+            _sample.Log.UpdateLog(string.Format("sdk version: ${0}",
+                _sample.RtcEngine.GetVersion()));
+            _sample.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));
 
-            SetBeautyEffectOptions .MakeVideoView(0);
+            SetBeautyEffectOptions.MakeVideoView(0);
         }
 
         public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            _sample.Logger.UpdateLog("OnRejoinChannelSuccess");
+            _sample.Log.UpdateLog("OnRejoinChannelSuccess");
         }
 
         public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
         {
-            _sample.Logger.UpdateLog("OnLeaveChannel");
+            _sample.Log.UpdateLog("OnLeaveChannel");
             SetBeautyEffectOptions.DestroyVideoView(0);
         }
 
         public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
         {
-            _sample.Logger.UpdateLog("OnClientRoleChanged");
+            _sample.Log.UpdateLog("OnClientRoleChanged");
         }
 
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
-            _sample.Logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+            _sample.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
             SetBeautyEffectOptions.MakeVideoView(uid, _sample.GetChannelName());
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
         {
-            _sample.Logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+            _sample.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                 (int)reason));
             SetBeautyEffectOptions.DestroyVideoView(uid);
         }

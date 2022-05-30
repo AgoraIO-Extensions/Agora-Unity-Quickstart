@@ -300,12 +300,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43f5a577f87154f2294650b9f1a341b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  appIdInput: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
-  appID: 
-  token: 
-  channelName: 
-  RTMP_URL: 
-  logText: {fileID: 1913692626}
+  _appIdInput: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
+  _appID: 
+  _token: 
+  _channelName: 
+  LogText: {fileID: 1913692626}
 --- !u!1 &1074959119
 GameObject:
   m_ObjectHideFlags: 0

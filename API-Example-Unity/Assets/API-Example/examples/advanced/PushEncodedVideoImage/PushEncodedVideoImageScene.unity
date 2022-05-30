@@ -355,12 +355,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0b155aeab44f48dfa41533c4fd66d04, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  appIdInput: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
-  appID: 
-  token: 
-  channelName: 
-  rolePrefab: {fileID: 1461356011399288, guid: 566dbb6797d9549b3b99bca2abbb8cae, type: 2}
-  logText: {fileID: 754053692}
+  _appIdInput: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
+  _appID: 
+  _token: 
+  _channelName: 
+  RolePrefab: {fileID: 1461356011399288, guid: 566dbb6797d9549b3b99bca2abbb8cae, type: 2}
+  LogText: {fileID: 754053692}
 --- !u!1 &1390194489
 GameObject:
   m_ObjectHideFlags: 0

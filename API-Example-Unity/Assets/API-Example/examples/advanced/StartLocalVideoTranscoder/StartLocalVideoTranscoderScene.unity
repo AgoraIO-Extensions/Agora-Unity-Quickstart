@@ -3085,21 +3085,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e578ddb1099943bc8df22e851f97c99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  appIdInput: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
-  appID: 
-  token: 
-  channelName: 
-  logText: {fileID: 0}
-  remoteUserUids: 
-  toggleRecord: {fileID: 306889555}
-  togglePrimartCamera: {fileID: 1755496607}
-  toggleSecondaryCamera: {fileID: 216780293}
-  togglePng: {fileID: 1215402665}
-  toggleJpg: {fileID: 1302745303}
-  toggleJif: {fileID: 1688279918}
-  toggleRemote: {fileID: 189935858}
-  toggleScreenShare: {fileID: 715250961}
-  toggleMediaPlay: {fileID: 866933562}
+  _appIdInput: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
+  _appID: 
+  _token: 
+  _channelName: 
+  LogText: {fileID: 853628988}
+  ToggleRecord: {fileID: 306889555}
+  TogglePrimartCamera: {fileID: 1755496607}
+  ToggleSecondaryCamera: {fileID: 216780293}
+  TogglePng: {fileID: 1215402665}
+  ToggleJpg: {fileID: 1302745303}
+  ToggleGif: {fileID: 1688279918}
+  ToggleRemote: {fileID: 715250961}
+  ToggleScreenShare: {fileID: 715250961}
+  ToggleMediaPlay: {fileID: 866933562}
 --- !u!114 &1804667960
 MonoBehaviour:
   m_ObjectHideFlags: 0

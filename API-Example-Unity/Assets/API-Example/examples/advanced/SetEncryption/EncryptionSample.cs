@@ -1,126 +1,124 @@
 ﻿using System.Text;
-using UnityEngine;
-using UnityEngine.UI;
 using agora.rtc;
-using Logger = agora.util.Logger;
 using agora.util;
+using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
+using Logger = agora.util.Logger;
 
 namespace Agora_Plugin.API_Example.examples.advanced.SetEncryption
 {
     public class EncryptionSample : MonoBehaviour
     {
-        [FormerlySerializedAs("appIdInput")] [SerializeField]
-        private AppIdInput appIdInput;
-        
+        [FormerlySerializedAs("appIdInput")]
+        [SerializeField]
+        private AppIdInput _appIdInput;
+
         [Header("_____________Basic Configuration_____________")]
-        [FormerlySerializedAs("APP_ID")] [SerializeField]
-        private string appID = "";
+        [FormerlySerializedAs("APP_ID")]
+        [SerializeField]
+        private string _appID = "";
 
-        [FormerlySerializedAs("TOKEN")] [SerializeField]
-        private string token = "";
+        [FormerlySerializedAs("TOKEN")]
+        [SerializeField]
+        private string _token = "";
 
-        [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
-        private string channelName = "";
+        [FormerlySerializedAs("CHANNEL_NAME")]
+        [SerializeField]
+        private string _channelName = "";
 
-        [SerializeField] private ENCRYPTION_MODE ENCRYPTION_MODE = ENCRYPTION_MODE.AES_128_GCM2;
+        [SerializeField]
+        public ENCRYPTION_MODE EncrytionMode = ENCRYPTION_MODE.AES_128_GCM2;
 
-        [SerializeField] private string SECRET = "";
+        [SerializeField]
+        public string Secret = "";
 
-        public Text logText;
-        private Logger logger;
-        private IRtcEngine mRtcEngine = null;
+        public Text LogText;
+        internal Logger Log;
+        internal IRtcEngine RtcEngine;
 
         // Start is called before the first frame update
-        void Start()
+        private void Start()
         {
             LoadAssetData();
-            CheckAppId();
-            InitRtcEngine();
-            SetEncryption();
-            JoinChannel();
+            if (CheckAppId())
+            {
+                InitRtcEngine();
+                SetEncryption();
+                JoinChannel();
+            }
         }
 
-        void Update()
+        private void Update()
         {
             PermissionHelper.RequestMicrophontPermission();
         }
 
-        void CheckAppId()
+        private bool CheckAppId()
         {
-            logger = new Logger(logText);
-            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
+            Log = new Logger(LogText);
+            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
-        
+
         //Show data in AgoraBasicProfile
         [ContextMenu("ShowAgoraBasicProfileData")]
-        public void LoadAssetData()
+        private void LoadAssetData()
         {
-            if (appIdInput == null) return;
-            appID = appIdInput.appID;
-            token = appIdInput.token;
-            channelName = appIdInput.channelName;
+            if (_appIdInput == null) return;
+            _appID = _appIdInput.appID;
+            _token = _appIdInput.token;
+            _channelName = _appIdInput.channelName;
         }
 
-        void InitRtcEngine()
+        private void InitRtcEngine()
         {
-            mRtcEngine = RtcEngine.CreateAgoraRtcEngine();
-            RtcEngineContext context = new RtcEngineContext(appID, 0, false,
+            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
+            RtcEngineContext context = new RtcEngineContext(_appID, 0, false,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            mRtcEngine.Initialize(context);
-            mRtcEngine.InitEventHandler(new UserEventHandler(this));
-            mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            mRtcEngine.EnableAudio();
-            mRtcEngine.EnableVideo();
+            RtcEngine.Initialize(context);
+            RtcEngine.InitEventHandler(new UserEventHandler(this));
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.EnableAudio();
+            RtcEngine.EnableVideo();
         }
 
-        byte[] GetEncryptionSaltFromServer()
+        private byte[] GetEncryptionSaltFromServer()
         {
             return Encoding.UTF8.GetBytes("EncryptionKdfSaltInBase64Strings");
         }
 
-        void SetEncryption()
+        private void SetEncryption()
         {
             var config = new EncryptionConfig
             {
-                encryptionMode = ENCRYPTION_MODE,
-                encryptionKey = SECRET,
+                encryptionMode = EncrytionMode,
+                encryptionKey = Secret,
                 encryptionKdfSalt = GetEncryptionSaltFromServer()
             };
-            logger.UpdateLog(string.Format("encryption mode: {0} secret: {1}", ENCRYPTION_MODE, SECRET));
-            mRtcEngine.EnableEncryption(true, config);
+            Log.UpdateLog(string.Format("encryption mode: {0} secret: {1}", EncrytionMode, Secret));
+            var nRet= RtcEngine.EnableEncryption(true, config);
+            this.Log.UpdateLog("EnableEncryption: " + nRet);
         }
 
-        void JoinChannel()
+        private void JoinChannel()
         {
-            mRtcEngine.JoinChannel(token, channelName, "", 0);
+            RtcEngine.JoinChannel(_token, _channelName, "", 0);
         }
 
-        void OnLeaveBtnClick()
+        private void OnLeaveBtnClick()
         {
-            mRtcEngine.LeaveChannel();
+            RtcEngine.LeaveChannel();
         }
 
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
-            if (mRtcEngine == null) return;
-            mRtcEngine.InitEventHandler(null);
-            mRtcEngine.LeaveChannel();
-            mRtcEngine.Dispose();
+            if (RtcEngine == null) return;
+            RtcEngine.InitEventHandler(null);
+            RtcEngine.LeaveChannel();
+            RtcEngine.Dispose();
         }
-
-        //void OnApplicationQuit()
-        //{
-        //    Debug.Log("OnApplicationQuit");
-        //    if (mRtcEngine != null)
-        //    {
-        //        mRtcEngine.LeaveChannel();
-        //        mRtcEngine.Dispose();
-        //    }
-        //}
-
 
         internal class UserEventHandler : IRtcEngineEventHandler
         {
@@ -133,31 +131,31 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetEncryption
 
             public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
             {
-                _encryptionSample.logger.UpdateLog(string.Format("sdk version: {0}",
-                    _encryptionSample.mRtcEngine.GetVersion()));
-                _encryptionSample.logger.UpdateLog(string.Format(
+                _encryptionSample.Log.UpdateLog(string.Format("sdk version: {0}",
+                    _encryptionSample.RtcEngine.GetVersion()));
+                _encryptionSample.Log.UpdateLog(string.Format(
                     "onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
                     connection.localUid, elapsed));
             }
 
             public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
             {
-                _encryptionSample.logger.UpdateLog("OnLeaveChannelSuccess");
+                _encryptionSample.Log.UpdateLog("OnLeaveChannelSuccess");
             }
 
             public override void OnWarning(int warn, string msg)
             {
-                _encryptionSample.logger.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
+                _encryptionSample.Log.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
             }
 
             public override void OnError(int error, string msg)
             {
-                _encryptionSample.logger.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
+                _encryptionSample.Log.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
             }
 
             public override void OnConnectionLost(RtcConnection connection)
             {
-                _encryptionSample.logger.UpdateLog(string.Format("OnConnectionLost "));
+                _encryptionSample.Log.UpdateLog(string.Format("OnConnectionLost "));
             }
         }
     }

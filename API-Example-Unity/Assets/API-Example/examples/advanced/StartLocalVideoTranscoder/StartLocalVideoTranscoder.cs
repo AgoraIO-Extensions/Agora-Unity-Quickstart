@@ -1,12 +1,12 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.Serialization;
-using agora.rtc;
-using agora.util;
-using Logger = agora.util.Logger;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using agora.rtc;
+using agora.util;
+using UnityEngine;
+using UnityEngine.Serialization;
+using UnityEngine.UI;
+using Logger = agora.util.Logger;
 
 namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
 {
@@ -16,49 +16,51 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
 
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
-        private AppIdInput appIdInput;
+        private AppIdInput _appIdInput;
 
         [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")]
         [SerializeField]
-        private string appID = "";
+        private string _appID = "";
 
         [FormerlySerializedAs("TOKEN")]
         [SerializeField]
-        private string token = "";
+        private string _token = "";
 
         [FormerlySerializedAs("CHANNEL_NAME")]
         [SerializeField]
-        private string channelName = "";
+        private string _channelName = "";
 
 
-        public Text logText;
-        internal Logger Logger;
-        internal IRtcEngine mRtcEngine = null;
-        internal IMediaPlayer mediaPlayer = null;
-        internal int playerId = 0;
-        public List<uint> remoteUserUids = new List<uint>();
+        public Text LogText;
+        internal Logger Log;
+        internal IRtcEngine RtcEngine = null;
+        internal IMediaPlayer MediaPlayer = null;
+        internal int PlayerId = 0;
+        internal List<uint> RemoteUserUids = new List<uint>();
 
 
-        public Toggle toggleRecord;
-        public Toggle togglePrimartCamera;
-        public Toggle toggleSecondaryCamera;
-        public Toggle togglePng;
-        public Toggle toggleJpg;
-        public Toggle toggleJif;
-        public Toggle toggleRemote;
-        public Toggle toggleScreenShare;
-        public Toggle toggleMediaPlay;
+        public Toggle ToggleRecord;
+        public Toggle TogglePrimartCamera;
+        public Toggle ToggleSecondaryCamera;
+        public Toggle TogglePng;
+        public Toggle ToggleJpg;
+        public Toggle ToggleGif;
+        public Toggle ToggleRemote;
+        public Toggle ToggleScreenShare;
+        public Toggle ToggleMediaPlay;
 
 
         private void Start()
         {
             LoadAssetData();
-            CheckAppId();
-            SetUpUI();
-            InitEngine();
-            //InitMediaPlayer();
-            //JoinChannel();
+            if (CheckAppId())
+            {
+                SetUpUI();
+                InitEngine();
+                //InitMediaPlayer();
+                //JoinChannel();
+            }
         }
 
 
@@ -72,12 +74,12 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
 
         //Show data in AgoraBasicProfile
         [ContextMenu("ShowAgoraBasicProfileData")]
-        public void LoadAssetData()
+        private void LoadAssetData()
         {
-            if (appIdInput == null) return;
-            appID = appIdInput.appID;
-            token = appIdInput.token;
-            channelName = appIdInput.channelName;
+            if (_appIdInput == null) return;
+            _appID = _appIdInput.appID;
+            _token = _appIdInput.token;
+            _channelName = _appIdInput.channelName;
         }
 
 
@@ -95,43 +97,39 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
             btn.onClick.AddListener(OnStopButtonPress);
         }
 
-        private void CheckAppId()
+        private bool CheckAppId()
         {
-            Logger = new Logger(logText);
-            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
+            Log = new Logger(LogText);
+            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
         private void InitEngine()
         {
-            mRtcEngine = RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(appID, 0, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            var ret = mRtcEngine.Initialize(context);
+            var ret = RtcEngine.Initialize(context);
             Debug.Log("Agora: Initialize " + ret);
-            mRtcEngine.InitEventHandler(handler);
-            mRtcEngine.EnableAudio();
-            mRtcEngine.EnableVideo();
-        
-            //var videoCanvas = new VideoCanvas();
-            //videoCanvas.sourceType = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_TRANSCODED;
-            //mRtcEngine.SetupLocalVideo(videoCanvas);
-            mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            mRtcEngine.StartPreview(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_TRANSCODED);
+            RtcEngine.InitEventHandler(handler);
+            RtcEngine.EnableAudio();
+            RtcEngine.EnableVideo();
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.StartPreview(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_TRANSCODED);
             MakeVideoView(0, "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_TRANSCODED);
         }
 
         private void InitMediaPlayer()
         {
-            mediaPlayer = mRtcEngine.GetMediaPlayer();
-            if (mediaPlayer == null)
+            MediaPlayer = RtcEngine.GetMediaPlayer();
+            if (MediaPlayer == null)
             {
                 Debug.Log("GetAgoraRtcMediaPlayer failed!");
             }
 
-            playerId = mediaPlayer.CreateMediaPlayer();
-            Debug.Log("playerId id: " + playerId);
+            PlayerId = MediaPlayer.CreateMediaPlayer();
+            Debug.Log("playerId id: " + PlayerId);
         }
 
         private void JoinChannel()
@@ -140,44 +138,44 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
             options.publishCameraTrack.SetValue(false);
             options.publishSecondaryCameraTrack.SetValue(false);
             options.publishTrancodedVideoTrack.SetValue(true);
-            mRtcEngine.JoinChannel(token, channelName, 0, options);
+            RtcEngine.JoinChannel(_token, _channelName, 0, options);
         }
 
-        LocalTranscoderConfiguration GenerateLocalTranscoderConfiguration()
+        private LocalTranscoderConfiguration GenerateLocalTranscoderConfiguration()
         {
 
             List<TranscodingVideoStream> list = new List<TranscodingVideoStream>();
 
-            if (this.toggleRecord.isOn)
+            if (this.ToggleRecord.isOn)
             {
                 list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.AUDIO_RECORDING_SOURCE, 0, "", 0, 0, 0, 0, 1, 1, false));
             }
 
-            if (this.togglePrimartCamera.isOn)
+            if (this.TogglePrimartCamera.isOn)
             {
-                var videoDeviceManager = mRtcEngine.GetVideoDeviceManager();
+                var videoDeviceManager = RtcEngine.GetVideoDeviceManager();
                 var devices = videoDeviceManager.EnumerateVideoDevices();
 
                 if (devices.Length >= 1)
                 {
-                     var configuration = new CameraCapturerConfiguration()
+                    var configuration = new CameraCapturerConfiguration()
                     {
                         format = new VideoFormat(640, 320, 30),
                         deviceId = devices[0].deviceId
                     };
-                    var nRet= this.mRtcEngine.StartPrimaryCameraCapture(configuration);
-                    this.Logger.UpdateLog("StartPrimaryCameraCapture :" + nRet);
+                    var nRet = this.RtcEngine.StartPrimaryCameraCapture(configuration);
+                    this.Log.UpdateLog("StartPrimaryCameraCapture :" + nRet);
                     list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE, 0, "", 0, 0, 640, 320, 1, 1, false));
                 }
                 else
                 {
-                    this.Logger.UpdateLog("PRIMARY_CAMERA Not Found!");
+                    this.Log.UpdateLog("PRIMARY_CAMERA Not Found!");
                 }
             }
 
-            if (this.toggleSecondaryCamera.isOn)
+            if (this.ToggleSecondaryCamera.isOn)
             {
-                var videoDeviceManager = mRtcEngine.GetVideoDeviceManager();
+                var videoDeviceManager = RtcEngine.GetVideoDeviceManager();
                 var devices = videoDeviceManager.EnumerateVideoDevices();
 
                 if (devices.Length >= 2)
@@ -187,59 +185,75 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
                         format = new VideoFormat(640, 320, 30),
                         deviceId = devices[0].deviceId
                     };
-                    this.mRtcEngine.StartSecondaryCameraCapture(configuration);
+                    this.RtcEngine.StartSecondaryCameraCapture(configuration);
 
                     list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.SECONDARY_CAMERA_SOURCE, 0, "", 0, 0, 360, 240, 1, 1, false));
                 }
                 else
                 {
-                    this.Logger.UpdateLog("SECONDARY_CAMERA Not Found!");
+                    this.Log.UpdateLog("SECONDARY_CAMERA Not Found!");
                 }
             }
 
-            if (this.togglePng.isOn)
+            if (this.TogglePng.isOn)
             {
+#if UNITY_ANDROID && !UNITY_EDITOR
+                // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
+                var filePath = "/assets/img/png.png";
+#else
                 var filePath = Path.Combine(Application.streamingAssetsPath, "img/png.png");
+#endif
                 list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.RTC_IMAGE_PNG_SOURCE, 0, filePath, 0, 0, 640, 360, 1, 1, false));
             }
 
-            if (this.toggleJpg.isOn)
+            if (this.ToggleJpg.isOn)
             {
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+                // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
+                var filePath = "/assets/img/jpg.jpg";
+#else
                 var filePath = Path.Combine(Application.streamingAssetsPath, "img/jpg.jpg");
+#endif
                 list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.RTC_IMAGE_JPEG_SOURCE, 0, filePath, 360, 240, 360, 240, 1, 1, false));
             }
 
 
-            if (this.toggleJif.isOn)
+            if (this.ToggleGif.isOn)
             {
+#if UNITY_ANDROID && !UNITY_EDITOR
+                // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
+                var filePath = "/assets/img/gif.git";
+#else
                 var filePath = Path.Combine(Application.streamingAssetsPath, "img/gif.git");
+#endif
                 list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.RTC_IMAGE_GIF_SOURCE, 0, filePath, 360, 0, 360, 240, 1, 1, false));
             }
 
-            if (this.toggleRemote.isOn)
+            if (this.ToggleRemote.isOn)
             {
-                if (this.remoteUserUids.Count >= 1)
+                if (this.RemoteUserUids.Count >= 1)
                 {
-                    var remoteUserUid = this.remoteUserUids[0];
+                    var remoteUserUid = this.RemoteUserUids[0];
                     list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.REMOTE_VIDEO_SOURCE, remoteUserUid, "", 100, 100, 100, 100, 1, 1, false));
                 }
                 else
                 {
-                    this.Logger.UpdateLog("remote user not found");
+                    this.Log.UpdateLog("remote user not found");
                 }
             }
 
-            if (this.toggleScreenShare.isOn)
+            if (this.ToggleScreenShare.isOn)
             {
                 list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.PRIMARY_SCREEN_SOURCE, 0, "", 0, 0, 640, 320, 1, 1, false));
             }
 
-            if (this.toggleMediaPlay.isOn)
+            if (this.ToggleMediaPlay.isOn)
             {
-                var ret = this.mediaPlayer.Open(this.playerId, "https://big-class-test.oss-cn-hangzhou.aliyuncs.com/61102.1592987815092.mp4", 0);
-                this.Logger.UpdateLog("Media palyer ret:" + ret);
-                var sourceId = this.playerId;
-                this.Logger.UpdateLog("Media palyer ret:" + ret);
+                var ret = this.MediaPlayer.Open(this.PlayerId, "https://big-class-test.oss-cn-hangzhou.aliyuncs.com/61102.1592987815092.mp4", 0);
+                this.Log.UpdateLog("Media palyer ret:" + ret);
+                var sourceId = this.PlayerId;
+                this.Log.UpdateLog("Media palyer ret:" + ret);
                 list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.MEDIA_PLAYER_SOURCE, 0, sourceId.ToString(), 0, 0, 360, 240, 1, 1, false));
             }
 
@@ -256,47 +270,36 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
             return conf;
         }
 
-        void OnStartButtonPress()
+        private void OnStartButtonPress()
         {
             var conf = this.GenerateLocalTranscoderConfiguration();
-            var nRet = mRtcEngine.StartLocalVideoTranscoder(conf);
-            this.Logger.UpdateLog("StartLocalVideoTranscoder:" + nRet);
+            var nRet = RtcEngine.StartLocalVideoTranscoder(conf);
+            this.Log.UpdateLog("StartLocalVideoTranscoder:" + nRet);
         }
 
 
-        void OnUpdateButtonPress()
+        private void OnUpdateButtonPress()
         {
             var conf = this.GenerateLocalTranscoderConfiguration();
-            var nRet = mRtcEngine.UpdateLocalTranscoderConfiguration(conf);
-            this.Logger.UpdateLog("UpdateLocalTranscoderConfiguration:" + nRet);
+            var nRet = RtcEngine.UpdateLocalTranscoderConfiguration(conf);
+            this.Log.UpdateLog("UpdateLocalTranscoderConfiguration:" + nRet);
         }
 
-        void OnStopButtonPress()
+        private void OnStopButtonPress()
         {
-            var nRet = mRtcEngine.StopLocalVideoTranscoder();
-            this.Logger.UpdateLog("StopLocalVideoTranscoder:" + nRet);
+            var nRet = RtcEngine.StopLocalVideoTranscoder();
+            this.Log.UpdateLog("StopLocalVideoTranscoder:" + nRet);
         }
 
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
-            if (mRtcEngine == null) return;
-            mRtcEngine.InitEventHandler(null);
-            mRtcEngine.LeaveChannel();
-            mRtcEngine.Dispose();
+            if (RtcEngine == null) return;
+            RtcEngine.InitEventHandler(null);
+            RtcEngine.LeaveChannel();
+            RtcEngine.Dispose();
         }
 
-        //private void OnApplicationQuit()
-        //{
-        //    Debug.Log("OnApplicationQuit");
-        //    if (mRtcEngine != null)
-        //    {
-        //        mRtcEngine.InitEventHandler(null);
-        //        mRtcEngine.LeaveChannel();
-        //        mRtcEngine.Dispose();
-        //        mRtcEngine = null;
-        //    }
-        //}
 
         internal static VideoSurface MakeVideoView(uint uid, string channelId = "", VIDEO_SOURCE_TYPE source = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA)
         {
@@ -323,7 +326,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
         }
 
         // VIDEO TYPE 1: 3D Object
-        private VideoSurface MakePlaneSurface(string goName)
+        private static VideoSurface MakePlaneSurface(string goName)
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
@@ -398,20 +401,20 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
 
             public override void OnWarning(int warn, string msg)
             {
-                _sample.Logger.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
+                _sample.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
             }
 
             public override void OnError(int err, string msg)
             {
-                _sample.Logger.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+                _sample.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
             }
 
             public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
             {
                 Debug.Log("Agora: OnJoinChannelSuccess ");
-                _sample.Logger.UpdateLog(string.Format("sdk version: ${0}",
-                    _sample.mRtcEngine.GetVersion()));
-                _sample.Logger.UpdateLog(
+                _sample.Log.UpdateLog(string.Format("sdk version: ${0}",
+                    _sample.RtcEngine.GetVersion()));
+                _sample.Log.UpdateLog(
                     string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                     connection.channelId, connection.localUid, elapsed));
 
@@ -420,35 +423,35 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
 
             public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
             {
-                _sample.Logger.UpdateLog("OnRejoinChannelSuccess");
+                _sample.Log.UpdateLog("OnRejoinChannelSuccess");
             }
 
             public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
             {
-                _sample.Logger.UpdateLog("OnLeaveChannel");
+                _sample.Log.UpdateLog("OnLeaveChannel");
                 StartLocalVideoTranscoder.DestroyVideoView(0);
             }
 
             public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
             {
-                _sample.Logger.UpdateLog("OnClientRoleChanged");
+                _sample.Log.UpdateLog("OnClientRoleChanged");
             }
 
             public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
             {
-                _sample.Logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-                StartLocalVideoTranscoder.MakeVideoView(uid, _sample.channelName);
+                _sample.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+                StartLocalVideoTranscoder.MakeVideoView(uid, _sample._channelName);
 
-                if (_sample.remoteUserUids.Contains(uid) == false)
-                    _sample.remoteUserUids.Add(uid);
+                if (_sample.RemoteUserUids.Contains(uid) == false)
+                    _sample.RemoteUserUids.Add(uid);
             }
 
             public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
             {
-                _sample.Logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+                _sample.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                     (int)reason));
                 StartLocalVideoTranscoder.DestroyVideoView(uid);
-                _sample.remoteUserUids.Remove(uid);
+                _sample.RemoteUserUids.Remove(uid);
             }
         }
 

@@ -292,13 +292,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db9ab9f4a16b440d5a282ceeaa0bf19c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  appIdInput: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
-  appID: 
-  token: 
-  channelName: 
-  ENCRYPTION_MODE: 7
-  SECRET: 
-  logText: {fileID: 1806852894}
+  _appIdInput: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
+  _appID: 
+  _token: 
+  _channelName: 
+  EncrytionMode: 7
+  Secret: 
+  LogText: {fileID: 1806852894}
 --- !u!1 &810450341
 GameObject:
   m_ObjectHideFlags: 0

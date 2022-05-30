@@ -487,11 +487,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1657ff169d52b409fbd5d4f29fa97852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  appIdInput: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
-  appID: 
-  token: 
-  channelName: 
-  logText: {fileID: 798621252}
+  _appIdInput: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
+  _appID: 
+  _token: 
+  _channelName: 
+  LogText: {fileID: 798621252}
 --- !u!1 &580846001
 GameObject:
   m_ObjectHideFlags: 0

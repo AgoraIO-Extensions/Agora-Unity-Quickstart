@@ -12,48 +12,50 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
     {
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
-        private AppIdInput appIdInput;
+        private AppIdInput _appIdInput;
 
         [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")]
         [SerializeField]
-        private string appID = "";
+        private string _appID = "";
 
         [FormerlySerializedAs("TOKEN")]
         [SerializeField]
-        private string token = "";
+        private string _token = "";
 
         [FormerlySerializedAs("CHANNEL_NAME")]
         [SerializeField]
-        private string channelName = "";
+        private string _channelName = "";
 
-        public Text logText;
-        internal Logger Logger;
-        internal IRtcEngine mRtcEngine = null;
-        internal IMediaPlayer _mediaPlayer = null;
+        public Text LogText;
+        internal Logger Log;
+        internal IRtcEngine RtcEngine = null;
+        internal IMediaPlayer MediaPlayer = null;
 
-        private const float Offset = 100;
-        public int playerId = 0;
+
+        public int PlayerId = 0;
         private const string MPK_URL =
             "https://agora-adc-artifacts.oss-cn-beijing.aliyuncs.com/video/meta_live_mpk.mov";
 
-        private Button button1;
-        private Button button2;
-        private Button button3;
+        private Button _button1;
+        private Button _button2;
+        private Button _button3;
 
-        public ILocalSpatialAudioEngine _spatialAudioEngine;
+        public ILocalSpatialAudioEngine SpatialAudioEngine;
         public int x = 0;
         // Use this for initialization
         private void Start()
         {
             LoadAssetData();
-            CheckAppId();
-            SetUpUI();
-            InitEngine();
-            InitMediaPlayer();
-            InitSpatialAudioEngine();
-            JoinChannelEx(channelName, 123);
-            JoinChannelEx_MPK(channelName, 67890, playerId);
+            if (CheckAppId())
+            {
+                SetUpUI();
+                InitEngine();
+                InitMediaPlayer();
+                InitSpatialAudioEngine();
+                JoinChannelEx(_channelName, 123);
+                JoinChannelExWithMPK(_channelName, 67890, PlayerId);
+            }
         }
 
         // Update is called once per frame
@@ -65,60 +67,76 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
 
         //Show data in AgoraBasicProfile
         [ContextMenu("ShowAgoraBasicProfileData")]
-        public void LoadAssetData()
+        private void LoadAssetData()
         {
-            if (appIdInput == null) return;
-            appID = appIdInput.appID;
-            token = appIdInput.token;
-            channelName = appIdInput.channelName;
+            if (_appIdInput == null) return;
+            _appID = _appIdInput.appID;
+            _token = _appIdInput.token;
+            _channelName = _appIdInput.channelName;
         }
 
-        private void CheckAppId()
+        private bool CheckAppId()
         {
-            Logger = new Logger(logText);
-            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
+            Log = new Logger(LogText);
+            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
         private void InitEngine()
         {
-            mRtcEngine = RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(appID, 0, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            var ret = mRtcEngine.Initialize(context);
+            var ret = RtcEngine.Initialize(context);
             Debug.Log("Agora: Initialize " + ret);
-            mRtcEngine.InitEventHandler(handler);
-            mRtcEngine.EnableAudio();
-            mRtcEngine.EnableVideo();
-            mRtcEngine.EnableSpatialAudio(true);
-            mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-        }
-
-        private void InitSpatialAudioEngine()
-        {
-            _spatialAudioEngine = mRtcEngine.GetLocalSpatialAudioEngine();
-            var ret = _spatialAudioEngine.Initialize();
-            Debug.Log("_spatialAudioEngine: Initialize " + ret);
-            _spatialAudioEngine.SetAudioRecvRange(30);
+            RtcEngine.InitEventHandler(handler);
+            RtcEngine.EnableAudio();
+            RtcEngine.EnableVideo();
+            RtcEngine.EnableSpatialAudio(true);
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
         }
 
         private void InitMediaPlayer()
         {
-            _mediaPlayer = mRtcEngine.GetMediaPlayer();
-            if (_mediaPlayer == null)
+            MediaPlayer = RtcEngine.GetMediaPlayer();
+            if (MediaPlayer == null)
             {
                 Debug.Log("GetAgoraRtcMediaPlayer failed!");
                 return;
             }
-            playerId = _mediaPlayer.CreateMediaPlayer();
+            PlayerId = MediaPlayer.CreateMediaPlayer();
             MpkEventHandler handler = new MpkEventHandler(this);
-            _mediaPlayer.InitEventHandler(handler);
-            Debug.Log("playerId id: " + playerId);
+            MediaPlayer.InitEventHandler(handler);
+            Debug.Log("playerId id: " + PlayerId);
+        }
+
+        private void InitSpatialAudioEngine()
+        {
+            SpatialAudioEngine = RtcEngine.GetLocalSpatialAudioEngine();
+            var ret = SpatialAudioEngine.Initialize();
+            Debug.Log("_spatialAudioEngine: Initialize " + ret);
+            SpatialAudioEngine.SetAudioRecvRange(30);
+        }
+
+        private void JoinChannelEx(string channelName, uint uid)
+        {
+            RtcConnection connection = new RtcConnection();
+            connection.channelId = channelName;
+            connection.localUid = uid;
+            ChannelMediaOptions options = new ChannelMediaOptions();
+            options.autoSubscribeAudio.SetValue(true);
+            options.autoSubscribeVideo.SetValue(true);
+            options.publishAudioTrack.SetValue(true);
+            options.publishCameraTrack.SetValue(false);
+            options.enableAudioRecordingOrPlayout.SetValue(true);
+            options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            var ret = RtcEngine.JoinChannelEx("", connection, options);
+            Debug.Log("RtcEngineController JoinChannelEx returns: " + ret);
         }
 
 
-        public void JoinChannelEx_MPK(string channelName, uint uid, int playerId)
+        private void JoinChannelExWithMPK(string channelName, uint uid, int playerId)
         {
             RtcConnection connection = new RtcConnection();
             connection.channelId = channelName;
@@ -133,66 +151,51 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
             options.publishMediaPlayerId.SetValue(playerId);
             options.enableAudioRecordingOrPlayout.SetValue(false);
             options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            var ret = mRtcEngine.JoinChannelEx("", connection, options);
-            mRtcEngine.UpdateChannelMediaOptionsEx(options, connection);
+            var ret = RtcEngine.JoinChannelEx("", connection, options);
+            RtcEngine.UpdateChannelMediaOptionsEx(options, connection);
             Debug.Log("RtcEngineController JoinChannelEx_MPK returns: " + ret);
         }
 
-        public void JoinChannelEx(string channelName, uint uid)
-        {
-            RtcConnection connection = new RtcConnection();
-            connection.channelId = channelName;
-            connection.localUid = uid;
-            ChannelMediaOptions options = new ChannelMediaOptions();
-            options.autoSubscribeAudio.SetValue(true);
-            options.autoSubscribeVideo.SetValue(true);
-            options.publishAudioTrack.SetValue(true);
-            options.publishCameraTrack.SetValue(false);
-            options.enableAudioRecordingOrPlayout.SetValue(true);
-            options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            var ret = mRtcEngine.JoinChannelEx("", connection, options);
-            Debug.Log("RtcEngineController JoinChannelEx returns: " + ret);
-        }
 
         private void SetUpUI()
         {
-            button1 = GameObject.Find("Button1").GetComponent<Button>();
-            button1.onClick.AddListener(onLeftLocationPress);
-            button2 = GameObject.Find("Button2").GetComponent<Button>();
-            button2.onClick.AddListener(onRightLocationPress);
-            button3 = GameObject.Find("Button3").GetComponent<Button>();
-            button3.onClick.AddListener(onOpenButtonPress);
+            _button1 = GameObject.Find("Button1").GetComponent<Button>();
+            _button1.onClick.AddListener(onLeftLocationPress);
+            _button2 = GameObject.Find("Button2").GetComponent<Button>();
+            _button2.onClick.AddListener(onRightLocationPress);
+            _button3 = GameObject.Find("Button3").GetComponent<Button>();
+            _button3.onClick.AddListener(onOpenButtonPress);
         }
 
         private void onLeftLocationPress()
         {
             float[] f1 = { 0.0f, 1.0f, 0.0f };
-            var ret = _spatialAudioEngine.UpdateRemotePositionEx(67890, f1, new float[] { 0, 0, 0 }, new RtcConnection(channelName, 123));
+            var ret = SpatialAudioEngine.UpdateRemotePositionEx(67890, f1, new float[] { 0, 0, 0 }, new RtcConnection(_channelName, 123));
             Debug.Log("_spatialAudio.UpdateRemotePosition returns: " + ret);
         }
 
         private void onRightLocationPress()
         {
             float[] f1 = { 0.0f, -1.0f, 0.0f };
-            var ret = _spatialAudioEngine.UpdateRemotePositionEx(67890, f1, new float[] { 0, 0, 0 }, new RtcConnection(channelName, 123));
+            var ret = SpatialAudioEngine.UpdateRemotePositionEx(67890, f1, new float[] { 0, 0, 0 }, new RtcConnection(_channelName, 123));
             Debug.Log("_spatialAudio.UpdateRemotePosition returns: " + ret);
         }
 
         private void onOpenButtonPress()
         {
-            var ret = _mediaPlayer.Open(playerId, MPK_URL, 0);
+            var ret = MediaPlayer.Open(PlayerId, MPK_URL, 0);
             Debug.Log("_mediaPlayer.Open returns: " + ret);
 
-            _mediaPlayer.AdjustPlayoutVolume(playerId, 0);
+            MediaPlayer.AdjustPlayoutVolume(PlayerId, 0);
         }
 
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
-            if (mRtcEngine == null) return;
-            mRtcEngine.InitEventHandler(null);
-            mRtcEngine.LeaveChannel();
-            mRtcEngine.Dispose();
+            if (RtcEngine == null) return;
+            RtcEngine.InitEventHandler(null);
+            RtcEngine.LeaveChannel();
+            RtcEngine.Dispose();
         }
 
         //private void OnApplicationQuit()
@@ -209,7 +212,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
 
         internal string GetChannelName()
         {
-            return channelName;
+            return _channelName;
         }
 
         internal static void MakeVideoView(uint uid, string channelId = "")
@@ -230,7 +233,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
         }
 
         // VIDEO TYPE 1: 3D Object
-        private VideoSurface MakePlaneSurface(string goName)
+        private static VideoSurface MakePlaneSurface(string goName)
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
@@ -307,13 +310,13 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
 
         public override void OnPlayerSourceStateChanged(int playerId, MEDIA_PLAYER_STATE state, MEDIA_PLAYER_ERROR ec)
         {
-            _spatialAudio.Logger.UpdateLog(string.Format(
+            _spatialAudio.Log.UpdateLog(string.Format(
                 "OnPlayerSourceStateChanged state: {0}, ec: {1}, playId: {2}", state, ec, playerId));
             Debug.Log("OnPlayerSourceStateChanged");
             if (state == MEDIA_PLAYER_STATE.PLAYER_STATE_OPEN_COMPLETED)
             {
                 _spatialAudio.x = 1;
-                var ret = _spatialAudio._mediaPlayer.Play(playerId);
+                var ret = _spatialAudio.MediaPlayer.Play(playerId);
                 Debug.Log("Play return" + ret);
                 SpatialAudioWithMediaPlayer.MakeVideoView(67890, _spatialAudio.GetChannelName());
             }
@@ -341,62 +344,62 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
 
         public override void OnWarning(int warn, string msg)
         {
-            _spatialAudio.Logger.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
+            _spatialAudio.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
         }
 
         public override void OnError(int err, string msg)
         {
-            _spatialAudio.Logger.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+            _spatialAudio.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
         }
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
             Debug.Log("Agora: OnJoinChannelSuccess ");
-            _spatialAudio.Logger.UpdateLog(
+            _spatialAudio.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));
             float[] f1 = new float[] { 0.0f, 0.0f, 0.0f };
             float[] f2 = new float[] { 1.0f, 0.0f, 0.0f };
             float[] f3 = new float[] { 0.0f, 1.0f, 0.0f };
             float[] f4 = new float[] { 0.0f, 0.0f, 1.0f };
-            var ret = _spatialAudio._spatialAudioEngine.UpdateSelfPositionEx(f1, f2, f3, f4, connection);
+            var ret = _spatialAudio.SpatialAudioEngine.UpdateSelfPositionEx(f1, f2, f3, f4, connection);
             Debug.Log("UpdateSelfPosition return: " + ret);
         }
 
         public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            _spatialAudio.Logger.UpdateLog("OnRejoinChannelSuccess");
+            _spatialAudio.Log.UpdateLog("OnRejoinChannelSuccess");
         }
 
         public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
         {
-            _spatialAudio.Logger.UpdateLog("OnLeaveChannel");
+            _spatialAudio.Log.UpdateLog("OnLeaveChannel");
             SpatialAudioWithMediaPlayer.DestroyVideoView(0);
         }
 
         public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
         {
-            _spatialAudio.Logger.UpdateLog("OnClientRoleChanged");
+            _spatialAudio.Log.UpdateLog("OnClientRoleChanged");
         }
 
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
-            _spatialAudio.Logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+            _spatialAudio.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
             if (uid == 67890)
             {
-                _spatialAudio.Logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+                _spatialAudio.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
 
             }
             else if (uid == 12345)
             {
-                _spatialAudio.Logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+                _spatialAudio.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
                 SpatialAudioWithMediaPlayer.MakeVideoView(uid, _spatialAudio.GetChannelName());
             }
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
         {
-            _spatialAudio.Logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+            _spatialAudio.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                 (int)reason));
             SpatialAudioWithMediaPlayer.DestroyVideoView(uid);
         }

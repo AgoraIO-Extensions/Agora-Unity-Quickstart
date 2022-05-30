@@ -15,36 +15,38 @@ namespace Agora_Plugin.API_Example.examples.basic.TakeSnapshot
 
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
-        private AppIdInput appIdInput;
+        private AppIdInput _appIdInput;
 
         [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")]
         [SerializeField]
-        private string appID = "";
+        private string _appID = "";
 
         [FormerlySerializedAs("TOKEN")]
         [SerializeField]
-        private string token = "";
+        private string _token = "";
 
         [FormerlySerializedAs("CHANNEL_NAME")]
         [SerializeField]
-        public string channelName = "";
+        public string _channelName = "";
 
-        public Text logText;
-        internal Logger Logger;
-        internal IRtcEngine mRtcEngine = null;
-        private const float Offset = 100;
-        public uint localUid = 0;
+        public Text LogText;
+        internal Logger Log;
+        internal IRtcEngine RtcEngine = null;
+
+        public uint LocalUid = 0;
 
         // Use this for initialization
         private void Start()
         {
             LoadAssetData();
-            CheckAppId();
-            SetupUI();
-            EnableUI(false);
-            InitEngine();
-            JoinChannel();
+            if (CheckAppId())
+            {
+                SetupUI();
+                EnableUI(false);
+                InitEngine();
+                JoinChannel();
+            }
         }
 
         // Update is called once per frame
@@ -54,48 +56,47 @@ namespace Agora_Plugin.API_Example.examples.basic.TakeSnapshot
             PermissionHelper.RequestCameraPermission();
         }
 
-       
+
         //Show data in AgoraBasicProfile
         [ContextMenu("ShowAgoraBasicProfileData")]
         public void LoadAssetData()
         {
-            if (appIdInput == null) return;
-            appID = appIdInput.appID;
-            token = appIdInput.token;
-            channelName = appIdInput.channelName;
+            if (_appIdInput == null) return;
+            _appID = _appIdInput.appID;
+            _token = _appIdInput.token;
+            _channelName = _appIdInput.channelName;
         }
 
-
-        private void CheckAppId()
+        private bool CheckAppId()
         {
-            Logger = new Logger(logText);
-            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
+            Log = new Logger(LogText);
+            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
         private void InitEngine()
         {
-            mRtcEngine = RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(appID, 0, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            mRtcEngine.Initialize(context);
-            mRtcEngine.InitEventHandler(handler);
-            mRtcEngine.EnableAudio();
-            mRtcEngine.EnableVideo();
-            mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.Initialize(context);
+            RtcEngine.InitEventHandler(handler);
+            RtcEngine.EnableAudio();
+            RtcEngine.EnableVideo();
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
         }
 
         private void JoinChannel()
         {
-            mRtcEngine.JoinChannel(token, channelName);
+            RtcEngine.JoinChannel(_token, _channelName);
         }
 
         private void SetupUI()
         {
-            var but =this.transform.Find("TakeSnapshotButton").GetComponent<Button>();
+            var but = this.transform.Find("TakeSnapshotButton").GetComponent<Button>();
             but.onClick.AddListener(OnTakeSnapshotButtonPress);
-               
+
         }
 
         public void EnableUI(bool visible)
@@ -108,35 +109,27 @@ namespace Agora_Plugin.API_Example.examples.basic.TakeSnapshot
         {
             //uid 0 means self. you can get other user uid in OnUserJoined()
             uint uid = 0;
-            string filePath =  Path.Combine(Application.persistentDataPath,"takeSnapshot.jpg");
+            string filePath = Path.Combine(Application.persistentDataPath, "takeSnapshot.jpg");
             var config = new SnapShotConfig()
             {
-                channel = this.channelName,
+                channel = this._channelName,
                 uid = uid,
                 filePath = filePath
             };
-            int nRet = mRtcEngine.TakeSnapshot(config);
-            this.Logger.UpdateLog("TakeSnapshot nRet: " + nRet);
-            this.Logger.UpdateLog("TakeSnapshot in " + filePath);
+            int nRet = RtcEngine.TakeSnapshot(config);
+            this.Log.UpdateLog("TakeSnapshot nRet: " + nRet);
+            this.Log.UpdateLog("TakeSnapshot in " + filePath);
         }
 
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
-            if (mRtcEngine == null) return;
-            mRtcEngine.InitEventHandler(null);
-            mRtcEngine.LeaveChannel();
-            mRtcEngine.Dispose();
+            if (RtcEngine == null) return;
+            RtcEngine.InitEventHandler(null);
+            RtcEngine.LeaveChannel();
+            RtcEngine.Dispose();
         }
 
-        //private void OnApplicationQuit()
-        //{
-        //    Debug.Log("OnApplicationQuit");
-        //    if (mRtcEngine == null) return;
-        //    mRtcEngine.InitEventHandler(null);
-        //    mRtcEngine.LeaveChannel();
-        //    mRtcEngine.Dispose();
-        //}
 
         internal static void MakeVideoView(uint uid, string channelId = "")
         {
@@ -239,59 +232,59 @@ namespace Agora_Plugin.API_Example.examples.basic.TakeSnapshot
 
         public override void OnWarning(int warn, string msg)
         {
-            _takeSnapshot.Logger.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
+            _takeSnapshot.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
         }
 
         public override void OnError(int err, string msg)
         {
-            _takeSnapshot.Logger.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+            _takeSnapshot.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
         }
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
             Debug.Log("Agora: OnJoinChannelSuccess ");
-            _takeSnapshot.Logger.UpdateLog(string.Format("sdk version: ${0}",
-                _takeSnapshot.mRtcEngine.GetVersion()));
-            _takeSnapshot.Logger.UpdateLog(
+            _takeSnapshot.Log.UpdateLog(string.Format("sdk version: ${0}",
+                _takeSnapshot.RtcEngine.GetVersion()));
+            _takeSnapshot.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));
 
-            _takeSnapshot.localUid = connection.localUid;
+            _takeSnapshot.LocalUid = connection.localUid;
             _takeSnapshot.EnableUI(true);
             TakeSnapshot.MakeVideoView(0);
         }
 
         public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            _takeSnapshot.Logger.UpdateLog("OnRejoinChannelSuccess");
+            _takeSnapshot.Log.UpdateLog("OnRejoinChannelSuccess");
         }
 
         public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
         {
-            _takeSnapshot.Logger.UpdateLog("OnLeaveChannel");
+            _takeSnapshot.Log.UpdateLog("OnLeaveChannel");
             TakeSnapshot.DestroyVideoView(0);
         }
 
         public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
         {
-            _takeSnapshot.Logger.UpdateLog("OnClientRoleChanged");
+            _takeSnapshot.Log.UpdateLog("OnClientRoleChanged");
         }
 
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
-            _takeSnapshot.Logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-            TakeSnapshot.MakeVideoView(uid, _takeSnapshot.channelName);
-            _takeSnapshot.EnableUI(true); 
+            _takeSnapshot.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+            TakeSnapshot.MakeVideoView(uid, _takeSnapshot._channelName);
+            _takeSnapshot.EnableUI(true);
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
         {
-            _takeSnapshot.Logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+            _takeSnapshot.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                 (int)reason));
             TakeSnapshot.DestroyVideoView(uid);
         }
 
-       
+
     }
 
 }

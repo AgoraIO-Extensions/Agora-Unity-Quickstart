@@ -420,11 +420,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf1d30aad36c945b7977b2ea5acde4e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  appIdInput: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
-  appID: 
-  token: 
-  channelName: 
-  logText: {fileID: 1669929522}
+  _appIdInput: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
+  _appID: 
+  _token: 
+  _channelName: 
+  LogText: {fileID: 1669929522}
 --- !u!1 &2059654527
 GameObject:
   m_ObjectHideFlags: 0

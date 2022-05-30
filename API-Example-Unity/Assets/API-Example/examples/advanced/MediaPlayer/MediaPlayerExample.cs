@@ -11,51 +11,53 @@ using Random = UnityEngine.Random;
 
 namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
 {
-    public class MediaPlayerTest : MonoBehaviour
+    public class MediaPlayerExample : MonoBehaviour
     {
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
-        private AppIdInput appIdInput;
+        private AppIdInput _appIdInput;
 
         [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")]
         [SerializeField]
-        private string appID = "";
+        private string _appID = "";
 
         [FormerlySerializedAs("TOKEN")]
         [SerializeField]
-        private string token = "";
+        private string _token = "";
 
         [FormerlySerializedAs("CHANNEL_NAME")]
         [SerializeField]
-        private string channelName = "";
+        private string _channelName = "";
 
-        public Text logText;
-        internal Logger Logger;
-        internal IRtcEngine mRtcEngine = null;
-        internal IMediaPlayer _mediaPlayer = null;
-        internal int playerId = 0;
+        public Text LogText;
+        internal Logger Log;
+        internal IRtcEngine RtcEngine = null;
+        internal IMediaPlayer MediaPlayer = null;
+        internal int PlayerId = 0;
 
-        private const float Offset = 100;
+
         private const string MPK_URL =
             "https://agora-adc-artifacts.oss-cn-beijing.aliyuncs.com/video/meta_live_mpk.mov";
 
-        private Button button1;
-        private Button button2;
-        private Button button3;
-        private Button button4;
-        private Button button5;
+        private Button _button1;
+        private Button _button2;
+        private Button _button3;
+        private Button _button4;
+        private Button _button5;
 
         // Use this for initialization
         private void Start()
         {
             LoadAssetData();
-            CheckAppId();
-            SetUpUI();
-            EnableUI(false);
-            InitEngine();
-            InitMediaPlayer();
-            JoinChannel_MPK();
+            if (CheckAppId())
+            {
+                SetUpUI();
+                EnableUI(false);
+                InitEngine();
+                InitMediaPlayer();
+                JoinChannelWithMPK();
+            }
         }
 
         // Update is called once per frame
@@ -67,22 +69,22 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
 
         private void SetUpUI()
         {
-            button1 = GameObject.Find("Button1").GetComponent<Button>();
-            button1.onClick.AddListener(onPlayButtonPress);
-            button2 = GameObject.Find("Button2").GetComponent<Button>();
-            button2.onClick.AddListener(onStopButtonPress);
-            button3 = GameObject.Find("Button3").GetComponent<Button>();
-            button3.onClick.AddListener(onPauseButtonPress);
-            button4 = GameObject.Find("Button4").GetComponent<Button>();
-            button4.onClick.AddListener(onResumeButtonPress);
-            button5 = GameObject.Find("Button5").GetComponent<Button>();
-            button5.onClick.AddListener(onOpenButtonPress);
+            _button1 = GameObject.Find("Button1").GetComponent<Button>();
+            _button1.onClick.AddListener(onPlayButtonPress);
+            _button2 = GameObject.Find("Button2").GetComponent<Button>();
+            _button2.onClick.AddListener(onStopButtonPress);
+            _button3 = GameObject.Find("Button3").GetComponent<Button>();
+            _button3.onClick.AddListener(onPauseButtonPress);
+            _button4 = GameObject.Find("Button4").GetComponent<Button>();
+            _button4.onClick.AddListener(onResumeButtonPress);
+            _button5 = GameObject.Find("Button5").GetComponent<Button>();
+            _button5.onClick.AddListener(onOpenButtonPress);
         }
 
         public void EnableUI(bool val)
         {
-            var obj= this.transform.Find("Button1").gameObject;
-            obj.SetActive ( val);
+            var obj = this.transform.Find("Button1").gameObject;
+            obj.SetActive(val);
 
             obj = this.transform.Find("Button2").gameObject;
             obj.SetActive(val);
@@ -94,37 +96,37 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
             obj.SetActive(val);
         }
 
-        private void CheckAppId()
+        private bool CheckAppId()
         {
-            Logger = new Logger(logText);
-            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
+            Log = new Logger(LogText);
+            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
         //Show data in AgoraBasicProfile
         [ContextMenu("ShowAgoraBasicProfileData")]
-        public void LoadAssetData()
+        private void LoadAssetData()
         {
-            if (appIdInput == null) return;
-            appID = appIdInput.appID;
-            token = appIdInput.token;
-            channelName = appIdInput.channelName;
+            if (_appIdInput == null) return;
+            _appID = _appIdInput.appID;
+            _token = _appIdInput.token;
+            _channelName = _appIdInput.channelName;
         }
 
         private void InitEngine()
         {
-            mRtcEngine = RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(appID, 0, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
-            mRtcEngine.Initialize(context);
-            mRtcEngine.InitEventHandler(handler);
-            mRtcEngine.EnableAudio();
-            mRtcEngine.EnableVideo();
-            mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.Initialize(context);
+            RtcEngine.InitEventHandler(handler);
+            RtcEngine.EnableAudio();
+            RtcEngine.EnableVideo();
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
         }
 
-        private void JoinChannel_MPK()
+        private void JoinChannelWithMPK()
         {
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.autoSubscribeAudio.SetValue(true);
@@ -133,91 +135,91 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
             options.publishCameraTrack.SetValue(false);
             options.publishMediaPlayerAudioTrack.SetValue(true);
             options.publishMediaPlayerVideoTrack.SetValue(true);
-            options.publishMediaPlayerId.SetValue(playerId);
+            options.publishMediaPlayerId.SetValue(PlayerId);
             options.enableAudioRecordingOrPlayout.SetValue(true);
             options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            var ret = mRtcEngine.JoinChannel(token, channelName, 0, options);
-            this.Logger.UpdateLog("RtcEngineController JoinChannel_MPK returns: " + ret);
+            var ret = RtcEngine.JoinChannel(_token, _channelName, 0, options);
+            this.Log.UpdateLog("RtcEngineController JoinChannel_MPK returns: " + ret);
         }
 
         private void onPlayButtonPress()
         {
-            var ret = _mediaPlayer.Play(playerId);
-            this.Logger.UpdateLog("Play return" + ret);
+            var ret = MediaPlayer.Play(PlayerId);
+            this.Log.UpdateLog("Play return" + ret);
             this.TestMediaPlayer();
         }
 
         private void onStopButtonPress()
         {
-            var ret = _mediaPlayer.Stop(playerId);
-            this.Logger.UpdateLog("Stop return" + ret);
+            var ret = MediaPlayer.Stop(PlayerId);
+            this.Log.UpdateLog("Stop return" + ret);
         }
 
         private void onPauseButtonPress()
         {
-            var ret = _mediaPlayer.Pause(playerId);
-            this.Logger.UpdateLog("Pause return" + ret);
+            var ret = MediaPlayer.Pause(PlayerId);
+            this.Log.UpdateLog("Pause return" + ret);
         }
 
         private void onResumeButtonPress()
         {
-            var ret = _mediaPlayer.Resume(playerId);
+            var ret = MediaPlayer.Resume(PlayerId);
 
-            this.Logger.UpdateLog("Resume returns: " + ret);
+            this.Log.UpdateLog("Resume returns: " + ret);
         }
 
         private void onOpenButtonPress()
         {
-            var ret = _mediaPlayer.Open(playerId, MPK_URL, 0);
-            this.Logger.UpdateLog("Open returns: " + ret);
+            var ret = MediaPlayer.Open(PlayerId, MPK_URL, 0);
+            this.Log.UpdateLog("Open returns: " + ret);
         }
 
         private void InitMediaPlayer()
         {
-            _mediaPlayer = mRtcEngine.GetMediaPlayer();
-            if (_mediaPlayer == null)
+            MediaPlayer = RtcEngine.GetMediaPlayer();
+            if (MediaPlayer == null)
             {
-                this.Logger.UpdateLog("GetAgoraRtcMediaPlayer failed!");
+                this.Log.UpdateLog("GetAgoraRtcMediaPlayer failed!");
                 return;
             }
-            playerId = _mediaPlayer.CreateMediaPlayer();
+            PlayerId = MediaPlayer.CreateMediaPlayer();
 
             MpkEventHandler handler = new MpkEventHandler(this);
-            _mediaPlayer.InitEventHandler(handler);
-            this.Logger.UpdateLog("playerId id: " + playerId);
+            MediaPlayer.InitEventHandler(handler);
+            this.Log.UpdateLog("playerId id: " + PlayerId);
         }
 
-        public void TestMediaPlayer()
+        private void TestMediaPlayer()
         {
             long duration = 0;
-            var ret = _mediaPlayer.GetDuration(playerId, ref duration);
+            var ret = MediaPlayer.GetDuration(PlayerId, ref duration);
             Debug.Log("_mediaPlayer.GetDuration returns: " + ret + "duration: " + duration);
 
             long pos = 0;
-            ret = _mediaPlayer.GetPlayPosition(playerId, ref pos);
+            ret = MediaPlayer.GetPlayPosition(PlayerId, ref pos);
             Debug.Log("_mediaPlayer.GetPlayPosition returns: " + ret + "position: " + pos);
 
-            Debug.Log("_mediaPlayer.GetState:" + _mediaPlayer.GetState(playerId));
+            Debug.Log("_mediaPlayer.GetState:" + MediaPlayer.GetState(PlayerId));
 
             bool mute = true;
-            ret = _mediaPlayer.GetMute(playerId, ref mute);
+            ret = MediaPlayer.GetMute(PlayerId, ref mute);
             Debug.Log("_mediaPlayer.GetMute returns: " + ret + "mute: " + mute);
 
             int volume = 0;
-            ret = _mediaPlayer.GetPlayoutVolume(playerId, ref volume);
+            ret = MediaPlayer.GetPlayoutVolume(PlayerId, ref volume);
             Debug.Log("_mediaPlayer.GetPlayoutVolume returns: " + ret + "volume: " + volume);
 
-            Debug.Log("SDK Version:" + _mediaPlayer.GetPlayerSdkVersion(playerId));
-            Debug.Log("GetPlaySrc:" + _mediaPlayer.GetPlaySrc(playerId));
+            Debug.Log("SDK Version:" + MediaPlayer.GetPlayerSdkVersion(PlayerId));
+            Debug.Log("GetPlaySrc:" + MediaPlayer.GetPlaySrc(PlayerId));
         }
 
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
-            _mediaPlayer.DestroyMediaPlayer(playerId);
-            if (mRtcEngine == null) return;
-            mRtcEngine.InitEventHandler(null);
-            mRtcEngine.LeaveChannel();
+            MediaPlayer.DestroyMediaPlayer(PlayerId);
+            if (RtcEngine == null) return;
+            RtcEngine.InitEventHandler(null);
+            RtcEngine.LeaveChannel();
         }
 
         //private void OnApplicationQuit()
@@ -233,7 +235,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
 
         internal string GetChannelName()
         {
-            return channelName;
+            return _channelName;
         }
 
         internal static void MakeVideoView(uint uid, string channelId = "", VIDEO_SOURCE_TYPE videoSourceType = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA)
@@ -322,103 +324,103 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
 
     internal class MpkEventHandler : IMediaPlayerSourceObserver
     {
-        private readonly MediaPlayerTest _mediaPlayerTest;
+        private readonly MediaPlayerExample _sample;
 
-        internal MpkEventHandler(MediaPlayerTest videoSample)
+        internal MpkEventHandler(MediaPlayerExample sample)
         {
-            _mediaPlayerTest = videoSample;
+            _sample = sample;
         }
 
         public override void OnPlayerSourceStateChanged(int playerId, MEDIA_PLAYER_STATE state, MEDIA_PLAYER_ERROR ec)
         {
-            _mediaPlayerTest.Logger.UpdateLog(string.Format(
+            _sample.Log.UpdateLog(string.Format(
                 "OnPlayerSourceStateChanged state: {0}, ec: {1}, playId: {2}", state, ec, playerId));
             Debug.Log("OnPlayerSourceStateChanged");
             if (state == MEDIA_PLAYER_STATE.PLAYER_STATE_OPEN_COMPLETED)
             {
-                MediaPlayerTest.MakeVideoView((uint)_mediaPlayerTest.playerId, "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_MEDIA_PLAYER);
-                _mediaPlayerTest.EnableUI(true);
-                _mediaPlayerTest.Logger.UpdateLog("Open Complete. Click start to play media");
+                MediaPlayerExample.MakeVideoView((uint)_sample.PlayerId, "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_MEDIA_PLAYER);
+                _sample.EnableUI(true);
+                _sample.Log.UpdateLog("Open Complete. Click start to play media");
             }
             else if (state == MEDIA_PLAYER_STATE.PLAYER_STATE_STOPPED)
             {
-                MediaPlayerTest.DestroyVideoView((uint)_mediaPlayerTest.playerId);
-                _mediaPlayerTest.EnableUI(false);
+                MediaPlayerExample.DestroyVideoView((uint)_sample.PlayerId);
+                _sample.EnableUI(false);
             }
         }
 
         public override void OnPlayerEvent(int playerId, MEDIA_PLAYER_EVENT @event, Int64 elapsedTime, string message)
         {
-            _mediaPlayerTest.Logger.UpdateLog(string.Format("OnPlayerEvent state: {0}", @event));
+            _sample.Log.UpdateLog(string.Format("OnPlayerEvent state: {0}", @event));
         }
     }
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
-        private readonly MediaPlayerTest _mediaPlayerTest;
+        private readonly MediaPlayerExample _sample;
 
-        internal UserEventHandler(MediaPlayerTest videoSample)
+        internal UserEventHandler(MediaPlayerExample sample)
         {
-            _mediaPlayerTest = videoSample;
+            _sample = sample;
         }
 
         public override void OnWarning(int warn, string msg)
         {
-            _mediaPlayerTest.Logger.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
+            _sample.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
         }
 
         public override void OnError(int err, string msg)
         {
-            _mediaPlayerTest.Logger.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+            _sample.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
         }
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            _mediaPlayerTest.Logger.UpdateLog(string.Format("sdk version: ${0}",
-                _mediaPlayerTest.mRtcEngine.GetVersion()));
-            _mediaPlayerTest.Logger.UpdateLog(
+            _sample.Log.UpdateLog(string.Format("sdk version: ${0}",
+                _sample.RtcEngine.GetVersion()));
+            _sample.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                     connection.channelId, connection.localUid, elapsed));
         }
 
         public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            _mediaPlayerTest.Logger.UpdateLog("OnRejoinChannelSuccess");
+            _sample.Log.UpdateLog("OnRejoinChannelSuccess");
         }
 
         public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
         {
-            _mediaPlayerTest.Logger.UpdateLog("OnLeaveChannel");
-            MediaPlayerTest.DestroyVideoView(0);
+            _sample.Log.UpdateLog("OnLeaveChannel");
+            MediaPlayerExample.DestroyVideoView(0);
         }
 
         public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole,
             CLIENT_ROLE_TYPE newRole)
         {
-            _mediaPlayerTest.Logger.UpdateLog("OnClientRoleChanged");
+            _sample.Log.UpdateLog("OnClientRoleChanged");
         }
 
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
             if (uid == 67890)
             {
-                _mediaPlayerTest.mRtcEngine.EnableSpatialAudio(true);
-                _mediaPlayerTest.Logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+                _sample.RtcEngine.EnableSpatialAudio(true);
+                _sample.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
                 //MediaPlayerTest.MakeVideoView(uid, "asdf");
             }
             else if (uid == 12345)
             {
                 //_mediaPlayerTest.x = 1;
-                _mediaPlayerTest.Logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-                MediaPlayerTest.MakeVideoView(uid, "asdf");
+                _sample.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+                MediaPlayerExample.MakeVideoView(uid, "asdf");
             }
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
         {
-            _mediaPlayerTest.Logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+            _sample.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                 (int)reason));
-            MediaPlayerTest.DestroyVideoView(uid);
+            MediaPlayerExample.DestroyVideoView(uid);
         }
     }
 }
