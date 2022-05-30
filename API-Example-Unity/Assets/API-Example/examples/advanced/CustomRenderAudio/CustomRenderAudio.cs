@@ -157,6 +157,7 @@ namespace CustomRenderAudio
             AudioFrame audioFrame = new AudioFrame(type, samples, BYTES_PER_SAMPLE.TWO_BYTES_PER_SAMPLE, channels, samplesPerSec, buffer, 0, avsync_type);
             IntPtr audioFrameBuffer = Marshal.AllocHGlobal(samples * bytesPerSample * channels);
             audioFrame.buffer = (UInt64)audioFrameBuffer;
+            audioFrame.bufferPtr = audioFrameBuffer;
             while (_pullAudioFrameThreadSignal)
             {
                 var toc = new TimeSpan(DateTime.Now.Ticks);
@@ -169,7 +170,6 @@ namespace CustomRenderAudio
 
                     if (ret == 0)
                     {
-
                         Marshal.Copy((IntPtr)audioFrame.buffer, audioFrame.RawBuffer, 0, audioFrame.RawBuffer.Length);
                         var floatArray = ConvertByteToFloat16(audioFrame.RawBuffer);
                         lock (_audioBuffer)
