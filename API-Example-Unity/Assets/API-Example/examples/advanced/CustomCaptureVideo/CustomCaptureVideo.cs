@@ -46,7 +46,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
         private byte[] _shareData;
 
 
-
         // Use this for initialization
         private void Start()
         {

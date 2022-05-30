@@ -28,6 +28,7 @@ public class CommandBuild : MonoBehaviour
             "Assets/API-Example/examples/advanced/JoinChannelVideoToken/JoinChannelVideoTokenScene.unity",
             "Assets/API-Example/examples/advanced/JoinChannelWithUserAccount/JoinChannelWithUserAccountScene.unity",
             "Assets/API-Example/examples/advanced/MediaPlayer/MediaPlayerScene.unity",
+            "Assets/API-Example/examples/advanced/Metadata/MetadataScene.unity",
             "Assets/API-Example/examples/advanced/ProcessRawData/ProcessRawDataScene.unity",
             "Assets/API-Example/examples/advanced/PushEncodedVideoImage/PushEncodedVideoImageScene.unity",
             "Assets/API-Example/examples/advanced/RtmpStreaming/RtmpStreamingScene.unity",

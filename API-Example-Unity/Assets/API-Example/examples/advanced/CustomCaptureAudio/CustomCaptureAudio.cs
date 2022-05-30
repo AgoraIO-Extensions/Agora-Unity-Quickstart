@@ -133,6 +133,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
             RtcEngine.InitEventHandler(null);
             RtcEngine.LeaveChannel();
             RtcEngine.Dispose();
+            _pushAudioFrameThreadSignal = false;
         }
 
         private void PushAudioFrameThread()

@@ -104,7 +104,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: New Text
+  m_Text: uid
 --- !u!222 &222307922825966058
 CanvasRenderer:
   m_ObjectHideFlags: 1
