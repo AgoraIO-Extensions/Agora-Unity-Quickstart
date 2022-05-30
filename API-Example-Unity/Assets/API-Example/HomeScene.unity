@@ -364,12 +364,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7b548af9d337405f889b92c979c9e36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  appIdInupt: {fileID: 958552242}
-  channelInput: {fileID: 1085297498}
-  tokenInput: {fileID: 444718502}
-  appInputConfig: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
-  casePanel: {fileID: 1036881438794844, guid: 2496050ad79454c69b7285bad8bdc7d5, type: 2}
-  caseScoller: {fileID: 1783804913}
+  AppIdInupt: {fileID: 958552242}
+  ChannelInput: {fileID: 1085297498}
+  TokenInput: {fileID: 444718502}
+  AppInputConfig: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
+  CasePanel: {fileID: 1036881438794844, guid: 2496050ad79454c69b7285bad8bdc7d5, type: 2}
+  CaseScrollerView: {fileID: 1783804913}
 --- !u!1 &237592858
 GameObject:
   m_ObjectHideFlags: 0
@@ -1403,7 +1403,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2042549588}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.99999994
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

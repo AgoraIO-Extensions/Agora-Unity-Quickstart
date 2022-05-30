@@ -11,23 +11,24 @@ using Logger = agora.util.Logger;
 
 public class Home : MonoBehaviour
 {
-    public InputField appIdInupt;
-    public InputField channelInput;
-    public InputField tokenInput;
+    public InputField AppIdInupt;
+    public InputField ChannelInput;
+    public InputField TokenInput;
 
 
-    public AppIdInput appInputConfig;
-    public GameObject casePanel;
-    public GameObject caseScoller;
-    private string PlaySceneName = "";
+    public AppIdInput AppInputConfig;
+    public GameObject CasePanel;
+    public GameObject CaseScrollerView;
+
+    private string _playSceneName = "";
 
 
-    private string[] baseSceneNameList = {
+    private string[] _baseSceneNameList = {
         "BasicAudioCallScene",
         "BasicVideoCallScene"
     };
 
-    private string[] advancedNameList = {
+    private string[] _advancedNameList = {
         "AudioMixingScene",
         "ChannelMediaRelayScene",
         "CustomCaptureAudioScene",
@@ -64,32 +65,32 @@ public class Home : MonoBehaviour
         GameObject content = GameObject.Find("Content");
         var contentRectTrans = content.GetComponent<RectTransform>();
 
-        for (int i = 0; i < baseSceneNameList.Length; i++)
+        for (int i = 0; i < _baseSceneNameList.Length; i++)
         {
-            var go = Instantiate(casePanel, content.transform);
+            var go = Instantiate(CasePanel, content.transform);
             var name = go.transform.Find("Text").gameObject.GetComponent<Text>();
-            name.text = baseSceneNameList[i];
+            name.text = _baseSceneNameList[i];
             var button = go.transform.Find("Button").gameObject.GetComponent<Button>();
             button.onClick.AddListener(OnJoinSceneClicked);
             button.onClick.AddListener(SetScolllerActive);
         }
 
-        for (int i = 0; i < advancedNameList.Length; i++)
+        for (int i = 0; i < _advancedNameList.Length; i++)
         {
-            var go = Instantiate(casePanel, content.transform);
+            var go = Instantiate(CasePanel, content.transform);
             var name = go.transform.Find("Text").gameObject.GetComponent<Text>();
-            name.text = advancedNameList[i];
+            name.text = _advancedNameList[i];
             var button = go.transform.Find("Button").gameObject.GetComponent<Button>();
             button.onClick.AddListener(OnJoinSceneClicked);
             button.onClick.AddListener(SetScolllerActive);
         }
 
 
-        if (this.appInputConfig)
+        if (this.AppInputConfig)
         {
-            this.appIdInupt.text = this.appInputConfig.appID;
-            this.channelInput.text = this.appInputConfig.channelName;
-            this.tokenInput.text = this.appInputConfig.token;
+            this.AppIdInupt.text = this.AppInputConfig.appID;
+            this.ChannelInput.text = this.AppInputConfig.channelName;
+            this.TokenInput.text = this.AppInputConfig.token;
         }
 
     }
@@ -109,43 +110,38 @@ public class Home : MonoBehaviour
     private void OnApplicationQuit()
     {
         Debug.Log("OnApplicationQuit");
-        //IRtcEngine mRtcEngine = RtcEngine.Get();
-        //if (mRtcEngine != null)
-        //{
-        //    mRtcEngine.Dispose(true);
-        //}
     }
 
     public void OnLeaveButtonClicked()
     {
         StartCoroutine(UnloadSceneAsync());
-        caseScoller.SetActive(true);
+        CaseScrollerView.SetActive(true);
     }
 
     public IEnumerator UnloadSceneAsync()
     {
-        if (this.PlaySceneName != "")
+        if (this._playSceneName != "")
         {
-            AsyncOperation async = SceneManager.UnloadSceneAsync(PlaySceneName);
+            AsyncOperation async = SceneManager.UnloadSceneAsync(_playSceneName);
             yield return async;
         }
     }
 
     public void OnJoinSceneClicked()
     {
-        this.appInputConfig.appID = this.appIdInupt.text;
-        this.appInputConfig.channelName = this.channelInput.text;
-        this.appInputConfig.token = this.tokenInput.text;
+        this.AppInputConfig.appID = this.AppIdInupt.text;
+        this.AppInputConfig.channelName = this.ChannelInput.text;
+        this.AppInputConfig.token = this.TokenInput.text;
 
         var button = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
         var sceneName = button.transform.parent.Find("Text").gameObject.GetComponent<Text>().text;
 
         SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
-        this.PlaySceneName = sceneName;
+        this._playSceneName = sceneName;
     }
 
     public void SetScolllerActive()
     {
-        caseScoller.SetActive(false);
+        CaseScrollerView.SetActive(false);
     }
 }
