@@ -110,8 +110,8 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRhythmPlayer
         {
 #if UNITY_ANDROID && !UNITY_EDITOR
             // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
-            string sound1 = "/assets/audio/ding.mp3"
-            string sound2 = "/assets/audio/dang.mp3"
+            string sound1 = "/assets/audio/ding.mp3";
+            string sound2 = "/assets/audio/dang.mp3";
 #else
             string sound1 = Path.Combine(Application.streamingAssetsPath, "audio/ding.mp3");
             string sound2 = Path.Combine(Application.streamingAssetsPath, "audio/dang.mp3");
