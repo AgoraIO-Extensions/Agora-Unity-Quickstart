@@ -86,12 +86,12 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
                 _texture.Apply();
 
 #if UNITY_2018_1_OR_NEWER
-                NativeArray<byte> nativeByteArray = mTexture.GetRawTextureData<byte>();
-                if (shareData?.Length != nativeByteArray.Length)
+                NativeArray<byte> nativeByteArray = _texture.GetRawTextureData<byte>();
+                if (_shareData?.Length != nativeByteArray.Length)
                 {
-                    shareData = new byte[nativeByteArray.Length];
+                    _shareData = new byte[nativeByteArray.Length];
                 }
-                nativeByteArray.CopyTo(shareData);
+                nativeByteArray.CopyTo(_shareData);
 #else
                 _shareData = _texture.GetRawTextureData();
 #endif
