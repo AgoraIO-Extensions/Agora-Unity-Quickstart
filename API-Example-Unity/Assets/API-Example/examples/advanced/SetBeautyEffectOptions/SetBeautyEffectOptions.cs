@@ -89,15 +89,16 @@ namespace Agora_Plugin.API_Example.examples.basic.SetBeautyEffectOptions
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
+        }
+
+        private void JoinChannel()
+        {
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
             var nRet = RtcEngine.EnableExtension("agora", "beauty", true, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
             this.Log.UpdateLog("EnableExtension:" + nRet);
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-        }
-
-        private void JoinChannel()
-        {
+            
             RtcEngine.JoinChannel(_token, _channelName);
         }
 

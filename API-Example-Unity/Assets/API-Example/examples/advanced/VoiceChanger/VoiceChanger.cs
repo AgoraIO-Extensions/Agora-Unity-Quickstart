@@ -68,12 +68,12 @@ namespace Agora_Plugin.API_Example.examples.advanced.VoiceChanger
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
-            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            RtcEngine.EnableAudio();
         }
 
         private void JoinChannel()
         {
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.EnableAudio();
             RtcEngine.JoinChannel(_token, _channelName, "");
         }
 

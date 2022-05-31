@@ -121,13 +121,14 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
-            RtcEngine.EnableAudio();
-            RtcEngine.EnableVideo();
-            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
         }
 
         private void JoinChannelWithMPK()
         {
+            RtcEngine.EnableAudio();
+            RtcEngine.EnableVideo();
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.autoSubscribeAudio.SetValue(true);
             options.autoSubscribeVideo.SetValue(true);
@@ -222,16 +223,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
             RtcEngine.LeaveChannel();
         }
 
-        //private void OnApplicationQuit()
-        //{
-        //    Debug.Log("OnApplicationQuit");
-        //    _mediaPlayer.DestroyMediaPlayer(playerId);
-
-        //    if (mRtcEngine == null) return;
-        //    mRtcEngine.InitEventHandler(null);
-        //    mRtcEngine.LeaveChannel();
-        //    mRtcEngine.Dispose(true);
-        //}
 
         internal string GetChannelName()
         {

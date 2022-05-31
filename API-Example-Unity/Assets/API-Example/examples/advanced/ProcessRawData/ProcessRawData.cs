@@ -76,13 +76,13 @@ namespace Agora_Plugin.API_Example.examples.advanced.ProcessRawData
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
             RtcEngine.RegisterVideoFrameObserver(new VideoFrameObserver(this), OBSERVER_MODE.RAW_DATA);
-            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            RtcEngine.EnableAudio();
-            RtcEngine.EnableVideo();
         }
 
         void JoinChannel()
         {
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.EnableAudio();
+            RtcEngine.EnableVideo();
             RtcEngine.JoinChannel(_token, _channelName, "");
         }
 
@@ -97,20 +97,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.ProcessRawData
                 RtcEngine.Dispose();
             }
         }
-
-        //void OnApplicationQuit()
-        //{
-        //	Debug.Log("OnApplicationQuit1");
-        //	if (mRtcEngine != null)
-        //	{
-        //		mRtcEngine.UnRegisterVideoFrameObserver();
-        //		mRtcEngine.InitEventHandler(null);
-        //          mRtcEngine.LeaveChannel();
-        //		mRtcEngine.Dispose();
-        //	}
-
-        //	Debug.Log("OnApplicationQuit2");
-        //}
 
         internal class UserEventHandler : IRtcEngineEventHandler
         {

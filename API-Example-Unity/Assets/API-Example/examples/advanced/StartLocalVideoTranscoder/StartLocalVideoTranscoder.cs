@@ -113,11 +113,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
             var ret = RtcEngine.Initialize(context);
             Debug.Log("Agora: Initialize " + ret);
             RtcEngine.InitEventHandler(handler);
-            RtcEngine.EnableAudio();
-            RtcEngine.EnableVideo();
-            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            RtcEngine.StartPreview(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_TRANSCODED);
-            MakeVideoView(0, "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_TRANSCODED);
         }
 
         private void InitMediaPlayer()
@@ -134,6 +129,12 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
 
         private void JoinChannel()
         {
+            RtcEngine.EnableAudio();
+            RtcEngine.EnableVideo();
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.StartPreview(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_TRANSCODED);
+            MakeVideoView(0, "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_TRANSCODED);
+            
             var options = new ChannelMediaOptions();
             options.publishCameraTrack.SetValue(false);
             options.publishSecondaryCameraTrack.SetValue(false);

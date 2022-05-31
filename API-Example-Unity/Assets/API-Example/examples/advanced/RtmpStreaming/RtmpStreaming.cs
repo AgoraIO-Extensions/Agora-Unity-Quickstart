@@ -81,17 +81,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.RtmpStreaming
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(new UserEventHandler(this));
-            RtcEngine.SetLogFile("./log.txt");
-
-            RtcEngine.SetChannelProfile(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING);
-            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            RtcEngine.SetVideoEncoderConfiguration(new VideoEncoderConfiguration
-            {
-                dimensions = new VideoDimensions { width = 720, height = 640 },
-                frameRate = 24
-            });
-            RtcEngine.EnableAudio();
-            RtcEngine.EnableVideo();
         }
 
         private void StartTranscoding(bool ifRemoteUser = false)
@@ -158,6 +147,16 @@ namespace Agora_Plugin.API_Example.examples.advanced.RtmpStreaming
 
         private void JoinChannel()
         {
+            RtcEngine.SetChannelProfile(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING);
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.SetVideoEncoderConfiguration(new VideoEncoderConfiguration
+            {
+                dimensions = new VideoDimensions { width = 720, height = 640 },
+                frameRate = 24
+            });
+            RtcEngine.EnableAudio();
+            RtcEngine.EnableVideo();
+            
             RtcEngine.JoinChannel(_token, _channelName, "");
         }
 

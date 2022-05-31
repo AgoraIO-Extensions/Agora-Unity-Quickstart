@@ -92,11 +92,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(new UserEventHandler(this));
-            RtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY,
-                AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            RtcEngine.EnableAudio();
-            var nRet = RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            this.Log.UpdateLog("SetClientRole nRet:" + nRet);
         }
 
         private void SetExternalAudioSource()
@@ -118,6 +113,10 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
 
         private void JoinChannel()
         {
+            RtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY,
+                AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
+            RtcEngine.EnableAudio();
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             RtcEngine.JoinChannel(_token, _channelName, "");
         }
 

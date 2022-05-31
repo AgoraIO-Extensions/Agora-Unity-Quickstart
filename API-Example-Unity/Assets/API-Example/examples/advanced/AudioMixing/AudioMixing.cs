@@ -76,9 +76,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
             RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            var ret = RtcEngine.Initialize(context);
+            RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
-            RtcEngine.EnableAudio();
         }
 
         private void SetupUI()
@@ -109,6 +108,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
 
         private void JoinChannel()
         {
+            RtcEngine.EnableAudio();
             var options = new ChannelMediaOptions();
             options.publishCustomAudioTrack.SetValue(true);
             RtcEngine.JoinChannel(_token, _channelName,0, options);
@@ -232,8 +232,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            // _audioSample.Logger.UpdateLog(string.Format("sdk version: ${0}",
-            //     _audioSample.AgoraRtcEngine.GetVersion()));
+            _audioMixing.Log.UpdateLog(string.Format("sdk version: ${0}",
+                _audioMixing.RtcEngine.GetVersion()));
             _audioMixing.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                     connection.channelId, connection.localUid, elapsed));

@@ -80,15 +80,15 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
-            RtcEngine.SetLogFile("./log.txt");
-            RtcEngine.StartPreview();
-            RtcEngine.EnableAudio();
-            RtcEngine.EnableVideo();
-            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
         }
 
         private void MainCameraJoinChannel()
         {
+            RtcEngine.StartPreview();
+            RtcEngine.EnableAudio();
+            RtcEngine.EnableVideo();
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            
             var ret = RtcEngine.StartPrimaryCameraCapture(_config1);
             Log.UpdateLog(
                 string.Format("StartPrimaryCameraCapture returns: {0}", ret));

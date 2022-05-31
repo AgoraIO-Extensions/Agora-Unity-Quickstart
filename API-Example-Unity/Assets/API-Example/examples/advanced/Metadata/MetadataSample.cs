@@ -71,9 +71,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.MetadataSample
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
-            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            RtcEngine.EnableAudio();
-            RtcEngine.EnableVideo();
 
             UserMetadataObserver metadataObserver = new UserMetadataObserver(this);
             RtcEngine.SetMaxMetadataSize((int)MAX_METADATA_SIZE_TYPE.DEFAULT_METADATA_SIZE_IN_BYTE);
@@ -90,6 +87,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.MetadataSample
 
         private void JoinChannel()
         {
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.EnableAudio();
+            RtcEngine.EnableVideo();
             RtcEngine.JoinChannel(_token, _channelName, "");
         }
 

@@ -93,13 +93,13 @@ namespace CustomRenderAudio
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             var ret = RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
-            RtcEngine.EnableAudio();
-            var nRet = RtcEngine.SetExternalAudioSink(SAMPLE_RATE, CHANNEL);
-            this.Log.UpdateLog("SetExternalAudioSink ret:" + nRet);
         }
 
         private void JoinChannel()
         {
+            RtcEngine.EnableAudio();
+            var nRet = RtcEngine.SetExternalAudioSink(SAMPLE_RATE, CHANNEL);
+            this.Log.UpdateLog("SetExternalAudioSink ret:" + nRet);
             RtcEngine.JoinChannel(_token, _channelName);
         }
 

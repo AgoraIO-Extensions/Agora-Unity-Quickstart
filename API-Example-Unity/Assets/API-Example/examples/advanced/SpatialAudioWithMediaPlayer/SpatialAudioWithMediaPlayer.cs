@@ -91,10 +91,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
             var ret = RtcEngine.Initialize(context);
             Debug.Log("Agora: Initialize " + ret);
             RtcEngine.InitEventHandler(handler);
-            RtcEngine.EnableAudio();
-            RtcEngine.EnableVideo();
-            RtcEngine.EnableSpatialAudio(true);
-            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
         }
 
         private void InitMediaPlayer()
@@ -121,6 +117,11 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
 
         private void JoinChannelEx(string channelName, uint uid)
         {
+            RtcEngine.EnableAudio();
+            RtcEngine.EnableVideo();
+            RtcEngine.EnableSpatialAudio(true);
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            
             RtcConnection connection = new RtcConnection();
             connection.channelId = channelName;
             connection.localUid = uid;
@@ -197,18 +198,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
             RtcEngine.LeaveChannel();
             RtcEngine.Dispose();
         }
-
-        //private void OnApplicationQuit()
-        //{
-        //    Debug.Log("OnApplicationQuit");
-        //    if (mRtcEngine != null)
-        //    {
-        //        mRtcEngine.InitEventHandler(null);
-        //        mRtcEngine.LeaveChannel();
-        //        mRtcEngine.Dispose();
-        //        mRtcEngine = null;
-        //    }
-        //}
 
         internal string GetChannelName()
         {

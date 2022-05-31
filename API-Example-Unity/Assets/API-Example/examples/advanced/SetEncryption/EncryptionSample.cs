@@ -78,9 +78,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetEncryption
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(new UserEventHandler(this));
-            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            RtcEngine.EnableAudio();
-            RtcEngine.EnableVideo();
         }
 
         private byte[] GetEncryptionSaltFromServer()
@@ -103,6 +100,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetEncryption
 
         private void JoinChannel()
         {
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.EnableAudio();
+            RtcEngine.EnableVideo();
             RtcEngine.JoinChannel(_token, _channelName, "", 0);
         }
 

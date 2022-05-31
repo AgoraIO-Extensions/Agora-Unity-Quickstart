@@ -73,14 +73,14 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
             RtcEngine.RegisterVideoEncodedImageReceiver(new VideoEncodedImageReceiver(this), OBSERVER_MODE.RAW_DATA);
-            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            RtcEngine.EnableVideo();
-
-            RtcEngine.SetExternalVideoSource(true, true, EXTERNAL_VIDEO_SOURCE_TYPE.ENCODED_VIDEO_FRAME);
         }
 
         private void JoinChannel()
         {
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.EnableVideo();
+            RtcEngine.SetExternalVideoSource(true, true, EXTERNAL_VIDEO_SOURCE_TYPE.ENCODED_VIDEO_FRAME);
+
             var option = new ChannelMediaOptions();
             option.autoSubscribeVideo.SetValue(true);
             option.autoSubscribeAudio.SetValue(true);
