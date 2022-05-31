@@ -92,7 +92,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
 
 #if UNITY_ANDROID && !UNITY_EDITOR
         // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
-        localPath = "/assets/audio/Agora.io-Interactions.mp3";
+            _localPath = "/assets/audio/Agora.io-Interactions.mp3";
 #else
             _localPath = Application.streamingAssetsPath + "/audio/" + "Agora.io-Interactions.mp3";
 #endif
