@@ -76,8 +76,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.MetadataSample
             RtcEngine.EnableVideo();
 
             UserMetadataObserver metadataObserver = new UserMetadataObserver(this);
-            RtcEngine.RegisterMediaMetadataObserver(metadataObserver, METADATA_TYPE.VIDEO_METADATA);
             RtcEngine.SetMaxMetadataSize((int)MAX_METADATA_SIZE_TYPE.DEFAULT_METADATA_SIZE_IN_BYTE);
+            RtcEngine.RegisterMediaMetadataObserver(metadataObserver, METADATA_TYPE.VIDEO_METADATA);
         }
 
         private void SetupUI()

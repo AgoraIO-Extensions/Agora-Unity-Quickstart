@@ -139,9 +139,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.StreamMessage
         private void SendStreamMessage(int streamId, string message)
         {
             byte[] byteArray = System.Text.Encoding.Default.GetBytes(message);
-            RtcEngine.SendStreamMessage(streamId, byteArray, Convert.ToUInt32(byteArray.Length));
+            var nRet = RtcEngine.SendStreamMessage(streamId, byteArray, Convert.ToUInt32(byteArray.Length));
+            this.Log.UpdateLog("SendStreamMessage :" + nRet);
         }
-
 
         private void OnDestroy()
         {
