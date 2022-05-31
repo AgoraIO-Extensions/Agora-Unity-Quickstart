@@ -197,11 +197,11 @@ public class CommandBuild : MonoBehaviour
     [MenuItem("Build/All")]
     public static void BuildAll()
     {
+        BuildAndrod();
         BuildIPhone();
         BuildMac();
         BuildWin32();
         BuildWin64();
-        BuildAndrod();
     }
 
 
