@@ -16,6 +16,4 @@ public class AppIdInput : ScriptableObject
 
     [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
     public string channelName = "YOUR_CHANNEL_NAME";
-
-    public bool isHomeStart = false;
 }
