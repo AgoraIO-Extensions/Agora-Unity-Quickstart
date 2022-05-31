@@ -45,6 +45,9 @@ EditorBuildSettings:
     path: Assets/API-Example/examples/advanced/MediaPlayer/MediaPlayerScene.unity
     guid: 992f3a816b8f149ef914d0779f89ac3a
   - enabled: 1
+    path: Assets/API-Example/examples/advanced/Metadata/MetadataScene.unity
+    guid: becddf48094e546e7aa03d144e6439fd
+  - enabled: 1
     path: Assets/API-Example/examples/advanced/ProcessRawData/ProcessRawDataScene.unity
     guid: 95956702ec8f74758ac3a0ad4e4c457c
   - enabled: 1
@@ -89,4 +92,3 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/API-Example/examples/advanced/VoiceChanger/VoiceChangerScene.unity
     guid: 5e00dd36388ca4686be1bdf82e52b79d
-  m_configObjects: {}
