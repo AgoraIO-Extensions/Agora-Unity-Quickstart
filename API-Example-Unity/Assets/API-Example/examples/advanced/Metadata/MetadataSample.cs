@@ -33,6 +33,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MetadataSample
         internal Logger Log;
         internal IRtcEngine RtcEngine;
 
+        internal bool Sending = false;
 
         private void Start()
         {
@@ -73,7 +74,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MetadataSample
             RtcEngine.InitEventHandler(handler);
 
             UserMetadataObserver metadataObserver = new UserMetadataObserver(this);
-            RtcEngine.SetMaxMetadataSize((int)MAX_METADATA_SIZE_TYPE.DEFAULT_METADATA_SIZE_IN_BYTE);
+
             RtcEngine.RegisterMediaMetadataObserver(metadataObserver, METADATA_TYPE.VIDEO_METADATA);
         }
 
@@ -81,8 +82,11 @@ namespace Agora_Plugin.API_Example.examples.advanced.MetadataSample
         {
             var ui = this.transform.Find("UI");
 
-            var btn = ui.Find("SendButton").GetComponent<Button>();
-            btn.onClick.AddListener(onSendButtonPress);
+            var btn = ui.Find("StartButton").GetComponent<Button>();
+            btn.onClick.AddListener(OnStartButtonPress);
+
+            btn = ui.Find("StopButton").GetComponent<Button>();
+            btn.onClick.AddListener(OnStopButtonPress);
         }
 
         private void JoinChannel()
@@ -99,29 +103,14 @@ namespace Agora_Plugin.API_Example.examples.advanced.MetadataSample
         }
 
 
-        private void onSendButtonPress()
+        private void OnStartButtonPress()
         {
-            var text = this.transform.Find("UI/InputField").GetComponent<InputField>();
-            if (text.text == "")
-            {
-                Log.UpdateLog("Dont send empty metadata!");
-            }
-
-            SendMetadata(text.text);
-            text.text = "";
+            this.Sending = true;
         }
 
-        private void SendMetadata(string data)
+        private void OnStopButtonPress()
         {
-            byte[] byteArray = System.Text.Encoding.Default.GetBytes(data);
-            Metadata metadata = new Metadata();
-            IntPtr ptr = Marshal.AllocHGlobal(byteArray.Length);
-            Marshal.Copy(byteArray, 0, ptr, byteArray.Length);
-            metadata.size = (uint)byteArray.Length;
-            metadata.buffer = ptr;
-            var nRet = RtcEngine.SendMetaData(metadata, VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA);
-            this.Log.UpdateLog("SendMetaData: " + nRet);
-            Marshal.FreeHGlobal(ptr);
+            this.Sending = false;
         }
 
 
@@ -302,23 +291,38 @@ namespace Agora_Plugin.API_Example.examples.advanced.MetadataSample
     internal class UserMetadataObserver : IMetadataObserver
     {
         MetadataSample _sample;
+        private int tick = 0;
 
         internal UserMetadataObserver(MetadataSample sample)
         {
             _sample = sample;
         }
 
+        public override int GetMaxMetadataSize()
+        {
+            return (int)MAX_METADATA_SIZE_TYPE.DEFAULT_METADATA_SIZE_IN_BYTE;
+        }
+
+        public override bool OnReadyToSendMetadata(ref Metadata metadata, VIDEO_SOURCE_TYPE source_type)
+        {
+            if (this._sample.Sending)
+            {
+                this.tick++;
+                string str = "tick :" + tick;
+                byte[] strByte = System.Text.Encoding.Default.GetBytes(str);
+                Marshal.Copy(strByte, 0, metadata.buffer, strByte.Length);
+                metadata.size = Convert.ToUInt32(strByte.Length);
+            }
+
+            return this._sample.Sending;
+        }
+
         public override void OnMetadataReceived(Metadata data)
         {
-            if (data.size > 0)
-            {
-                byte[] buffer = new byte[data.size];
-                IntPtr ptr = data.buffer;
-                Marshal.Copy(ptr, buffer, 0, Convert.ToInt32(data.size));
-                string strMessage = System.Text.Encoding.Default.GetString(buffer);
-                _sample.Log.UpdateLog(string.Format("OnMetadataReceived uid:{0} size:{1} data:{2}",data.uid,  data.size, strMessage));
-
-            }
+            byte[] strByte = new byte[data.size];
+            Marshal.Copy(data.buffer, strByte, 0, (int)data.size);
+            string str = System.Text.Encoding.Default.GetString(strByte);
+            this._sample.Log.UpdateLog(string.Format("OnMetadataReceived uid:{0} buffer:{1}", data.uid, str));
         }
     }
 
