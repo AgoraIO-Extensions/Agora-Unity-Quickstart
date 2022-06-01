@@ -312,8 +312,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.MetadataSample
                 string str = "tick :" + tick;
                 byte[] strByte = System.Text.Encoding.Default.GetBytes(str);
                 Marshal.Copy(strByte, 0, metadata.buffer, strByte.Length);
-                metadata.size = Convert.ToUInt32(strByte.Length);
-                Debug.Log("OnReadyToSendMetadata Sended");
+                metadata.size = (uint)strByte.Length;
+                Debug.Log("OnReadyToSendMetadata Sended metadatasize:" + metadata.size);
+
             }
 
             return this._sample.Sending;
@@ -324,7 +325,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MetadataSample
             byte[] strByte = new byte[data.size];
             Marshal.Copy(data.buffer, strByte, 0, (int)data.size);
             string str = System.Text.Encoding.Default.GetString(strByte);
-            this._sample.Log.UpdateLog(string.Format("OnMetadataReceived uid:{0} buffer:{1}", data.uid, str));
+            Debug.Log(string.Format("OnMetadataReceived uid:{0} buffer:{1}", data.uid, str));
         }
     }
 

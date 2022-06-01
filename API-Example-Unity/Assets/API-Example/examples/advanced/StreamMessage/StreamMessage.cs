@@ -138,7 +138,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.StreamMessage
 
         private void SendStreamMessage(int streamId, string message)
         {
-            byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(message);
+            byte[] byteArray = System.Text.Encoding.Default.GetBytes(message);
             var nRet = RtcEngine.SendStreamMessage(streamId, byteArray, Convert.ToUInt32(byteArray.Length));
             this.Log.UpdateLog("SendStreamMessage :" + nRet);
         }
@@ -220,7 +220,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.StreamMessage
             {
                 Marshal.Copy(data, buffer, 0, (int)length);
             }
-            string streamMessage = System.Text.Encoding.UTF8.GetString(buffer);
+            string streamMessage = System.Text.Encoding.Default.GetString(buffer);
             _streamMessage.Log.UpdateLog(string.Format("OnStreamMessage remoteUid: {0}, stream message: {1}", remoteUid, streamMessage));
         }
 
