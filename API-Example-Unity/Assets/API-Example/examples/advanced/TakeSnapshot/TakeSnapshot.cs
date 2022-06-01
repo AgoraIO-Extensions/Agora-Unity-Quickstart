@@ -284,6 +284,10 @@ namespace Agora_Plugin.API_Example.examples.basic.TakeSnapshot
             TakeSnapshot.DestroyVideoView(uid);
         }
 
+        public override void OnSnapshotTaken(string channel, uint uid, string filePath, int width, int height, int errCode)
+        {
+            _takeSnapshot.Log.UpdateLog(string.Format("OnSnapshotTaken: {0},{1},{2},{3}", filePath, width, height, errCode));
+        }
 
     }
 

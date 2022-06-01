@@ -70,15 +70,15 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
         private void SetUpUI()
         {
             _button1 = GameObject.Find("Button1").GetComponent<Button>();
-            _button1.onClick.AddListener(onPlayButtonPress);
+            _button1.onClick.AddListener(OnPlayButtonPress);
             _button2 = GameObject.Find("Button2").GetComponent<Button>();
-            _button2.onClick.AddListener(onStopButtonPress);
+            _button2.onClick.AddListener(OnStopButtonPress);
             _button3 = GameObject.Find("Button3").GetComponent<Button>();
-            _button3.onClick.AddListener(onPauseButtonPress);
+            _button3.onClick.AddListener(OnPauseButtonPress);
             _button4 = GameObject.Find("Button4").GetComponent<Button>();
-            _button4.onClick.AddListener(onResumeButtonPress);
+            _button4.onClick.AddListener(OnResumeButtonPress);
             _button5 = GameObject.Find("Button5").GetComponent<Button>();
-            _button5.onClick.AddListener(onOpenButtonPress);
+            _button5.onClick.AddListener(OnOpenButtonPress);
         }
 
         public void EnableUI(bool val)
@@ -143,36 +143,42 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
             this.Log.UpdateLog("RtcEngineController JoinChannel_MPK returns: " + ret);
         }
 
-        private void onPlayButtonPress()
+        private void OnPlayButtonPress()
         {
             var ret = MediaPlayer.Play(PlayerId);
             this.Log.UpdateLog("Play return" + ret);
             this.TestMediaPlayer();
         }
 
-        private void onStopButtonPress()
+        private void OnStopButtonPress()
         {
             var ret = MediaPlayer.Stop(PlayerId);
             this.Log.UpdateLog("Stop return" + ret);
         }
 
-        private void onPauseButtonPress()
+        private void OnPauseButtonPress()
         {
             var ret = MediaPlayer.Pause(PlayerId);
             this.Log.UpdateLog("Pause return" + ret);
         }
 
-        private void onResumeButtonPress()
+        private void OnResumeButtonPress()
         {
             var ret = MediaPlayer.Resume(PlayerId);
 
             this.Log.UpdateLog("Resume returns: " + ret);
         }
 
-        private void onOpenButtonPress()
+        private void OnOpenButtonPress()
         {
             var ret = MediaPlayer.Open(PlayerId, MPK_URL, 0);
             this.Log.UpdateLog("Open returns: " + ret);
+        }
+
+        private void OnOpenWithCustomSource()
+        {
+            var ret = MediaPlayer.OpenWithCustomSource(PlayerId, 0, new UserPlayerCustomDataProvider(this));
+            this.Log.UpdateLog("OpenWithCustomSource" + ret);
         }
 
         private void InitMediaPlayer()
@@ -412,6 +418,29 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
             _sample.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                 (int)reason));
             MediaPlayerExample.DestroyVideoView(uid);
+        }
+    }
+
+    internal class UserPlayerCustomDataProvider : IMediaPlayerCustomDataProvider
+    {
+
+        MediaPlayerExample _sample;
+
+        internal UserPlayerCustomDataProvider(MediaPlayerExample sample)
+        {
+            _sample = sample;
+        }
+
+        public override Int64 OnSeek(Int64 offset, int whence, int playerId)
+        {
+            Debug.Log("UserPlayerCustomDataProvider OnSeek");
+            return 0;
+        }
+
+        public override int OnReadData(IntPtr bufferPtr, int bufferSize, int playerId)
+        {
+            Debug.Log("UserPlayerCustomDataProvider OnReadData");
+            return 0;
         }
     }
 }
