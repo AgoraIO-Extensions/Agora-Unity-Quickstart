@@ -42,8 +42,6 @@ namespace CustomAudioSink
         private Thread _pullAudioFrameThread = null;
         private bool _pullAudioFrameThreadSignal = true;
 
-        private bool _startSignal;
-
         IntPtr BufferPtr { get; set; }
 
         // Start is called before the first frame update
@@ -99,7 +97,7 @@ namespace CustomAudioSink
 
         void KickStartAudio(AudioSource aud, string clipName)
         {
-            var bufferLength = SAMPLES * 1000; // 10-sec-length buffer
+            var bufferLength = SAMPLES * 100; // 1-sec-length buffer
             audioBuffer = new RingBuffer<float>(bufferLength);
 
             _audioRawDataManager = AudioRawDataManager.GetInstance(mRtcEngine);
@@ -155,7 +153,6 @@ namespace CustomAudioSink
         {
             Debug.Log("OnApplicationQuit");
             _pullAudioFrameThreadSignal = false;
-            _startSignal = false;
             audioBuffer.Clear();
             if (BufferPtr != IntPtr.Zero)
             {
@@ -203,8 +200,6 @@ namespace CustomAudioSink
         {
             BufferPtr = Marshal.AllocHGlobal(BUFFER_SIZE);
 
-            int count = 0;
-
             var tic = new TimeSpan(DateTime.Now.Ticks);
 
             var byteArray = new byte[BUFFER_SIZE];
@@ -240,13 +235,8 @@ namespace CustomAudioSink
 
                     writeCount += floatArray.Length;
                     if (DebugFlag) Debug.Log("PullAudioFrame rc = " + rc + " writeCount = " + writeCount);
-                    count += 1;
                 }
 
-                if (count == 100)
-                {
-                    _startSignal = true;
-                }
             }
 
             if (BufferPtr != IntPtr.Zero)
@@ -272,16 +262,15 @@ namespace CustomAudioSink
         // This Monobehavior method feeds data into the audio source
         private void OnAudioRead(float[] data)
         {
-            if (!_startSignal) return;
             for (var i = 0; i < data.Length; i++)
             {
                 lock (audioBuffer)
                 {
-                    try
+                    if (audioBuffer.Count > 0)
                     {
                         data[i] = audioBuffer.Get();
                     }
-                    catch
+                    else
                     {
                         // no data
                         data[i] = 0;
