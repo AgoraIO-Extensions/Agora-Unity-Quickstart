@@ -45,10 +45,13 @@ public class Home : MonoBehaviour
         "RtmpStreamingScene",
         "ScreenShareScene",
         "ScreenShareWhileVideoCallScene",
+        "SetBeautyEffectOptionsScene",
         "SetEncryptionScene",
         "SetVideoEncodeConfigurationScene",
+        "StartLocalVideoTranscoderScene",
         "SpatialAudioWithMediaPlayerScene",
         "StartRhythmPlayerScene",
+        "StartRtmpStreamWithTranscodingScene",
         "StreamMessageScene",
         "TakeSnapshotScene",
         "VoiceChangerScene"
