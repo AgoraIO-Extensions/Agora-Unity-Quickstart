@@ -28,9 +28,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.RtmpStreaming
         [SerializeField]
         private string _channelName = "";
 
-        [SerializeField]
-        private const string RTMP_URL = "";
 
+        private const string RTMP_URL = "rtmp://push.alexmk.name/live/agora_rtc_unity";
         public Text LogText;
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;

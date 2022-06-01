@@ -74,7 +74,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.MetadataSample
             RtcEngine.InitEventHandler(handler);
 
             UserMetadataObserver metadataObserver = new UserMetadataObserver(this);
-
             RtcEngine.RegisterMediaMetadataObserver(metadataObserver, METADATA_TYPE.VIDEO_METADATA);
         }
 
@@ -106,11 +105,13 @@ namespace Agora_Plugin.API_Example.examples.advanced.MetadataSample
         private void OnStartButtonPress()
         {
             this.Sending = true;
+            this.Log.UpdateLog("Sending: true");
         }
 
         private void OnStopButtonPress()
         {
             this.Sending = false;
+            this.Log.UpdateLog("Sending: false");
         }
 
 
@@ -312,6 +313,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MetadataSample
                 byte[] strByte = System.Text.Encoding.Default.GetBytes(str);
                 Marshal.Copy(strByte, 0, metadata.buffer, strByte.Length);
                 metadata.size = Convert.ToUInt32(strByte.Length);
+                Debug.Log("OnReadyToSendMetadata Sended");
             }
 
             return this._sample.Sending;

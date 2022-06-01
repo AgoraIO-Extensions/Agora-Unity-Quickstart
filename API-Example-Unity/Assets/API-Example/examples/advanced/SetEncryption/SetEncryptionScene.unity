@@ -199,7 +199,7 @@ GameObject:
   - component: {fileID: 577133588}
   - component: {fileID: 577133592}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: VideoCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -297,7 +297,6 @@ MonoBehaviour:
   _token: 
   _channelName: 
   EncrytionMode: 7
-  Secret: 
   LogText: {fileID: 1806852894}
 --- !u!1 &810450341
 GameObject:

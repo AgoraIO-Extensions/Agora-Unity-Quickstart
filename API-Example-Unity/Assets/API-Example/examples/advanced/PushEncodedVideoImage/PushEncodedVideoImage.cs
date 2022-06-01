@@ -72,7 +72,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
-            RtcEngine.RegisterVideoEncodedImageReceiver(new VideoEncodedImageReceiver(this), OBSERVER_MODE.RAW_DATA);
+            RtcEngine.RegisterVideoEncodedImageReceiver(new VideoEncodedImageReceiver(this), OBSERVER_MODE.INTPTR);
         }
 
         private void JoinChannel()
@@ -130,6 +130,11 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
                 text.text += "\n(Local)";
                 role.AddComponent<UIElementDrag>();
                 this._roleLocal = role;
+            }
+            else if (this._roleLocal != null)
+            {
+                var count = this.transform.childCount;
+                this._roleLocal.transform.SetSiblingIndex(count - 1);
             }
 
             role.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
@@ -297,8 +302,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
 
         public override bool OnEncodedVideoImageReceived(IntPtr imageBufferPtr, UInt64 length, EncodedVideoFrameInfo videoEncodedFrameInfo)
         {
+            Debug.Log("OnEncodedVideoImageReceived");
             byte[] imageBuffer = new byte[length];
-            Marshal.Copy(imageBuffer, 0, imageBufferPtr, (int)length);
+            Marshal.Copy(imageBufferPtr, imageBuffer, 0, (int)length);
             string str = System.Text.Encoding.Default.GetString(imageBuffer);
             var pos = JsonUtility.FromJson<Vector3>(str);
             var uid = videoEncodedFrameInfo.uid.ToString();

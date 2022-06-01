@@ -30,8 +30,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetEncryption
         [SerializeField]
         public ENCRYPTION_MODE EncrytionMode = ENCRYPTION_MODE.AES_128_GCM2;
 
-        [SerializeField]
-        public string Secret = "";
+        private string secret = "Hello_Unity";
 
         public Text LogText;
         internal Logger Log;
@@ -87,13 +86,14 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetEncryption
 
         private void SetEncryption()
         {
+            byte[] kdfSal = this.GetEncryptionSaltFromServer(); 
             var config = new EncryptionConfig
             {
                 encryptionMode = EncrytionMode,
-                encryptionKey = Secret,
-                encryptionKdfSalt = GetEncryptionSaltFromServer()
+                encryptionKey = secret,
+                encryptionKdfSalt = kdfSal
             };
-            Log.UpdateLog(string.Format("encryption mode: {0} secret: {1}", EncrytionMode, Secret));
+            Log.UpdateLog(string.Format("encryption mode: {0} secret: {1}", EncrytionMode, secret));
             var nRet= RtcEngine.EnableEncryption(true, config);
             this.Log.UpdateLog("EnableEncryption: " + nRet);
         }
@@ -120,43 +120,161 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetEncryption
             RtcEngine.Dispose();
         }
 
-        internal class UserEventHandler : IRtcEngineEventHandler
+
+        internal static void MakeVideoView(uint uid, string channelId = "")
         {
-            private readonly EncryptionSample _encryptionSample;
-
-            internal UserEventHandler(EncryptionSample encryptionSample)
+            var go = GameObject.Find(uid.ToString());
+            if (!ReferenceEquals(go, null))
             {
-                _encryptionSample = encryptionSample;
+                return; // reuse
             }
 
-            public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
+            // create a GameObject and assign to this new user
+            var videoSurface = MakeImageSurface(uid.ToString());
+            if (ReferenceEquals(videoSurface, null)) return;
+            // configure videoSurface
+            if (uid == 0)
             {
-                _encryptionSample.Log.UpdateLog(string.Format("sdk version: {0}",
-                    _encryptionSample.RtcEngine.GetVersion()));
-                _encryptionSample.Log.UpdateLog(string.Format(
-                    "onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
-                    connection.localUid, elapsed));
+                videoSurface.SetForUser(uid, channelId);
+            }
+            else
+            {
+                videoSurface.SetForUser(uid, channelId, VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE);
+            }
+            videoSurface.SetEnable(true);
+        }
+
+        // VIDEO TYPE 1: 3D Object
+        private static VideoSurface MakePlaneSurface(string goName)
+        {
+            var go = GameObject.CreatePrimitive(PrimitiveType.Plane);
+
+            if (go == null)
+            {
+                return null;
             }
 
-            public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
+            go.name = goName;
+            // set up transform
+            go.transform.Rotate(-90.0f, 0.0f, 0.0f);
+            var yPos = Random.Range(3.0f, 5.0f);
+            var xPos = Random.Range(-2.0f, 2.0f);
+            go.transform.position = Vector3.zero;
+            go.transform.localScale = new Vector3(0.25f, 0.5f, 0.5f);
+
+            // configure videoSurface
+            var videoSurface = go.AddComponent<VideoSurface>();
+            return videoSurface;
+        }
+
+        // Video TYPE 2: RawImage
+        private static VideoSurface MakeImageSurface(string goName)
+        {
+            GameObject go = new GameObject();
+
+            if (go == null)
             {
-                _encryptionSample.Log.UpdateLog("OnLeaveChannelSuccess");
+                return null;
             }
 
-            public override void OnWarning(int warn, string msg)
+            go.name = goName;
+            // to be renderered onto
+            go.AddComponent<RawImage>();
+            // make the object draggable
+            go.AddComponent<UIElementDrag>();
+            var canvas = GameObject.Find("VideoCanvas");
+            if (canvas != null)
             {
-                _encryptionSample.Log.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
+                go.transform.parent = canvas.transform;
+                Debug.Log("add video view");
+            }
+            else
+            {
+                Debug.Log("Canvas is null video view");
             }
 
-            public override void OnError(int error, string msg)
-            {
-                _encryptionSample.Log.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
-            }
+            // set up transform
+            go.transform.Rotate(0f, 0.0f, 180.0f);
+            go.transform.localPosition = Vector3.zero;
+            go.transform.localScale = new Vector3(2f, 3f, 1f);
 
-            public override void OnConnectionLost(RtcConnection connection)
+            // configure videoSurface
+            var videoSurface = go.AddComponent<VideoSurface>();
+            return videoSurface;
+        }
+
+        internal static void DestroyVideoView(uint uid)
+        {
+            var go = GameObject.Find(uid.ToString());
+            if (!ReferenceEquals(go, null))
             {
-                _encryptionSample.Log.UpdateLog(string.Format("OnConnectionLost "));
+                Destroy(go);
             }
+        }
+
+        internal string GetChannelName()
+        {
+            return _channelName;
+        }
+    }
+
+    internal class UserEventHandler : IRtcEngineEventHandler
+    {
+        private readonly EncryptionSample _encryptionSample;
+
+        internal UserEventHandler(EncryptionSample encryptionSample)
+        {
+            _encryptionSample = encryptionSample;
+        }
+
+        public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
+        {
+            _encryptionSample.Log.UpdateLog(string.Format("sdk version: {0}",
+                _encryptionSample.RtcEngine.GetVersion()));
+            _encryptionSample.Log.UpdateLog(string.Format(
+                "onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
+                connection.localUid, elapsed));
+            EncryptionSample.MakeVideoView(0);
+        }
+
+        public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
+        {
+            _encryptionSample.Log.UpdateLog("OnLeaveChannelSuccess");
+            EncryptionSample.MakeVideoView(0);
+        }
+
+        public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
+        {
+            _encryptionSample.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+            EncryptionSample.MakeVideoView(uid, _encryptionSample.GetChannelName());
+        }
+
+        public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
+        {
+            _encryptionSample.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+                (int)reason));
+            EncryptionSample.DestroyVideoView(uid);
+        }
+
+
+        public override void OnWarning(int warn, string msg)
+        {
+            _encryptionSample.Log.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
+        }
+
+        public override void OnError(int error, string msg)
+        {
+            _encryptionSample.Log.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
+        }
+
+        public override void OnConnectionLost(RtcConnection connection)
+        {
+            _encryptionSample.Log.UpdateLog(string.Format("OnConnectionLost "));
+        }
+
+        public override void OnEncryptionError(RtcConnection connection, ENCRYPTION_ERROR_TYPE errorType)
+        {
+            _encryptionSample.Log.UpdateLog("OnEncryptionError: " + errorType);
         }
     }
 }
