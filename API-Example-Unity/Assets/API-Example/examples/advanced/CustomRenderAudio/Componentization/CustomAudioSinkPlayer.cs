@@ -63,7 +63,7 @@ namespace agora_sample
 
         void KickStartAudio(AudioSource aud, string clipName)
         {
-            var bufferLength = SAMPLES * 1000; // 10-sec-length buffer
+            var bufferLength = SAMPLES * 100; // 1-sec-length buffer
             audioBuffer = new RingBuffer<float>(bufferLength);
 
             _audioRawDataManager = AudioRawDataManager.GetInstance(mRtcEngine);
