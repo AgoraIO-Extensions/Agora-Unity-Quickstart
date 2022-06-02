@@ -33,6 +33,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShareWhileVideoCall
         internal Logger Log;
         internal IRtcEngineEx RtcEngine = null;
 
+        public uint Uid1 = 123;
+        public uint Uid2 = 456;
        
         private Dropdown _winIdSelect;
         private Button _startShareBtn;
@@ -84,7 +86,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShareWhileVideoCall
             options.publishScreenTrack.SetValue(false);
             options.enableAudioRecordingOrPlayout.SetValue(true);
             options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            RtcEngine.JoinChannel(_token, _channelName, 123, options);
+            RtcEngine.JoinChannel(_token, _channelName, this.Uid1, options);
         }
 
         private void ScreenShareJoinChannel()
@@ -97,13 +99,13 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShareWhileVideoCall
             options.publishScreenTrack.SetValue(true);
             options.enableAudioRecordingOrPlayout.SetValue(false);
             options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            var ret = RtcEngine.JoinChannelEx(_token, new RtcConnection(_channelName, 456), options);
+            var ret = RtcEngine.JoinChannelEx(_token, new RtcConnection(_channelName, this.Uid2), options);
             Debug.Log("JoinChannelEx returns: " + ret);
         }
 
         private void ScreenShareLeaveChannel()
         {
-            RtcEngine.LeaveChannelEx(new RtcConnection(_channelName, 456));
+            RtcEngine.LeaveChannelEx(new RtcConnection(_channelName, Uid2));
         }
 
         private void InitEngine()
@@ -338,11 +340,11 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShareWhileVideoCall
             _desktopScreenShare.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));
-            if (connection.localUid == 123)
+            if (connection.localUid == _desktopScreenShare.Uid1)
             {
                 ScreenShareWhileVideoCall.MakeVideoView(0);
             }
-            else if (connection.localUid == 456)
+            else if (connection.localUid == _desktopScreenShare.Uid2)
             {
                 ScreenShareWhileVideoCall.MakeVideoView(0, "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_SCREEN);
             }
@@ -356,11 +358,11 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShareWhileVideoCall
         public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
         {
             _desktopScreenShare.Log.UpdateLog("OnLeaveChannel");
-            if (connection.localUid == 123)
+            if (connection.localUid == _desktopScreenShare.Uid1)
             {
                 ScreenShareWhileVideoCall.DestroyVideoView("MainCameraView");
             }
-            else if (connection.localUid == 456)
+            else if (connection.localUid == _desktopScreenShare.Uid2)
             {
                 ScreenShareWhileVideoCall.DestroyVideoView("ScreenShareView");
             }
@@ -374,7 +376,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShareWhileVideoCall
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
             _desktopScreenShare.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-            if (uid != 123 && uid != 456)
+            if (uid != _desktopScreenShare.Uid1 && uid != _desktopScreenShare.Uid2)
             {
                 ScreenShareWhileVideoCall.MakeVideoView(uid, _desktopScreenShare.GetChannelName(), VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE);
             }
@@ -384,7 +386,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShareWhileVideoCall
         {
             _desktopScreenShare.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                 (int)reason));
-            if (uid != 123 && uid != 456)
+            if (uid != _desktopScreenShare.Uid1 && uid != _desktopScreenShare.Uid2)
             {
                 ScreenShareWhileVideoCall.DestroyVideoView(uid.ToString());
             }

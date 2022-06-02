@@ -402,18 +402,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
 
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
-            if (uid == 67890)
-            {
-                _sample.RtcEngine.EnableSpatialAudio(true);
-                _sample.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-                //MediaPlayerTest.MakeVideoView(uid, "asdf");
-            }
-            else if (uid == 12345)
-            {
-                //_mediaPlayerTest.x = 1;
-                _sample.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-                MediaPlayerExample.MakeVideoView(uid, "asdf");
-            }
+            _sample.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)

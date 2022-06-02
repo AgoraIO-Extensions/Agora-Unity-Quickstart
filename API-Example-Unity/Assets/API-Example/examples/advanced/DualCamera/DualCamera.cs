@@ -30,12 +30,15 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
         internal Logger Log;
         internal IRtcEngineEx RtcEngine = null;
 
-        internal bool IJoinChannel = false;
+        internal bool IsChannelJoined = false;
 
         private IVideoDeviceManager _videoDeviceManager;
         private DeviceInfo[] _videoDeviceInfos;
         private CameraCapturerConfiguration _config1;
         private CameraCapturerConfiguration _config2;
+
+        public uint UID1 = 123;
+        public uint UID2 = 456;
 
         // Use this for initialization
         private void Start()
@@ -100,7 +103,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
             options1.publishScreenTrack.SetValue(false);
             options1.enableAudioRecordingOrPlayout.SetValue(true);
             options1.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            ret = RtcEngine.JoinChannel(_token, _channelName, 123, options1);
+            ret = RtcEngine.JoinChannel(_token, _channelName, UID1, options1);
             Debug.Log("MainCameraJoinChannel returns: " + ret);
         }
 
@@ -117,7 +120,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
             options2.publishSecondaryCameraTrack.SetValue(true);
             options2.enableAudioRecordingOrPlayout.SetValue(false);
             options2.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            ret = RtcEngine.JoinChannelEx(_token, new RtcConnection(_channelName, 456), options2);
+            ret = RtcEngine.JoinChannelEx(_token, new RtcConnection(_channelName, UID2), options2);
             Debug.Log("JoinChannelEx returns: " + ret);
         }
 
@@ -172,7 +175,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
             }
 
             // create a GameObject and assign to this new user
-            VideoSurface videoSurface = new VideoSurface();
+            VideoSurface videoSurface = null;
 
             if (videoSourceType == VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA)
             {
@@ -287,19 +290,19 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            _videoSample.IJoinChannel = true;
+            _videoSample.IsChannelJoined = true;
             _videoSample.Log.UpdateLog(string.Format("sdk version: ${0}",
                 _videoSample.RtcEngine.GetVersion()));
             _videoSample.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                     connection.channelId, connection.localUid, elapsed));
 
-            if (connection.localUid == 123)
+            if (connection.localUid == _videoSample.UID1)
             {
                 DualCamera.MakeVideoView(0);
             }
 
-            if (connection.localUid == 456)
+            if (connection.localUid == _videoSample.UID2)
             {
                 DualCamera.MakeVideoView(0, "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_SECONDARY);
             }
@@ -312,14 +315,14 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
 
         public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
         {
-            _videoSample.IJoinChannel = false;
+            _videoSample.IsChannelJoined = false;
             _videoSample.Log.UpdateLog("OnLeaveChannel");
-            if (connection.localUid == 123)
+            if (connection.localUid == _videoSample.UID1)
             {
                 DualCamera.DestroyVideoView("MainCameraView");
             }
 
-            if (connection.localUid == 456)
+            if (connection.localUid == _videoSample.UID2)
             {
                 DualCamera.DestroyVideoView("SecondCameraView");
             }
@@ -334,7 +337,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
             _videoSample.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-            if (uid != 123 && uid != 456)
+            if (uid != _videoSample.UID1 && uid != _videoSample.UID2)
             {
                 DualCamera.MakeVideoView(uid, _videoSample.GetChannelName());
             }
@@ -344,7 +347,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
         {
             _videoSample.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                 (int)reason));
-            if (uid != 123 && uid != 456)
+            if (uid != _videoSample.UID1 && uid != _videoSample.UID2)
             {
                 DualCamera.DestroyVideoView(uid.ToString());
             }

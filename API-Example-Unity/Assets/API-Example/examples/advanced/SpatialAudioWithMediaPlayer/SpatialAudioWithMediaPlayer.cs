@@ -40,6 +40,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
         private Button _button2;
         private Button _button3;
 
+        public uint UidUseInEx = 123;
+        public uint UidUseInMPK = 67890;
+
         public ILocalSpatialAudioEngine SpatialAudioEngine;
         public int x = 0;
         // Use this for initialization
@@ -52,8 +55,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
                 InitEngine();
                 InitMediaPlayer();
                 InitSpatialAudioEngine();
-                JoinChannelEx(_channelName, 123);
-                JoinChannelExWithMPK(_channelName, 67890, MediaPlayer.GetId());
+                JoinChannelEx(_channelName, UidUseInEx);
+                JoinChannelExWithMPK(_channelName, UidUseInMPK, MediaPlayer.GetId());
             }
         }
 
@@ -170,14 +173,14 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
         private void onLeftLocationPress()
         {
             float[] f1 = { 0.0f, 1.0f, 0.0f };
-            var ret = SpatialAudioEngine.UpdateRemotePositionEx(67890, f1, new float[] { 0, 0, 0 }, new RtcConnection(_channelName, 123));
+            var ret = SpatialAudioEngine.UpdateRemotePositionEx(UidUseInMPK, f1, new float[] { 0, 0, 0 }, new RtcConnection(_channelName, UidUseInEx));
             Debug.Log("_spatialAudio.UpdateRemotePosition returns: " + ret);
         }
 
         private void onRightLocationPress()
         {
             float[] f1 = { 0.0f, -1.0f, 0.0f };
-            var ret = SpatialAudioEngine.UpdateRemotePositionEx(67890, f1, new float[] { 0, 0, 0 }, new RtcConnection(_channelName, 123));
+            var ret = SpatialAudioEngine.UpdateRemotePositionEx(UidUseInMPK, f1, new float[] { 0, 0, 0 }, new RtcConnection(_channelName, UidUseInEx));
             Debug.Log("_spatialAudio.UpdateRemotePosition returns: " + ret);
         }
 
@@ -306,7 +309,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
                 _spatialAudio.x = 1;
                 var ret = _spatialAudio.MediaPlayer.Play();
                 Debug.Log("Play return" + ret);
-                SpatialAudioWithMediaPlayer.MakeVideoView(67890, _spatialAudio.GetChannelName());
+                SpatialAudioWithMediaPlayer.MakeVideoView(_spatialAudio.UidUseInMPK, _spatialAudio.GetChannelName());
             }
             else if (state == MEDIA_PLAYER_STATE.PLAYER_STATE_STOPPED)
             {
@@ -373,12 +376,12 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
             _spatialAudio.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-            if (uid == 67890)
+            if (uid == _spatialAudio.UidUseInMPK)
             {
                 _spatialAudio.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
 
             }
-            else if (uid == 12345)
+            else if (uid == _spatialAudio.UidUseInEx)
             {
                 _spatialAudio.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
                 SpatialAudioWithMediaPlayer.MakeVideoView(uid, _spatialAudio.GetChannelName());

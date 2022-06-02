@@ -41,6 +41,10 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
         // Start is called before the first frame update
         private void Start()
         {
+#if UNITY_IPHONE || UNITY_ANDROID
+            this.LogText.text = "Not Support in this platform!";
+
+#else
             LoadAssetData();
             if (CheckAppId())
             {
@@ -49,7 +53,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DeviceManager
                 CallDeviceManagerApi();
                 //JoinChannel();
             }
-
+#endif
         }
 
         private void Update()
