@@ -74,6 +74,18 @@ public class AgoraMultiChannel : MonoBehaviour
         channel2.JoinChannel(TOKEN_2, "", 0, new ChannelMediaOptions(true, true, false, false));
     }
 
+    public void Leave(int channel)
+    {
+        if (channel == 1)
+        {
+            channel1.LeaveChannel();
+        }
+        if (channel == 2)
+        {
+            channel2.LeaveChannel();
+        }
+    }
+
     void OnApplicationQuit()
     {
         Debug.Log("OnApplicationQuit");
@@ -143,7 +155,7 @@ public class AgoraMultiChannel : MonoBehaviour
 
     void Channel2OnUserOfflineHandler(string channelId, uint uid, USER_OFFLINE_REASON reason)
     {
-        logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid, (int) reason));
+        logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid, (int)reason));
         DestroyVideoView(uid);
     }
 

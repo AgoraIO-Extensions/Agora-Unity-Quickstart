@@ -2,22 +2,13 @@
 using System.Runtime.InteropServices;
 using System.Threading;
 using UnityEngine;
-using UnityEngine.UI;
 using agora_gaming_rtc;
 using RingBuffer;
 
-namespace CustomAudioSink
+namespace agora_sample
 {
-    public class CustomAudioSinkSample : MonoBehaviour
+    public class CustomAudioSinkPlayer : MonoBehaviour
     {
-        [SerializeField] private string APP_ID = "YOUR_APPID";
-
-        [SerializeField] private string TOKEN = "";
-
-        [SerializeField] private string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
-
-        public Text logText;
-        private Logger logger;
         private IRtcEngine mRtcEngine = null;
         private IAudioRawDataManager _audioRawDataManager;
 
@@ -47,52 +38,27 @@ namespace CustomAudioSink
         // Start is called before the first frame update
         void Start()
         {
-            var ifValid = CheckAppId();
-            InitRtcEngine();
-            JoinChannel();
-
-            var aud = GetComponent<AudioSource>();
-            if (aud == null)
-            {
-                gameObject.AddComponent<AudioSource>();
-            }
-
-
             SAMPLES = SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL;
             FREQ = 1000 / PULL_FREQ_PER_SEC;
             BUFFER_SIZE = SAMPLES * BYTES_PER_SAMPLE;
 
-            if (ifValid) KickStartAudio(aud, "externalClip");
+            StartCoroutine(CoStartRunning());
         }
 
-        void Update()
+        System.Collections.IEnumerator CoStartRunning()
         {
-            PermissionHelper.RequestMicrophontPermission();
-        }
+            while (mRtcEngine == null)
+            {
+                yield return new WaitForFixedUpdate();
+                mRtcEngine = IRtcEngine.QueryEngine();
+            }
 
-        bool CheckAppId()
-        {
-            logger = new Logger(logText);
-            return logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in Canvas!!!!!");
-        }
-
-        void InitRtcEngine()
-        {
-            mRtcEngine = IRtcEngine.GetEngine(APP_ID);
-            var nRet = mRtcEngine.SetExternalAudioSink(true, SAMPLE_RATE, CHANNEL);
-            this.logger.UpdateLog("SetExternalAudioSink:nRet" + nRet);
-            mRtcEngine.SetLogFile("log.txt");
-            mRtcEngine.SetDefaultAudioRouteToSpeakerphone(true);
-            mRtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
-            mRtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
-            mRtcEngine.OnWarning += OnSDKWarningHandler;
-            mRtcEngine.OnError += OnSDKErrorHandler;
-            mRtcEngine.OnConnectionLost += OnConnectionLostHandler;
-        }
-
-        void JoinChannel()
-        {
-            mRtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
+            var aud = GetComponent<AudioSource>();
+            if (aud == null)
+            {
+                aud = gameObject.AddComponent<AudioSource>();
+            }
+            KickStartAudio(aud, "externalClip");
         }
 
         void KickStartAudio(AudioSource aud, string clipName)
@@ -122,7 +88,8 @@ namespace CustomAudioSink
             }
 
             _pullAudioFrameThread = new Thread(PullAudioFrameThread);
-            _pullAudioFrameThread.Start("pullAudio" + writeCount);
+            //_pullAudioFrameThread.Start("pullAudio" + writeCount);
+            _pullAudioFrameThread.Start();
         }
 
         bool _paused = false;
@@ -130,9 +97,13 @@ namespace CustomAudioSink
         {
             if (pause)
             {
-                Debug.LogWarning("Application paused. AudioBuffer length = " + audioBuffer.Size);
+                if (DebugFlag)
+                {
+                    Debug.Log("Application paused. AudioBuffer length = " + audioBuffer.Size);
+                    Debug.Log("PullAudioFrameThread state = " + _pullAudioFrameThread.ThreadState + " signal =" + _pullAudioFrameThreadSignal);
+                }
+
                 // Invalidate the buffer
-                Debug.LogWarning("PullAudioFrameThread state = " + _pullAudioFrameThread.ThreadState + " signal =" + _pullAudioFrameThreadSignal);
                 _pullAudioFrameThread.Abort();
                 _pullAudioFrameThread = null;
                 _paused = true;
@@ -141,7 +112,7 @@ namespace CustomAudioSink
             {
                 if (_paused) // had been paused, not from starting up
                 {
-                    Debug.LogWarning("Resuming Thread");
+                    Debug.Log("Resuming PullAudioThread");
                     audioBuffer.Clear();
                     StartPullAudioThread();
                 }
@@ -165,36 +136,6 @@ namespace CustomAudioSink
                 IRtcEngine.Destroy();
             }
         }
-
-        #region -- Agora callbacks --
-        void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
-        {
-            logger.UpdateLog(string.Format("sdk version: {0}", IRtcEngine.GetSdkVersion()));
-            logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName,
-                uid, elapsed));
-        }
-
-        void OnLeaveChannelHandler(RtcStats stats)
-        {
-            logger.UpdateLog("OnLeaveChannelSuccess");
-        }
-
-        void OnSDKWarningHandler(int warn, string msg)
-        {
-            logger.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
-        }
-
-        void OnSDKErrorHandler(int error, string msg)
-        {
-            logger.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
-        }
-
-        void OnConnectionLostHandler()
-        {
-            logger.UpdateLog(string.Format("OnConnectionLost "));
-        }
-
-        #endregion
 
         private void PullAudioFrameThread()
         {
