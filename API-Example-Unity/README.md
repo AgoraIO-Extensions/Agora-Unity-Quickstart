@@ -45,6 +45,7 @@ Any scene of this project can run successfully alone.
 | [StartRtmpStreamWithTranscoding](https://github.com/AgoraIO/Agora-Unity-Quickstart/tree/master/API-Example-Unity/Assets/API-Example/examples/advanced/StartRtmpStreamWithTranscoding) | stream video by RTMP Push to a CDN        | StartRtmpStreamWithTranscoding, UpdateRtmpTranscoding, StopRtmpStream                        |
 | [StreamMessage](https://github.com/AgoraIO/Agora-Unity-Quickstart/tree/master/API-Example-Unity/Assets/API-Example/examples/advanced/StreamMessage) | how to send stream message        | CreateDataStream, SendStreamMessage                        |
 | [TakeSnapshot](https://github.com/AgoraIO/Agora-Unity-Quickstart/tree/master/API-Example-Unity/Assets/API-Example/examples/advanced/TakeSnapshot) | how to screen shot      | TakeSnapshot                        |
+| [VirtualBackground](https://github.com/AgoraIO/Agora-Unity-Quickstart/tree/master/API-Example-Unity/Assets/API-Example/examples/advanced/VirtualBackground) | enable virtual background   | EnableVirtualBackground                 |
 | [VoiceChanger](https://github.com/AgoraIO/Agora-Unity-Quickstart/tree/master/API-Example-Unity/Assets/API-Example/examples/advanced/VoiceChanger) | how to modify your voice   | SetVoiceBeautifierPreset, SetAudioEffectPreset,SetVoiceConversionPreset,SetLocalVoicePitch, SetLocalVoiceEqualization,   SetLocalVoiceReverb                  |
 
 ## How to run the sample project

@@ -43,6 +43,7 @@ public class CommandBuild : MonoBehaviour
             "Assets/API-Example/examples/advanced/StartRtmpStreamWithTranscoding/StartRtmpStreamWithTranscodingScene.unity",
             "Assets/API-Example/examples/advanced/StreamMessage/StreamMessageScene.unity",
             "Assets/API-Example/examples/advanced/TakeSnapshot/TakeSnapshotScene.unity",
+            "Assets/API-Example/examples/advanced/VirtualBackground/VirtualBackgroundScene.unity",
             "Assets/API-Example/examples/advanced/VoiceChanger/VoiceChangerScene.unity"
         };
         return scenes;

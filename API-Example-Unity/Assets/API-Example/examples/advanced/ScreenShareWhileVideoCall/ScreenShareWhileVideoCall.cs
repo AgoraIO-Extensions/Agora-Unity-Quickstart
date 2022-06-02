@@ -42,7 +42,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShareWhileVideoCall
         private void Start()
         {
 #if UNITY_IPHONE || UNITY_ANDROID
-           this.Log.UpdateLog("Not Support in this platform!");
+           this.LogText.text = "Not Support in this platform!";
 #else
             LoadAssetData();
             if (CheckAppId())

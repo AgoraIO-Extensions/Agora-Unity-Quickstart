@@ -90,5 +90,8 @@ EditorBuildSettings:
     path: Assets/API-Example/examples/advanced/TakeSnapshot/TakeSnapshotScene.unity
     guid: 49d61b9ad1b4d41c0be0f71894bca71e
   - enabled: 1
+    path: Assets/API-Example/examples/advanced/VirtualBackground/VirtualBackgroundScene.unity
+    guid: 5b10ad6c190314ef581e0a6b00b6761e
+  - enabled: 1
     path: Assets/API-Example/examples/advanced/VoiceChanger/VoiceChangerScene.unity
     guid: 5e00dd36388ca4686be1bdf82e52b79d

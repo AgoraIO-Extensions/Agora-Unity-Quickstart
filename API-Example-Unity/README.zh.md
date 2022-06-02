@@ -45,6 +45,7 @@
 | [StartRtmpStreamWithTranscoding](https://github.com/AgoraIO/Agora-Unity-Quickstart/tree/master/API-Example-Unity/Assets/API-Example/examples/advanced/StartRtmpStreamWithTranscoding) | 推流到CDN        | StartRtmpStreamWithTranscoding, UpdateRtmpTranscoding, StopRtmpStream                        |
 | [StreamMessage](https://github.com/AgoraIO/Agora-Unity-Quickstart/tree/master/API-Example-Unity/Assets/API-Example/examples/advanced/StreamMessage) | 发送流数据        | CreateDataStream, SendStreamMessage                        |
 | [TakeSnapshot](https://github.com/AgoraIO/Agora-Unity-Quickstart/tree/master/API-Example-Unity/Assets/API-Example/examples/advanced/TakeSnapshot) | 屏幕截图      | TakeSnapshot                        |
+| [VirtualBackground](https://github.com/AgoraIO/Agora-Unity-Quickstart/tree/master/API-Example-Unity/Assets/API-Example/examples/advanced/VirtualBackground) | 开启虚拟背景   | EnableVirtualBackground                 |
 | [VoiceChanger](https://github.com/AgoraIO/Agora-Unity-Quickstart/tree/master/API-Example-Unity/Assets/API-Example/examples/advanced/VoiceChanger) | 变声设置   | SetVoiceBeautifierPreset, SetAudioEffectPreset,SetVoiceConversionPreset,SetLocalVoicePitch, SetLocalVoiceEqualization,   SetLocalVoiceReverb                  |
 
 

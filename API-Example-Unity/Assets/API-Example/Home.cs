@@ -54,6 +54,7 @@ public class Home : MonoBehaviour
         "StartRtmpStreamWithTranscodingScene",
         "StreamMessageScene",
         "TakeSnapshotScene",
+        "VirtualBackgroundScene",
         "VoiceChangerScene"
     };
 
