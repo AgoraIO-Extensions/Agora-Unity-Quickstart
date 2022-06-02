@@ -36,7 +36,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
         internal IMediaPlayer MediaPlayer = null;
-        internal int PlayerId = 0;
+     
         internal List<uint> RemoteUserUids = new List<uint>();
 
 
@@ -117,14 +117,12 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
 
         private void InitMediaPlayer()
         {
-            MediaPlayer = RtcEngine.GetMediaPlayer();
+            MediaPlayer = RtcEngine.CreateMediaPlayer();
             if (MediaPlayer == null)
             {
                 Debug.Log("GetAgoraRtcMediaPlayer failed!");
             }
-
-            PlayerId = MediaPlayer.CreateMediaPlayer();
-            Debug.Log("playerId id: " + PlayerId);
+            Debug.Log("playerId id: " + MediaPlayer.GetId());
         }
 
         private void JoinChannel()
@@ -251,9 +249,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
 
             if (this.ToggleMediaPlay.isOn)
             {
-                var ret = this.MediaPlayer.Open(this.PlayerId, "https://big-class-test.oss-cn-hangzhou.aliyuncs.com/61102.1592987815092.mp4", 0);
+                var ret = this.MediaPlayer.Open( "https://big-class-test.oss-cn-hangzhou.aliyuncs.com/61102.1592987815092.mp4", 0);
                 this.Log.UpdateLog("Media palyer ret:" + ret);
-                var sourceId = this.PlayerId;
+                var sourceId = this.MediaPlayer.GetId();
                 this.Log.UpdateLog("Media palyer ret:" + ret);
                 list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.MEDIA_PLAYER_SOURCE, 0, sourceId.ToString(), 0, 0, 360, 240, 1, 1, false));
             }

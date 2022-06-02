@@ -28,7 +28,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
 
         public Text LogText;
         internal Logger Log;
-        internal IRtcEngine RtcEngine = null;
+        internal IRtcEngineEx RtcEngine = null;
 
         internal bool IJoinChannel = false;
 
@@ -73,7 +73,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
 
         private void InitEngine()
         {
-            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngineEx();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,

@@ -29,11 +29,10 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
 
         public Text LogText;
         internal Logger Log;
-        internal IRtcEngine RtcEngine = null;
+        internal IRtcEngineEx RtcEngine = null;
         internal IMediaPlayer MediaPlayer = null;
 
 
-        public int PlayerId = 0;
         private const string MPK_URL =
             "https://agora-adc-artifacts.oss-cn-beijing.aliyuncs.com/video/meta_live_mpk.mov";
 
@@ -54,7 +53,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
                 InitMediaPlayer();
                 InitSpatialAudioEngine();
                 JoinChannelEx(_channelName, 123);
-                JoinChannelExWithMPK(_channelName, 67890, PlayerId);
+                JoinChannelExWithMPK(_channelName, 67890, MediaPlayer.GetId());
             }
         }
 
@@ -83,7 +82,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
 
         private void InitEngine()
         {
-            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngineEx();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
@@ -95,16 +94,16 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
 
         private void InitMediaPlayer()
         {
-            MediaPlayer = RtcEngine.GetMediaPlayer();
+            MediaPlayer = RtcEngine.CreateMediaPlayer();
             if (MediaPlayer == null)
             {
                 Debug.Log("GetAgoraRtcMediaPlayer failed!");
                 return;
             }
-            PlayerId = MediaPlayer.CreateMediaPlayer();
+
             MpkEventHandler handler = new MpkEventHandler(this);
             MediaPlayer.InitEventHandler(handler);
-            Debug.Log("playerId id: " + PlayerId);
+            Debug.Log("playerId id: " + MediaPlayer.GetId());
         }
 
         private void InitSpatialAudioEngine()
@@ -121,7 +120,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
             RtcEngine.EnableVideo();
             RtcEngine.EnableSpatialAudio(true);
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            
+
             RtcConnection connection = new RtcConnection();
             connection.channelId = channelName;
             connection.localUid = uid;
@@ -184,10 +183,10 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
 
         private void onOpenButtonPress()
         {
-            var ret = MediaPlayer.Open(PlayerId, MPK_URL, 0);
+            var ret = MediaPlayer.Open(MPK_URL, 0);
             Debug.Log("_mediaPlayer.Open returns: " + ret);
 
-            MediaPlayer.AdjustPlayoutVolume(PlayerId, 0);
+            MediaPlayer.AdjustPlayoutVolume(0);
         }
 
         private void OnDestroy()
@@ -297,15 +296,15 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
             _spatialAudio = spatialAudio;
         }
 
-        public override void OnPlayerSourceStateChanged(int playerId, MEDIA_PLAYER_STATE state, MEDIA_PLAYER_ERROR ec)
+        public override void OnPlayerSourceStateChanged(MEDIA_PLAYER_STATE state, MEDIA_PLAYER_ERROR ec)
         {
             _spatialAudio.Log.UpdateLog(string.Format(
-                "OnPlayerSourceStateChanged state: {0}, ec: {1}, playId: {2}", state, ec, playerId));
+                "OnPlayerSourceStateChanged state: {0}, ec: {1}, playId: {2}", state, ec, _spatialAudio.MediaPlayer.GetId()));
             Debug.Log("OnPlayerSourceStateChanged");
             if (state == MEDIA_PLAYER_STATE.PLAYER_STATE_OPEN_COMPLETED)
             {
                 _spatialAudio.x = 1;
-                var ret = _spatialAudio.MediaPlayer.Play(playerId);
+                var ret = _spatialAudio.MediaPlayer.Play();
                 Debug.Log("Play return" + ret);
                 SpatialAudioWithMediaPlayer.MakeVideoView(67890, _spatialAudio.GetChannelName());
             }
@@ -315,7 +314,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
             }
         }
 
-        public override void OnPlayerEvent(int playerId, MEDIA_PLAYER_EVENT @event, Int64 elapsedTime, string message)
+        public override void OnPlayerEvent(MEDIA_PLAYER_EVENT @event, Int64 elapsedTime, string message)
         {
 
 
