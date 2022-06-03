@@ -98,7 +98,7 @@ namespace CustomAudioSink
         void KickStartAudio(AudioSource aud, string clipName)
         {
             var bufferLength = SAMPLES * 100; // 1-sec-length buffer
-            audioBuffer = new RingBuffer<float>(bufferLength);
+            audioBuffer = new RingBuffer<float>(bufferLength, overflow: true);
 
             _audioRawDataManager = AudioRawDataManager.GetInstance(mRtcEngine);
 
