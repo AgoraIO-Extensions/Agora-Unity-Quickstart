@@ -512,8 +512,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -142.5, y: -41.6}
-  m_SizeDelta: {x: -297.1, y: -83.1}
+  m_AnchoredPosition: {x: -229.8, y: -41.6}
+  m_SizeDelta: {x: -471.6, y: -83.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &424067497
 MonoBehaviour:
@@ -1395,6 +1395,8 @@ MonoBehaviour:
   _token: 
   _channelName: 
   LogText: {fileID: 424067497}
+  Uid1: 123
+  Uid2: 456
 --- !u!1 &1370585358
 GameObject:
   m_ObjectHideFlags: 0
@@ -1505,8 +1507,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -153, y: 135}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchoredPosition: {x: -250.9, y: 135}
+  m_SizeDelta: {x: 395.9, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1429482570
 MonoBehaviour:

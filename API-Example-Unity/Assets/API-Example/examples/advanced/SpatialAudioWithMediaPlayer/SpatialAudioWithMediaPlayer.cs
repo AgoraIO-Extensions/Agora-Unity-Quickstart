@@ -221,6 +221,12 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
             videoSurface.SetForUser(uid, channelId, VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE);
             videoSurface.SetEnable(true);
             videoSurface.EnableFilpTextureApply(true, false);
+            videoSurface.OnTextureSizeModify += (int width, int height) =>
+            {
+                float scale = (float)height / (float)width;
+                videoSurface.transform.localScale = new Vector3(2, 2 * scale, 1);
+                Debug.Log("OnTextureSizeModify: " + width + "  " + height);
+            };
         }
 
         // VIDEO TYPE 1: 3D Object

@@ -206,6 +206,14 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
             // configure videoSurface
             videoSurface.SetForUser(uid, channelId, videoSourceType);
             videoSurface.SetEnable(true);
+
+            videoSurface.OnTextureSizeModify += (int width, int height) =>
+            {
+                float scale = (float)height / (float)width;
+                videoSurface.transform.localScale = new Vector3(2, 2 * scale, 1);
+                Debug.Log("OnTextureSizeModify: " + width + "  " + height);
+            };
+
             videoSurface.EnableFilpTextureApply(true, false);
         }
 
