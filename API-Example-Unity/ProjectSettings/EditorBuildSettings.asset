@@ -21,6 +21,9 @@ EditorBuildSettings:
     path: Assets/API-Example/examples/advanced/ChannelMediaRelay/ChannelMediaRelayScene.unity
     guid: 6fe4259f41e8b4ebc9988a4776c0b73f
   - enabled: 1
+    path: Assets/API-Example/examples/advanced/ContentInspect/ContentInspectScene.unity
+    guid: d3418a868ac044da7bbfcfd80cda8e9f
+  - enabled: 1
     path: Assets/API-Example/examples/advanced/CustomCaptureAudio/CustomCaptureAudioScene.unity
     guid: b9bb49b57ed774507b9e5d93624c57f6
   - enabled: 1

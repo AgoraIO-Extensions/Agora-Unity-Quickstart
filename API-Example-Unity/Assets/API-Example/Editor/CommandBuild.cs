@@ -20,6 +20,7 @@ public class CommandBuild : MonoBehaviour
 
             "Assets/API-Example/examples/advanced/AudioMixing/AudioMixingScene.unity",
             "Assets/API-Example/examples/advanced/ChannelMediaRelay/ChannelMediaRelayScene.unity",
+            "Assets/API-Example/examples/advanced/ContentInspect/ContentInspectScene.unity",
             "Assets/API-Example/examples/advanced/CustomCaptureAudio/CustomCaptureAudioScene.unity",
             "Assets/API-Example/examples/advanced/CustomCaptureVideo/CustomCaptureVideoScene.unity",
             "Assets/API-Example/examples/advanced/CustomRenderAudio/CustomRenderAudioScene.unity",
