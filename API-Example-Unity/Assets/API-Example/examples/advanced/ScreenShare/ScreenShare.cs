@@ -6,7 +6,6 @@ using agora.rtc;
 using agora.util;
 using UnityEngine.Serialization;
 using Logger = agora.util.Logger;
-using Random = UnityEngine.Random;
 
 namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
 {
@@ -42,7 +41,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
         {
 #if UNITY_IPHONE || UNITY_ANDROID
             this.LogText.text = "Not Support in this platform!";
-
 #else
             LoadAssetData();
             if (CheckAppId())
@@ -210,7 +208,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
             videoSurface.OnTextureSizeModify += (int width, int height) =>
             {
                 float scale = (float)height / (float)width;
-                videoSurface.transform.localScale = new Vector3(2, 2 * scale, 1);
+                videoSurface.transform.localScale = new Vector3(5, 5 * scale, 1);
                 Debug.Log("OnTextureSizeModify: " + width + "  " + height);
             };
 
