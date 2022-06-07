@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using agora.rtc;
@@ -9,42 +9,46 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
 {
     public class DualCamera : MonoBehaviour
     {
-        [FormerlySerializedAs("AgoraBaseProfile")] [SerializeField]
-        private AgoraBaseProfile agoraBaseProfile;
-        
+        [FormerlySerializedAs("appIdInput")]
+        [SerializeField]
+        private AppIdInput _appIdInput;
+
         [Header("_____________Basic Configuration_____________")]
-        [FormerlySerializedAs("APP_ID")] [SerializeField]
-        private string appID = "";
+        [FormerlySerializedAs("APP_ID")]
+        [SerializeField]
+        private string _appID = "";
 
-        [FormerlySerializedAs("TOKEN")] [SerializeField]
-        private string token = "";
+        [FormerlySerializedAs("TOKEN")]
+        [SerializeField]
+        private string _token = "";
 
-        [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
-        private string channelName = "";
+        [FormerlySerializedAs("CHANNEL_NAME")]
+        [SerializeField]
+        private string _channelName = "";
 
-        public Text logText;
-        internal Logger Logger;
-        internal IAgoraRtcEngine _mRtcEngine = null;
-        private const float Offset = 100;
+        public Text LogText;
+        internal Logger Log;
+        internal IRtcEngineEx RtcEngine = null;
 
-        private Button _JoinChannelbutton;
-        private Button _LeaveChannelbutton;
-        private Button _StartButton;
+        internal bool IsChannelJoined = false;
 
-        internal bool isJoinChannel = false;
+        private IVideoDeviceManager _videoDeviceManager;
+        private DeviceInfo[] _videoDeviceInfos;
+        private CameraCapturerConfiguration _config1;
+        private CameraCapturerConfiguration _config2;
 
-        private IAgoraRtcVideoDeviceManager _videoDeviceManager;
-        internal DeviceInfo[] _videoDeviceInfos;
-        internal CameraCapturerConfiguration config1;
-        internal CameraCapturerConfiguration config2;
+        public uint UID1 = 123;
+        public uint UID2 = 456;
 
         // Use this for initialization
         private void Start()
         {
             LoadAssetData();
-            CheckAppId();
-            InitEngine();
-            GetVideoDeviceManager();
+            if (CheckAppId())
+            {
+                InitEngine();
+                GetVideoDeviceManager();
+            }
         }
 
         // Update is called once per frame
@@ -53,112 +57,113 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
             PermissionHelper.RequestMicrophontPermission();
             PermissionHelper.RequestCameraPermission();
         }
-        
-        private void CheckAppId()
+
+        private bool CheckAppId()
         {
-            Logger = new Logger(logText);
-            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+            Log = new Logger(LogText);
+            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
-        
+
         //Show data in AgoraBasicProfile
         [ContextMenu("ShowAgoraBasicProfileData")]
-        public void LoadAssetData()
+        private void LoadAssetData()
         {
-            if (agoraBaseProfile == null) return;
-            appID = agoraBaseProfile.appID;
-            token = agoraBaseProfile.token;
-            channelName = agoraBaseProfile.channelName;
+            if (_appIdInput == null) return;
+            _appID = _appIdInput.appID;
+            _token = _appIdInput.token;
+            _channelName = _appIdInput.channelName;
         }
 
         private void InitEngine()
         {
-            _mRtcEngine = AgoraRtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngineEx();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(null, appID, null, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            _mRtcEngine.Initialize(context);
-            _mRtcEngine.InitEventHandler(handler);
-            _mRtcEngine.SetLogFile("./log.txt");
-            _mRtcEngine.StartPreview();
-            _mRtcEngine.EnableAudio();
-            _mRtcEngine.EnableVideo();
-            _mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.Initialize(context);
+            RtcEngine.InitEventHandler(handler);
         }
 
-        public void MainCameraJoinChannel()
+        private void MainCameraJoinChannel()
         {
-            var ret = _mRtcEngine.StartPrimaryCameraCapture(config1);
-            Logger.UpdateLog(
+            RtcEngine.StartPreview();
+            RtcEngine.EnableAudio();
+            RtcEngine.EnableVideo();
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            
+            var ret = RtcEngine.StartPrimaryCameraCapture(_config1);
+            Log.UpdateLog(
                 string.Format("StartPrimaryCameraCapture returns: {0}", ret));
             ChannelMediaOptions options1 = new ChannelMediaOptions();
-            options1.publishCameraTrack = true;
-            options1.publishAudioTrack = true;
-            options1.autoSubscribeAudio = true;
-            options1.autoSubscribeVideo = true;
-            options1.publishScreenTrack = false;
-            options1.enableAudioRecordingOrPlayout = true;
-            options1.clientRoleType = CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER;
-            ret = _mRtcEngine.JoinChannel(token, channelName, 123, options1);
+            options1.publishCameraTrack.SetValue(true);
+            options1.publishAudioTrack.SetValue(true);
+            options1.autoSubscribeAudio.SetValue(true);
+            options1.autoSubscribeVideo.SetValue(true);
+            options1.publishScreenTrack.SetValue(false);
+            options1.enableAudioRecordingOrPlayout.SetValue(true);
+            options1.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            ret = RtcEngine.JoinChannel(_token, _channelName, UID1, options1);
             Debug.Log("MainCameraJoinChannel returns: " + ret);
         }
-        
-        public void SecondCameraJoinChannel()
+
+        private void SecondCameraJoinChannel()
         {
-            var ret = _mRtcEngine.StartSecondaryCameraCapture(config2);
-            Logger.UpdateLog(
+            var ret = RtcEngine.StartSecondaryCameraCapture(_config2);
+            Log.UpdateLog(
                 string.Format("StartSecondaryCameraCapture returns: {0}", ret));
             ChannelMediaOptions options2 = new ChannelMediaOptions();
-            options2.autoSubscribeAudio = false;
-            options2.autoSubscribeVideo = false;
-            options2.publishAudioTrack = false;
-            options2.publishCameraTrack = false;
-            options2.publishSecondaryCameraTrack = true;
-            options2.enableAudioRecordingOrPlayout = false;
-            options2.clientRoleType = CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER;
-            ret = _mRtcEngine.JoinChannelEx(token, new RtcConnection(channelName, 456), options2, null);
+            options2.autoSubscribeAudio.SetValue(false);
+            options2.autoSubscribeVideo.SetValue(false);
+            options2.publishAudioTrack.SetValue(false);
+            options2.publishCameraTrack.SetValue(false);
+            options2.publishSecondaryCameraTrack.SetValue(true);
+            options2.enableAudioRecordingOrPlayout.SetValue(false);
+            options2.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            ret = RtcEngine.JoinChannelEx(_token, new RtcConnection(_channelName, UID2), options2);
             Debug.Log("JoinChannelEx returns: " + ret);
         }
-        
+
         private void GetVideoDeviceManager()
         {
-            _videoDeviceManager = _mRtcEngine.GetAgoraRtcVideoDeviceManager();
+            _videoDeviceManager = RtcEngine.GetVideoDeviceManager();
             _videoDeviceInfos = _videoDeviceManager.EnumerateVideoDevices();
-            Logger.UpdateLog(string.Format("VideoDeviceManager count: {0}", _videoDeviceInfos.Length));
+            Log.UpdateLog(string.Format("VideoDeviceManager count: {0}", _videoDeviceInfos.Length));
             for (var i = 0; i < _videoDeviceInfos.Length; i++)
             {
-                Logger.UpdateLog(string.Format("VideoDeviceManager device index: {0}, name: {1}, id: {2}", i,
+                Log.UpdateLog(string.Format("VideoDeviceManager device index: {0}, name: {1}, id: {2}", i,
                     _videoDeviceInfos[i].deviceName, _videoDeviceInfos[i].deviceId));
             }
 
-            config1 = new CameraCapturerConfiguration();
-            config1.deviceId = _videoDeviceInfos[0].deviceId;
-            Debug.Log("PrimaryCamera: " + config1.deviceId);
-            config1.format = new VideoFormat();
+            _config1 = new CameraCapturerConfiguration();
+            _config1.deviceId = _videoDeviceInfos[0].deviceId;
+            Debug.Log("PrimaryCamera: " + _config1.deviceId);
+            _config1.format = new VideoFormat();
 
             if (_videoDeviceInfos.Length > 1)
             {
-                config2 = new CameraCapturerConfiguration();
-                config2.deviceId = _videoDeviceInfos[1].deviceId;
-                Debug.Log("SecondaryCamera: " + config2.deviceId);
-                config2.format = new VideoFormat();
+                _config2 = new CameraCapturerConfiguration();
+                _config2.deviceId = _videoDeviceInfos[1].deviceId;
+                Debug.Log("SecondaryCamera: " + _config2.deviceId);
+                _config2.format = new VideoFormat();
             }
         }
 
-        private void OnApplicationQuit()
+        private void OnDestroy()
         {
-            Debug.Log("OnApplicationQuit");
-            if (_mRtcEngine == null) return;
-            _mRtcEngine.StopSecondaryCameraCapture();
-            _mRtcEngine.StopPrimaryCameraCapture();
-            _mRtcEngine.LeaveChannelEx(new RtcConnection(channelName, 456));
-            _mRtcEngine.LeaveChannel();
-            _mRtcEngine.Dispose();
+            Debug.Log("OnDestroy");
+            if (RtcEngine == null) return;
+            RtcEngine.InitEventHandler(null);
+            RtcEngine.LeaveChannel();
+            RtcEngine.StopSecondaryCameraCapture();
+            RtcEngine.StopPrimaryCameraCapture();
+            RtcEngine.LeaveChannelEx(new RtcConnection(_channelName, 456));
+            RtcEngine.Dispose();
         }
 
         internal string GetChannelName()
         {
-            return channelName;
+            return _channelName;
         }
 
         internal static void MakeVideoView(uint uid, string channelId = "", VIDEO_SOURCE_TYPE videoSourceType = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA)
@@ -168,15 +173,15 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
             {
                 return; // reuse
             }
-            
+
             // create a GameObject and assign to this new user
-            AgoraVideoSurface videoSurface = new AgoraVideoSurface();
-            
+            VideoSurface videoSurface = null;
+
             if (videoSourceType == VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA)
             {
                 videoSurface = MakeImageSurface("MainCameraView");
             }
-            else if(videoSourceType == VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_SECONDARY)
+            else if (videoSourceType == VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_SECONDARY)
             {
                 videoSurface = MakeImageSurface("SecondCameraView");
             }
@@ -188,18 +193,26 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
             if (ReferenceEquals(videoSurface, null)) return;
             // configure videoSurface
             videoSurface.SetForUser(uid, channelId, videoSourceType);
+
+            videoSurface.OnTextureSizeModify += (int width, int height) =>
+            {
+                float scale = (float)height / (float)width;
+                videoSurface.transform.localScale = new Vector3(5, 5 * scale, 1);
+                Debug.Log("OnTextureSizeModify: " + width + "  " + height);
+            };
+
             videoSurface.SetEnable(true);
         }
 
         // VIDEO TYPE 1: 3D Object
-        private AgoraVideoSurface MakePlaneSurface(string goName)
+        private static VideoSurface MakePlaneSurface(string goName)
         {
             var go = GameObject.Find(goName);
             if (!ReferenceEquals(go, null))
             {
                 return null; // reuse
             }
-            
+
             go = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
             if (go == null)
@@ -210,18 +223,16 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
             go.name = goName;
             // set up transform
             go.transform.Rotate(-90.0f, 0.0f, 0.0f);
-            var yPos = Random.Range(3.0f, 5.0f);
-            var xPos = Random.Range(-2.0f, 2.0f);
-            go.transform.position = new Vector3(xPos, yPos, 0f);
+            go.transform.position = Vector3.zero;
             go.transform.localScale = new Vector3(0.25f, 0.5f, 0.5f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<AgoraVideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurface>();
             return videoSurface;
         }
 
         // Video TYPE 2: RawImage
-        private static AgoraVideoSurface MakeImageSurface(string goName)
+        private static VideoSurface MakeImageSurface(string goName)
         {
             GameObject go = new GameObject();
 
@@ -248,14 +259,11 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
 
             // set up transform
             go.transform.Rotate(0f, 0.0f, 180.0f);
-            var xPos = Random.Range(Offset - Screen.width / 2f, Screen.width / 2f - Offset);
-            var yPos = Random.Range(Offset, Screen.height / 2f - Offset);
-            Debug.Log("position x " + xPos + " y: " + yPos);
-            go.transform.localPosition = new Vector3(xPos, yPos, 0f);
+            go.transform.localPosition = Vector3.zero;
             go.transform.localScale = new Vector3(2f, 3f, 1f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<AgoraVideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurface>();
             return videoSurface;
         }
 
@@ -269,7 +277,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
         }
     }
 
-    internal class UserEventHandler : IAgoraRtcEngineEventHandler
+    internal class UserEventHandler : IRtcEngineEventHandler
     {
         private readonly DualCamera _videoSample;
 
@@ -280,29 +288,29 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
 
         public override void OnWarning(int warn, string msg)
         {
-            _videoSample.Logger.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
+            _videoSample.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
         }
 
         public override void OnError(int err, string msg)
         {
-            _videoSample.Logger.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+            _videoSample.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
         }
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            _videoSample.isJoinChannel = true;
-            _videoSample.Logger.UpdateLog(string.Format("sdk version: ${0}",
-                _videoSample._mRtcEngine.GetVersion()));
-            _videoSample.Logger.UpdateLog(
+            _videoSample.IsChannelJoined = true;
+            _videoSample.Log.UpdateLog(string.Format("sdk version: ${0}",
+                _videoSample.RtcEngine.GetVersion()));
+            _videoSample.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                     connection.channelId, connection.localUid, elapsed));
 
-            if (connection.localUid == 123)
+            if (connection.localUid == _videoSample.UID1)
             {
                 DualCamera.MakeVideoView(0);
             }
 
-            if (connection.localUid == 456)
+            if (connection.localUid == _videoSample.UID2)
             {
                 DualCamera.MakeVideoView(0, "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_SECONDARY);
             }
@@ -310,19 +318,19 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
 
         public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            _videoSample.Logger.UpdateLog("OnRejoinChannelSuccess");
+            _videoSample.Log.UpdateLog("OnRejoinChannelSuccess");
         }
 
         public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
         {
-            _videoSample.isJoinChannel = false;
-            _videoSample.Logger.UpdateLog("OnLeaveChannel");
-            if (connection.localUid == 123)
+            _videoSample.IsChannelJoined = false;
+            _videoSample.Log.UpdateLog("OnLeaveChannel");
+            if (connection.localUid == _videoSample.UID1)
             {
                 DualCamera.DestroyVideoView("MainCameraView");
             }
 
-            if (connection.localUid == 456)
+            if (connection.localUid == _videoSample.UID2)
             {
                 DualCamera.DestroyVideoView("SecondCameraView");
             }
@@ -331,13 +339,13 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
         public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole,
             CLIENT_ROLE_TYPE newRole)
         {
-            _videoSample.Logger.UpdateLog("OnClientRoleChanged");
+            _videoSample.Log.UpdateLog("OnClientRoleChanged");
         }
 
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
-            _videoSample.Logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-            if (uid != 123 && uid != 456)
+            _videoSample.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+            if (uid != _videoSample.UID1 && uid != _videoSample.UID2)
             {
                 DualCamera.MakeVideoView(uid, _videoSample.GetChannelName());
             }
@@ -345,9 +353,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
         {
-            _videoSample.Logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
-                (int) reason));
-            if (uid != 123 && uid != 456)
+            _videoSample.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+                (int)reason));
+            if (uid != _videoSample.UID1 && uid != _videoSample.UID2)
             {
                 DualCamera.DestroyVideoView(uid.ToString());
             }

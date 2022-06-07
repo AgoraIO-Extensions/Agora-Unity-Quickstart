@@ -11,80 +11,81 @@ namespace Agora_Plugin.API_Example.examples.advanced.VoiceChanger
     public class VoiceChanger : MonoBehaviour
     {
 
-        [FormerlySerializedAs("AgoraBaseProfile")]
+        [FormerlySerializedAs("appIdInput")]
         [SerializeField]
-        private AgoraBaseProfile agoraBaseProfile;
+        private AppIdInput _appIdInput;
 
         [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")]
         [SerializeField]
-        private string appID = "";
+        private string _appID = "";
 
         [FormerlySerializedAs("TOKEN")]
         [SerializeField]
-        private string token = "";
+        private string _token = "";
 
         [FormerlySerializedAs("CHANNEL_NAME")]
         [SerializeField]
-        private string channelName = "";
+        private string _channelName = "";
 
-        public Text logText;
-        private Logger logger;
-        internal IAgoraRtcEngine mRtcEngine = null;
+        public Text LogText;
+        internal Logger Log;
+        internal IRtcEngine RtcEngine = null;
 
-
-        void Start()
+        private void Start()
         {
             LoadAssetData();
-            CheckAppId();
-            InitEngine();
-            SetupUI();
-            JoinChannel();
+            if (CheckAppId())
+            {
+                InitEngine();
+                SetupUI();
+                JoinChannel();
+            }
         }
 
 
         [ContextMenu("ShowAgoraBasicProfileData")]
         public void LoadAssetData()
         {
-            if (agoraBaseProfile == null) return;
-            appID = agoraBaseProfile.appID;
-            token = agoraBaseProfile.token;
-            channelName = agoraBaseProfile.channelName;
+            if (_appIdInput == null) return;
+            _appID = _appIdInput.appID;
+            _token = _appIdInput.token;
+            _channelName = _appIdInput.channelName;
         }
 
-        void CheckAppId()
+        private bool CheckAppId()
         {
-            logger = new Logger(logText);
-            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+            Log = new Logger(LogText);
+            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
-        void InitEngine()
+        private void InitEngine()
         {
-            mRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(null, appID, null, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            mRtcEngine.Initialize(context);
-            mRtcEngine.InitEventHandler(handler);
-            mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            mRtcEngine.EnableAudio();
+            RtcEngine.Initialize(context);
+            RtcEngine.InitEventHandler(handler);
         }
 
-        void JoinChannel()
+        private void JoinChannel()
         {
-            mRtcEngine.JoinChannel(token, channelName, "");
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.EnableAudio();
+            RtcEngine.JoinChannel(_token, _channelName, "");
         }
 
-        void Update()
+        private void Update()
         {
             PermissionHelper.RequestMicrophontPermission();
         }
 
-
-        void SetupUI()
+        private void SetupUI()
         {
             Transform content = GameObject.Find("Canvas/Scroll View/Viewport/Content").transform;
+
             Button but = content.Find("ChatBeautifierButton").GetComponent<Button>();
             but.onClick.AddListener(OnChatBeautifierButtonPress);
 
@@ -93,9 +94,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.VoiceChanger
 
             but = content.Find("TimbreTransformationButton").GetComponent<Button>();
             but.onClick.AddListener(OnTimbreTransformationButtonPress);
-
-            but = content.Find("OffVoiceBeautifierButton").GetComponent<Button>();
-            but.onClick.AddListener(OnOffVoiceBeautifierButtonPress);
 
             but = content.Find("OffVoiceBeautifierButton").GetComponent<Button>();
             but.onClick.AddListener(OnOffVoiceBeautifierButtonPress);
@@ -125,107 +123,108 @@ namespace Agora_Plugin.API_Example.examples.advanced.VoiceChanger
             but.onClick.AddListener(OnCustomVocalEffectsButtonPress);
         }
 
-        void OnApplicationQuit()
+        private void OnDestroy()
         {
-            Debug.Log("OnApplicationQuit");
-            if (mRtcEngine != null)
-            {
-                mRtcEngine.LeaveChannel();
-                mRtcEngine.Dispose();
-            }
+            Debug.Log("OnDestroy");
+            if (RtcEngine == null) return;
+            RtcEngine.InitEventHandler(null);
+            RtcEngine.LeaveChannel();
+            RtcEngine.Dispose();
         }
+
+
 
         #region VoiceBeautifier
-        void OnChatBeautifierButtonPress()
+        private void OnChatBeautifierButtonPress()
         {
-            mRtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
-            int nRet = mRtcEngine.SetVoiceBeautifierPreset(VOICE_BEAUTIFIER_PRESET.CHAT_BEAUTIFIER_MAGNETIC);
-            this.logger.UpdateLog(string.Format("SetVoiceBeautifierPreset nRet:{0}", nRet));
+            RtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
+            int nRet = RtcEngine.SetVoiceBeautifierPreset(VOICE_BEAUTIFIER_PRESET.CHAT_BEAUTIFIER_MAGNETIC);
+            this.Log.UpdateLog(string.Format("SetVoiceBeautifierPreset nRet:{0}", nRet));
         }
 
-        void OnSingingBeautifierButtonPress()
+        private void OnSingingBeautifierButtonPress()
         {
-            mRtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
-            int nRet = mRtcEngine.SetVoiceBeautifierPreset(VOICE_BEAUTIFIER_PRESET.SINGING_BEAUTIFIER);
-            this.logger.UpdateLog(string.Format("SetVoiceBeautifierPreset nRet:{0}", nRet));
+            RtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
+            int nRet = RtcEngine.SetVoiceBeautifierPreset(VOICE_BEAUTIFIER_PRESET.SINGING_BEAUTIFIER);
+            this.Log.UpdateLog(string.Format("SetVoiceBeautifierPreset nRet:{0}", nRet));
         }
 
-        void OnTimbreTransformationButtonPress()
+        private void OnTimbreTransformationButtonPress()
         {
-            mRtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
-            int nRet = mRtcEngine.SetVoiceBeautifierPreset(VOICE_BEAUTIFIER_PRESET.TIMBRE_TRANSFORMATION_VIGOROUS);
-            this.logger.UpdateLog(string.Format("SetVoiceBeautifierPreset nRet:{0}", nRet));
+            RtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
+            int nRet = RtcEngine.SetVoiceBeautifierPreset(VOICE_BEAUTIFIER_PRESET.TIMBRE_TRANSFORMATION_VIGOROUS);
+            this.Log.UpdateLog(string.Format("SetVoiceBeautifierPreset nRet:{0}", nRet));
         }
 
-        void OnOffVoiceBeautifierButtonPress()
+        private void OnOffVoiceBeautifierButtonPress()
         {
-            mRtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
-            int nRet = mRtcEngine.SetVoiceBeautifierPreset(VOICE_BEAUTIFIER_PRESET.VOICE_BEAUTIFIER_OFF);
-            this.logger.UpdateLog(string.Format("SetVoiceBeautifierPreset nRet:{0}", nRet));
+            RtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
+            int nRet = RtcEngine.SetVoiceBeautifierPreset(VOICE_BEAUTIFIER_PRESET.VOICE_BEAUTIFIER_OFF);
+            this.Log.UpdateLog(string.Format("SetVoiceBeautifierPreset nRet:{0}", nRet));
         }
         #endregion
 
         #region AudioEffect
-        void OnStyleTransformationButtonPress()
+        private void OnStyleTransformationButtonPress()
         {
-            mRtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
-            int nRet = mRtcEngine.SetAudioEffectPreset(AUDIO_EFFECT_PRESET.STYLE_TRANSFORMATION_POPULAR);
-            this.logger.UpdateLog(string.Format("SetAudioEffectPreset nRet:{0}", nRet));
+            RtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
+            int nRet = RtcEngine.SetAudioEffectPreset(AUDIO_EFFECT_PRESET.STYLE_TRANSFORMATION_POPULAR);
+            this.Log.UpdateLog(string.Format("SetAudioEffectPreset nRet:{0}", nRet));
         }
 
-        void OnRoomAcoustuicsButtonPress()
+        private void OnRoomAcoustuicsButtonPress()
         {
-            mRtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
-            int nRet = mRtcEngine.SetAudioEffectPreset(AUDIO_EFFECT_PRESET.ROOM_ACOUSTICS_KTV);
-            this.logger.UpdateLog(string.Format("SetAudioEffectPreset nRet:{0}", nRet));
+            RtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
+            int nRet = RtcEngine.SetAudioEffectPreset(AUDIO_EFFECT_PRESET.ROOM_ACOUSTICS_KTV);
+            this.Log.UpdateLog(string.Format("SetAudioEffectPreset nRet:{0}", nRet));
         }
 
-        void OnPitchButtonPress()
+        private void OnPitchButtonPress()
         {
-            mRtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
-            int nRet = mRtcEngine.SetAudioEffectPreset(AUDIO_EFFECT_PRESET.PITCH_CORRECTION);
-            this.logger.UpdateLog(string.Format("SetAudioEffectPreset nRet:{0}", nRet));
+            RtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
+            int nRet = RtcEngine.SetAudioEffectPreset(AUDIO_EFFECT_PRESET.PITCH_CORRECTION);
+            this.Log.UpdateLog(string.Format("SetAudioEffectPreset nRet:{0}", nRet));
         }
 
-        void OnOffAudioEffectButtonPress()
+        private void OnOffAudioEffectButtonPress()
         {
-            mRtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
-            int nRet = mRtcEngine.SetAudioEffectPreset(AUDIO_EFFECT_PRESET.AUDIO_EFFECT_OFF);
-            this.logger.UpdateLog(string.Format("SetAudioEffectPreset nRet:{0}", nRet));
+            RtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
+            int nRet = RtcEngine.SetAudioEffectPreset(AUDIO_EFFECT_PRESET.AUDIO_EFFECT_OFF);
+            this.Log.UpdateLog(string.Format("SetAudioEffectPreset nRet:{0}", nRet));
         }
         #endregion
 
         #region VoiceConversion
-        void OnVoiceChangerButtonPress()
+        private void OnVoiceChangerButtonPress()
         {
-            mRtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
-            int nRet = mRtcEngine.SetVoiceConversionPreset(VOICE_CONVERSION_PRESET.VOICE_CHANGER_NEUTRAL);
-            this.logger.UpdateLog(string.Format("SetVoiceConversionPreset nRet:{0}", nRet));
+            RtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
+            int nRet = RtcEngine.SetVoiceConversionPreset(VOICE_CONVERSION_PRESET.VOICE_CHANGER_NEUTRAL);
+            this.Log.UpdateLog(string.Format("SetVoiceConversionPreset nRet:{0}", nRet));
         }
 
-        void OnOffVoiceChangerButtonPress()
+        private void OnOffVoiceChangerButtonPress()
         {
-            mRtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
-            int nRet = mRtcEngine.SetVoiceConversionPreset(VOICE_CONVERSION_PRESET.VOICE_CONVERSION_OFF);
-            this.logger.UpdateLog(string.Format("SetVoiceConversionPreset nRet:{0}", nRet));
+            RtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
+            int nRet = RtcEngine.SetVoiceConversionPreset(VOICE_CONVERSION_PRESET.VOICE_CONVERSION_OFF);
+            this.Log.UpdateLog(string.Format("SetVoiceConversionPreset nRet:{0}", nRet));
         }
 
         #endregion
 
         #region Custom vocal effects
-        void OnCustomVocalEffectsButtonPress()
+        private void OnCustomVocalEffectsButtonPress()
         {
 
             //Set the tone. It can be set in the range of [0.5, 2.0]. The smaller the value, the lower the tone. The default value is 1.0, which means there is no need to modify the tone.
-            int nRet = mRtcEngine.SetLocalVoicePitch(0.5);
-            this.logger.UpdateLog(string.Format("SetLocalVoicePitch nRet:{0}", nRet));
+            int nRet = RtcEngine.SetLocalVoicePitch(0.5);
+            this.Log.UpdateLog(string.Format("SetLocalVoicePitch nRet:{0}", nRet));
 
             /**
              * Set the center frequency of the local vocal equalization band
              * The first parameter is the spectrum subband index, with a value range of [0,9], representing 10 frequency bands respectively, and the corresponding center frequency is [31,62,125,250,500,1000,2000,4000,8000,16000] Hz
              * The second parameter is the gain value of each frequency interval, the value range is [- 15,15], the unit is dB, and the default value is 0
              */
-            nRet = mRtcEngine.SetLocalVoiceEqualization(AUDIO_EQUALIZATION_BAND_FREQUENCY.AUDIO_EQUALIZATION_BAND_31, -15);
+            nRet = RtcEngine.SetLocalVoiceEqualization(AUDIO_EQUALIZATION_BAND_FREQUENCY.AUDIO_EQUALIZATION_BAND_31, -15);
             //nRet = mRtcEngine.SetLocalVoiceEqualization(AUDIO_EQUALIZATION_BAND_FREQUENCY.AUDIO_EQUALIZATION_BAND_62, 3);
             //nRet = mRtcEngine.SetLocalVoiceEqualization(AUDIO_EQUALIZATION_BAND_FREQUENCY.AUDIO_EQUALIZATION_BAND_125, -9);
             //nRet = mRtcEngine.SetLocalVoiceEqualization(AUDIO_EQUALIZATION_BAND_FREQUENCY.AUDIO_EQUALIZATION_BAND_250, -8);
@@ -235,33 +234,33 @@ namespace Agora_Plugin.API_Example.examples.advanced.VoiceChanger
             //nRet = mRtcEngine.SetLocalVoiceEqualization(AUDIO_EQUALIZATION_BAND_FREQUENCY.AUDIO_EQUALIZATION_BAND_4K, -2);
             //nRet = mRtcEngine.SetLocalVoiceEqualization(AUDIO_EQUALIZATION_BAND_FREQUENCY.AUDIO_EQUALIZATION_BAND_8K, -1);
             //nRet = mRtcEngine.SetLocalVoiceEqualization(AUDIO_EQUALIZATION_BAND_FREQUENCY.AUDIO_EQUALIZATION_BAND_16K, 1);
-            this.logger.UpdateLog(string.Format("SetLocalVoiceEqualization nRet:{0}", nRet));
+            this.Log.UpdateLog(string.Format("SetLocalVoiceEqualization nRet:{0}", nRet));
 
 
             // The original vocal intensity, the so-called dry signal, has a value range of [- 20,10], and the unit is dB
-            nRet = mRtcEngine.SetLocalVoiceReverb(AUDIO_REVERB_TYPE.AUDIO_REVERB_DRY_LEVEL, 10);
-            this.logger.UpdateLog(string.Format("SetLocalVoiceReverb nRet:{0}", nRet));
+            nRet = RtcEngine.SetLocalVoiceReverb(AUDIO_REVERB_TYPE.AUDIO_REVERB_DRY_LEVEL, 10);
+            this.Log.UpdateLog(string.Format("SetLocalVoiceReverb nRet:{0}", nRet));
 
             // The early reflected signal intensity, the so-called wet signal, has a value range of [- 20,10], and the unit is dB
-            nRet = mRtcEngine.SetLocalVoiceReverb(AUDIO_REVERB_TYPE.AUDIO_REVERB_WET_LEVEL, 7);
-            this.logger.UpdateLog(string.Format("SetLocalVoiceReverb nRet:{0}", nRet));
+            nRet = RtcEngine.SetLocalVoiceReverb(AUDIO_REVERB_TYPE.AUDIO_REVERB_WET_LEVEL, 7);
+            this.Log.UpdateLog(string.Format("SetLocalVoiceReverb nRet:{0}", nRet));
 
             // The room size required for reverberation effect. Generally, the larger the room is, the stronger the reverberation effect is. Value range [0100]
-            nRet = mRtcEngine.SetLocalVoiceReverb(AUDIO_REVERB_TYPE.AUDIO_REVERB_ROOM_SIZE, 6);
-            this.logger.UpdateLog(string.Format("SetLocalVoiceReverb nRet:{0}", nRet));
+            nRet = RtcEngine.SetLocalVoiceReverb(AUDIO_REVERB_TYPE.AUDIO_REVERB_ROOM_SIZE, 6);
+            this.Log.UpdateLog(string.Format("SetLocalVoiceReverb nRet:{0}", nRet));
 
             // Initial delay length of wet signal, value range [0200], unit: ms
-            nRet = mRtcEngine.SetLocalVoiceReverb(AUDIO_REVERB_TYPE.AUDIO_REVERB_WET_DELAY, 124);
-            this.logger.UpdateLog(string.Format("SetLocalVoiceReverb nRet:{0}", nRet));
+            nRet = RtcEngine.SetLocalVoiceReverb(AUDIO_REVERB_TYPE.AUDIO_REVERB_WET_DELAY, 124);
+            this.Log.UpdateLog(string.Format("SetLocalVoiceReverb nRet:{0}", nRet));
 
             // The continuous intensity of reverberation effect. The value range is [0100]. The greater the value, the stronger the reverberation effect
-            nRet = mRtcEngine.SetLocalVoiceReverb(AUDIO_REVERB_TYPE.AUDIO_REVERB_STRENGTH, 78);
-            this.logger.UpdateLog(string.Format("SetLocalVoiceReverb nRet:{0}", nRet));
+            nRet = RtcEngine.SetLocalVoiceReverb(AUDIO_REVERB_TYPE.AUDIO_REVERB_STRENGTH, 78);
+            this.Log.UpdateLog(string.Format("SetLocalVoiceReverb nRet:{0}", nRet));
         }
         #endregion
 
 
-        internal class UserEventHandler : IAgoraRtcEngineEventHandler
+        internal class UserEventHandler : IRtcEngineEventHandler
         {
             private readonly VoiceChanger _voiceChanger;
 
@@ -272,45 +271,45 @@ namespace Agora_Plugin.API_Example.examples.advanced.VoiceChanger
 
             public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
             {
-                _voiceChanger.logger.UpdateLog(string.Format("sdk version: ${0}",
-                    _voiceChanger.mRtcEngine.GetVersion()));
-                _voiceChanger.logger.UpdateLog(string.Format(
+                _voiceChanger.Log.UpdateLog(string.Format("sdk version: ${0}",
+                    _voiceChanger.RtcEngine.GetVersion()));
+                _voiceChanger.Log.UpdateLog(string.Format(
                     "onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
                     connection.localUid, elapsed));
             }
 
             public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
             {
-                _voiceChanger.logger.UpdateLog("OnLeaveChannelSuccess");
+                _voiceChanger.Log.UpdateLog("OnLeaveChannelSuccess");
             }
 
             public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
             {
-                _voiceChanger.logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid,
+                _voiceChanger.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid,
                     elapsed));
             }
 
             public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
             {
-                _voiceChanger.logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+                _voiceChanger.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                     (int)reason));
             }
 
             public override void OnWarning(int warn, string msg)
             {
-                _voiceChanger.logger.UpdateLog(
+                _voiceChanger.Log.UpdateLog(
                     string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
             }
 
             public override void OnError(int error, string msg)
             {
-                _voiceChanger.logger.UpdateLog(
+                _voiceChanger.Log.UpdateLog(
                     string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
             }
 
             public override void OnConnectionLost(RtcConnection connection)
             {
-                _voiceChanger.logger.UpdateLog(string.Format("OnConnectionLost "));
+                _voiceChanger.Log.UpdateLog(string.Format("OnConnectionLost "));
             }
         }
 

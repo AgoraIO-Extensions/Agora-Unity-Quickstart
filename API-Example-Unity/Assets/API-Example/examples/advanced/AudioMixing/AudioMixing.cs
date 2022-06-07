@@ -9,132 +9,132 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
 {
     public class AudioMixing : MonoBehaviour
     {
-        [FormerlySerializedAs("AgoraBaseProfile")] [SerializeField]
-        private AgoraBaseProfile agoraBaseProfile;
-        
+        [FormerlySerializedAs("AppIdInput")]
+        [SerializeField]
+        private AppIdInput _appIdInput;
+
         [Header("_____________Basic Configuration_____________")]
-        [FormerlySerializedAs("APP_ID")] [SerializeField]
-        private string appID = "";
+        [FormerlySerializedAs("APP_ID")]
+        [SerializeField]
+        private string _appID = "";
 
-        [FormerlySerializedAs("TOKEN")] [SerializeField]
-        private string token = "";
+        [FormerlySerializedAs("TOKEN")]
+        [SerializeField]
+        private string _token = "";
 
-        [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
-        private string channelName = "";
+        [FormerlySerializedAs("CHANNEL_NAME")]
+        [SerializeField]
+        private string _channelName = "";
 
-        [SerializeField] string Sound_URL = "";
+        [SerializeField] public string Sound_URL = "";
 
-        string localPath = "";
+        private string _localPath = "";
 
-        public Text logText;
-        internal Logger Logger;
-        private IAgoraRtcEngine _mRtcEngine = null;
-        private IAgoraRtcAudioPlaybackDeviceManager manager = null;
+        public Text LogText;
+        internal Logger Log;
+        internal IRtcEngine RtcEngine = null;
 
         // Start is called before the first frame update
-        void Start()
+        private void Start()
         {
             LoadAssetData();
-            CheckAppId();
-            InitRtcEngine();
-            SetupUI();
-            //StartAudioPlaybackTest();
-            JoinChannel();
+            if (CheckAppId())
+            {
+                InitRtcEngine();
+                SetupUI();
+                // enable it after joining
+                EnableUI(false);
+                JoinChannel();
+            }
         }
 
-        void Update()
+        private void Update()
         {
             PermissionHelper.RequestMicrophontPermission();
         }
-        
+
         //Show data in AgoraBasicProfile
         [ContextMenu("ShowAgoraBasicProfileData")]
-        public void LoadAssetData()
+        private void LoadAssetData()
         {
-            if (agoraBaseProfile == null) return;
-            appID = agoraBaseProfile.appID;
-            token = agoraBaseProfile.token;
-            channelName = agoraBaseProfile.channelName;
+            if (_appIdInput == null) return;
+            _appID = _appIdInput.appID;
+            _token = _appIdInput.token;
+            _channelName = _appIdInput.channelName;
         }
 
-        void CheckAppId()
+        private bool CheckAppId()
         {
-            Logger = new Logger(logText);
-            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in Canvas!!!!!");
+            Log = new Logger(LogText);
+            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
-        void InitRtcEngine()
+        private void InitRtcEngine()
         {
-            _mRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(null, appID, null, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            var ret = _mRtcEngine.Initialize(context);
-            _mRtcEngine.InitEventHandler(handler);
-            _mRtcEngine.EnableAudio();
+            RtcEngine.Initialize(context);
+            RtcEngine.InitEventHandler(handler);
         }
 
-        void SetupUI()
+        private void SetupUI()
         {
-            MixingButton = GameObject.Find("MixButton").GetComponent<Button>();
-            MixingButton.onClick.AddListener(HandleAudioMixingButton);
-            EffectButton = GameObject.Find("EffectButton").GetComponent<Button>();
-            EffectButton.onClick.AddListener(HandleEffectButton);
-            urlToggle = GameObject.Find("Toggle").GetComponent<Toggle>();
-            urlToggle.onValueChanged.AddListener(OnToggle);
-            _useURL = urlToggle.isOn;
+            _mixingButton = GameObject.Find("MixButton").GetComponent<Button>();
+            _mixingButton.onClick.AddListener(HandleAudioMixingButton);
+            _effectButton = GameObject.Find("EffectButton").GetComponent<Button>();
+            _effectButton.onClick.AddListener(HandleEffectButton);
+            _urlToggle = GameObject.Find("Toggle").GetComponent<Toggle>();
+            _urlToggle.onValueChanged.AddListener(OnToggle);
+            _useURL = _urlToggle.isOn;
 
 #if UNITY_ANDROID && !UNITY_EDITOR
         // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
-        localPath = "/assets/audio/DESERTMUSIC.wav";
+            _localPath = "/assets/audio/Agora.io-Interactions.mp3";
 #else
-            localPath = Application.streamingAssetsPath + "/audio/" + "DESERTMUSIC.wav";
+            _localPath = Application.streamingAssetsPath + "/audio/" + "Agora.io-Interactions.mp3";
 #endif
-            Logger.UpdateLog(string.Format("the audio file path: {0}", localPath));
-
-            EnableUI(false); // enable it after joining
+            Log.UpdateLog(string.Format("the audio file path: {0}", _localPath));
+         
         }
 
         internal void EnableUI(bool enable)
         {
-            MixingButton.enabled = enable;
-            EffectButton.enabled = enable;
+            _mixingButton.enabled = enable;
+            _effectButton.enabled = enable;
         }
 
-        void JoinChannel()
+        private void JoinChannel()
         {
-            _mRtcEngine.JoinChannel(token, channelName);
+            RtcEngine.EnableAudio();
+            var options = new ChannelMediaOptions();
+            options.publishCustomAudioTrack.SetValue(true);
+            RtcEngine.JoinChannel(_token, _channelName,0, options);
         }
 
         #region -- Test Control logic ---
 
-        void StartAudioMixing()
+        private void StartAudioMixing()
         {
             Debug.Log("Playing with " + (_useURL ? "URL" : "local file"));
 
-            var ret = _mRtcEngine.StartAudioMixing(_useURL ? Sound_URL : localPath, true, false, -1);
+            var ret = RtcEngine.StartAudioMixing(_useURL ? Sound_URL : _localPath, true, false, -1);
             Debug.Log("StartAudioMixing returns: " + ret);
         }
 
-        // void StartAudioPlaybackTest()
-        // {
-        //     manager = _mRtcEngine.GetAudioPlaybackDeviceManager();
-        //     manager.CreateAAudioPlaybackDeviceManager();
-        //     manager.StartAudioPlaybackDeviceTest(localPath);
-        // }
-
-        void PlayEffectTest()
+        private void PlayEffectTest()
         {
             Debug.Log("Playing with " + (_useURL ? "URL" : "local file"));
-            //IAudioEffectManager effectManager = _mRtcEngine.GetAudioEffectManager();
-            _mRtcEngine.PlayEffect(1, _useURL ? Sound_URL : localPath, 1, 1.0, 0, 100, true);
+            //IAudioEffectManager effectManager = mRtcEngine.GetAudioEffectManager();
+            RtcEngine.PlayEffect(1, _useURL ? Sound_URL : _localPath, 1, 1.0, 0, 100, true);
         }
 
-        void StopEffectTest()
+        private void StopEffectTest()
         {
-            //IAudioEffectManager effectManager = _mRtcEngine.GetAudioEffectManager();
-            _mRtcEngine.StopAllEffects();
+            //IAudioEffectManager effectManager = mRtcEngine.GetAudioEffectManager();
+            RtcEngine.StopAllEffects();
         }
 
         #endregion
@@ -142,37 +142,29 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
-            if (_mRtcEngine == null) return;
-            _mRtcEngine.LeaveChannel();
+            if (RtcEngine == null) return;
+            RtcEngine.InitEventHandler(null);
+            RtcEngine.LeaveChannel();
+            RtcEngine.Dispose();
         }
 
-        private void OnApplicationQuit()
-        {
-            Debug.Log("OnApplicationQuit");
-            if (_mRtcEngine != null)
-            {
-                _mRtcEngine.LeaveChannel();
-                _mRtcEngine.Dispose();
-                _mRtcEngine = null;
-            }
-        }
-
+       
         #region -- Application UI Logic ---
 
-        bool _isMixing = false;
-        Button MixingButton { get; set; }
+        private bool _isMixing = false;
+        private Button _mixingButton { get; set; }
 
-        void HandleAudioMixingButton()
+        private void HandleAudioMixingButton()
         {
             if (_effectOn)
             {
-                Logger.UpdateLog("Testing Effect right now, can't play effect...");
+                Log.UpdateLog("Testing Effect right now, can't play effect...");
                 return;
             }
 
             if (_isMixing)
             {
-                _mRtcEngine.StopAudioMixing();
+                RtcEngine.StopAudioMixing();
             }
             else
             {
@@ -180,18 +172,18 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
             }
 
             _isMixing = !_isMixing;
-            MixingButton.GetComponentInChildren<Text>().text = (_isMixing ? "Stop Mixing" : "Start Mixing");
+            _mixingButton.GetComponentInChildren<Text>().text = (_isMixing ? "Stop Mixing" : "Start Mixing");
         }
 
 
-        bool _effectOn = false;
-        Button EffectButton { get; set; }
+        private bool _effectOn = false;
+        private Button _effectButton { get; set; }
 
-        void HandleEffectButton()
+        private void HandleEffectButton()
         {
             if (_isMixing)
             {
-                Logger.UpdateLog("Testing Mixing right now, can't play effect...");
+                Log.UpdateLog("Testing Mixing right now, can't play effect...");
                 return;
             }
 
@@ -205,11 +197,11 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
             }
 
             _effectOn = !_effectOn;
-            EffectButton.GetComponentInChildren<Text>().text = (_effectOn ? "Stop Effect" : "Play Effect");
+            _effectButton.GetComponentInChildren<Text>().text = (_effectOn ? "Stop Effect" : "Play Effect");
         }
 
-        bool _useURL { get; set; }
-        Toggle urlToggle { get; set; }
+        private bool _useURL { get; set; }
+        private Toggle _urlToggle { get; set; }
 
         void OnToggle(bool enable)
         {
@@ -219,7 +211,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
         #endregion
     }
 
-    internal class UserEventHandler : IAgoraRtcEngineEventHandler
+    internal class UserEventHandler : IRtcEngineEventHandler
     {
         private readonly AudioMixing _audioMixing;
 
@@ -230,19 +222,19 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
 
         public override void OnWarning(int warn, string msg)
         {
-            _audioMixing.Logger.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
+            _audioMixing.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
         }
 
         public override void OnError(int err, string msg)
         {
-            _audioMixing.Logger.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+            _audioMixing.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
         }
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            // _audioSample.Logger.UpdateLog(string.Format("sdk version: ${0}",
-            //     _audioSample.AgoraRtcEngine.GetVersion()));
-            _audioMixing.Logger.UpdateLog(
+            _audioMixing.Log.UpdateLog(string.Format("sdk version: ${0}",
+                _audioMixing.RtcEngine.GetVersion()));
+            _audioMixing.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                     connection.channelId, connection.localUid, elapsed));
             _audioMixing.EnableUI(true);
@@ -250,34 +242,34 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
 
         public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            _audioMixing.Logger.UpdateLog("OnRejoinChannelSuccess");
+            _audioMixing.Log.UpdateLog("OnRejoinChannelSuccess");
         }
 
         public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
         {
-            _audioMixing.Logger.UpdateLog("OnLeaveChannel");
+            _audioMixing.Log.UpdateLog("OnLeaveChannel");
         }
 
         public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole,
             CLIENT_ROLE_TYPE newRole)
         {
-            _audioMixing.Logger.UpdateLog("OnClientRoleChanged");
+            _audioMixing.Log.UpdateLog("OnClientRoleChanged");
         }
 
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
-            _audioMixing.Logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+            _audioMixing.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
         {
-            _audioMixing.Logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
-                (int) reason));
+            _audioMixing.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+                (int)reason));
         }
 
         public override void OnAudioMixingStateChanged(AUDIO_MIXING_STATE_TYPE state, AUDIO_MIXING_ERROR_TYPE errorCode)
         {
-            _audioMixing.Logger.UpdateLog(string.Format("AUDIO_MIXING_STATE_TYPE: ${0}, AUDIO_MIXING_ERROR_TYPE: ${1}",
+            _audioMixing.Log.UpdateLog(string.Format("AUDIO_MIXING_STATE_TYPE: ${0}, AUDIO_MIXING_ERROR_TYPE: ${1}",
                 state, errorCode));
         }
     }

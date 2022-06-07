@@ -10,85 +10,82 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
 
     public class ChannelMediaRelay : MonoBehaviour
     {
-
-
-        [FormerlySerializedAs("AgoraBaseProfile")]
+        [FormerlySerializedAs("appIdInput")]
         [SerializeField]
-        private AgoraBaseProfile agoraBaseProfile;
+        private AppIdInput _appIdInput;
 
-        [FormerlySerializedAs("AgoraBaseProfile2")]
-        [SerializeField]
-        private AgoraBaseProfile agoraBaseProfile2;
 
         [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")]
         [SerializeField]
-        public string appID = "";
+        public string _appID = "";
 
         [FormerlySerializedAs("TOKEN")]
         [SerializeField]
-        public string token = "";
+        public string _token = "";
 
         [FormerlySerializedAs("CHANNEL_NAME")]
         [SerializeField]
-        public string channelName = "";
+        public string _channelName = "";
 
-        public Text logText;
-        public Logger logger;
-        internal IAgoraRtcEngine mRtcEngine = null;
+        public Text LogText;
+        internal Logger Log;
+        internal IRtcEngine RtcEngine = null;
 
 
-        void Start()
+        private void Start()
         {
             LoadAssetData();
-            CheckAppId();
-            InitEngine();
-            SetupUI();
-            EnableUI(false);
-            JoinChannel();
+            if (CheckAppId())
+            {
+                InitEngine();
+                SetupUI();
+                EnableUI(false);
+                JoinChannel();
+            }
         }
 
         [ContextMenu("ShowAgoraBasicProfileData")]
-        public void LoadAssetData()
+        private void LoadAssetData()
         {
-            if (agoraBaseProfile == null) return;
-            appID = agoraBaseProfile.appID;
-            token = agoraBaseProfile.token;
-            channelName = agoraBaseProfile.channelName;
+            if (_appIdInput == null) return;
+            _appID = _appIdInput.appID;
+            _token = _appIdInput.token;
+            _channelName = _appIdInput.channelName;
         }
 
-        void CheckAppId()
+        private bool CheckAppId()
         {
-            logger = new Logger(logText);
-            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+            Log = new Logger(LogText);
+            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
-        void InitEngine()
+        private void InitEngine()
         {
-            mRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(null, appID, null, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
-            mRtcEngine.Initialize(context);
-            mRtcEngine.InitEventHandler(handler);
-            mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            mRtcEngine.EnableAudio();
-            mRtcEngine.EnableVideo();
+            RtcEngine.Initialize(context);
+            RtcEngine.InitEventHandler(handler);
         }
 
-        void JoinChannel()
+        private void JoinChannel()
         {
-            mRtcEngine.JoinChannel(token, channelName, "");
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.EnableAudio();
+            RtcEngine.EnableVideo();
+            RtcEngine.JoinChannel(_token, _channelName, "");
         }
 
-        void Update()
+        private void Update()
         {
             PermissionHelper.RequestMicrophontPermission();
             PermissionHelper.RequestCameraPermission();
         }
 
-        public void SetupUI()
+        private void SetupUI()
         {
             var ui = this.transform.Find("UI");
 
@@ -115,91 +112,79 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
             ui.gameObject.SetActive(visible);
         }
 
-
-        void OnStartButtonClick()
+        private void OnStartButtonClick()
         {
-            if (this.agoraBaseProfile2 == null)
-            {
-                this.logger.UpdateLog("you must set second channel first!!");
-                return;
-            }
-
             ChannelMediaRelayConfiguration config = new ChannelMediaRelayConfiguration();
             config.srcInfo = new ChannelMediaInfo
             {
-                channelName = this.agoraBaseProfile.channelName,
+                channelName = this._appIdInput.channelName,
                 uid = 0,
-                token = this.agoraBaseProfile.token
+                token = this._appIdInput.token
             };
 
             //you can relay to another channels (limit max is 4)
             config.destInfos = new ChannelMediaInfo[1];
             config.destInfos[0] = new ChannelMediaInfo
             {
-                channelName = this.agoraBaseProfile2.channelName,
+                channelName = this._appIdInput.channelName + "_2",
                 uid = 0,
-                token = this.agoraBaseProfile2.token
+                token = this._appIdInput.token
             };
             config.destCount = 1;
 
-            mRtcEngine.StartChannelMediaRelay(config);
-
+            var nRet = RtcEngine.StartChannelMediaRelay(config);
+            this.Log.UpdateLog("StartChannelMediaRelay nRet:" + nRet);
         }
 
-        void onUpdateButtonClick()
+        private void onUpdateButtonClick()
         {
-            if (this.agoraBaseProfile2 == null)
-            {
-                this.logger.UpdateLog("you must set second channel first!!");
-                return;
-            }
-
             ChannelMediaRelayConfiguration config = new ChannelMediaRelayConfiguration();
             config.srcInfo = new ChannelMediaInfo
             {
-                channelName = this.agoraBaseProfile.channelName,
+                channelName = this._appIdInput.channelName,
                 uid = 0,
-                token = this.agoraBaseProfile.token
+                token = this._appIdInput.token
             };
 
             config.destInfos = new ChannelMediaInfo[1];
             config.destInfos[0] = new ChannelMediaInfo
             {
-                channelName = this.agoraBaseProfile2.channelName,
+                channelName = this._appIdInput.channelName + "_3",
                 uid = 0,
-                token = this.agoraBaseProfile2.token
+                token = this._appIdInput.token
             };
             config.destCount = 1;
 
             //after StartChannelMediaRelay you can use StartChannelMediaRelay to remove or relay to anthoner channel
-            mRtcEngine.UpdateChannelMediaRelay(config);
-
-
+            var nRet = RtcEngine.UpdateChannelMediaRelay(config);
+            this.Log.UpdateLog("UpdateChannelMediaRelay nRet:" + nRet);
         }
 
-        void onPauseAllButtonClick()
+        private void onPauseAllButtonClick()
         {
-            mRtcEngine.PauseAllChannelMediaRelay();
+            var nRet = RtcEngine.PauseAllChannelMediaRelay();
+            this.Log.UpdateLog("onPauseAllButtonClick nRet:" + nRet);
         }
 
-        void OnResumeAllButtonClick()
+        private void OnResumeAllButtonClick()
         {
-            mRtcEngine.ResumeAllChannelMediaRelay();
+            var nRet = RtcEngine.ResumeAllChannelMediaRelay();
+            this.Log.UpdateLog("OnResumeAllButtonClick nRet:" + nRet);
         }
 
-        void OnStopButtonClick()
+        private void OnStopButtonClick()
         {
-            mRtcEngine.StopChannelMediaRelay();
+            var nRet = RtcEngine.StopChannelMediaRelay();
+            this.Log.UpdateLog("OnStopButtonClick nRet:" + nRet);
         }
 
-        void OnApplicationQuit()
+        private void OnDestroy()
         {
-            Debug.Log("OnApplicationQuit");
-            if (mRtcEngine != null)
-            {
-                mRtcEngine.LeaveChannel();
-                mRtcEngine.Dispose();
-            }
+            Debug.Log("OnDestroy");
+            if (RtcEngine == null) return;
+            RtcEngine.InitEventHandler(null);
+            RtcEngine.LeaveChannel();
+            RtcEngine.Dispose();
         }
 
         internal static void MakeVideoView(uint uid, string channelId = "")
@@ -211,7 +196,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
             }
 
             // create a GameObject and assign to this new user
-            var videoSurface = MakePlaneSurface(uid.ToString());//MakeImageSurface(uid.ToString());
+            var videoSurface = MakeImageSurface(uid.ToString());
             if (ReferenceEquals(videoSurface, null)) return;
             // configure videoSurface
             if (uid == 0)
@@ -222,11 +207,18 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
             {
                 videoSurface.SetForUser(uid, channelId, VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE);
             }
+
+            videoSurface.OnTextureSizeModify += (int width, int height) =>
+            {
+                float scale = (float)height / (float)width;
+                videoSurface.transform.localScale = new Vector3(5, 5 * scale, 1);
+                Debug.Log("OnTextureSizeModify: " + width + "  " + height);
+            };
             videoSurface.SetEnable(true);
         }
 
         // VIDEO TYPE 1: 3D Object
-        private static AgoraVideoSurface MakePlaneSurface(string goName)
+        private static VideoSurface MakePlaneSurface(string goName)
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
@@ -238,18 +230,17 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
             go.name = goName;
             // set up transform
             go.transform.Rotate(-90.0f, 0.0f, 0.0f);
-            var yPos = Random.Range(3.0f, 5.0f);
-            var xPos = Random.Range(-2.0f, 2.0f);
-            go.transform.position = new Vector3(xPos, yPos, 0f);
+
+            go.transform.position = Vector3.zero;
             go.transform.localScale = new Vector3(0.25f, 0.5f, 0.5f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<AgoraVideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurface>();
             return videoSurface;
         }
 
         // Video TYPE 2: RawImage
-        private static AgoraVideoSurface MakeImageSurface(string goName)
+        private static VideoSurface MakeImageSurface(string goName)
         {
             GameObject go = new GameObject();
 
@@ -276,14 +267,11 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
 
             // set up transform
             go.transform.Rotate(0f, 0.0f, 180.0f);
-            //var xPos = Random.Range(Offset - Screen.width / 2f, Screen.width / 2f - Offset);
-            //var yPos = Random.Range(Offset, Screen.height / 2f - Offset);
-            //Debug.Log("position x " + xPos + " y: " + yPos);
-            go.transform.localPosition = new Vector3(Screen.width / 2f - 100, Screen.height / 2f - 100, 0f);
+            go.transform.localPosition = Vector3.zero;
             go.transform.localScale = new Vector3(2f, 3f, 1f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<AgoraVideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurface>();
             return videoSurface;
         }
 
@@ -298,7 +286,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
 
     }
 
-    internal class UserEventHandler : IAgoraRtcEngineEventHandler
+    internal class UserEventHandler : IRtcEngineEventHandler
     {
         private readonly ChannelMediaRelay _channelMediaRelay;
 
@@ -309,20 +297,20 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
 
         public override void OnWarning(int warn, string msg)
         {
-            _channelMediaRelay.logger.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
+            _channelMediaRelay.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
         }
 
         public override void OnError(int err, string msg)
         {
-            _channelMediaRelay.logger.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+            _channelMediaRelay.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
         }
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
             Debug.Log("Agora: OnJoinChannelSuccess ");
-            _channelMediaRelay.logger.UpdateLog(string.Format("sdk version: ${0}",
-                _channelMediaRelay.mRtcEngine.GetVersion()));
-            _channelMediaRelay.logger.UpdateLog(
+            _channelMediaRelay.Log.UpdateLog(string.Format("sdk version: ${0}",
+                _channelMediaRelay.RtcEngine.GetVersion()));
+            _channelMediaRelay.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));
             _channelMediaRelay.EnableUI(true);
@@ -332,43 +320,43 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
 
         public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            _channelMediaRelay.logger.UpdateLog("OnRejoinChannelSuccess");
+            _channelMediaRelay.Log.UpdateLog("OnRejoinChannelSuccess");
         }
 
         public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
         {
-            _channelMediaRelay.logger.UpdateLog("OnLeaveChannel");
+            _channelMediaRelay.Log.UpdateLog("OnLeaveChannel");
             _channelMediaRelay.EnableUI(false);
             ChannelMediaRelay.DestroyVideoView(0);
         }
 
         public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
         {
-            _channelMediaRelay.logger.UpdateLog("OnClientRoleChanged");
+            _channelMediaRelay.Log.UpdateLog(string.Format("OnClientRoleChanged {0}, {1}", oldRole, newRole));
         }
 
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
-            _channelMediaRelay.logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-            ChannelMediaRelay.MakeVideoView(uid, _channelMediaRelay.channelName);
+            _channelMediaRelay.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+            ChannelMediaRelay.MakeVideoView(uid, _channelMediaRelay._channelName);
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
         {
-            _channelMediaRelay.logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+            _channelMediaRelay.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                 (int)reason));
             ChannelMediaRelay.DestroyVideoView(uid);
         }
 
         public override void OnChannelMediaRelayEvent(int code)
         {
-            _channelMediaRelay.logger.UpdateLog(string.Format("OnChannelMediaRelayEvent: {0}", code));
-                
+            _channelMediaRelay.Log.UpdateLog(string.Format("OnChannelMediaRelayEvent: {0}", code));
+
         }
 
         public override void OnChannelMediaRelayStateChanged(int state, int code)
         {
-            _channelMediaRelay.logger.UpdateLog(string.Format("OnChannelMediaRelayStateChanged state: {0}, code: {1}", state,code));
+            _channelMediaRelay.Log.UpdateLog(string.Format("OnChannelMediaRelayStateChanged state: {0}, code: {1}", state, code));
         }
     }
 }

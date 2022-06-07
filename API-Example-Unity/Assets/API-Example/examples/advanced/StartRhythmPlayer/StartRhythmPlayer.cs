@@ -16,35 +16,38 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRhythmPlayer
     {
 
 
-        [FormerlySerializedAs("AgoraBaseProfile")]
+        [FormerlySerializedAs("appIdInput")]
         [SerializeField]
-        private AgoraBaseProfile agoraBaseProfile;
+        private AppIdInput _appIdInput;
 
         [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")]
         [SerializeField]
-        private string appID = "";
+        private string _appID = "";
 
         [FormerlySerializedAs("TOKEN")]
         [SerializeField]
-        private string token = "";
+        private string _token = "";
 
         [FormerlySerializedAs("CHANNEL_NAME")]
         [SerializeField]
-        public string channelName = "";
+        public string _channelName = "";
 
-        public Text logText;
-        internal Logger logger;
-        internal IAgoraRtcEngine _mRtcEngine = null;
+        public Text LogText;
+        internal Logger Log;
+        internal IRtcEngine RtcEngine = null;
 
         // Use this for initialization
         private void Start()
         {
             LoadAssetData();
-            CheckAppId();
-            SetupUI();
-            InitEngine();
-            JoinChannel();
+            if (CheckAppId())
+            {
+                SetupUI();
+                InitEngine();
+                JoinChannel();
+            }
+           
         }
 
         private void Update()
@@ -56,19 +59,19 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRhythmPlayer
 
         //Show data in AgoraBasicProfile
         [ContextMenu("ShowAgoraBasicProfileData")]
-        public void LoadAssetData()
+        private void LoadAssetData()
         {
-            if (agoraBaseProfile == null) return;
-            appID = agoraBaseProfile.appID;
-            token = agoraBaseProfile.token;
-            channelName = agoraBaseProfile.channelName;
+            if (_appIdInput == null) return;
+            _appID = _appIdInput.appID;
+            _token = _appIdInput.token;
+            _channelName = _appIdInput.channelName;
         }
 
 
-        private void CheckAppId()
+        private bool CheckAppId()
         {
-            logger = new Logger(logText);
-            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+            Log = new Logger(LogText);
+            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
 
@@ -86,64 +89,70 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRhythmPlayer
 
         private void InitEngine()
         {
-            _mRtcEngine = AgoraRtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(null, appID, null, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            _mRtcEngine.Initialize(context);
-            _mRtcEngine.InitEventHandler(handler);
-            _mRtcEngine.EnableAudio();
-            _mRtcEngine.EnableVideo();
-            _mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.Initialize(context);
+            RtcEngine.InitEventHandler(handler);
         }
 
         private void JoinChannel()
         {
-            _mRtcEngine.JoinChannel(token, channelName);
+            RtcEngine.EnableAudio();
+            RtcEngine.EnableVideo();
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.JoinChannel(_token, _channelName);
         }
 
-        void OnStartButtonPress()
+        private void OnStartButtonPress()
         {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
+            string sound1 = "/assets/audio/ding.mp3";
+            string sound2 = "/assets/audio/dang.mp3";
+#else
             string sound1 = Path.Combine(Application.streamingAssetsPath, "audio/ding.mp3");
             string sound2 = Path.Combine(Application.streamingAssetsPath, "audio/dang.mp3");
+#endif 
             AgoraRhythmPlayerConfig config = new AgoraRhythmPlayerConfig()
             {
                 beatsPerMeasure = 4,
                 beatsPerMinute = 60
             };
 
-            int nRet = _mRtcEngine.StartRhythmPlayer(sound1, sound2, config);
-            this.logger.UpdateLog("StartRhythmPlayer nRet:" + nRet);
+            int nRet = RtcEngine.StartRhythmPlayer(sound1, sound2, config);
+            this.Log.UpdateLog("StartRhythmPlayer nRet:" + nRet);
         }
 
-        void OnStopButtonPress()
+        private void OnStopButtonPress()
         {
-            int nRet = _mRtcEngine.StopRhythmPlayer();
-            this.logger.UpdateLog("StopRhythmPlayer nRet:" + nRet);
+            int nRet = RtcEngine.StopRhythmPlayer();
+            this.Log.UpdateLog("StopRhythmPlayer nRet:" + nRet);
         }
 
-        void OnConfigButtonPress()
+        private void OnConfigButtonPress()
         {
             AgoraRhythmPlayerConfig config = new AgoraRhythmPlayerConfig()
             {
                 beatsPerMeasure = 4,
                 beatsPerMinute = 60
             };
-            int nRet = _mRtcEngine.ConfigRhythmPlayer(config);
-            this.logger.UpdateLog("ConfigRhythmPlayer nRet:" + nRet);
+            int nRet = RtcEngine.ConfigRhythmPlayer(config);
+            this.Log.UpdateLog("ConfigRhythmPlayer nRet:" + nRet);
         }
 
-        private void OnApplicationQuit()
+        private void OnDestroy()
         {
-            Debug.Log("OnApplicationQuit");
-            if (_mRtcEngine == null) return;
-            _mRtcEngine.LeaveChannel();
-            _mRtcEngine.Dispose();
+            Debug.Log("OnDestroy");
+            if (RtcEngine == null) return;
+            RtcEngine.InitEventHandler(null);
+            RtcEngine.LeaveChannel();
+            RtcEngine.Dispose();
         }
 
-
-        internal class UserEventHandler : IAgoraRtcEngineEventHandler
+        internal class UserEventHandler : IRtcEngineEventHandler
         {
             private readonly StartRhythmPlayer _startRhythmPlayer;
 
@@ -154,55 +163,55 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRhythmPlayer
 
             public override void OnWarning(int warn, string msg)
             {
-                _startRhythmPlayer.logger.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
+                _startRhythmPlayer.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
             }
 
             public override void OnError(int err, string msg)
             {
-                _startRhythmPlayer.logger.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+                _startRhythmPlayer.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
             }
 
             public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
             {
                 Debug.Log("Agora: OnJoinChannelSuccess ");
-                _startRhythmPlayer.logger.UpdateLog(string.Format("sdk version: ${0}",
-                    _startRhythmPlayer._mRtcEngine.GetVersion()));
-                _startRhythmPlayer.logger.UpdateLog(
+                _startRhythmPlayer.Log.UpdateLog(string.Format("sdk version: ${0}",
+                    _startRhythmPlayer.RtcEngine.GetVersion()));
+                _startRhythmPlayer.Log.UpdateLog(
                     string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                     connection.channelId, connection.localUid, elapsed));
             }
 
             public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
             {
-                _startRhythmPlayer.logger.UpdateLog("OnRejoinChannelSuccess");
+                _startRhythmPlayer.Log.UpdateLog("OnRejoinChannelSuccess");
             }
 
             public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
             {
-                _startRhythmPlayer.logger.UpdateLog("OnLeaveChannel");
+                _startRhythmPlayer.Log.UpdateLog("OnLeaveChannel");
 
             }
 
             public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
             {
-                _startRhythmPlayer.logger.UpdateLog("OnClientRoleChanged");
+                _startRhythmPlayer.Log.UpdateLog("OnClientRoleChanged");
             }
 
             public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
             {
-                _startRhythmPlayer.logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+                _startRhythmPlayer.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
 
             }
 
             public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
             {
-                _startRhythmPlayer.logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+                _startRhythmPlayer.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                     (int)reason));
             }
 
             public override void OnRhythmPlayerStateChanged(RHYTHM_PLAYER_STATE_TYPE state, RHYTHM_PLAYER_ERROR_TYPE errorCode)
             {
-                _startRhythmPlayer.logger.UpdateLog(string.Format("OnRhythmPlayerStateChanged {0},{1}", state, errorCode));
+                _startRhythmPlayer.Log.UpdateLog(string.Format("OnRhythmPlayerStateChanged {0},{1}", state, errorCode));
             }
 
         }

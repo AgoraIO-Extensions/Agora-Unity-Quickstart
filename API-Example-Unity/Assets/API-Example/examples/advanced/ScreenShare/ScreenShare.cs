@@ -1,5 +1,4 @@
-﻿#if UNITY_STANDALONE_OSX || UNITY_STANDALONE_WIN || UNITY_EDITOR_OSX || UNITY_EDITOR_WIN
-using System;
+﻿using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,30 +6,32 @@ using agora.rtc;
 using agora.util;
 using UnityEngine.Serialization;
 using Logger = agora.util.Logger;
-using Random = UnityEngine.Random;
 
 namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
 {
     public class ScreenShare : MonoBehaviour
     {
-        [FormerlySerializedAs("AgoraBaseProfile")] [SerializeField]
-        private AgoraBaseProfile agoraBaseProfile;
-        
+        [FormerlySerializedAs("appIdInput")]
+        [SerializeField]
+        private AppIdInput _appIdInput;
+
         [Header("_____________Basic Configuration_____________")]
-        [FormerlySerializedAs("APP_ID")] [SerializeField]
-        private string appID = "";
+        [FormerlySerializedAs("APP_ID")]
+        [SerializeField]
+        private string _appID = "";
 
-        [FormerlySerializedAs("TOKEN")] [SerializeField]
-        private string token = "";
+        [FormerlySerializedAs("TOKEN")]
+        [SerializeField]
+        private string _token = "";
 
-        [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
-        private string channelName = "";
+        [FormerlySerializedAs("CHANNEL_NAME")]
+        [SerializeField]
+        private string _channelName = "";
 
-        internal IAgoraRtcEngine _mRtcEngine = null;
+        public Text LogText;
+        internal Logger Log;
+        internal IRtcEngine RtcEngine = null;
 
-        private const float Offset = 100;
-        public Text logText;
-        internal Logger Logger;
         private Dropdown _winIdSelect;
         private Button _startShareBtn;
         private Button _stopShareBtn;
@@ -39,78 +40,87 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
         private void Start()
         {
 #if UNITY_IPHONE || UNITY_ANDROID
-            throw new PlatformNotSupportedException();
+            this.LogText.text = "Not Support in this platform!";
 #else
             LoadAssetData();
-            CheckAppId();
-            InitEngine();
-            PrepareScreenCapture();
-            JoinChannel();
+            if (CheckAppId())
+            {
+                InitEngine();
+                PrepareScreenCapture();
+                JoinChannel();
+            }
 #endif
         }
 
-        private void CheckAppId()
+        private bool CheckAppId()
         {
-            Logger = new Logger(logText);
-            Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+            Log = new Logger(LogText);
+            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
-        
+
         //Show data in AgoraBasicProfile
         [ContextMenu("ShowAgoraBasicProfileData")]
-        public void LoadAssetData()
+        private void LoadAssetData()
         {
-            if (agoraBaseProfile == null) return;
-            appID = agoraBaseProfile.appID;
-            token = agoraBaseProfile.token;
-            channelName = agoraBaseProfile.channelName;
+            if (_appIdInput == null) return;
+            _appID = _appIdInput.appID;
+            _token = _appIdInput.token;
+            _channelName = _appIdInput.channelName;
         }
 
         private void JoinChannel()
         {
+            RtcEngine.EnableAudio();
+            RtcEngine.EnableVideo();
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            
             ChannelMediaOptions options = new ChannelMediaOptions();
-            options.autoSubscribeAudio = true;
-            options.autoSubscribeVideo = true;
-            options.publishAudioTrack = true;
-            options.publishCameraTrack = false;
-            options.publishScreenTrack = true;
-            options.enableAudioRecordingOrPlayout = true;
-            options.clientRoleType = CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER;
-            var ret = _mRtcEngine.JoinChannel(token, channelName, 0, options);
+            options.autoSubscribeAudio.SetValue(true);
+            options.autoSubscribeVideo.SetValue(true);
+            options.publishAudioTrack.SetValue(true);
+            options.publishCameraTrack.SetValue(false);
+            options.publishScreenTrack.SetValue(true);
+            options.enableAudioRecordingOrPlayout.SetValue(true);
+            options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            var ret = RtcEngine.JoinChannel(_token, _channelName, 0, options);
             Debug.Log("JoinChannel returns: " + ret);
         }
 
         private void InitEngine()
         {
-            _mRtcEngine = AgoraRtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(null, appID, null, true, 
+            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            _mRtcEngine.Initialize(context);
-            _mRtcEngine.InitEventHandler(new UserEventHandler(this));
-            _mRtcEngine.EnableAudio();
-            _mRtcEngine.EnableVideo();
-            _mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.Initialize(context);
+            RtcEngine.InitEventHandler(new UserEventHandler(this));
         }
-
 
         private void PrepareScreenCapture()
         {
             _winIdSelect = GameObject.Find("winIdSelect").GetComponent<Dropdown>();
 
-            if (_winIdSelect == null || _mRtcEngine == null) return;
+            if (_winIdSelect == null || RtcEngine == null) return;
 
             _winIdSelect.ClearOptions();
 
-            var displayInfos = _mRtcEngine.GetDisplayInfos();
-            var windowInfos = _mRtcEngine.GetWindowInfos();
+            // var displayInfos = mRtcEngine.GetDisplayInfos();
+            // var windowInfos = mRtcEngine.GetWindowInfos();
+            SIZE t = new SIZE();
+            t.width = 360;
+            t.height = 240;
+            SIZE s = new SIZE();
+            s.width = 360;
+            s.height = 240;
+            var info = RtcEngine.GetScreenCaptureSources(t, s, true);
 
-            _winIdSelect.AddOptions(displayInfos.Select(w =>
-                new Dropdown.OptionData(
-                    string.Format("Display {0}", w.DisplayId))).ToList());
-            _winIdSelect.AddOptions(windowInfos.Select(w =>
+            //_winIdSelect.AddOptions(info.Select(w =>
+            //    new Dropdown.OptionData(
+            //        string.Format("Display {0}", w.sourceId))).ToList());
+            _winIdSelect.AddOptions(info.Select(w =>
                     new Dropdown.OptionData(
-                        string.Format("{0}-{1} | {2}", w.AppName, w.WindowName, w.WindowId)))
+                        string.Format("{0}-{1} | {2}", w.sourceName, w.sourceTitle, w.sourceId)))
                 .ToList());
             _startShareBtn = GameObject.Find("startShareBtn").GetComponent<Button>();
             _stopShareBtn = GameObject.Find("stopShareBtn").GetComponent<Button>();
@@ -124,11 +134,11 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
 
         private void OnStartShareBtnClick()
         {
-            if (_mRtcEngine == null) return;
+            if (RtcEngine == null) return;
 
             if (_startShareBtn != null) _startShareBtn.gameObject.SetActive(false);
             if (_stopShareBtn != null) _stopShareBtn.gameObject.SetActive(true);
-            _mRtcEngine.StopScreenCapture();
+            RtcEngine.StopScreenCapture();
 
             if (_winIdSelect == null) return;
             var option = _winIdSelect.options[_winIdSelect.value].text;
@@ -136,16 +146,16 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
             if (option.Contains("|"))
             {
                 var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
-                Logger.UpdateLog(string.Format(">>>>> Start sharing {0}", windowId));
-                _mRtcEngine.StartScreenCaptureByWindowId(ulong.Parse(windowId), default(Rectangle),
+                Log.UpdateLog(string.Format(">>>>> Start sharing {0}", windowId));
+                RtcEngine.StartScreenCaptureByWindowId(ulong.Parse(windowId), default(Rectangle),
                         default(ScreenCaptureParameters));
             }
             else
             {
                 var dispId = uint.Parse(option.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1]);
-                Logger.UpdateLog(string.Format(">>>>> Start sharing display {0}", dispId));
-                _mRtcEngine.StartScreenCaptureByDisplayId(dispId, default(Rectangle),
-                    new ScreenCaptureParameters {captureMouseCursor = true, frameRate = 30});
+                Log.UpdateLog(string.Format(">>>>> Start sharing display {0}", dispId));
+                RtcEngine.StartScreenCaptureByDisplayId(dispId, default(Rectangle),
+                    new ScreenCaptureParameters { captureMouseCursor = true, frameRate = 30 });
             }
         }
 
@@ -153,30 +163,22 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
         {
             if (_startShareBtn != null) _startShareBtn.gameObject.SetActive(true);
             if (_stopShareBtn != null) _stopShareBtn.gameObject.SetActive(false);
-            _mRtcEngine.StopScreenCapture();
+            RtcEngine.StopScreenCapture();
         }
 
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
-            if (_mRtcEngine == null) return;
-            _mRtcEngine.LeaveChannel();
+            if (RtcEngine == null) return;
+            RtcEngine.InitEventHandler(null);
+            RtcEngine.LeaveChannel();
+            RtcEngine.Dispose();
         }
 
-        private void OnApplicationQuit()
-        {
-            Debug.Log("OnApplicationQuit");
-            if (_mRtcEngine != null)
-            {
-                _mRtcEngine.LeaveChannel();
-                _mRtcEngine.Dispose();
-                _mRtcEngine = null;
-            }
-        }
-
+      
         internal string GetChannelName()
         {
-            return channelName;
+            return _channelName;
         }
 
         internal static void DestroyVideoView(uint uid)
@@ -202,11 +204,19 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
             // configure videoSurface
             videoSurface.SetForUser(uid, channelId, videoSourceType);
             videoSurface.SetEnable(true);
+
+            videoSurface.OnTextureSizeModify += (int width, int height) =>
+            {
+                float scale = (float)height / (float)width;
+                videoSurface.transform.localScale = new Vector3(5, 5 * scale, 1);
+                Debug.Log("OnTextureSizeModify: " + width + "  " + height);
+            };
+
             videoSurface.EnableFilpTextureApply(true, false);
         }
 
         // VIDEO TYPE 1: 3D Object
-        private AgoraVideoSurface MakePlaneSurface(string goName)
+        private static VideoSurface MakePlaneSurface(string goName)
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
@@ -218,18 +228,16 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
             go.name = goName;
             // set up transform
             go.transform.Rotate(-90.0f, 0.0f, 0.0f);
-            var yPos = Random.Range(3.0f, 5.0f);
-            var xPos = Random.Range(-2.0f, 2.0f);
-            go.transform.position = new Vector3(xPos, yPos, 0f);
+            go.transform.position = Vector3.zero;
             go.transform.localScale = new Vector3(0.25f, 0.5f, .5f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<AgoraVideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurface>();
             return videoSurface;
         }
 
         // Video TYPE 2: RawImage
-        private static AgoraVideoSurface MakeImageSurface(string goName)
+        private static VideoSurface MakeImageSurface(string goName)
         {
             var go = new GameObject();
 
@@ -256,19 +264,16 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
 
             // set up transform
             go.transform.Rotate(0f, 0.0f, 180.0f);
-            var xPos = Random.Range(Offset - Screen.width / 2f, Screen.width / 2f - Offset);
-            var yPos = Random.Range(Offset, Screen.height / 2f - Offset);
-            Debug.Log("position x " + xPos + " y: " + yPos);
-            go.transform.localPosition = new Vector3(xPos, yPos, 0f);
+            go.transform.localPosition = Vector3.zero;
             go.transform.localScale = new Vector3(3f, 4f, 1f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<AgoraVideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurface>();
             return videoSurface;
         }
     }
 
-    internal class UserEventHandler : IAgoraRtcEngineEventHandler
+    internal class UserEventHandler : IRtcEngineEventHandler
     {
         private readonly ScreenShare _desktopScreenShare;
 
@@ -279,53 +284,52 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
 
         public override void OnWarning(int warn, string msg)
         {
-            _desktopScreenShare.Logger.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
+            _desktopScreenShare.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
         }
 
         public override void OnError(int err, string msg)
         {
-            _desktopScreenShare.Logger.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+            _desktopScreenShare.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
         }
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            _desktopScreenShare.Logger.UpdateLog(string.Format("sdk version: ${0}",
-                _desktopScreenShare._mRtcEngine.GetVersion()));
-            _desktopScreenShare.Logger.UpdateLog(
-                string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", 
+            _desktopScreenShare.Log.UpdateLog(string.Format("sdk version: ${0}",
+                _desktopScreenShare.RtcEngine.GetVersion()));
+            _desktopScreenShare.Log.UpdateLog(
+                string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));
             ScreenShare.MakeVideoView(0, "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_SCREEN);
         }
 
         public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            _desktopScreenShare.Logger.UpdateLog("OnRejoinChannelSuccess");
+            _desktopScreenShare.Log.UpdateLog("OnRejoinChannelSuccess");
         }
 
         public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
         {
-            _desktopScreenShare.Logger.UpdateLog("OnLeaveChannel");
+            _desktopScreenShare.Log.UpdateLog("OnLeaveChannel");
             ScreenShare.DestroyVideoView(connection.localUid);
             ScreenShare.DestroyVideoView(0);
         }
 
         public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
         {
-            _desktopScreenShare.Logger.UpdateLog("OnClientRoleChanged");
+            _desktopScreenShare.Log.UpdateLog("OnClientRoleChanged");
         }
 
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
-            _desktopScreenShare.Logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+            _desktopScreenShare.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
             ScreenShare.MakeVideoView(uid, _desktopScreenShare.GetChannelName(), VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE);
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
         {
-            _desktopScreenShare.Logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
-                (int) reason));
+            _desktopScreenShare.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+                (int)reason));
             ScreenShare.DestroyVideoView(uid);
         }
     }
 }
-#endif

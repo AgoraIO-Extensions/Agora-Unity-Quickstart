@@ -16,9 +16,9 @@ namespace agora.util
         {
             Debug.Log(logMessage);
             string srcLogMessage = text.text;
-            if (srcLogMessage.Length > 1000)
+            if (srcLogMessage.Length > 500)
             {
-                srcLogMessage = "";
+                srcLogMessage = srcLogMessage.Substring(srcLogMessage.Length - 50);
             }
 
             srcLogMessage += "\r\n \r\n";

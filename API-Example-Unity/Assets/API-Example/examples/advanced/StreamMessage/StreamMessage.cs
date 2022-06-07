@@ -5,93 +5,94 @@ using agora.util;
 using UnityEngine.Serialization;
 using Logger = agora.util.Logger;
 using System;
+using System.Runtime.InteropServices;
 
 namespace Agora_Plugin.API_Example.examples.advanced.StreamMessage
 {
 
     public class StreamMessage : MonoBehaviour
     {
-
-
-        [FormerlySerializedAs("AgoraBaseProfile")]
+        [FormerlySerializedAs("appIdInput")]
         [SerializeField]
-        private AgoraBaseProfile agoraBaseProfile;
+        private AppIdInput _appIdInput;
 
         [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")]
         [SerializeField]
-        public string appID = "";
+        public string _appID = "";
 
         [FormerlySerializedAs("TOKEN")]
         [SerializeField]
-        public string token = "";
+        public string _token = "";
 
         [FormerlySerializedAs("CHANNEL_NAME")]
         [SerializeField]
-        public string channelName = "";
-
-        int streamId = -1;
-        public Text logText;
-        public Logger logger;
-        internal IAgoraRtcEngine mRtcEngine = null;
+        public string _channelName = "";
 
 
-        void Start()
+        public Text LogText;
+        internal Logger Log;
+        internal IRtcEngine RtcEngine;
+
+        private int _streamId = -1;
+
+        private void Start()
         {
             LoadAssetData();
-            CheckAppId();
-            InitEngine();
-            SetupUI();
-            EnableUI(false);
-            JoinChannel();
+            if (CheckAppId())
+            {
+                InitEngine();
+                SetupUI();
+                EnableUI(false);
+                JoinChannel();
+            }
         }
 
         [ContextMenu("ShowAgoraBasicProfileData")]
-        public void LoadAssetData()
+        private void LoadAssetData()
         {
-            if (agoraBaseProfile == null) return;
-            appID = agoraBaseProfile.appID;
-            token = agoraBaseProfile.token;
-            channelName = agoraBaseProfile.channelName;
+            if (_appIdInput == null) return;
+            _appID = _appIdInput.appID;
+            _token = _appIdInput.token;
+            _channelName = _appIdInput.channelName;
         }
 
-        void CheckAppId()
+        private bool CheckAppId()
         {
-            logger = new Logger(logText);
-            logger.DebugAssert(appID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+            Log = new Logger(LogText);
+            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
-        void InitEngine()
+        private void InitEngine()
         {
-            mRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(null, appID, null, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
-            mRtcEngine.Initialize(context);
-            mRtcEngine.InitEventHandler(handler);
-            mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            mRtcEngine.EnableAudio();
+            RtcEngine.Initialize(context);
+            RtcEngine.InitEventHandler(handler);
         }
 
-        void JoinChannel()
+        private void JoinChannel()
         {
-            mRtcEngine.JoinChannel(token, channelName, "");
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.EnableAudio();
+            RtcEngine.JoinChannel(_token, _channelName, "");
         }
 
-        void Update()
+        private void Update()
         {
             PermissionHelper.RequestMicrophontPermission();
         }
 
-        public void SetupUI()
+        private void SetupUI()
         {
             var ui = this.transform.Find("UI");
 
             var btn = ui.Find("SendButton").GetComponent<Button>();
             btn.onClick.AddListener(onSendButtonPress);
         }
-
 
         public void EnableUI(bool visible)
         {
@@ -100,18 +101,18 @@ namespace Agora_Plugin.API_Example.examples.advanced.StreamMessage
         }
 
 
-        void onSendButtonPress()
+        private void onSendButtonPress()
         {
             var text = this.transform.Find("UI/InputField").GetComponent<InputField>();
             if (text.text == "")
             {
-                logger.UpdateLog("Dont send empty message!");
+                Log.UpdateLog("Dont send empty message!");
             }
 
             int streamId = this.CreateDataStreamId();
             if (streamId < 0)
             {
-                logger.UpdateLog("CreateDataStream failed!");
+                Log.UpdateLog("CreateDataStream failed!");
                 return;
             }
             else
@@ -121,39 +122,39 @@ namespace Agora_Plugin.API_Example.examples.advanced.StreamMessage
             }
         }
 
-        int CreateDataStreamId()
+        private int CreateDataStreamId()
         {
-            if (this.streamId == -1)
+            if (this._streamId == -1)
             {
                 var config = new DataStreamConfig();
                 config.syncWithAudio = false;
                 config.ordered = true;
-                streamId = mRtcEngine.CreateDataStream(config);
+                var nRet = RtcEngine.CreateDataStream(ref this._streamId, config);
+                this.Log.UpdateLog(string.Format("CreateDataStream: nRet{0}, streamId{1}", nRet, _streamId));
             }
-            return streamId;
+            return _streamId;
         }
 
 
-        void SendStreamMessage(int streamId, string message)
+        private void SendStreamMessage(int streamId, string message)
         {
             byte[] byteArray = System.Text.Encoding.Default.GetBytes(message);
-            mRtcEngine.SendStreamMessage(streamId, byteArray, Convert.ToUInt32(byteArray.Length));
+            var nRet = RtcEngine.SendStreamMessage(streamId, byteArray, Convert.ToUInt32(byteArray.Length));
+            this.Log.UpdateLog("SendStreamMessage :" + nRet);
         }
 
-
-        void OnApplicationQuit()
+        private void OnDestroy()
         {
-            Debug.Log("OnApplicationQuit");
-            if (mRtcEngine != null)
-            {
-                mRtcEngine.LeaveChannel();
-                mRtcEngine.Dispose();
-            }
+            Debug.Log("OnDestroy");
+            if (RtcEngine == null) return;
+            RtcEngine.InitEventHandler(null);
+            RtcEngine.LeaveChannel();
+            RtcEngine.Dispose();
         }
     }
 
 
-    internal class UserEventHandler : IAgoraRtcEngineEventHandler
+    internal class UserEventHandler : IRtcEngineEventHandler
     {
         private readonly StreamMessage _streamMessage;
 
@@ -164,20 +165,20 @@ namespace Agora_Plugin.API_Example.examples.advanced.StreamMessage
 
         public override void OnWarning(int warn, string msg)
         {
-            _streamMessage.logger.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
+            _streamMessage.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
         }
 
         public override void OnError(int err, string msg)
         {
-            _streamMessage.logger.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+            _streamMessage.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
         }
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
             Debug.Log("Agora: OnJoinChannelSuccess ");
-            _streamMessage.logger.UpdateLog(string.Format("sdk version: ${0}",
-                _streamMessage.mRtcEngine.GetVersion()));
-            _streamMessage.logger.UpdateLog(
+            _streamMessage.Log.UpdateLog(string.Format("sdk version: ${0}",
+                _streamMessage.RtcEngine.GetVersion()));
+            _streamMessage.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));
             _streamMessage.EnableUI(true);
@@ -185,42 +186,47 @@ namespace Agora_Plugin.API_Example.examples.advanced.StreamMessage
 
         public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            _streamMessage.logger.UpdateLog("OnRejoinChannelSuccess");
+            _streamMessage.Log.UpdateLog("OnRejoinChannelSuccess");
         }
 
         public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
         {
-            _streamMessage.logger.UpdateLog("OnLeaveChannel");
+            _streamMessage.Log.UpdateLog("OnLeaveChannel");
             _streamMessage.EnableUI(false);
         }
 
         public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
         {
-            _streamMessage.logger.UpdateLog("OnClientRoleChanged");
+            _streamMessage.Log.UpdateLog("OnClientRoleChanged");
         }
 
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
-            _streamMessage.logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+            _streamMessage.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
 
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
         {
-            _streamMessage.logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+            _streamMessage.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                 (int)reason));
 
         }
 
-        public override void OnStreamMessage(RtcConnection connection, uint remoteUid, int streamId, byte[] data, uint length, ulong sentTs)
+        public override void OnStreamMessage(RtcConnection connection, uint remoteUid, int streamId, IntPtr data, uint length, ulong sentTs)
         {
-            string streamMessage = System.Text.Encoding.Default.GetString(data);
-            _streamMessage.logger.UpdateLog(string.Format("OnStreamMessage remoteUid: {0}, stream message: {1}", remoteUid, streamMessage));
+            byte[] buffer = new byte[length];
+            if (data != IntPtr.Zero)
+            {
+                Marshal.Copy(data, buffer, 0, (int)length);
+            }
+            string streamMessage = System.Text.Encoding.Default.GetString(buffer);
+            _streamMessage.Log.UpdateLog(string.Format("OnStreamMessage remoteUid: {0}, stream message: {1}", remoteUid, streamMessage));
         }
 
         public override void OnStreamMessageError(RtcConnection connection, uint remoteUid, int streamId, int code, int missed, int cached)
         {
-            _streamMessage.logger.UpdateLog(string.Format("OnStreamMessageError remoteUid: {0}, streamId: {1}, code: {2}, missed: {3}, cached: {4}", remoteUid, streamId, code, missed, cached));
+            _streamMessage.Log.UpdateLog(string.Format("OnStreamMessageError remoteUid: {0}, streamId: {1}, code: {2}, missed: {3}, cached: {4}", remoteUid, streamId, code, missed, cached));
         }
 
     }

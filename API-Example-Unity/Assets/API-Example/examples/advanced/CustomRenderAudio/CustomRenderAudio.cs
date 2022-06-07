@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,110 +6,119 @@ using RingBuffer;
 using UnityEngine.Serialization;
 using agora.rtc;
 using agora.util;
+using System.Runtime.InteropServices;
 using Logger = agora.util.Logger;
 
 namespace CustomRenderAudio
 {
     public class CustomRenderAudio : MonoBehaviour
     {
-        [FormerlySerializedAs("AgoraBaseProfile")] [SerializeField]
-        private AgoraBaseProfile agoraBaseProfile;
-        
+        [FormerlySerializedAs("appIdInput")]
+        [SerializeField]
+        private AppIdInput _appIdInput;
+
         [Header("_____________Basic Configuration_____________")]
-        [FormerlySerializedAs("APP_ID")] [SerializeField]
-        private string appID = "";
+        [FormerlySerializedAs("APP_ID")]
+        [SerializeField]
+        private string _appID = "";
 
-        [FormerlySerializedAs("TOKEN")] [SerializeField]
-        private string token = "";
+        [FormerlySerializedAs("TOKEN")]
+        [SerializeField]
+        private string _token = "";
 
-        [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
-        private string channelName = "";
+        [FormerlySerializedAs("CHANNEL_NAME")]
+        [SerializeField]
+        private string _channelName = "";
 
-        public Text logText;
-        internal Logger Logger;
-        internal IAgoraRtcEngine AgoraRtcEngine;
-        //private IAudioRawDataManager _audioRawDataManager;
+        public Text LogText;
+        internal Logger Log;
+        internal IRtcEngine RtcEngine;
 
-        private int CHANNEL = 1;
-        private int SAMPLE_RATE = 44100;
-        private int PULL_FREQ_PER_SEC = 100;
 
-        private int count;
+        private const int CHANNEL = 1;
+        private const int SAMPLE_RATE = 44100;
+        private const int PULL_FREQ_PER_SEC = 100;
 
-        private int writeCount;
-        private int readCount;
 
-        private RingBuffer<float> audioBuffer;
+        private RingBuffer<float> _audioBuffer;
         private AudioClip _audioClip;
 
 
         private Thread _pullAudioFrameThread;
         private bool _pullAudioFrameThreadSignal = true;
 
-        private bool _startSignal;
+        private int _writeCount;
+        private int _readCount;
 
-        // Start is called before the first frame update
-        void Start()
+        private void Start()
         {
             LoadAssetData();
-            var ifValid = CheckAppId();
-            InitRtcEngine();
-            JoinChannel();
-
-            var aud = GetComponent<AudioSource>();
-            if (aud == null)
+            if (CheckAppId())
             {
-                gameObject.AddComponent<AudioSource>();
+                InitRtcEngine();
+                JoinChannel();
+                var aud = InitAudioSource();
+                StartPullAudioFrame(aud, "externalClip");
             }
-
-            if (ifValid) StartPullAudioFrame(aud, "externalClip");
         }
 
-        void Update()
+        private void Update()
         {
             PermissionHelper.RequestMicrophontPermission();
         }
 
-        bool CheckAppId()
+        private bool CheckAppId()
         {
-            Logger = new Logger(logText);
-            return Logger.DebugAssert(appID.Length > 10, "Please fill in your appId in Canvas!!!!!");
+            Log = new Logger(LogText);
+            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
-        
+
         //Show data in AgoraBasicProfile
         [ContextMenu("ShowAgoraBasicProfileData")]
-        public void LoadAssetData()
+        private void LoadAssetData()
         {
-            if (agoraBaseProfile == null) return;
-            appID = agoraBaseProfile.appID;
-            token = agoraBaseProfile.token;
-            channelName = agoraBaseProfile.channelName;
+            if (_appIdInput == null) return;
+            _appID = _appIdInput.appID;
+            _token = _appIdInput.token;
+            _channelName = _appIdInput.channelName;
         }
 
-        void InitRtcEngine()
+        private void InitRtcEngine()
         {
-            AgoraRtcEngine = agora.rtc.AgoraRtcEngine.CreateAgoraRtcEngine();
-            AgoraRtcEngine.SetExternalAudioSink(SAMPLE_RATE, CHANNEL);
-
+            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(handler, appID, null, true,
+            //be care, enableAudioDevice need be false
+            RtcEngineContext context = new RtcEngineContext(_appID, 0, false,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            var ret = AgoraRtcEngine.Initialize(context);
-            AgoraRtcEngine.InitEventHandler(handler);
+            var ret = RtcEngine.Initialize(context);
+            RtcEngine.InitEventHandler(handler);
         }
 
-        void JoinChannel()
+        private void JoinChannel()
         {
-            AgoraRtcEngine.JoinChannel(token, channelName, "");
+            RtcEngine.EnableAudio();
+            var nRet = RtcEngine.SetExternalAudioSink(SAMPLE_RATE, CHANNEL);
+            this.Log.UpdateLog("SetExternalAudioSink ret:" + nRet);
+            RtcEngine.JoinChannel(_token, _channelName);
         }
 
-        void StartPullAudioFrame(AudioSource aud, string clipName)
+        private AudioSource InitAudioSource()
         {
-            //_audioRawDataManager = AudioRawDataManager.GetInstance(AgoraRtcEngine);
+            var aud = GetComponent<AudioSource>();
+            if (aud == null)
+            {
+                aud = gameObject.AddComponent<AudioSource>();
+            }
+            return aud;
+        }
 
-            var bufferLength = SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL * 1000; // 10-sec-length buffer
-            audioBuffer = new RingBuffer<float>(bufferLength);
+        private void StartPullAudioFrame(AudioSource aud, string clipName)
+        {
+
+            // 1-sec-length buffer
+            var bufferLength = SAMPLE_RATE * CHANNEL;
+            _audioBuffer = new RingBuffer<float>(bufferLength, true);
 
             _pullAudioFrameThread = new Thread(PullAudioFrameThread);
             _pullAudioFrameThread.Start();
@@ -122,15 +131,16 @@ namespace CustomRenderAudio
             aud.Play();
         }
 
-        void OnApplicationQuit()
+        private void OnDestroy()
         {
-            Debug.Log("OnApplicationQuit");
+            Debug.Log("OnDestroy");
+            if (RtcEngine == null) return;
+            RtcEngine.InitEventHandler(null);
+            RtcEngine.LeaveChannel();
+            RtcEngine.Dispose();
             _pullAudioFrameThreadSignal = false;
-            _pullAudioFrameThread.Abort();
-            if (AgoraRtcEngine == null) return;
-            AgoraRtcEngine.LeaveChannel();
-            AgoraRtcEngine.Dispose();
         }
+
 
         private void PullAudioFrameThread()
         {
@@ -145,36 +155,36 @@ namespace CustomRenderAudio
 
             var tic = new TimeSpan(DateTime.Now.Ticks);
 
-            AudioFrame audioFrame = new AudioFrame(type, samples, bytesPerSample, channels, samplesPerSec, buffer, 0, avsync_type);
+            AudioFrame audioFrame = new AudioFrame(type, samples, BYTES_PER_SAMPLE.TWO_BYTES_PER_SAMPLE, channels, samplesPerSec, buffer, 0, avsync_type);
+            IntPtr audioFrameBuffer = Marshal.AllocHGlobal(samples * bytesPerSample * channels);
+            audioFrame.buffer = (UInt64)audioFrameBuffer;
+            audioFrame.bufferPtr = audioFrameBuffer;
             while (_pullAudioFrameThreadSignal)
             {
                 var toc = new TimeSpan(DateTime.Now.Ticks);
                 if (toc.Subtract(tic).Duration().Milliseconds >= freq)
                 {
                     tic = new TimeSpan(DateTime.Now.Ticks);
-                    var ret = AgoraRtcEngine.PullAudioFrame(audioFrame);
+                    var ret = RtcEngine.PullAudioFrame(audioFrame);
+
                     Debug.Log("PullAudioFrame returns: " + ret);
 
-                    var byteArray = buffer;
-                    //Marshal.Copy(buffer, byteArray, 0, samples * bytesPerSample);
-
-                    var floatArray = ConvertByteToFloat16(byteArray);
-                    lock (audioBuffer)
+                    if (ret == 0)
                     {
-                        audioBuffer.Put(floatArray);
+                        Marshal.Copy((IntPtr)audioFrame.buffer, audioFrame.RawBuffer, 0, audioFrame.RawBuffer.Length);
+                        var floatArray = ConvertByteToFloat16(audioFrame.RawBuffer);
+                        lock (_audioBuffer)
+                        {
+                            _audioBuffer.Put(floatArray);
+                        }
+
+                        _writeCount += floatArray.Length;
+
                     }
-
-                    writeCount += floatArray.Length;
-                    count += 1;
-                }
-
-                if (count == 100)
-                {
-                    _startSignal = true;
                 }
             }
 
-            //Marshal.FreeHGlobal(buffer);
+            Marshal.FreeHGlobal(audioFrameBuffer);
         }
 
         private static float[] ConvertByteToFloat16(byte[] byteArray)
@@ -191,22 +201,29 @@ namespace CustomRenderAudio
 
         private void OnAudioRead(float[] data)
         {
-            if (!_startSignal) return;
+            //if (!_startSignal) return;
             for (var i = 0; i < data.Length; i++)
             {
-                lock (audioBuffer)
+                lock (_audioBuffer)
                 {
-                    data[i] = audioBuffer.Get();
+                    if (_audioBuffer.Count > 0)
+                    {
+                        data[i] = _audioBuffer.Get();
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
 
-                readCount += 1;
+                //readCount += 1;
             }
 
-            //Debug.LogFormat("buffer length remains: {0}", writeCount - readCount);
+            Debug.LogFormat("buffer length remains: {0}", _writeCount - _readCount);
         }
     }
 
-    internal class UserEventHandler : IAgoraRtcEngineEventHandler
+    internal class UserEventHandler : IRtcEngineEventHandler
     {
         private readonly CustomRenderAudio _customAudioSinkSample;
 
@@ -217,29 +234,29 @@ namespace CustomRenderAudio
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            _customAudioSinkSample.Logger.UpdateLog(string.Format("sdk version: {0}", _customAudioSinkSample.AgoraRtcEngine.GetVersion()));
-            _customAudioSinkSample.Logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
+            _customAudioSinkSample.Log.UpdateLog(string.Format("sdk version: {0}", _customAudioSinkSample.RtcEngine.GetVersion()));
+            _customAudioSinkSample.Log.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
                 connection.localUid, elapsed));
         }
 
         public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
         {
-            _customAudioSinkSample.Logger.UpdateLog("OnLeaveChannelSuccess");
+            _customAudioSinkSample.Log.UpdateLog("OnLeaveChannelSuccess");
         }
 
         public override void OnWarning(int warn, string msg)
         {
-            _customAudioSinkSample.Logger.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
+            _customAudioSinkSample.Log.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
         }
 
         public override void OnError(int error, string msg)
         {
-            _customAudioSinkSample.Logger.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
+            _customAudioSinkSample.Log.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
         }
 
         public override void OnConnectionLost(RtcConnection connection)
         {
-            _customAudioSinkSample.Logger.UpdateLog(string.Format("OnConnectionLost "));
+            _customAudioSinkSample.Log.UpdateLog(string.Format("OnConnectionLost "));
         }
     }
 }
