@@ -5,36 +5,38 @@ using agora_gaming_rtc;
 public class AudioMixing : MonoBehaviour
 {
     [SerializeField]
-    string APP_ID = "YOUR_APPID";
+    public string APP_ID = "YOUR_APPID";
     
     [SerializeField]
-    string TOKEN = "";
+    public string TOKEN = "";
 
     [SerializeField]
-    string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
+    public string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
 
     [SerializeField]
-    string Sound_URL = "";
+    public string Sound_URL = "";
 
     [SerializeField]
-    Toggle loopbackToggle;
+    public Toggle loopbackToggle;
 
-    string localPath = "";
+    private string _localPath = "";
 
-    public Text logText;
-    private Logger logger;
-    private IRtcEngine mRtcEngine = null;
-    private IAudioPlaybackDeviceManager manager = null;
-    const string SampleAudioSubpath = "/audio/Agora.io-Interactions.mp3";
+    public Text LogText;
+    private Logger _logger;
+    private IRtcEngine _rtcEngine = null;
+    private IAudioPlaybackDeviceManager _manager = null;
+    private const string _sampleAudioSubpath = "/audio/Agora.io-Interactions.mp3";
 
     // Start is called before the first frame update
     void Start()
     {
-        CheckAppId();
-        InitRtcEngine();
-        SetupUI();
-        //StartAudioPlaybackTest();
-        JoinChannel();
+        if (CheckAppId())
+        {
+            InitRtcEngine();
+            SetupUI();
+            //StartAudioPlaybackTest();
+            JoinChannel();
+        }
     }
 
     void Update() 
@@ -42,24 +44,24 @@ public class AudioMixing : MonoBehaviour
         PermissionHelper.RequestMicrophontPermission();
     }
 
-    void CheckAppId()
+    bool CheckAppId()
     {
-        logger = new Logger(logText);
-        logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in Canvas!!!!!");
+        _logger = new Logger(LogText);
+        return _logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in Canvas!!!!!");
     }
 
     void InitRtcEngine()
     {
-        mRtcEngine = IRtcEngine.GetEngine(APP_ID);
-        mRtcEngine.SetLogFile("log.txt");
+        _rtcEngine = IRtcEngine.GetEngine(APP_ID);
+        _rtcEngine.SetLogFile("log.txt");
         //mRtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY,
         //    AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
         //mRtcEngine.EnableAudio();
-        mRtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
-        mRtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
-        mRtcEngine.OnWarning += OnSDKWarningHandler;
-        mRtcEngine.OnError += OnSDKErrorHandler;
-        mRtcEngine.OnConnectionLost += OnConnectionLostHandler;
+        _rtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
+        _rtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
+        _rtcEngine.OnWarning += OnSDKWarningHandler;
+        _rtcEngine.OnError += OnSDKErrorHandler;
+        _rtcEngine.OnConnectionLost += OnConnectionLostHandler;
         
     }
     void SetupUI()
@@ -74,11 +76,11 @@ public class AudioMixing : MonoBehaviour
 
 #if UNITY_ANDROID && !UNITY_EDITOR
         // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
-        localPath = "/assets" + SampleAudioSubpath;
+        _localPath = "/assets" + SampleAudioSubpath;
 #else
-        localPath = Application.streamingAssetsPath + SampleAudioSubpath;
+        _localPath = Application.streamingAssetsPath + _sampleAudioSubpath;
 #endif
-        logger.UpdateLog(string.Format("the audio file path: {0}", localPath));
+        _logger.UpdateLog(string.Format("the audio file path: {0}", _localPath));
 
         EnableUI(false); // enable it after joining
     }
@@ -91,7 +93,7 @@ public class AudioMixing : MonoBehaviour
 
     void JoinChannel()
     {
-        mRtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
+        _rtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
     }
 
     #region -- Test Control logic ---
@@ -100,7 +102,7 @@ public class AudioMixing : MonoBehaviour
         Debug.Log("Playing with " + ( _useURL? "URL" : "local file") );
         bool bLoopback = loopbackToggle.isOn;
 
-        mRtcEngine.StartAudioMixing( filePath: _useURL? Sound_URL : localPath, 
+        _rtcEngine.StartAudioMixing( filePath: _useURL? Sound_URL : _localPath, 
 	                                 loopback: bLoopback, 
 				                      replace: true, 
 				                        cycle: -1, 
@@ -109,19 +111,19 @@ public class AudioMixing : MonoBehaviour
 
     void StartAudioPlaybackTest()
     {
-        manager = mRtcEngine.GetAudioPlaybackDeviceManager();
-        manager.CreateAAudioPlaybackDeviceManager();
-        manager.StartAudioPlaybackDeviceTest(localPath);
+        _manager = _rtcEngine.GetAudioPlaybackDeviceManager();
+        _manager.CreateAAudioPlaybackDeviceManager();
+        _manager.StartAudioPlaybackDeviceTest(_localPath);
     }
     
     void PlayEffectTest () {
         Debug.Log("Playing with " + ( _useURL? "URL" : "local file") );
-        IAudioEffectManager effectManager = mRtcEngine.GetAudioEffectManager ();
-        effectManager.PlayEffect (1, _useURL? Sound_URL : localPath, 1, 1.0, 0, 100, true);
+        IAudioEffectManager effectManager = _rtcEngine.GetAudioEffectManager ();
+        effectManager.PlayEffect (1, _useURL? Sound_URL : _localPath, 1, 1.0, 0, 100, true);
     }
 
     void StopEffectTest() {
-        IAudioEffectManager effectManager = mRtcEngine.GetAudioEffectManager();
+        IAudioEffectManager effectManager = _rtcEngine.GetAudioEffectManager();
         effectManager.StopAllEffects();
     }
 
@@ -130,12 +132,12 @@ public class AudioMixing : MonoBehaviour
     void OnApplicationQuit()
     {
         Debug.Log("OnApplicationQuit");
-        if (manager != null)
+        if (_manager != null)
         {
-            manager.StopAudioPlaybackDeviceTest();
-            manager.ReleaseAAudioPlaybackDeviceManager();
+            _manager.StopAudioPlaybackDeviceTest();
+            _manager.ReleaseAAudioPlaybackDeviceManager();
         }
-        if (mRtcEngine != null)
+        if (_rtcEngine != null)
         {
             IRtcEngine.Destroy();
         }
@@ -144,29 +146,29 @@ public class AudioMixing : MonoBehaviour
     #region -- SDK callbacks ----
     void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
     {
-        logger.UpdateLog(string.Format("sdk version: {0}", IRtcEngine.GetSdkVersion()));
-        logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName, uid, elapsed));
+        _logger.UpdateLog(string.Format("sdk version: {0}", IRtcEngine.GetSdkVersion()));
+        _logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName, uid, elapsed));
         EnableUI(true);
     }
 
     void OnLeaveChannelHandler(RtcStats stats)
     {
-        logger.UpdateLog("OnLeaveChannelSuccess");
+        _logger.UpdateLog("OnLeaveChannelSuccess");
     }
 
     void OnSDKWarningHandler(int warn, string msg)
     {
-        logger.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
+        _logger.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
     }
     
     void OnSDKErrorHandler(int error, string msg)
     {
-        logger.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
+        _logger.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
     }
     
     void OnConnectionLostHandler()
     {
-        logger.UpdateLog(string.Format("OnConnectionLost "));
+        _logger.UpdateLog(string.Format("OnConnectionLost "));
     }
 
     #endregion
@@ -178,13 +180,13 @@ public class AudioMixing : MonoBehaviour
     {
         if (_effectOn)
         {
-            logger.UpdateLog("Testing Effect right now, can't play effect...");
+            _logger.UpdateLog("Testing Effect right now, can't play effect...");
             return;
         }
 
         if (_isMixing)
         {
-            mRtcEngine.StopAudioMixing();
+            _rtcEngine.StopAudioMixing();
         }
         else
         {
@@ -202,7 +204,7 @@ public class AudioMixing : MonoBehaviour
     {
         if (_isMixing)
         { 
-	        logger.UpdateLog("Testing Mixing right now, can't play effect...");
+	        _logger.UpdateLog("Testing Mixing right now, can't play effect...");
             return;
 	    }
 

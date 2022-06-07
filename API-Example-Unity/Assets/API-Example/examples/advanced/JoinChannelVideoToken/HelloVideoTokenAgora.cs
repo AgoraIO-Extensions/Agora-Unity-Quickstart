@@ -16,29 +16,32 @@ public class HelloVideoTokenAgora : MonoBehaviour
 
     [SerializeField]
     private string APP_ID = "YOUR_APPID";
-    public Text logText;
-    private Logger logger;
-    private IRtcEngine mRtcEngine = null;
-    private const float Offset = 100;
-    private static string channelName = "Agora_Channel";
-    private static string channelToken = "";
-    private static string tokenBase = "http://localhost:8080";
-    private CONNECTION_STATE_TYPE state = CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED;
+
+    public Text LogText;
+    private Logger _logger;
+    private IRtcEngine _rtcEngine = null;
+    private const float _offset = 100;
+    private static string _channelName = "Agora_Channel";
+    private static string _channelToken = "";
+    private static string _tokenBase = "http://localhost:8080";
+    private CONNECTION_STATE_TYPE _state = CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED;
 
     // Use this for initialization
     void Start()
     {
-        CheckAppId();
-        InitEngine();
-        JoinChannel();
+        if (CheckAppId())
+        {
+            InitEngine();
+            JoinChannel();
+        }
     }
 
     void RenewOrJoinToken(string newToken)
     {
-        HelloVideoTokenAgora.channelToken = newToken;
-        if (state == CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED
-            || state == CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED
-            || state == CONNECTION_STATE_TYPE.CONNECTION_STATE_FAILED
+        HelloVideoTokenAgora._channelToken = newToken;
+        if (_state == CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED
+            || _state == CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED
+            || _state == CONNECTION_STATE_TYPE.CONNECTION_STATE_FAILED
         )
         {
             // If we are not connected yet, connect to the channel as normal
@@ -60,106 +63,106 @@ public class HelloVideoTokenAgora : MonoBehaviour
 
     void UpdateToken()
     {
-        mRtcEngine.RenewToken(HelloVideoTokenAgora.channelToken);
+        _rtcEngine.RenewToken(HelloVideoTokenAgora._channelToken);
     }
 
-    void CheckAppId()
+    bool CheckAppId()
     {
-        logger = new Logger(logText);
-        logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+        _logger = new Logger(LogText);
+        return _logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
     }
 
     void InitEngine()
     {
-        mRtcEngine = IRtcEngine.GetEngine(APP_ID);
-        mRtcEngine.SetLogFile("log.txt");
-        mRtcEngine.SetChannelProfile(CHANNEL_PROFILE.CHANNEL_PROFILE_LIVE_BROADCASTING);
-        mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-        mRtcEngine.EnableAudio();
-        mRtcEngine.EnableVideo();
-        mRtcEngine.EnableVideoObserver();
-        mRtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
-        mRtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
-        mRtcEngine.OnWarning += OnSDKWarningHandler;
-        mRtcEngine.OnError += OnSDKErrorHandler;
-        mRtcEngine.OnConnectionLost += OnConnectionLostHandler;
-        mRtcEngine.OnUserJoined += OnUserJoinedHandler;
-        mRtcEngine.OnUserOffline += OnUserOfflineHandler;
-        mRtcEngine.OnTokenPrivilegeWillExpire += OnTokenPrivilegeWillExpireHandler;
-        mRtcEngine.OnConnectionStateChanged += OnConnectionStateChangedHandler;
+        _rtcEngine = IRtcEngine.GetEngine(APP_ID);
+        _rtcEngine.SetLogFile("log.txt");
+        _rtcEngine.SetChannelProfile(CHANNEL_PROFILE.CHANNEL_PROFILE_LIVE_BROADCASTING);
+        _rtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+        _rtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
+        _rtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
+        _rtcEngine.OnWarning += OnSDKWarningHandler;
+        _rtcEngine.OnError += OnSDKErrorHandler;
+        _rtcEngine.OnConnectionLost += OnConnectionLostHandler;
+        _rtcEngine.OnUserJoined += OnUserJoinedHandler;
+        _rtcEngine.OnUserOffline += OnUserOfflineHandler;
+        _rtcEngine.OnTokenPrivilegeWillExpire += OnTokenPrivilegeWillExpireHandler;
+        _rtcEngine.OnConnectionStateChanged += OnConnectionStateChangedHandler;
 
     }
 
     void JoinChannel()
     {
-        if (string.IsNullOrEmpty(channelToken))
+        if (string.IsNullOrEmpty(_channelToken))
         {
-            StartCoroutine(HelperClass.FetchToken(tokenBase, channelName, 0, this.RenewOrJoinToken));
+            StartCoroutine(HelperClass.FetchToken(_tokenBase, _channelName, 0, this.RenewOrJoinToken));
             return;
         }
-        mRtcEngine.JoinChannelByKey(channelToken, channelName, "", 0);
+        _rtcEngine.EnableAudio();
+        _rtcEngine.EnableVideo();
+        _rtcEngine.EnableVideoObserver();
+        _rtcEngine.JoinChannelByKey(_channelToken, _channelName, "", 0);
     }
 
     void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
     {
-        logger.UpdateLog(string.Format("sdk version: ${0}", IRtcEngine.GetSdkVersion()));
-        logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName, uid, elapsed));
-        logger.UpdateLog(string.Format("New Token: {0}", HelloVideoTokenAgora.channelToken));
+        _logger.UpdateLog(string.Format("sdk version: ${0}", IRtcEngine.GetSdkVersion()));
+        _logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName, uid, elapsed));
+        _logger.UpdateLog(string.Format("New Token: {0}", HelloVideoTokenAgora._channelToken));
         // HelperClass.FetchToken(tokenBase, channelName, 0, this.RenewOrJoinToken);
         makeVideoView(0);
     }
 
     void OnLeaveChannelHandler(RtcStats stats)
     {
-        logger.UpdateLog("OnLeaveChannelSuccess");
+        _logger.UpdateLog("OnLeaveChannelSuccess");
         DestroyVideoView(0);
     }
 
     void OnUserJoinedHandler(uint uid, int elapsed)
     {
-        logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+        _logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
         makeVideoView(uid);
     }
 
     void OnUserOfflineHandler(uint uid, USER_OFFLINE_REASON reason)
     {
-        logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid, (int)reason));
+        _logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid, (int)reason));
         DestroyVideoView(uid);
     }
 
     void OnTokenPrivilegeWillExpireHandler(string token)
     {
-        StartCoroutine(HelperClass.FetchToken(tokenBase, channelName, 0, this.RenewOrJoinToken));
+        StartCoroutine(HelperClass.FetchToken(_tokenBase, _channelName, 0, this.RenewOrJoinToken));
     }
 
     void OnConnectionStateChangedHandler(CONNECTION_STATE_TYPE state, CONNECTION_CHANGED_REASON_TYPE reason)
     {
-        this.state = state;
-        logger.UpdateLog(string.Format("ConnectionState changed {0}, reason: ${1}", state, reason));
+        this._state = state;
+        _logger.UpdateLog(string.Format("ConnectionState changed {0}, reason: ${1}", state, reason));
     }
 
     void OnSDKWarningHandler(int warn, string msg)
     {
-        logger.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
+        _logger.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
     }
 
     void OnSDKErrorHandler(int error, string msg)
     {
-        logger.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
+        _logger.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
     }
 
     void OnConnectionLostHandler()
     {
-        logger.UpdateLog(string.Format("OnConnectionLost "));
+        _logger.UpdateLog(string.Format("OnConnectionLost "));
     }
 
     void OnApplicationQuit()
     {
         Debug.Log("OnApplicationQuit");
-        if (mRtcEngine != null)
+        if (_rtcEngine != null)
         {
-            mRtcEngine.LeaveChannel();
-            mRtcEngine.DisableVideoObserver();
+            _rtcEngine.LeaveChannel();
+            _rtcEngine.DisableVideoObserver();
             IRtcEngine.Destroy();
         }
     }
@@ -219,8 +222,8 @@ public class HelloVideoTokenAgora : MonoBehaviour
         }
         // set up transform
         go.transform.Rotate(0f, 0.0f, 180.0f);
-        float xPos = Random.Range(Offset - Screen.width / 2f, Screen.width / 2f - Offset);
-        float yPos = Random.Range(Offset, Screen.height / 2f - Offset);
+        float xPos = Random.Range(_offset - Screen.width / 2f, Screen.width / 2f - _offset);
+        float yPos = Random.Range(_offset, Screen.height / 2f - _offset);
         Debug.Log("position x " + xPos + " y: " + yPos);
         go.transform.localPosition = new Vector3(xPos, yPos, 0f);
         go.transform.localScale = new Vector3(3f, 4f, 1f);

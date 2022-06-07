@@ -10,40 +10,42 @@ public class AgoraScreenShare : MonoBehaviour
 {
 
     [SerializeField]
-    private string APP_ID = "YOUR_APPID";
+    public string APP_ID = "YOUR_APPID";
 
     [SerializeField]
-    private string TOKEN = "";
+    public string TOKEN = "";
 
     [SerializeField]
-    private string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
-   	public Text logText;
-    private Logger logger;
-	public IRtcEngine mRtcEngine = null;
-	private static string channelName = "Agora_Channel";
-	private const float Offset = 100;
-	private Texture2D mTexture;
-    private Rect mRect;	
-	private int i = 0;
-    private WebCamTexture webCameraTexture;
-    public RawImage rawImage;
-	public Vector2 cameraSize = new Vector2(640, 480);
-	public int cameraFPS = 15;
+    public string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
+
+   	public Text LogText;
+    private Logger _logger;
+	public IRtcEngine _rtcEngine = null;
+	private const float _offset = 100;
+	private Texture2D _texture;
+    private Rect _rect;	
+    private WebCamTexture _webCameraTexture;
+    public RawImage _rawImage;
+	private Vector2 _cameraSize = new Vector2(640, 480);
+	private int _cameraFPS = 15;
 
 	// Use this for initialization
 	void Start () 
 	{
-        InitCameraDevice();
-        InitTexture();
-		CheckAppId();	
-		InitEngine();
-		JoinChannel();
+        if (CheckAppId())
+        {
+            InitCameraDevice();
+            InitTexture();
+            InitEngine();
+            JoinChannel();
+        }
 	}
 
     void Update() 
     {
         PermissionHelper.RequestMicrophontPermission();
-		StartCoroutine(shareScreen());
+        PermissionHelper.RequestCameraPermission();
+        StartCoroutine(shareScreen());
     }
 
     IEnumerator shareScreen()
@@ -52,16 +54,16 @@ public class AgoraScreenShare : MonoBehaviour
         IRtcEngine rtc = IRtcEngine.QueryEngine();
         if (rtc != null)
         {
-            mTexture.ReadPixels(mRect, 0, 0);
-            mTexture.Apply();
-            byte[] bytes = mTexture.GetRawTextureData();
+            _texture.ReadPixels(_rect, 0, 0);
+            _texture.Apply();
+            byte[] bytes = _texture.GetRawTextureData();
             int size = Marshal.SizeOf(bytes[0]) * bytes.Length;
             ExternalVideoFrame externalVideoFrame = new ExternalVideoFrame();
             externalVideoFrame.type = ExternalVideoFrame.VIDEO_BUFFER_TYPE.VIDEO_BUFFER_RAW_DATA;
             externalVideoFrame.format = ExternalVideoFrame.VIDEO_PIXEL_FORMAT.VIDEO_PIXEL_RGBA;
             externalVideoFrame.buffer = bytes;
-            externalVideoFrame.stride = (int)mRect.width;
-            externalVideoFrame.height = (int)mRect.height;
+            externalVideoFrame.stride = (int)_rect.width;
+            externalVideoFrame.height = (int)_rect.height;
             externalVideoFrame.cropLeft = 10;
             externalVideoFrame.cropTop = 10;
             externalVideoFrame.cropRight = 10;
@@ -75,101 +77,101 @@ public class AgoraScreenShare : MonoBehaviour
 
 	void InitEngine()
 	{
-        mRtcEngine = IRtcEngine.GetEngine(APP_ID);
-		mRtcEngine.SetLogFile("log.txt");
-		mRtcEngine.SetChannelProfile(CHANNEL_PROFILE.CHANNEL_PROFILE_LIVE_BROADCASTING);
-		mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-		mRtcEngine.EnableAudio();
-		mRtcEngine.EnableVideo();
-		mRtcEngine.EnableVideoObserver();
-		mRtcEngine.SetExternalVideoSource(true, false);
-        mRtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
-        mRtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
-        mRtcEngine.OnWarning += OnSDKWarningHandler;
-        mRtcEngine.OnError += OnSDKErrorHandler;
-        mRtcEngine.OnConnectionLost += OnConnectionLostHandler;
-        mRtcEngine.OnUserJoined += OnUserJoinedHandler;
-        mRtcEngine.OnUserOffline += OnUserOfflineHandler;
+        _rtcEngine = IRtcEngine.GetEngine(APP_ID);
+		_rtcEngine.SetLogFile("log.txt");
+		_rtcEngine.SetChannelProfile(CHANNEL_PROFILE.CHANNEL_PROFILE_LIVE_BROADCASTING);
+		_rtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+		_rtcEngine.SetExternalVideoSource(true, false);
+        _rtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
+        _rtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
+        _rtcEngine.OnWarning += OnSDKWarningHandler;
+        _rtcEngine.OnError += OnSDKErrorHandler;
+        _rtcEngine.OnConnectionLost += OnConnectionLostHandler;
+        _rtcEngine.OnUserJoined += OnUserJoinedHandler;
+        _rtcEngine.OnUserOffline += OnUserOfflineHandler;
 	}
 
 	void JoinChannel()
 	{
-        int ret = mRtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
+        _rtcEngine.EnableAudio();
+        _rtcEngine.EnableVideo();
+        _rtcEngine.EnableVideoObserver();
+        int ret = _rtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
         Debug.Log(string.Format("JoinChannel ret: ${0}", ret));
 	}
 
-	void CheckAppId()
+	bool CheckAppId()
     {
-        logger = new Logger(logText);
-        logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in Canvas!!!!");
+        _logger = new Logger(LogText);
+        return _logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in Canvas!!!!");
     }
 
     void InitTexture()
     {
-        mRect = new Rect(0, 0, Screen.width, Screen.height);
-        mTexture = new Texture2D((int)mRect.width, (int)mRect.height, TextureFormat.RGBA32, false);
+        _rect = new Rect(0, 0, Screen.width, Screen.height);
+        _texture = new Texture2D((int)_rect.width, (int)_rect.height, TextureFormat.RGBA32, false);
     }
 
     public void InitCameraDevice()
     {   
-
         WebCamDevice[] devices = WebCamTexture.devices;
-        webCameraTexture = new WebCamTexture(devices[0].name, (int)cameraSize.x, (int)cameraSize.y, cameraFPS);
-        rawImage.texture = webCameraTexture;
-        webCameraTexture.Play();
+        _webCameraTexture = new WebCamTexture(devices[0].name, (int)_cameraSize.x, (int)_cameraSize.y, _cameraFPS);
+        _rawImage.texture = _webCameraTexture;
+        _webCameraTexture.Play();
     }
 	
 	void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
     {
-        logger.UpdateLog(string.Format("sdk version: ${0}", IRtcEngine.GetSdkVersion()));
-        logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName, uid, elapsed));
+        _logger.UpdateLog(string.Format("sdk version: ${0}", IRtcEngine.GetSdkVersion()));
+        _logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName, uid, elapsed));
+     
     }
 
     void OnLeaveChannelHandler(RtcStats stats)
     {
-        logger.UpdateLog("OnLeaveChannelSuccess");
+        _logger.UpdateLog("OnLeaveChannelSuccess");
     }
 
     void OnUserJoinedHandler(uint uid, int elapsed)
     {
-        logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+        _logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
         makeVideoView(uid);
     }
 
     void OnUserOfflineHandler(uint uid, USER_OFFLINE_REASON reason)
     {
-        logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid, (int)reason));
+        _logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid, (int)reason));
         DestroyVideoView(uid);
     }
 
     void OnSDKWarningHandler(int warn, string msg)
     {
-        logger.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
+        _logger.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
     }
     
     void OnSDKErrorHandler(int error, string msg)
     {
-        logger.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
+        _logger.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
     }
     
     void OnConnectionLostHandler()
     {
-        logger.UpdateLog(string.Format("OnConnectionLost "));
+        _logger.UpdateLog(string.Format("OnConnectionLost "));
     }
 
     void OnApplicationQuit()
     {
-        if (webCameraTexture)
+        if (_webCameraTexture)
         {
-            webCameraTexture.Stop();
+            _webCameraTexture.Stop();
         }
 
-        if (mRtcEngine != null)
+        if (_rtcEngine != null)
         {
-			mRtcEngine.LeaveChannel();
-			mRtcEngine.DisableVideoObserver();
+			_rtcEngine.LeaveChannel();
+			_rtcEngine.DisableVideoObserver();
             IRtcEngine.Destroy();
-            mRtcEngine = null;
+            _rtcEngine = null;
         }
     }
 
@@ -251,8 +253,8 @@ public class AgoraScreenShare : MonoBehaviour
         }
         // set up transform
         go.transform.Rotate(0f, 0.0f, 180.0f);
-        float xPos = Random.Range(Offset - Screen.width / 2f, Screen.width / 2f - Offset);
-        float yPos = Random.Range(Offset, Screen.height / 2f - Offset);
+        float xPos = Random.Range(_offset - Screen.width / 2f, Screen.width / 2f - _offset);
+        float yPos = Random.Range(_offset, Screen.height / 2f - _offset);
         Debug.Log("position x " + xPos + " y: " + yPos);
         go.transform.localPosition = new Vector3(xPos, yPos, 0f);
         go.transform.localScale = new Vector3(3f, 4f, 1f);

@@ -11,16 +11,19 @@ using Random = UnityEngine.Random;
 
 public class DesktopScreenShare : MonoBehaviour
 {
-    [SerializeField] private string APP_ID = "";
+    [SerializeField]
+    public string APP_ID = "";
 
-    [SerializeField] private string TOKEN = "";
+    [SerializeField]
+    public string TOKEN = "";
 
-    [SerializeField] private string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
+    [SerializeField]
+    public string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
 
-    private IRtcEngine mRtcEngine;
-    private uint remoteUid = 0;
-    private const float Offset = 100;
-    public Text logText;
+    private IRtcEngine _rtcEngine;
+    private uint _remoteUid = 0;
+    private const float _offset = 100;
+    public Text LogText;
     private Logger _logger;
     private Dropdown _winIdSelect;
     private Button _startShareBtn;
@@ -33,7 +36,7 @@ public class DesktopScreenShare : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        _logger = new Logger(logText);
+        _logger = new Logger(LogText);
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
         _dispRect = new Dictionary<uint, AgoraNativeBridge.RECT>();
 #endif
@@ -55,23 +58,23 @@ public class DesktopScreenShare : MonoBehaviour
 
     private void JoinChannel()
     {
-        mRtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME);
+        _rtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME);
     }
 
     private void InitEngine()
     {
-        mRtcEngine = IRtcEngine.GetEngine(APP_ID);
-        mRtcEngine.SetLogFile("log.txt");
-        mRtcEngine.EnableAudio();
-        mRtcEngine.EnableVideo();
-        mRtcEngine.EnableVideoObserver();
-        mRtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
-        mRtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
-        mRtcEngine.OnWarning += OnSDKWarningHandler;
-        mRtcEngine.OnError += OnSDKErrorHandler;
-        mRtcEngine.OnConnectionLost += OnConnectionLostHandler;
-        mRtcEngine.OnUserJoined += OnUserJoinedHandler;
-        mRtcEngine.OnUserOffline += OnUserOfflineHandler;
+        _rtcEngine = IRtcEngine.GetEngine(APP_ID);
+        _rtcEngine.SetLogFile("log.txt");
+        _rtcEngine.EnableAudio();
+        _rtcEngine.EnableVideo();
+        _rtcEngine.EnableVideoObserver();
+        _rtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
+        _rtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
+        _rtcEngine.OnWarning += OnSDKWarningHandler;
+        _rtcEngine.OnError += OnSDKErrorHandler;
+        _rtcEngine.OnConnectionLost += OnConnectionLostHandler;
+        _rtcEngine.OnUserJoined += OnUserJoinedHandler;
+        _rtcEngine.OnUserOffline += OnUserOfflineHandler;
     }
 
 
@@ -138,7 +141,7 @@ public class DesktopScreenShare : MonoBehaviour
     {
         if (_startShareBtn != null) _startShareBtn.gameObject.SetActive(false);
         if (_stopShareBtn != null) _stopShareBtn.gameObject.SetActive(true);
-        mRtcEngine.StopScreenCapture();
+        _rtcEngine.StopScreenCapture();
 
         if (_winIdSelect == null) return;
         var option = _winIdSelect.options[_winIdSelect.value].text;
@@ -147,7 +150,7 @@ public class DesktopScreenShare : MonoBehaviour
         {
             var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
             _logger.UpdateLog(string.Format(">>>>> Start sharing {0}", windowId));
-            mRtcEngine.StartScreenCaptureByWindowId(int.Parse(windowId), default(Rectangle),
+            _rtcEngine.StartScreenCaptureByWindowId(int.Parse(windowId), default(Rectangle),
                 default(ScreenCaptureParameters));
         }
         else
@@ -155,7 +158,7 @@ public class DesktopScreenShare : MonoBehaviour
 #if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
             var dispId = uint.Parse(option.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1]);
             _logger.UpdateLog(string.Format(">>>>> Start sharing display {0}", dispId));
-            mRtcEngine.StartScreenCaptureByDisplayId(dispId, default(Rectangle),
+            _rtcEngine.StartScreenCaptureByDisplayId(dispId, default(Rectangle),
                 new ScreenCaptureParameters {captureMouseCursor = true, frameRate = 30});
 #elif UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             var diapFlag = uint.Parse(option.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1]);
@@ -178,7 +181,7 @@ public class DesktopScreenShare : MonoBehaviour
     {
         if (_startShareBtn != null) _startShareBtn.gameObject.SetActive(true);
         if (_stopShareBtn != null) _stopShareBtn.gameObject.SetActive(false);
-        mRtcEngine.StopScreenCapture();
+        _rtcEngine.StopScreenCapture();
     }
 
     private void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
@@ -197,14 +200,14 @@ public class DesktopScreenShare : MonoBehaviour
 
     private void OnUserJoinedHandler(uint uid, int elapsed)
     {
-        if (remoteUid == 0) remoteUid = uid;
+        if (_remoteUid == 0) _remoteUid = uid;
         _logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
         makeVideoView(uid);
     }
 
     private void OnUserOfflineHandler(uint uid, USER_OFFLINE_REASON reason)
     {
-        remoteUid = 0;
+        _remoteUid = 0;
         _logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid, (int) reason));
         DestroyVideoView(uid);
     }
@@ -227,10 +230,10 @@ public class DesktopScreenShare : MonoBehaviour
     void OnApplicationQuit()
     {
         Debug.Log("OnApplicationQuit");
-        if (mRtcEngine != null)
+        if (_rtcEngine != null)
         {
-            mRtcEngine.LeaveChannel();
-            mRtcEngine.DisableVideoObserver();
+            _rtcEngine.LeaveChannel();
+            _rtcEngine.DisableVideoObserver();
             IRtcEngine.Destroy();
         }
     }
@@ -316,8 +319,8 @@ public class DesktopScreenShare : MonoBehaviour
 
         // set up transform
         go.transform.Rotate(0.0f, 0.0f, 180.0f);
-        var xPos = Random.Range(Offset - Screen.width / 2f, Screen.width / 2f - Offset);
-        var yPos = Random.Range(Offset, Screen.height / 2f - Offset);
+        var xPos = Random.Range(_offset - Screen.width / 2f, Screen.width / 2f - _offset);
+        var yPos = Random.Range(_offset, Screen.height / 2f - _offset);
         go.transform.localPosition = new Vector3(xPos, yPos, 0f);
         go.transform.localScale = new Vector3(3f, 4f, 1f);
 
