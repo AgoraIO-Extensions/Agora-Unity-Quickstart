@@ -5,22 +5,22 @@ using RingBuffer;
 
 public class UserAudioFrameHandler : MonoBehaviour {
 
-	AudioSource audioSource;
+	AudioSource _audioSource;
     IUserAudioFrameDelegate _userAudioFrameDelegate;
 
-    uint UID { get; set; }
+    private uint UID { get; set; }
 
-    private int CHANNEL = 2;
-    private int PULL_FREQ_PER_SEC = 100;
-    private int SAMPLE_RATE = 48000; // this should = CLIP_SAMPLES x PULL_FREQ_PER_SEC
-    private int CLIP_SAMPLES = 480;
+    private  int CHANNEL = 2;
+    private  int PULL_FREQ_PER_SEC = 100;
+    private  int SAMPLE_RATE = 48000; // this should = CLIP_SAMPLES x PULL_FREQ_PER_SEC
+    private  int CLIP_SAMPLES = 480;
 
-    private int count;
+    private int _count;
 
-    private int writeCount;
-    private int readCount;
+    private int _writeCount;
+    private int _readCount;
 
-    private RingBuffer<float> audioBuffer;
+    private RingBuffer<float> _audioBuffer;
     private AudioClip _audioClip = null;
 
     private bool _startSignal;
@@ -28,13 +28,13 @@ public class UserAudioFrameHandler : MonoBehaviour {
 
     // Use this for initialization (runs after Init)
     void Start () {
-		audioSource = GetComponent<AudioSource>();	
-        if (audioSource == null)
+		_audioSource = GetComponent<AudioSource>();	
+        if (_audioSource == null)
 		{
-			audioSource = gameObject.AddComponent<AudioSource>();
+			_audioSource = gameObject.AddComponent<AudioSource>();
 	    }
         _userAudioFrameDelegate.HandleAudioFrameForUser += HandleAudioFrame;
-        SetupAudio(audioSource, "clip_for_" + UID);
+        SetupAudio(_audioSource, "clip_for_" + UID);
     }
 
     private void OnDisable()
@@ -59,7 +59,7 @@ public class UserAudioFrameHandler : MonoBehaviour {
 
         //The larger the buffer, the higher the delay
         var bufferLength = SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL * 100; // 1-sec-length buffer
-        audioBuffer = new RingBuffer<float>(bufferLength,true);
+        _audioBuffer = new RingBuffer<float>(bufferLength,true);
         // Debug.Log($"{UID} Created clip for SAMPLE_RATE:" + SAMPLE_RATE + " CLIP_SAMPLES:" + CLIP_SAMPLES + " channel:" + CHANNEL + " => bufferLength = " + bufferLength);
         _audioClip = AudioClip.Create(clipName,
             CLIP_SAMPLES,
@@ -73,11 +73,11 @@ public class UserAudioFrameHandler : MonoBehaviour {
     void ResetHandler()
     {
         _startSignal = false;
-        if (audioBuffer != null)
+        if (_audioBuffer != null)
         {
-            audioBuffer.Clear();
+            _audioBuffer.Clear();
         }
-        count = 0;
+        _count = 0;
     }
 
     private void OnApplicationPause(bool pause)
@@ -95,14 +95,14 @@ public class UserAudioFrameHandler : MonoBehaviour {
 
     void HandleAudioFrame(uint uid, AudioFrame audioFrame)
     {
-        if (UID != uid || audioBuffer == null) return;
+        if (UID != uid || _audioBuffer == null) return;
 
         var floatArray = ConvertByteToFloat16(audioFrame.buffer);
-        lock (audioBuffer)
+        lock (_audioBuffer)
         {
-            audioBuffer.Put(floatArray);
-            writeCount += floatArray.Length;
-            count++;
+            _audioBuffer.Put(floatArray);
+            _writeCount += floatArray.Length;
+            _count++;
         }
     }
 
@@ -111,11 +111,11 @@ public class UserAudioFrameHandler : MonoBehaviour {
      
         for (var i = 0; i < data.Length; i++)
         {
-            lock (audioBuffer)
-            {   if (audioBuffer.Count > 0)
+            lock (_audioBuffer)
+            {   if (_audioBuffer.Count > 0)
                 {
-                    data[i] = audioBuffer.Get();
-                    readCount += 1;
+                    data[i] = _audioBuffer.Get();
+                    _readCount += 1;
                 }
             }
         }

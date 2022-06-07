@@ -11,28 +11,33 @@ using Random = UnityEngine.Random;
 
 public class RtmpStreaming : MonoBehaviour
 {
-    [SerializeField] private string APP_ID = "";
+    [SerializeField]
+    public string APP_ID = "";
 
-    [SerializeField] private string TOKEN = "";
+    [SerializeField]
+    public string TOKEN = "";
 
-    [SerializeField] private string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
+    [SerializeField]
+    public string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
 
-    [SerializeField] private string RTMP_URL = "";
+    [SerializeField]
+    public string RTMP_URL = "";
 
-    public Text logText;
-    private Logger logger;
-    private IRtcEngine mRtcEngine = null;
-    private const float Offset = 100;
-    private static string channelName = "Agora_Channel";
-    private uint remoteUid = 0;
-    private bool isStreaming = false;
+    public Text LogText;
+    private Logger _logger;
+    private IRtcEngine _rtcEngine = null;
+    private const float _offset = 100;
+    private uint _remoteUid = 0;
+    private bool _isStreaming = false;
 
     // Use this for initialization
     void Start()
     {
-        CheckAppId();
-        InitEngine();
-        JoinChannel();
+        if (CheckAppId())
+        {
+            InitEngine();
+            JoinChannel();
+        }
     }
 
     // Update is called once per frame
@@ -42,44 +47,42 @@ public class RtmpStreaming : MonoBehaviour
         PermissionHelper.RequestCameraPermission();
     }
 
-    void CheckAppId()
+    bool CheckAppId()
     {
-        logger = new Logger(logText);
-        logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+        _logger = new Logger(LogText);
+        return _logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
     }
 
     void InitEngine()
     {
-        mRtcEngine = IRtcEngine.GetEngine(APP_ID);
-        mRtcEngine.SetLogFile("log.txt");
-        mRtcEngine.SetChannelProfile(CHANNEL_PROFILE.CHANNEL_PROFILE_LIVE_BROADCASTING);
-        mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-        mRtcEngine.SetVideoEncoderConfiguration(new VideoEncoderConfiguration
+        _rtcEngine = IRtcEngine.GetEngine(APP_ID);
+        _rtcEngine.SetLogFile("log.txt");
+        _rtcEngine.SetChannelProfile(CHANNEL_PROFILE.CHANNEL_PROFILE_LIVE_BROADCASTING);
+        _rtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+        _rtcEngine.SetVideoEncoderConfiguration(new VideoEncoderConfiguration
         {
             dimensions = new VideoDimensions {width = 720, height = 640},
             frameRate = FRAME_RATE.FRAME_RATE_FPS_24
         });
-        mRtcEngine.EnableAudio();
-        mRtcEngine.EnableVideo();
-        mRtcEngine.EnableVideoObserver();
-        mRtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
-        mRtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
-        mRtcEngine.OnWarning += OnSDKWarningHandler;
-        mRtcEngine.OnError += OnSDKErrorHandler;
-        mRtcEngine.OnConnectionLost += OnConnectionLostHandler;
-        mRtcEngine.OnUserJoined += OnUserJoinedHandler;
-        mRtcEngine.OnUserOffline += OnUserOfflineHandler;
-        mRtcEngine.OnStreamPublished += OnStreamPublishedHandler;
-        mRtcEngine.OnRtmpStreamingStateChanged += OnRtmpStreamingStateChangedHandler;
-        mRtcEngine.OnRtmpStreamingEvent += OnRtmpStreamingEventHandler;
+     
+        _rtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
+        _rtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
+        _rtcEngine.OnWarning += OnSDKWarningHandler;
+        _rtcEngine.OnError += OnSDKErrorHandler;
+        _rtcEngine.OnConnectionLost += OnConnectionLostHandler;
+        _rtcEngine.OnUserJoined += OnUserJoinedHandler;
+        _rtcEngine.OnUserOffline += OnUserOfflineHandler;
+        _rtcEngine.OnStreamPublished += OnStreamPublishedHandler;
+        _rtcEngine.OnRtmpStreamingStateChanged += OnRtmpStreamingStateChangedHandler;
+        _rtcEngine.OnRtmpStreamingEvent += OnRtmpStreamingEventHandler;
     }
 
     void StartTranscoding(bool ifRemoteUser = false)
     {
-        if (isStreaming && !ifRemoteUser) return;
-        if (isStreaming && ifRemoteUser)
+        if (_isStreaming && !ifRemoteUser) return;
+        if (_isStreaming && ifRemoteUser)
         {
-            mRtcEngine.RemovePublishStreamUrl(RTMP_URL);
+            _rtcEngine.RemovePublishStreamUrl(RTMP_URL);
         }
         
         var lt = new LiveTranscoding();
@@ -109,7 +112,7 @@ public class RtmpStreaming : MonoBehaviour
         {
             var remoteUser = new TranscodingUser()
             {
-                uid = remoteUid,
+                uid = _remoteUid,
                 x = 360,
                 y = 0,
                 width = 360,
@@ -130,21 +133,24 @@ public class RtmpStreaming : MonoBehaviour
             lt.transcodingUsers = new[] {localUesr};
         }
         
-        mRtcEngine.SetLiveTranscoding(lt);
+        _rtcEngine.SetLiveTranscoding(lt);
 
-        var rc = mRtcEngine.AddPublishStreamUrl(RTMP_URL, true);
-        if (rc == 0) logger.UpdateLog(string.Format("Error in AddPublishStreamUrl: {0}", RTMP_URL));
+        var rc = _rtcEngine.AddPublishStreamUrl(RTMP_URL, true);
+         _logger.UpdateLog(string.Format("AddPublishStreamUrl: {0}", rc));
     }
 
     void JoinChannel()
     {
-        mRtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
+        _rtcEngine.EnableAudio();
+        _rtcEngine.EnableVideo();
+        _rtcEngine.EnableVideoObserver();
+        _rtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
     }
 
     void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
     {
-        logger.UpdateLog(string.Format("sdk version: ${0}", IRtcEngine.GetSdkVersion()));
-        logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName,
+        _logger.UpdateLog(string.Format("sdk version: ${0}", IRtcEngine.GetSdkVersion()));
+        _logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName,
             uid, elapsed));
         makeVideoView(0);
         StartTranscoding();
@@ -152,64 +158,64 @@ public class RtmpStreaming : MonoBehaviour
 
     void OnLeaveChannelHandler(RtcStats stats)
     {
-        logger.UpdateLog("OnLeaveChannelSuccess");
+        _logger.UpdateLog("OnLeaveChannelSuccess");
         DestroyVideoView(0);
     }
 
     void OnUserJoinedHandler(uint uid, int elapsed)
     {
-        if (remoteUid == 0) remoteUid = uid;
+        if (_remoteUid == 0) _remoteUid = uid;
         StartTranscoding(true);
-        logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+        _logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
         makeVideoView(uid);
     }
 
     void OnUserOfflineHandler(uint uid, USER_OFFLINE_REASON reason)
     {
-        remoteUid = 0;
-        logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid, (int) reason));
+        _remoteUid = 0;
+        _logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid, (int) reason));
         DestroyVideoView(uid);
     }
 
     void OnSDKWarningHandler(int warn, string msg)
     {
-        logger.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
+        _logger.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
     }
 
     void OnSDKErrorHandler(int error, string msg)
     {
-        logger.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
+        _logger.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
     }
 
     void OnConnectionLostHandler()
     {
-        logger.UpdateLog("OnConnectionLost ");
+        _logger.UpdateLog("OnConnectionLost ");
     }
 
     void OnStreamPublishedHandler(string url, int error)
     {
-        logger.UpdateLog(string.Format("OnStreamPublished url: {0}, error : {1}", url, error));
+        _logger.UpdateLog(string.Format("OnStreamPublished url: {0}, error : {1}", url, error));
     }
 
     void OnRtmpStreamingStateChangedHandler(string url, RTMP_STREAM_PUBLISH_STATE state, RTMP_STREAM_PUBLISH_ERROR_TYPE code)
     {
-        logger.UpdateLog(string.Format("OnRtmpStreamingStateChanged url: {0}, state: {1}, code: {2}", url, state,
+        _logger.UpdateLog(string.Format("OnRtmpStreamingStateChanged url: {0}, state: {1}, code: {2}", url, state,
             code));
     }
 
     void OnRtmpStreamingEventHandler(string url, RTMP_STREAMING_EVENT code)
     {
-        logger.UpdateLog(string.Format("OnRtmpStreamingEvent url: {0}, code: {1}", url, code));
+        _logger.UpdateLog(string.Format("OnRtmpStreamingEvent url: {0}, code: {1}", url, code));
     }
 
     void OnApplicationQuit()
     {
         Debug.Log("OnApplicationQuit");
-        if (mRtcEngine != null)
+        if (_rtcEngine != null)
         {
-            mRtcEngine.RemovePublishStreamUrl(RTMP_URL);
-            mRtcEngine.LeaveChannel();
-            mRtcEngine.DisableVideoObserver();
+            _rtcEngine.RemovePublishStreamUrl(RTMP_URL);
+            _rtcEngine.LeaveChannel();
+            _rtcEngine.DisableVideoObserver();
             IRtcEngine.Destroy();
         }
     }
@@ -294,8 +300,8 @@ public class RtmpStreaming : MonoBehaviour
 
         // set up transform
         go.transform.Rotate(0f, 0.0f, 180.0f);
-        float xPos = Random.Range(Offset - Screen.width / 2f, Screen.width / 2f - Offset);
-        float yPos = Random.Range(Offset, Screen.height / 2f - Offset);
+        float xPos = Random.Range(_offset - Screen.width / 2f, Screen.width / 2f - _offset);
+        float yPos = Random.Range(_offset, Screen.height / 2f - _offset);
         Debug.Log("position x " + xPos + " y: " + yPos);
         go.transform.localPosition = new Vector3(xPos, yPos, 0f);
         go.transform.localScale = new Vector3(3f, 4f, 1f);

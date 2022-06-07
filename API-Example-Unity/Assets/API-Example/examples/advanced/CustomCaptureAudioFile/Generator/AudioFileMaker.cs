@@ -4,10 +4,10 @@ using UnityEngine;
 public class AudioFileMaker : MonoBehaviour
 {
     [SerializeField]
-    AudioSource audioSource;
+    public AudioSource Audio;
 
     [SerializeField]
-    string ByteFileName = "myaudio.bytes";
+    public string ByteFileName = "audio/myaudio.bytes";
 
     #region Button Listener
     public void LoadSound()
@@ -18,19 +18,19 @@ public class AudioFileMaker : MonoBehaviour
         float[] samples = ConvertByteToFloat16(buffer);
         AudioClip clip = AudioClip.Create("NewWavClip", buffer.Length / 2, 1, 48000, false);
         clip.SetData(samples, 0);
-        audioSource.clip = clip;
-        audioSource.Play();
+        Audio.clip = clip;
+        Audio.Play();
     }
 
     public void SaveSound()
     {
-        AudioClip clip = audioSource.clip;
+        AudioClip clip = Audio.clip;
         float[] samples = new float[clip.samples];
         bool ok = clip.GetData(samples, 0);
         if (ok)
         {
             byte[] buffer = Float2PCM16(samples);
-            WriteFileWithBytes("myaudio.bytes", buffer);
+            WriteFileWithBytes(ByteFileName, buffer);
         }
     }
 

@@ -7,18 +7,18 @@ public class EchoTest : MonoBehaviour
 {
 
     [SerializeField]
-    private string APP_ID = "";
+    public string APP_ID = "";
 
     [SerializeField]
-    private string TOKEN = "";
+    public string TOKEN = "";
 
     [SerializeField]
-    private string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
+    public string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
 
-    public Text logText;
-    private Logger logger;
-    private IRtcEngine mRtcEngine = null;
-    private const float Offset = 100;
+    public Text LogText;
+    private Logger _logger;
+    private IRtcEngine _rtcEngine = null;
+    private const float _offset = 100;
 
     // Use this for initialization
     void Start()
@@ -38,76 +38,76 @@ public class EchoTest : MonoBehaviour
 
     bool CheckAppId()
     {
-        logger = new Logger(logText);
-        return logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+        _logger = new Logger(LogText);
+        return _logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
     }
 
     void InitEngine()
     {
-        mRtcEngine = IRtcEngine.GetEngine(APP_ID);
-        mRtcEngine.SetLogFile("log.txt");
-        mRtcEngine.SetChannelProfile(CHANNEL_PROFILE.CHANNEL_PROFILE_LIVE_BROADCASTING);
-        mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-        mRtcEngine.EnableAudio();
-        mRtcEngine.EnableVideo();
-        mRtcEngine.EnableVideoObserver();
-        mRtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
-        mRtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
-        mRtcEngine.OnUserJoined += OnUserJoinedHandler;
-        mRtcEngine.OnUserOffline += OnUserOfflineHandler;
+        _rtcEngine = IRtcEngine.GetEngine(APP_ID);
+        _rtcEngine.SetLogFile("log.txt");
+        _rtcEngine.SetChannelProfile(CHANNEL_PROFILE.CHANNEL_PROFILE_LIVE_BROADCASTING);
+        _rtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+        _rtcEngine.EnableAudio();
+        _rtcEngine.EnableVideo();
+        _rtcEngine.EnableVideoObserver();
+        _rtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
+        _rtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
+        _rtcEngine.OnUserJoined += OnUserJoinedHandler;
+        _rtcEngine.OnUserOffline += OnUserOfflineHandler;
     }
 
     public void JoinChannel()
     {
-        mRtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
+        _rtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
     }
 
     public void HandleLeave()
     {
-        mRtcEngine.LeaveChannel();
+        _rtcEngine.LeaveChannel();
     }
 
     public void StartEchoTest()
     {
-        mRtcEngine.StartEchoTest(2);
+        _rtcEngine.StartEchoTest(2);
     }
     public void StopEchoTest()
     {
-        mRtcEngine.StopEchoTest();
+        _rtcEngine.StopEchoTest();
     }
 
     void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
     {
-        logger.UpdateLog(string.Format("sdk version: {0}", IRtcEngine.GetSdkVersion()));
-        logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName, uid, elapsed));
+        _logger.UpdateLog(string.Format("sdk version: {0}", IRtcEngine.GetSdkVersion()));
+        _logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName, uid, elapsed));
         makeVideoView(0);
     }
 
     void OnLeaveChannelHandler(RtcStats stats)
     {
-        logger.UpdateLog("OnLeaveChannelSuccess");
+        _logger.UpdateLog("OnLeaveChannelSuccess");
         DestroyVideoView(0);
     }
 
     void OnUserJoinedHandler(uint uid, int elapsed)
     {
-        logger.UpdateLog(string.Format("OnUserJoined uid: {0} elapsed: {1}", uid, elapsed));
+        _logger.UpdateLog(string.Format("OnUserJoined uid: {0} elapsed: {1}", uid, elapsed));
         makeVideoView(uid);
     }
 
     void OnUserOfflineHandler(uint uid, USER_OFFLINE_REASON reason)
     {
-        logger.UpdateLog(string.Format("OnUserOffLine uid: {0}, reason: {1}", uid, (int)reason));
+        _logger.UpdateLog(string.Format("OnUserOffLine uid: {0}, reason: {1}", uid, (int)reason));
         DestroyVideoView(uid);
     }
 
     void OnApplicationQuit()
     {
         Debug.Log("OnApplicationQuit");
-        if (mRtcEngine != null)
+        if (_rtcEngine != null)
         {
-            mRtcEngine.LeaveChannel();
-            mRtcEngine.DisableVideoObserver();
+            _rtcEngine.LeaveChannel();
+            _rtcEngine.DisableVideoObserver();
             IRtcEngine.Destroy();
         }
     }
@@ -167,8 +167,8 @@ public class EchoTest : MonoBehaviour
         }
         // set up transform
         go.transform.Rotate(0f, 0.0f, 180.0f);
-        float xPos = Random.Range(Offset - Screen.width / 2f, Screen.width / 2f - Offset);
-        float yPos = Random.Range(Offset, Screen.height / 2f - Offset);
+        float xPos = Random.Range(_offset - Screen.width / 2f, Screen.width / 2f - _offset);
+        float yPos = Random.Range(_offset, Screen.height / 2f - _offset);
         Debug.Log("position x " + xPos + " y: " + yPos);
         go.transform.localPosition = new Vector3(xPos, yPos, 0f);
         go.transform.localScale = new Vector3(3f, 4f, 1f);

@@ -16,48 +16,49 @@ using RingBuffer;
 /// </summary>
 public class FileCustomAudioSource : MonoBehaviour
 {
-    [SerializeField] private string APP_ID = "YOUR_APPID";
-
-    [SerializeField] private string TOKEN = "";
-
-    [SerializeField] private string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
-
-    [SerializeField] Text logText;
-
-    internal static Logger logger;
-    private IRtcEngine mRtcEngine = null;
+    [SerializeField]
+    private string APP_ID = "YOUR_APPID";
 
     [SerializeField]
-    private int CHANNEL = 1;
+    private string TOKEN = "";
 
     [SerializeField]
-    private int SAMPLE_RATE = 48000;
-    private int PUSH_FREQ_PER_SEC = 100;
+    private string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
+
+    public Text LogText;
+
+    private Logger _logger;
+    private IRtcEngine _rtcEngine = null;
+
+
+    private const int CHANNEL = 1;
+    private const int SAMPLE_RATE = 48000;
+    private const int PUSH_FREQ_PER_SEC = 100;
 
     // Copy this file to Assets/StreamingAssets
     [Tooltip("Load file from StreamingAssets folder")]
     [SerializeField]
-    string MyPCMByteFile = "myaudio.bytes";
+    public string MyPCMByteFile = "audio/myaudio.bytes";
 
 
-    private RingBuffer<byte> audioBuffer;
+    private RingBuffer<byte> _audioBuffer;
 
     private Thread _pushAudioFrameThread;
     private bool _pushAudioFrameThreadSignal = false;
     private bool _startSignal = false;
 
-    byte[] MediaBuffer;
+    private byte[] _mediaBuffer;
 
     // Use this for initialization
     void Start()
     {
-        var game = GameObject.Find("Canvas");
-
-        CheckAppId();
-        InitRtcEngine();
-        JoinChannel();
-        LoadSound();
-        StartPushAudioFrame();
+        if (CheckAppId())
+        {
+            InitRtcEngine();
+            JoinChannel();
+            LoadSound();
+            StartPushAudioFrame();
+        }
     }
 
     // Update is called once per frame
@@ -66,32 +67,31 @@ public class FileCustomAudioSource : MonoBehaviour
         PermissionHelper.RequestMicrophontPermission();
     }
 
-    void CheckAppId()
+    bool CheckAppId()
     {
-        logger = new Logger(logText);
-        logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in Canvas!!!!!");
+        _logger = new Logger(LogText);
+        return _logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in Canvas!!!!!");
     }
 
     void InitRtcEngine()
     {
-        mRtcEngine = IRtcEngine.GetEngine(APP_ID);
-        mRtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY,
+        _rtcEngine = IRtcEngine.GetEngine(APP_ID);
+        _rtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY,
             AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
-        mRtcEngine.SetExternalAudioSource(true, SAMPLE_RATE, CHANNEL);
-        mRtcEngine.SetLogFile("log.txt");
-        mRtcEngine.EnableVideo();
-        mRtcEngine.EnableVideoObserver();
-        mRtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
-        mRtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
-        mRtcEngine.OnWarning += OnSDKWarningHandler;
-        mRtcEngine.OnError += OnSDKErrorHandler;
-        mRtcEngine.OnConnectionLost += OnConnectionLostHandler;
+        _rtcEngine.SetExternalAudioSource(true, SAMPLE_RATE, CHANNEL);
+        _rtcEngine.SetLogFile("log.txt");
+       
+        _rtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
+        _rtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
+        _rtcEngine.OnWarning += OnSDKWarningHandler;
+        _rtcEngine.OnError += OnSDKErrorHandler;
+        _rtcEngine.OnConnectionLost += OnConnectionLostHandler;
     }
 
     void LoadSound()
     {
         var bufferLength = SAMPLE_RATE / PUSH_FREQ_PER_SEC * CHANNEL * 10000;
-        audioBuffer = new RingBuffer<byte>(bufferLength);
+        _audioBuffer = new RingBuffer<byte>(bufferLength);
 
 #if UNITY_ANDROID && !UNITY_EDITOR
         // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
@@ -99,8 +99,8 @@ public class FileCustomAudioSource : MonoBehaviour
 #else
         string fileStreamName = Application.streamingAssetsPath + "/" + MyPCMByteFile;
 #endif
-        MediaBuffer = File.ReadAllBytes(fileStreamName);
-        logger.UpdateLog("Read " + MediaBuffer.Length + " bytes from " + fileStreamName);
+        _mediaBuffer = File.ReadAllBytes(fileStreamName);
+        _logger.UpdateLog("Read " + _mediaBuffer.Length + " bytes from " + fileStreamName);
         AppendRingBuffer();
     }
 
@@ -113,14 +113,16 @@ public class FileCustomAudioSource : MonoBehaviour
 
     void JoinChannel()
     {
-        mRtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
+        _rtcEngine.EnableVideo();
+        _rtcEngine.EnableVideoObserver();
+        _rtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
     }
 
     void OnApplicationQuit()
     {
         Debug.Log("OnApplicationQuit");
         _pushAudioFrameThreadSignal = false;
-        if (mRtcEngine != null)
+        if (_rtcEngine != null)
         {
             IRtcEngine.Destroy();
         }
@@ -128,29 +130,29 @@ public class FileCustomAudioSource : MonoBehaviour
 
     void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
     {
-        logger.UpdateLog(string.Format("sdk version: {0}", IRtcEngine.GetSdkVersion()));
-        logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName,
+        _logger.UpdateLog(string.Format("sdk version: {0}", IRtcEngine.GetSdkVersion()));
+        _logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName,
             uid, elapsed));
     }
 
     void OnLeaveChannelHandler(RtcStats stats)
     {
-        logger.UpdateLog("OnLeaveChannelSuccess");
+        _logger.UpdateLog("OnLeaveChannelSuccess");
     }
 
     void OnSDKWarningHandler(int warn, string msg)
     {
-        logger.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, IRtcEngine.GetErrorDescription(warn)));
+        _logger.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, IRtcEngine.GetErrorDescription(warn)));
     }
 
     void OnSDKErrorHandler(int error, string msg)
     {
-        logger.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, IRtcEngine.GetErrorDescription(error)));
+        _logger.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, IRtcEngine.GetErrorDescription(error)));
     }
 
     void OnConnectionLostHandler()
     {
-        logger.UpdateLog(string.Format("OnConnectionLost "));
+        _logger.UpdateLog(string.Format("OnConnectionLost "));
     }
 
     void PushAudioFrameThread()
@@ -178,13 +180,13 @@ public class FileCustomAudioSource : MonoBehaviour
             {
                 tic = new TimeSpan(DateTime.Now.Ticks);
 
-                lock (audioBuffer)
+                lock (_audioBuffer)
                 {
-                    if (audioBuffer.Size > samples * bytesPerSample * CHANNEL)
+                    if (_audioBuffer.Size > samples * bytesPerSample * CHANNEL)
                     {
                         for (var j = 0; j < samples * bytesPerSample * CHANNEL; j++)
                         {
-                            buffer[j] = audioBuffer.Get();
+                            buffer[j] = _audioBuffer.Get();
                         }
 
                         var audioFrame = new AudioFrame
@@ -198,7 +200,7 @@ public class FileCustomAudioSource : MonoBehaviour
                             renderTimeMs = DateTime.Now.Ticks
                         };
 
-                        mRtcEngine.PushAudioFrame(audioFrame);
+                        _rtcEngine.PushAudioFrame(audioFrame);
                     }
                     else
                     {
@@ -211,9 +213,9 @@ public class FileCustomAudioSource : MonoBehaviour
 
     private void AppendRingBuffer()
     {
-        foreach (var s in MediaBuffer)
+        foreach (var s in _mediaBuffer)
         {
-            audioBuffer.Put(s);
+            _audioBuffer.Put(s);
         }
         _startSignal = true;
     }

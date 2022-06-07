@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-#if NET_4_6 || NET_STANDARD_2_0
+
 using System.Collections.Concurrent;
-#endif
+
 using UnityEngine;
 using UnityEngine.UI;
 using agora_gaming_rtc;
@@ -22,12 +22,14 @@ namespace agora_sample_code
 
         [SerializeField]
         private string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
-        public Text logText;
-        private Logger logger;
-        private IRtcEngine mRtcEngine = null;
+        public Text _logText;
+        private Logger _logger;
+        private IRtcEngine _rtcEngine = null;
 
-        [SerializeField] Transform rootSpace;
-        [SerializeField] GameObject userPrefab;
+        [SerializeField]
+        public Transform RootSpace;
+        [SerializeField]
+        public GameObject UserPrefab;
 
         private IAudioRawDataManager _audioRawDataManager;
         public AudioRawDataManager.OnPlaybackAudioFrameBeforeMixingHandler HandleAudioFrameForUser
@@ -35,15 +37,15 @@ namespace agora_sample_code
             get; set;
         }
 
-#if NET_4_6 || NET_STANDARD_2_0
-        BlockingCollection<System.Action> blockingCollection;
-        Dictionary<uint, GameObject> RemoteUserObject = new Dictionary<uint, GameObject>();
-        HashSet<uint> RemoteUserConfigured = new HashSet<uint>();
+
+        private Queue<System.Action> _queue;
+        private Dictionary<uint, GameObject> _remoteUserObject = new Dictionary<uint, GameObject>();
+        private HashSet<uint> _remoteUserConfigured = new HashSet<uint>();
 
         private void Awake()
         {
-            blockingCollection = new BlockingCollection<System.Action>();
-            if (userPrefab == null)
+            _queue = new Queue<System.Action>();
+            if (UserPrefab == null)
             {
                 Debug.LogWarning("User prefab wasn't assigned, generating primitive object as prefab.");
                 MakePrefab();
@@ -54,55 +56,63 @@ namespace agora_sample_code
         {
             PermissionHelper.RequestMicrophontPermission();
             PermissionHelper.RequestCameraPermission();
-            CheckAppId();
-            InitEngine();
-            JoinChannel();
+            if (CheckAppId())
+            {
+                InitEngine();
+                JoinChannel();
+            }
         }
 
         void Update()
         {
-            System.Action action;
-            while (blockingCollection.TryTake(out action)) action();
+            lock (_queue)
+            {
+                if (_queue.Count > 0)
+                {
+                    var action = _queue.Dequeue();
+                    action();
+                }
+            }
         }
 
-        void CheckAppId()
+        bool CheckAppId()
         {
-            logger = new Logger(logText);
-            logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
+            _logger = new Logger(_logText);
+            return _logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in VideoCanvas!!!!!");
         }
 
         void InitEngine()
         {
-            mRtcEngine = IRtcEngine.GetEngine(APP_ID);
-            mRtcEngine.SetLogFile("log.txt");
-            //mRtcEngine.SetChannelProfile(CHANNEL_PROFILE.CHANNEL_PROFILE_LIVE_BROADCASTING);
-            //mRtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            mRtcEngine.EnableAudio();
-            mRtcEngine.EnableVideo();
-            mRtcEngine.EnableLocalVideo(false);
-            mRtcEngine.EnableVideoObserver();
-            mRtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
-            mRtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
-            mRtcEngine.OnWarning += OnSDKWarningHandler;
-            mRtcEngine.OnError += OnSDKErrorHandler;
-            mRtcEngine.OnConnectionLost += OnConnectionLostHandler;
-            mRtcEngine.OnUserJoined += OnUserJoinedHandler;
-            mRtcEngine.OnUserOffline += OnUserOfflineHandler;
-            _audioRawDataManager = AudioRawDataManager.GetInstance(mRtcEngine);
+            _rtcEngine = IRtcEngine.GetEngine(APP_ID);
+            _rtcEngine.SetLogFile("log.txt");
+            //_rtcEngine.SetChannelProfile(CHANNEL_PROFILE.CHANNEL_PROFILE_LIVE_BROADCASTING);
+            //_rtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            _rtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
+            _rtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
+            _rtcEngine.OnWarning += OnSDKWarningHandler;
+            _rtcEngine.OnError += OnSDKErrorHandler;
+            _rtcEngine.OnConnectionLost += OnConnectionLostHandler;
+            _rtcEngine.OnUserJoined += OnUserJoinedHandler;
+            _rtcEngine.OnUserOffline += OnUserOfflineHandler;
+            _audioRawDataManager = AudioRawDataManager.GetInstance(_rtcEngine);
             _audioRawDataManager.RegisterAudioRawDataObserver();
-            mRtcEngine.SetDefaultAudioRouteToSpeakerphone(true);
-            mRtcEngine.SetParameter("che.audio.external_render", true);
+            _rtcEngine.SetDefaultAudioRouteToSpeakerphone(true);
+            _rtcEngine.SetParameter("che.audio.external_render", true);
         }
 
         void JoinChannel()
         {
-            mRtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
-            
+            _rtcEngine.EnableAudio();
+            _rtcEngine.EnableVideo();
+            _rtcEngine.EnableLocalVideo(false);
+            _rtcEngine.EnableVideoObserver();
+            _rtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
+
         }
         void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
         {
-            logger.UpdateLog(string.Format("sdk version: ${0}", IRtcEngine.GetSdkVersion()));
-            logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName, uid, elapsed));
+            _logger.UpdateLog(string.Format("sdk version: ${0}", IRtcEngine.GetSdkVersion()));
+            _logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName, uid, elapsed));
             // makeVideoView(0);
 
             _audioRawDataManager.SetOnPlaybackAudioFrameBeforeMixingCallback(OnPlaybackAudioFrameBeforeMixingHandler);
@@ -111,16 +121,16 @@ namespace agora_sample_code
 
         void OnLeaveChannelHandler(RtcStats stats)
         {
-            logger.UpdateLog("OnLeaveChannelSuccess");
+            _logger.UpdateLog("OnLeaveChannelSuccess");
         }
 
         int userCount = 0;
         void OnUserJoinedHandler(uint uid, int elapsed)
         {
-            logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-            GameObject go = Instantiate(userPrefab);
-            RemoteUserObject[uid] = go;
-            go.transform.SetParent(rootSpace);
+            _logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+            GameObject go = Instantiate(UserPrefab);
+            _remoteUserObject[uid] = go;
+            go.transform.SetParent(RootSpace);
             go.transform.localScale = Vector3.one;
             go.transform.localPosition = new Vector3(userCount * 2, 0, 0);
 
@@ -133,42 +143,45 @@ namespace agora_sample_code
 
         void OnUserOfflineHandler(uint uid, USER_OFFLINE_REASON reason)
         {
-            logger.UpdateLog("User " + uid + " went offline, reason:" + reason);
-            dispatch(() => { logger.UpdateLog("Dispatched log + OFFLINE reason = " + reason); });
+            _logger.UpdateLog("User " + uid + " went offline, reason:" + reason);
+            Dispatch(() => { _logger.UpdateLog("Dispatched log + OFFLINE reason = " + reason); });
 
-            lock (RemoteUserConfigured)
+            lock (_remoteUserConfigured)
             {
-                if (RemoteUserObject.ContainsKey(uid))
+                if (_remoteUserObject.ContainsKey(uid))
                 {
-                    Destroy(RemoteUserObject[uid]);
-                    RemoteUserObject.Remove(uid);
+                    Destroy(_remoteUserObject[uid]);
+                    _remoteUserObject.Remove(uid);
                 }
 
-                if (RemoteUserConfigured.Contains(uid))
+                if (_remoteUserConfigured.Contains(uid))
                 {
-                    RemoteUserConfigured.Remove(uid);
+                    _remoteUserConfigured.Remove(uid);
                 }
             }
         }
 
         void OnSDKWarningHandler(int warn, string msg)
         {
-            logger.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, IRtcEngine.GetErrorDescription(warn)));
+            _logger.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, IRtcEngine.GetErrorDescription(warn)));
         }
 
         void OnSDKErrorHandler(int error, string msg)
         {
-            logger.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, IRtcEngine.GetErrorDescription(error)));
+            _logger.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, IRtcEngine.GetErrorDescription(error)));
         }
 
         void OnConnectionLostHandler()
         {
-            logger.UpdateLog(string.Format("OnConnectionLost "));
+            _logger.UpdateLog(string.Format("OnConnectionLost "));
         }
 
-        public void dispatch(System.Action action)
+        public void Dispatch(System.Action action)
         {
-            blockingCollection.Add(action);
+            lock (_queue)
+            {
+                _queue.Enqueue(action);
+            }
         }
 
         int count = 0;
@@ -181,36 +194,36 @@ namespace agora_sample_code
             count++;
 
             // The audio stream info contains in this audioframe, we will use this construct the AudioClip
-            lock (RemoteUserConfigured)
+            lock (_remoteUserConfigured)
             {
-                if (!RemoteUserConfigured.Contains(uid) && RemoteUserObject.ContainsKey(uid))
+                if (!_remoteUserConfigured.Contains(uid) && _remoteUserObject.ContainsKey(uid))
                 {
                     if (count < MAXAUC)
-                        dispatch(() =>
+                        Dispatch(() =>
                         {
-                            logger.UpdateLog("Uid:" + uid + " setting up audio frame handler....");
+                            _logger.UpdateLog("Uid:" + uid + " setting up audio frame handler....");
                         });
 
-                    GameObject go = RemoteUserObject[uid];
+                    GameObject go = _remoteUserObject[uid];
                     if (go != null)
                     {
-                        dispatch(() =>
+                        Dispatch(() =>
                         {
                             UserAudioFrameHandler userAudio = go.GetComponent<UserAudioFrameHandler>();
                             if (userAudio == null)
                             {
                                 userAudio = go.AddComponent<UserAudioFrameHandler>();
                                 userAudio.Init(uid, this, audioFrame);
-                                RemoteUserConfigured.Add(uid);
+                                _remoteUserConfigured.Add(uid);
                             }
                             go.SetActive(true);
                         });
                     }
                     else
                     {
-                        dispatch(() =>
+                        Dispatch(() =>
                         {
-                            logger.UpdateLog("Uid: " + uid + " setting up audio frame handler._<> no go");
+                            _logger.UpdateLog("Uid: " + uid + " setting up audio frame handler._<> no go");
                         });
                     }
                 }
@@ -225,10 +238,10 @@ namespace agora_sample_code
         void OnApplicationQuit()
         {
             Debug.Log("OnApplicationQuit");
-            if (mRtcEngine != null)
+            if (_rtcEngine != null)
             {
-                mRtcEngine.LeaveChannel();
-                mRtcEngine.DisableVideoObserver();
+                _rtcEngine.LeaveChannel();
+                _rtcEngine.DisableVideoObserver();
                 if (_audioRawDataManager != null)
                 {
                     AudioRawDataManager.ReleaseInstance();
@@ -241,7 +254,7 @@ namespace agora_sample_code
         {
             Debug.LogWarning("Generating cube as prefab.");
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            userPrefab = go;
+            UserPrefab = go;
             go.transform.SetPositionAndRotation(Vector3.zero, Quaternion.Euler(0, 45f, 45f));
             MeshRenderer mesh = GetComponent<MeshRenderer>();
             if (mesh != null)
@@ -250,13 +263,5 @@ namespace agora_sample_code
             }
             go.SetActive(false);
         }
-#else
-    public string USE_NET46 = "PLEASE USE .NET 4.6 or Standard 2.0";
-    void Start()
-    {
-        Debug.LogError("PLease use .Net 4.6 or standard 2.0 to run this demo!!");
-    }
-#endif
-
     }
 }
