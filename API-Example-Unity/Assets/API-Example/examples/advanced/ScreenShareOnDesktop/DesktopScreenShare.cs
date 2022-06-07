@@ -171,7 +171,7 @@ public class DesktopScreenShare : MonoBehaviour
             };
             _logger.UpdateLog(string.Format(">>>>> Start sharing display {0}: {1} {2} {3} {4}", diapFlag, screenRect.x,
                 screenRect.y, screenRect.width, screenRect.height));
-            var ret = mRtcEngine.StartScreenCaptureByScreenRect(screenRect,
+            var ret = _rtcEngine.StartScreenCaptureByScreenRect(screenRect,
                 new Rectangle {x = 0, y = 0, width = 0, height = 0}, default(ScreenCaptureParameters));
 #endif
         }
