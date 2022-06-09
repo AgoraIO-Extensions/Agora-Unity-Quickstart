@@ -79,7 +79,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
         {
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             RtcEngine.EnableVideo();
-            RtcEngine.SetExternalVideoSource(true, true, EXTERNAL_VIDEO_SOURCE_TYPE.ENCODED_VIDEO_FRAME);
+            RtcEngine.SetExternalVideoSource(true, true, EXTERNAL_VIDEO_SOURCE_TYPE.ENCODED_VIDEO_FRAME, new SenderOptions());
 
             var option = new ChannelMediaOptions();
             option.autoSubscribeVideo.SetValue(true);

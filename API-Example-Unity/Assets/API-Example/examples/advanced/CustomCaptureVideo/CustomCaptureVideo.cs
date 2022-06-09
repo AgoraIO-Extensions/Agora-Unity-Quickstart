@@ -126,7 +126,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
 
         private void SetExternalVideoSource()
         {
-            var ret = RtcEngine.SetExternalVideoSource(true, false, EXTERNAL_VIDEO_SOURCE_TYPE.VIDEO_FRAME);
+            var ret = RtcEngine.SetExternalVideoSource(true, false, EXTERNAL_VIDEO_SOURCE_TYPE.VIDEO_FRAME, new SenderOptions());
             this.Log.UpdateLog("SetExternalVideoSource returns:" + ret);
         }
 
