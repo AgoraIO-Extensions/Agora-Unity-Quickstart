@@ -213,14 +213,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.StreamMessage
 
         }
 
-        public override void OnStreamMessage(RtcConnection connection, uint remoteUid, int streamId, IntPtr data, uint length, ulong sentTs)
+        public override void OnStreamMessage(RtcConnection connection, uint remoteUid, int streamId, byte[] data, uint length, ulong sentTs)
         {
-            byte[] buffer = new byte[length];
-            if (data != IntPtr.Zero)
-            {
-                Marshal.Copy(data, buffer, 0, (int)length);
-            }
-            string streamMessage = System.Text.Encoding.Default.GetString(buffer);
+            string streamMessage = System.Text.Encoding.Default.GetString(data);
             _streamMessage.Log.UpdateLog(string.Format("OnStreamMessage remoteUid: {0}, stream message: {1}", remoteUid, streamMessage));
         }
 
