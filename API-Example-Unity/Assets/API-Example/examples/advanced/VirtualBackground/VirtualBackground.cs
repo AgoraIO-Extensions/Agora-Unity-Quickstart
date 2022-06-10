@@ -73,7 +73,7 @@ namespace Agora_Plugin.API_Example.examples.basic.VirtualBackground
         {
             RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
@@ -106,14 +106,16 @@ namespace Agora_Plugin.API_Example.examples.basic.VirtualBackground
         private void OnStartButtonPress()
         {
             var source = new VirtualBackgroundSource();
-            var nRet = RtcEngine.EnableVirtualBackground(true, source);
+            var segproperty = new SegmentationProperty();
+            var nRet = RtcEngine.EnableVirtualBackground(true, source, segproperty, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
             this.Log.UpdateLog("EnableVirtualBackground true :" + nRet);
         }
 
         private void OnStopButtonPress()
         {
             var source = new VirtualBackgroundSource();
-            var nRet = RtcEngine.EnableVirtualBackground(false, source);
+            var segproperty = new SegmentationProperty();
+            var nRet = RtcEngine.EnableVirtualBackground(false, source,segproperty, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
             this.Log.UpdateLog("EnableVirtualBackground false :" + nRet);
         }
         
@@ -239,11 +241,6 @@ namespace Agora_Plugin.API_Example.examples.basic.VirtualBackground
         internal UserEventHandler(VirtualBackground sample)
         {
             _sample = sample;
-        }
-
-        public override void OnWarning(int warn, string msg)
-        {
-            _sample.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
         }
 
         public override void OnError(int err, string msg)

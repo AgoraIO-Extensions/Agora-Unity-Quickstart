@@ -77,7 +77,7 @@ namespace Agora_Plugin.API_Example.examples.basic.TakeSnapshot
         {
             RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
@@ -110,13 +110,7 @@ namespace Agora_Plugin.API_Example.examples.basic.TakeSnapshot
             //uid 0 means self. you can get other user uid in OnUserJoined()
             uint uid = 0;
             string filePath = Path.Combine(Application.persistentDataPath, "takeSnapshot.jpg");
-            var config = new SnapShotConfig()
-            {
-                channel = this._channelName,
-                uid = uid,
-                filePath = filePath
-            };
-            int nRet = RtcEngine.TakeSnapshot(config);
+            int nRet = RtcEngine.TakeSnapshot(uid, filePath);
             this.Log.UpdateLog("TakeSnapshot nRet: " + nRet);
             this.Log.UpdateLog("TakeSnapshot in " + filePath);
         }
@@ -238,11 +232,6 @@ namespace Agora_Plugin.API_Example.examples.basic.TakeSnapshot
             _takeSnapshot = videoSample;
         }
 
-        public override void OnWarning(int warn, string msg)
-        {
-            _takeSnapshot.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
-        }
-
         public override void OnError(int err, string msg)
         {
             _takeSnapshot.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
@@ -292,7 +281,7 @@ namespace Agora_Plugin.API_Example.examples.basic.TakeSnapshot
             TakeSnapshot.DestroyVideoView(uid);
         }
 
-        public override void OnSnapshotTaken(string channel, uint uid, string filePath, int width, int height, int errCode)
+        public override void OnSnapshotTaken( RtcConnection connection, uint remoteUid, string filePath, int width, int height, int errCode)
         {
             _takeSnapshot.Log.UpdateLog(string.Format("OnSnapshotTaken: {0},{1},{2},{3}", filePath, width, height, errCode));
         }

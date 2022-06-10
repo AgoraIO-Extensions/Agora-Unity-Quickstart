@@ -78,7 +78,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
         {
             RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngineEx();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
@@ -97,7 +97,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
                 string.Format("StartPrimaryCameraCapture returns: {0}", ret));
             ChannelMediaOptions options1 = new ChannelMediaOptions();
             options1.publishCameraTrack.SetValue(true);
-            options1.publishAudioTrack.SetValue(true);
+            options1.publishCustomAudioTrack.SetValue(true);
+            options1.publishCustomAudioSourceId.SetValue(0);
             options1.autoSubscribeAudio.SetValue(true);
             options1.autoSubscribeVideo.SetValue(true);
             options1.publishScreenTrack.SetValue(false);
@@ -115,7 +116,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
             ChannelMediaOptions options2 = new ChannelMediaOptions();
             options2.autoSubscribeAudio.SetValue(false);
             options2.autoSubscribeVideo.SetValue(false);
-            options2.publishAudioTrack.SetValue(false);
+            options2.publishCustomAudioTrack.SetValue(false);
             options2.publishCameraTrack.SetValue(false);
             options2.publishSecondaryCameraTrack.SetValue(true);
             options2.enableAudioRecordingOrPlayout.SetValue(false);
@@ -284,11 +285,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
         internal UserEventHandler(DualCamera videoSample)
         {
             _videoSample = videoSample;
-        }
-
-        public override void OnWarning(int warn, string msg)
-        {
-            _videoSample.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
         }
 
         public override void OnError(int err, string msg)

@@ -87,7 +87,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
         {
             RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngineEx();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             var ret = RtcEngine.Initialize(context);
@@ -130,7 +130,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.autoSubscribeAudio.SetValue(true);
             options.autoSubscribeVideo.SetValue(true);
-            options.publishAudioTrack.SetValue(true);
+            //options.publishAudioTrack.SetValue(true);
             options.publishCameraTrack.SetValue(false);
             options.enableAudioRecordingOrPlayout.SetValue(true);
             options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
@@ -147,7 +147,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.autoSubscribeAudio.SetValue(false);
             options.autoSubscribeVideo.SetValue(false);
-            options.publishAudioTrack.SetValue(false);
+            //options.publishAudioTrack.SetValue(false);
             options.publishCameraTrack.SetValue(false);
             options.publishMediaPlayerAudioTrack.SetValue(true);
             options.publishMediaPlayerVideoTrack.SetValue(true);
@@ -337,11 +337,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
         internal UserEventHandler(SpatialAudioWithMediaPlayer spatialAudio)
         {
             _spatialAudio = spatialAudio;
-        }
-
-        public override void OnWarning(int warn, string msg)
-        {
-            _spatialAudio.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
         }
 
         public override void OnError(int err, string msg)

@@ -87,7 +87,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
         {
             RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
 
-            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
@@ -244,11 +244,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
             public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
             {
                 _customAudioSource.Log.UpdateLog("OnLeaveChannelSuccess");
-            }
-
-            public override void OnWarning(int warn, string msg)
-            {
-                _customAudioSource.Log.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
             }
 
             public override void OnError(int error, string msg)

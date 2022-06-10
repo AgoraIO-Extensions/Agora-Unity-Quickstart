@@ -73,7 +73,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
         {
             RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
@@ -97,7 +97,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
             _localPath = Application.streamingAssetsPath + "/audio/" + "Agora.io-Interactions.mp3";
 #endif
             Log.UpdateLog(string.Format("the audio file path: {0}", _localPath));
-         
+
         }
 
         internal void EnableUI(bool enable)
@@ -111,7 +111,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
             RtcEngine.EnableAudio();
             var options = new ChannelMediaOptions();
             options.publishCustomAudioTrack.SetValue(true);
-            RtcEngine.JoinChannel(_token, _channelName,0, options);
+            RtcEngine.JoinChannel(_token, _channelName, 0, options);
         }
 
         #region -- Test Control logic ---
@@ -148,7 +148,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
             RtcEngine.Dispose();
         }
 
-       
+
         #region -- Application UI Logic ---
 
         private bool _isMixing = false;
@@ -220,11 +220,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
             _audioMixing = audioMixing;
         }
 
-        public override void OnWarning(int warn, string msg)
-        {
-            _audioMixing.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
-        }
-
         public override void OnError(int err, string msg)
         {
             _audioMixing.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
@@ -267,9 +262,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
                 (int)reason));
         }
 
-        public override void OnAudioMixingStateChanged(AUDIO_MIXING_STATE_TYPE state, AUDIO_MIXING_ERROR_TYPE errorCode)
+        public override void OnAudioMixingStateChanged(AUDIO_MIXING_STATE_TYPE state, AUDIO_MIXING_REASON_TYPE errorCode)
         {
-            _audioMixing.Log.UpdateLog(string.Format("AUDIO_MIXING_STATE_TYPE: ${0}, AUDIO_MIXING_ERROR_TYPE: ${1}",
+            _audioMixing.Log.UpdateLog(string.Format("AUDIO_MIXING_STATE_TYPE: ${0}, AUDIO_MIXING_REASON_TYPE: ${1}",
                 state, errorCode));
         }
     }

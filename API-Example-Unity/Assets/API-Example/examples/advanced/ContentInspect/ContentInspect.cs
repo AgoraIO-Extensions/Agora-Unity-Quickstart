@@ -73,7 +73,7 @@ namespace Agora_Plugin.API_Example.examples.basic.ContentInspect
         {
             RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
@@ -102,20 +102,20 @@ namespace Agora_Plugin.API_Example.examples.basic.ContentInspect
         private void OnStartButtonClick()
         {
             var config = new ContentInspectConfig();
-            config.enable = true;
-            config.DeviceWork = true;
-            config.CloudWork = false;
-            config.extraInfo = "";
+            config.ContentWorkType = CONTENT_INSPECT_WORK_TYPE.CONTENT_INSPECT_WORK_DEVICE;
             config.DeviceworkType = CONTENT_INSPECT_DEVICE_TYPE.CONTENT_INSPECT_DEVICE_AGORA;
             config.modules = new ContentInspectModule[1];
             config.modules[0] = new ContentInspectModule
             {
                 type = CONTENT_INSPECT_TYPE.CONTENT_INSPECT_MODERATION,
+                vendor = CONTENT_INSPECT_VENDOR.CONTENT_INSPECT_VENDOR_AGORA,
+                callbackUrl = "",
+                token = "",
                 frequency = 2
             };
             config.moduleCount = 1;
 
-            var nRet = RtcEngine.SetContentInspect(config);
+            var nRet = RtcEngine.EnableContentInspect(true, config);
             this.Log.UpdateLog("StartContentInspect: " + nRet);
         }
 
@@ -123,20 +123,20 @@ namespace Agora_Plugin.API_Example.examples.basic.ContentInspect
         private void OnStopButtonClick()
         {
             var config = new ContentInspectConfig();
-            config.enable = false;
-            config.DeviceWork = true;
-            config.CloudWork = false;
-            config.extraInfo = "";
+            config.ContentWorkType = CONTENT_INSPECT_WORK_TYPE.CONTENT_INSPECT_WORK_DEVICE;
             config.DeviceworkType = CONTENT_INSPECT_DEVICE_TYPE.CONTENT_INSPECT_DEVICE_AGORA;
             config.modules = new ContentInspectModule[1];
             config.modules[0] = new ContentInspectModule
             {
                 type = CONTENT_INSPECT_TYPE.CONTENT_INSPECT_MODERATION,
+                vendor = CONTENT_INSPECT_VENDOR.CONTENT_INSPECT_VENDOR_AGORA,
+                callbackUrl = "",
+                token = "",
                 frequency = 2
             };
             config.moduleCount = 1;
 
-            var nRet = RtcEngine.SetContentInspect(config);
+            var nRet = RtcEngine.EnableContentInspect(false, config);
             this.Log.UpdateLog("StopContentInspect: " + nRet);
         }
 
@@ -261,11 +261,6 @@ namespace Agora_Plugin.API_Example.examples.basic.ContentInspect
         internal UserEventHandler(ContentInspect sample)
         {
             _sample = sample;
-        }
-
-        public override void OnWarning(int warn, string msg)
-        {
-            _sample.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
         }
 
         public override void OnError(int err, string msg)

@@ -67,24 +67,24 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
         {
             RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
-            RtcEngine.RegisterVideoEncodedImageReceiver(new VideoEncodedImageReceiver(this), OBSERVER_MODE.INTPTR);
+            RtcEngine.RegisterVideoEncodedFrameObserver(new VideoEncodedImageReceiver(this), OBSERVER_MODE.INTPTR);
         }
 
         private void JoinChannel()
         {
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             RtcEngine.EnableVideo();
-            RtcEngine.SetExternalVideoSource(true, true, EXTERNAL_VIDEO_SOURCE_TYPE.ENCODED_VIDEO_FRAME);
+            RtcEngine.SetExternalVideoSource(true, true, EXTERNAL_VIDEO_SOURCE_TYPE.ENCODED_VIDEO_FRAME, new SenderOptions());
 
             var option = new ChannelMediaOptions();
             option.autoSubscribeVideo.SetValue(true);
             option.autoSubscribeAudio.SetValue(true);
-            option.publishAudioTrack.SetValue(false);
+            option.publishCustomAudioTrack.SetValue(false);
             option.publishCameraTrack.SetValue(false);
             option.publishCustomVideoTrack.SetValue(false);
             option.publishEncodedVideoTrack.SetValue(true);
@@ -212,11 +212,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
             _pushEncodedVideoImage = videoSample;
         }
 
-        public override void OnWarning(int warn, string msg)
-        {
-            _pushEncodedVideoImage.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
-        }
-
         public override void OnError(int err, string msg)
         {
             _pushEncodedVideoImage.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
@@ -290,7 +285,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
     }
 
 
-    internal class VideoEncodedImageReceiver : IVideoEncodedImageReceiver
+    internal class VideoEncodedImageReceiver : IVideoEncodedFrameObserver
     {
 
         private readonly PushEncodedVideoImage _pushEncodedVideoImage;
@@ -300,25 +295,25 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
             _pushEncodedVideoImage = videoSample;
         }
 
-        public override bool OnEncodedVideoImageReceived(IntPtr imageBufferPtr, UInt64 length, EncodedVideoFrameInfo videoEncodedFrameInfo)
+        public override bool OnEncodedVideoFrame(uint uid, IntPtr imageBufferPtr, UInt64 length, EncodedVideoFrameInfo videoEncodedFrameInfo)
         {
             Debug.Log("OnEncodedVideoImageReceived");
             byte[] imageBuffer = new byte[length];
             Marshal.Copy(imageBufferPtr, imageBuffer, 0, (int)length);
             string str = System.Text.Encoding.Default.GetString(imageBuffer);
             var pos = JsonUtility.FromJson<Vector3>(str);
-            var uid = videoEncodedFrameInfo.uid.ToString();
+            var uidStr = uid.ToString();
 
             //this called is not in Unity MainThread.we need push data in this dic. And read it in Update()
             lock (_pushEncodedVideoImage.RolePositionDic)
             {
-                if (_pushEncodedVideoImage.RolePositionDic.ContainsKey(uid))
+                if (_pushEncodedVideoImage.RolePositionDic.ContainsKey(uidStr))
                 {
-                    _pushEncodedVideoImage.RolePositionDic[uid] = pos;
+                    _pushEncodedVideoImage.RolePositionDic[uidStr] = pos;
                 }
                 else
                 {
-                    _pushEncodedVideoImage.RolePositionDic.Add(uid, pos);
+                    _pushEncodedVideoImage.RolePositionDic.Add(uidStr, pos);
                 }
             }
             return true;

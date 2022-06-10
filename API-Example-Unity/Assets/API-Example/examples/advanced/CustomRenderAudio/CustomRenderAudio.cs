@@ -88,7 +88,7 @@ namespace CustomRenderAudio
             RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             //be care, enableAudioDevice need be false
-            RtcEngineContext context = new RtcEngineContext(_appID, 0, false,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             var ret = RtcEngine.Initialize(context);
@@ -98,7 +98,8 @@ namespace CustomRenderAudio
         private void JoinChannel()
         {
             RtcEngine.EnableAudio();
-            var nRet = RtcEngine.SetExternalAudioSink(SAMPLE_RATE, CHANNEL);
+            //no enableAudioDevice to set false？ how this methond work?
+            var nRet = RtcEngine.SetExternalAudioSink(true,SAMPLE_RATE, CHANNEL);
             this.Log.UpdateLog("SetExternalAudioSink ret:" + nRet);
             RtcEngine.JoinChannel(_token, _channelName);
         }
@@ -242,11 +243,6 @@ namespace CustomRenderAudio
         public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
         {
             _customAudioSinkSample.Log.UpdateLog("OnLeaveChannelSuccess");
-        }
-
-        public override void OnWarning(int warn, string msg)
-        {
-            _customAudioSinkSample.Log.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
         }
 
         public override void OnError(int error, string msg)
