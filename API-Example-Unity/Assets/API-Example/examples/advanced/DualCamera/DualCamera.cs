@@ -97,8 +97,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
                 string.Format("StartPrimaryCameraCapture returns: {0}", ret));
             ChannelMediaOptions options1 = new ChannelMediaOptions();
             options1.publishCameraTrack.SetValue(true);
-            options1.publishCustomAudioTrack.SetValue(true);
-            options1.publishCustomAudioSourceId.SetValue(0);
             options1.autoSubscribeAudio.SetValue(true);
             options1.autoSubscribeVideo.SetValue(true);
             options1.publishScreenTrack.SetValue(false);
