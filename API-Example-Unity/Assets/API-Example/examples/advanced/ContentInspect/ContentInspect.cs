@@ -311,7 +311,7 @@ namespace Agora_Plugin.API_Example.examples.basic.ContentInspect
 
         public override void OnContentInspectResult(CONTENT_INSPECT_RESULT result)
         {
-            Debug.Log("OnContentInspectResult :" + result);
+            _sample.Log.UpdateLog("OnContentInspectResult :" + result);
         }
 
     }
