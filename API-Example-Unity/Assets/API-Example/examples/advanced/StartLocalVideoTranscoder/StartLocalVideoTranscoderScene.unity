@@ -3169,7 +3169,7 @@ MonoBehaviour:
   TogglePng: {fileID: 1215402665}
   ToggleJpg: {fileID: 1302745303}
   ToggleGif: {fileID: 1688279918}
-  ToggleRemote: {fileID: 715250961}
+  ToggleRemote: {fileID: 189935858}
   ToggleScreenShare: {fileID: 715250961}
   ToggleMediaPlay: {fileID: 866933562}
 --- !u!114 &1804667960

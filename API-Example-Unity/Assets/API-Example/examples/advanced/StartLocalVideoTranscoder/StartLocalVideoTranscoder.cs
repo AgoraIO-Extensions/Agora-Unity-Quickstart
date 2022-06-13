@@ -58,8 +58,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
             {
                 SetUpUI();
                 InitEngine();
-                //InitMediaPlayer();
-                //JoinChannel();
+                InitMediaPlayer();
+                JoinChannel();
             }
         }
 
@@ -202,7 +202,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
 #else
                 var filePath = Path.Combine(Application.streamingAssetsPath, "img/png.png");
 #endif
-                list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.RTC_IMAGE_PNG_SOURCE, 0, filePath, 0, 0, 640, 360, 1, 1, false));
+                list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.RTC_IMAGE_PNG_SOURCE, 0, filePath, 320, 180, 640, 360, 1, 1, false));
             }
 
             if (this.ToggleJpg.isOn)
@@ -226,7 +226,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
 #else
                 var filePath = Path.Combine(Application.streamingAssetsPath, "img/gif.git");
 #endif
-                list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.RTC_IMAGE_GIF_SOURCE, 0, filePath, 360, 0, 360, 240, 1, 1, false));
+                list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.RTC_IMAGE_GIF_SOURCE, 0, filePath, 0, 0, 476, 280, 1, 1, false));
             }
 
             if (this.ToggleRemote.isOn)
@@ -234,7 +234,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
                 if (this.RemoteUserUids.Count >= 1)
                 {
                     var remoteUserUid = this.RemoteUserUids[0];
-                    list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.REMOTE_VIDEO_SOURCE, remoteUserUid, "", 100, 100, 100, 100, 1, 1, false));
+                    list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.REMOTE_VIDEO_SOURCE, remoteUserUid, "", 200, 200, 100, 100, 1, 1, false));
                 }
                 else
                 {
@@ -244,7 +244,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
 
             if (this.ToggleScreenShare.isOn)
             {
-                list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.PRIMARY_SCREEN_SOURCE, 0, "", 0, 0, 640, 320, 1, 1, false));
+                list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.PRIMARY_SCREEN_SOURCE, 0, "", 0, 320, 320, 320, 1, 1, false));
             }
 
             if (this.ToggleMediaPlay.isOn)
