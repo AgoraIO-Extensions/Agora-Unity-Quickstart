@@ -209,7 +209,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
             videoSurface.OnTextureSizeModify += (int width, int height) =>
             {
                 float scale = (float)height / (float)width;
-                videoSurface.transform.localScale = new Vector3(5, 5 * scale, 1);
+                videoSurface.transform.localScale = new Vector3(-5, 5 * scale, 1);
                 Debug.Log("OnTextureSizeModify: " + width + "  " + height);
             };
         }
