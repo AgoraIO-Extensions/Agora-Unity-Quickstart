@@ -200,11 +200,11 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
         private void TestMediaPlayer()
         {
             long duration = 0;
-            var ret = MediaPlayer.GetDuration( ref duration);
+            var ret = MediaPlayer.GetDuration(ref duration);
             Debug.Log("_mediaPlayer.GetDuration returns: " + ret + "duration: " + duration);
 
             long pos = 0;
-            ret = MediaPlayer.GetPlayPosition( ref pos);
+            ret = MediaPlayer.GetPlayPosition(ref pos);
             Debug.Log("_mediaPlayer.GetPlayPosition returns: " + ret + "position: " + pos);
 
             Debug.Log("_mediaPlayer.GetState:" + MediaPlayer.GetState());
@@ -214,7 +214,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
             Debug.Log("_mediaPlayer.GetMute returns: " + ret + "mute: " + mute);
 
             int volume = 0;
-            ret = MediaPlayer.GetPlayoutVolume( ref volume);
+            ret = MediaPlayer.GetPlayoutVolume(ref volume);
             Debug.Log("_mediaPlayer.GetPlayoutVolume returns: " + ret + "volume: " + volume);
 
             Debug.Log("SDK Version:" + MediaPlayer.GetPlayerSdkVersion());
@@ -257,7 +257,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
             videoSurface.OnTextureSizeModify += (int width, int height) =>
             {
                 float scale = (float)height / (float)width;
-                videoSurface.transform.localScale = new Vector3(5, 5 * scale, 1);
+                videoSurface.transform.localScale = new Vector3(-5, 5 * scale, 1);
                 Debug.Log("OnTextureSizeModify: " + width + "  " + height);
             };
         }
@@ -338,7 +338,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
             _sample = sample;
         }
 
-        public override void OnPlayerSourceStateChanged( MEDIA_PLAYER_STATE state, MEDIA_PLAYER_ERROR ec)
+        public override void OnPlayerSourceStateChanged(MEDIA_PLAYER_STATE state, MEDIA_PLAYER_ERROR ec)
         {
             _sample.Log.UpdateLog(string.Format(
                 "OnPlayerSourceStateChanged state: {0}, ec: {1}, playId: {2}", state, ec, _sample.MediaPlayer.GetId()));
@@ -356,7 +356,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
             }
         }
 
-        public override void OnPlayerEvent( MEDIA_PLAYER_EVENT @event, Int64 elapsedTime, string message)
+        public override void OnPlayerEvent(MEDIA_PLAYER_EVENT @event, Int64 elapsedTime, string message)
         {
             _sample.Log.UpdateLog(string.Format("OnPlayerEvent state: {0}", @event));
         }
