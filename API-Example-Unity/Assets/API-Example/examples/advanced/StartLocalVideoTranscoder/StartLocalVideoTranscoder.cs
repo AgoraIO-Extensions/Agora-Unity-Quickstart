@@ -58,8 +58,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
             {
                 SetUpUI();
                 InitEngine();
-                //InitMediaPlayer();
-                //JoinChannel();
+                InitMediaPlayer();
+                JoinChannel();
             }
         }
 
