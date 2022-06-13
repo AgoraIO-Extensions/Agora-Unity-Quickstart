@@ -102,8 +102,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
 
         private void StartPushAudioFrame()
         {
-            var bufferLength = SAMPLE_RATE / PUSH_FREQ_PER_SEC * CHANNEL * 10000;
-            _audioBuffer = new RingBuffer<byte>(bufferLength);
+            // 1-sec-length buffer
+            var bufferLength = SAMPLE_RATE * CHANNEL;
+            _audioBuffer = new RingBuffer<byte>(bufferLength, true);
             _startConvertSignal = true;
 
             _pushAudioFrameThreadSignal = true;
@@ -145,7 +146,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
             var buffer = new byte[samples * bytesPerSample * CHANNEL];
             var freq = 1000 / PUSH_FREQ_PER_SEC;
 
-            var tic = new TimeSpan(DateTime.Now.Ticks);
+            var tic = DateTime.Now;
 
 
             IntPtr audioFrameBuffer = Marshal.AllocHGlobal(buffer.Length);
@@ -167,32 +168,33 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
             {
                 //if (!_startSignal)
                 //{
-                //    tic = new TimeSpan(DateTime.Now.Ticks);
+                //    tic = DateTime.Now; //new TimeSpan(DateTime.Now.Ticks);
                 //}
 
-                var toc = new TimeSpan(DateTime.Now.Ticks);
+                var toc = DateTime.Now;
 
-                if (toc.Subtract(tic).Duration().Milliseconds >= freq)
+                if ((toc - tic).Milliseconds >= freq)
                 {
-                    tic = new TimeSpan(DateTime.Now.Ticks);
-
-                    for (var i = 0; i < 2; i++)
+                    lock (_audioBuffer)
                     {
-                        lock (_audioBuffer)
+                        if (_audioBuffer.Size > samples * bytesPerSample * CHANNEL)
                         {
-                            if (_audioBuffer.Size > samples * bytesPerSample * CHANNEL)
+                            for (var j = 0; j < samples * bytesPerSample * CHANNEL; j++)
                             {
-                                for (var j = 0; j < samples * bytesPerSample * CHANNEL; j++)
-                                {
-                                    buffer[j] = _audioBuffer.Get();
-                                }
-
-                                Marshal.Copy(buffer, 0, audioFrame.bufferPtr, buffer.Length);
-                                var ret = RtcEngine.PushAudioFrame(MEDIA_SOURCE_TYPE.AUDIO_PLAYOUT_SOURCE, audioFrame);
-                                Debug.Log("PushAudioFrame returns: " + ret);
+                                buffer[j] = _audioBuffer.Get();
                             }
+
+                            Marshal.Copy(buffer, 0, audioFrame.bufferPtr, buffer.Length);
+                            var ret = RtcEngine.PushAudioFrame(MEDIA_SOURCE_TYPE.AUDIO_PLAYOUT_SOURCE, audioFrame);
+                            Debug.Log("PushAudioFrame returns: " + ret);
+                            tic = toc;
+                        }
+                        else
+                        {
+                            tic = tic.AddMilliseconds(1);
                         }
                     }
+
                 }
             }
 
