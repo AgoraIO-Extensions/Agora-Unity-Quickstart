@@ -31,7 +31,7 @@ public class Home : MonoBehaviour
     private string[] _advancedNameList = {
         "AudioMixingScene",
         "ChannelMediaRelayScene",
-        "ContentInspectScene",
+        //"ContentInspectScene",
         "CustomCaptureAudioScene",
         "CustomCaptureVideoScene",
         "CustomRenderAudioScene",
