@@ -212,8 +212,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
                 videoSurface.transform.localScale = new Vector3(5, 5 * scale, 1);
                 Debug.Log("OnTextureSizeModify: " + width + "  " + height);
             };
-
-            videoSurface.EnableFilpTextureApply(true, false);
         }
 
         // VIDEO TYPE 1: 3D Object
