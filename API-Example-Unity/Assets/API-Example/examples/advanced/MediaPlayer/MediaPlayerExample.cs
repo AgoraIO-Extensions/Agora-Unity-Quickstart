@@ -252,8 +252,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
             // configure videoSurface
             videoSurface.SetForUser(uid, channelId, videoSourceType);
             videoSurface.SetEnable(true);
-            videoSurface.EnableFilpTextureApply(true, false);
-
+       
             videoSurface.OnTextureSizeModify += (int width, int height) =>
             {
                 float scale = (float)height / (float)width;
