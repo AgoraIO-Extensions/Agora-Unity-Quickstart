@@ -106,8 +106,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
 
             _winIdSelect.ClearOptions();
 
-            // var displayInfos = mRtcEngine.GetDisplayInfos();
-            // var windowInfos = mRtcEngine.GetWindowInfos();
             SIZE t = new SIZE();
             t.width = 360;
             t.height = 240;
@@ -116,12 +114,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
             s.height = 240;
             var info = RtcEngine.GetScreenCaptureSources(t, s, true);
 
-            //_winIdSelect.AddOptions(info.Select(w =>
-            //    new Dropdown.OptionData(
-            //        string.Format("Display {0}", w.sourceId))).ToList());
             _winIdSelect.AddOptions(info.Select(w =>
                     new Dropdown.OptionData(
-                        string.Format("{0}-{1} | {2}", w.sourceName, w.sourceTitle, w.sourceId)))
+                        string.Format("{0}: {1}-{2} | {3}",w.type, w.sourceName, w.sourceTitle, w.sourceId)))
                 .ToList());
             _startShareBtn = GameObject.Find("startShareBtn").GetComponent<Button>();
             _stopShareBtn = GameObject.Find("stopShareBtn").GetComponent<Button>();
@@ -144,7 +139,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
             if (_winIdSelect == null) return;
             var option = _winIdSelect.options[_winIdSelect.value].text;
             if (string.IsNullOrEmpty(option)) return;
-            if (option.Contains("|"))
+            if (option.Contains("ScreenCaptureSourceType_Window"))
             {
                 var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
                 Log.UpdateLog(string.Format(">>>>> Start sharing {0}", windowId));
@@ -153,7 +148,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
             }
             else
             {
-                var dispId = uint.Parse(option.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1]);
+                var dispId = uint.Parse(option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1]);
                 Log.UpdateLog(string.Format(">>>>> Start sharing display {0}", dispId));
                 RtcEngine.StartScreenCaptureByDisplayId(dispId, default(Rectangle),
                     new ScreenCaptureParameters { captureMouseCursor = true, frameRate = 30 });
