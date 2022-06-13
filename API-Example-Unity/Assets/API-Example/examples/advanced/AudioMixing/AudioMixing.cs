@@ -28,6 +28,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
 
         [SerializeField] public string Sound_URL = "";
 
+
+
         private string _localPath = "";
 
         public Text LogText;
@@ -87,8 +89,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
             _effectButton = GameObject.Find("EffectButton").GetComponent<Button>();
             _effectButton.onClick.AddListener(HandleEffectButton);
             _urlToggle = GameObject.Find("Toggle").GetComponent<Toggle>();
-            _urlToggle.onValueChanged.AddListener(OnToggle);
-            _useURL = _urlToggle.isOn;
+            _loopbackToggle = GameObject.Find("Loopback").GetComponent<Toggle>();
+
+          
 
 #if UNITY_ANDROID && !UNITY_EDITOR
         // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
@@ -97,7 +100,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
             _localPath = Application.streamingAssetsPath + "/audio/" + "Agora.io-Interactions.mp3";
 #endif
             Log.UpdateLog(string.Format("the audio file path: {0}", _localPath));
-         
+
         }
 
         internal void EnableUI(bool enable)
@@ -111,24 +114,24 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
             RtcEngine.EnableAudio();
             var options = new ChannelMediaOptions();
             options.publishCustomAudioTrack.SetValue(true);
-            RtcEngine.JoinChannel(_token, _channelName,0, options);
+            RtcEngine.JoinChannel(_token, _channelName, 0, options);
         }
 
         #region -- Test Control logic ---
 
         private void StartAudioMixing()
         {
-            Debug.Log("Playing with " + (_useURL ? "URL" : "local file"));
+            Debug.Log("Playing with " + (_urlToggle.isOn ? "URL" : "local file"));
 
-            var ret = RtcEngine.StartAudioMixing(_useURL ? Sound_URL : _localPath, true, false, -1);
+            var ret = RtcEngine.StartAudioMixing(_urlToggle.isOn ? Sound_URL : _localPath, _loopbackToggle.isOn, false, -1);
             Debug.Log("StartAudioMixing returns: " + ret);
         }
 
         private void PlayEffectTest()
         {
-            Debug.Log("Playing with " + (_useURL ? "URL" : "local file"));
+            Debug.Log("Playing with " + (_urlToggle.isOn ? "URL" : "local file"));
             //IAudioEffectManager effectManager = mRtcEngine.GetAudioEffectManager();
-            RtcEngine.PlayEffect(1, _useURL ? Sound_URL : _localPath, 1, 1.0, 0, 100, true);
+            RtcEngine.PlayEffect(1, _urlToggle.isOn ? Sound_URL : _localPath, 1, 1.0, 0, 100, true);
         }
 
         private void StopEffectTest()
@@ -148,7 +151,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
             RtcEngine.Dispose();
         }
 
-       
+
         #region -- Application UI Logic ---
 
         private bool _isMixing = false;
@@ -200,13 +203,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
             _effectButton.GetComponentInChildren<Text>().text = (_effectOn ? "Stop Effect" : "Play Effect");
         }
 
-        private bool _useURL { get; set; }
+       
         private Toggle _urlToggle { get; set; }
-
-        void OnToggle(bool enable)
-        {
-            _useURL = enable;
-        }
+        private Toggle _loopbackToggle { get; set; }
 
         #endregion
     }
