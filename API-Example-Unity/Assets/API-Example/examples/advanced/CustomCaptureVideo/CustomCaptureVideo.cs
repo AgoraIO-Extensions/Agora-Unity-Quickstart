@@ -152,7 +152,6 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
 
         private void InitCameraDevice()
         {
-
             WebCamDevice[] devices = WebCamTexture.devices;
             _webCameraTexture = new WebCamTexture(devices[0].name, (int)CameraSize.x, (int)CameraSize.y, CameraFPS);
             RawImage.texture = _webCameraTexture;

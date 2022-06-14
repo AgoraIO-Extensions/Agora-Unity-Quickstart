@@ -6,6 +6,7 @@ using UnityEngine.Serialization;
 using Logger = agora.util.Logger;
 using System;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
 namespace Agora_Plugin.API_Example.examples.advanced.MetadataSample
 {
@@ -32,8 +33,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.MetadataSample
         public Text LogText;
         internal Logger Log;
         internal IRtcEngine RtcEngine;
-
         internal bool Sending = false;
+        internal Queue<String> MetadataQueue = new Queue<string>();
+
 
         private void Start()
         {
@@ -54,6 +56,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MetadataSample
             _token = _appIdInput.token;
             _channelName = _appIdInput.channelName;
         }
+
 
 
 
@@ -99,6 +102,14 @@ namespace Agora_Plugin.API_Example.examples.advanced.MetadataSample
         private void Update()
         {
             PermissionHelper.RequestMicrophontPermission();
+            lock (MetadataQueue)
+            {
+                while(MetadataQueue.Count > 0)
+                {
+                    string metadataString = MetadataQueue.Dequeue();
+                    this.Log.UpdateLog(metadataString);
+                }
+            }
         }
 
 
@@ -325,10 +336,15 @@ namespace Agora_Plugin.API_Example.examples.advanced.MetadataSample
 
         public override void OnMetadataReceived(Metadata data)
         {
+            //this callback not trigger in unity main thread
             byte[] strByte = new byte[data.size];
             Marshal.Copy(data.buffer, strByte, 0, (int)data.size);
             string str = System.Text.Encoding.Default.GetString(strByte);
-            Debug.Log(string.Format("OnMetadataReceived uid:{0} buffer:{1}", data.uid, str));
+            var str2 = string.Format("OnMetadataReceived uid:{0} buffer:{1}", data.uid, str);
+            lock (this._sample.MetadataQueue)
+            {
+                this._sample.MetadataQueue.Enqueue(str2);
+            }
         }
     }
 
