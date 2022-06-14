@@ -140,6 +140,7 @@ namespace CustomRenderAudio
                 RtcEngine.InitEventHandler(null);
                 RtcEngine.LeaveChannel();
                 RtcEngine.Dispose();
+                RtcEngine = null;
             }
         }
 
