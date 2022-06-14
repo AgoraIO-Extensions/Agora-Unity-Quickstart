@@ -36,7 +36,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
         internal IMediaPlayer MediaPlayer = null;
-     
+
         internal List<uint> RemoteUserUids = new List<uint>();
 
 
@@ -132,7 +132,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             RtcEngine.StartPreview(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_TRANSCODED);
             MakeVideoView(0, "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_TRANSCODED);
-            
+
             var options = new ChannelMediaOptions();
             options.publishCameraTrack.SetValue(false);
             options.publishSecondaryCameraTrack.SetValue(false);
@@ -244,12 +244,19 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
 
             if (this.ToggleScreenShare.isOn)
             {
-                list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.PRIMARY_SCREEN_SOURCE, 0, "", 0, 0, 640, 320, 1, 1, false));
+                if (this.StartScreenShare())
+                {
+                    list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.PRIMARY_SCREEN_SOURCE, 0, "", 480, 640, 640, 320, 1, 1, false));
+                }
+            }
+            else
+            {
+                this.StopScreenShare();
             }
 
             if (this.ToggleMediaPlay.isOn)
             {
-                var ret = this.MediaPlayer.Open( "https://big-class-test.oss-cn-hangzhou.aliyuncs.com/61102.1592987815092.mp4", 0);
+                var ret = this.MediaPlayer.Open("https://big-class-test.oss-cn-hangzhou.aliyuncs.com/61102.1592987815092.mp4", 0);
                 this.Log.UpdateLog("Media palyer ret:" + ret);
                 var sourceId = this.MediaPlayer.GetId();
                 this.Log.UpdateLog("Media palyer ret:" + ret);
@@ -267,6 +274,53 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
             conf.videoOutputConfiguration.dimensions.height = 960;
 
             return conf;
+        }
+
+
+        private bool StartScreenShare()
+        {
+#if UNITY_IPHONE || UNITY_ANDROID
+            this.Log.UpdateLog("Not Support Screen Share in this platform!";
+             return false;
+#else
+            SIZE t = new SIZE();
+            t.width = 360;
+            t.height = 240;
+            SIZE s = new SIZE();
+            s.width = 360;
+            s.height = 240;
+            var info = RtcEngine.GetScreenCaptureSources(t, s, true);
+
+            if (info.Length > 0)
+            {
+                ScreenCaptureSourceInfo item = info[0];
+                if (item.type == ScreenCaptureSourceType.ScreenCaptureSourceType_Window)
+                {
+                    RtcEngine.StartScreenCaptureByWindowId(item.sourceId, default(Rectangle),
+                       default(ScreenCaptureParameters));
+                }
+                else
+                {
+                    RtcEngine.StartScreenCaptureByDisplayId((uint)item.sourceId, default(Rectangle),
+                 new ScreenCaptureParameters { captureMouseCursor = true, frameRate = 30 });
+                }
+                return true;
+            }
+            else
+            {
+                this.Log.UpdateLog("Not Screen can share");
+                return false;
+            }
+#endif
+        }
+
+        private void StopScreenShare()
+        {
+#if UNITY_IPHONE || UNITY_ANDROID
+            this.Log.UpdateLog("Not Support Screen Share in this platform!";
+#else
+            RtcEngine.StopScreenCapture();
+#endif
         }
 
         private void OnStartButtonPress()
