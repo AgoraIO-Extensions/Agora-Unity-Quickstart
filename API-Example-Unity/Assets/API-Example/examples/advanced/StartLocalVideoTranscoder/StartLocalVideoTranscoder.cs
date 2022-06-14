@@ -118,10 +118,13 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
         private void InitMediaPlayer()
         {
             MediaPlayer = RtcEngine.CreateMediaPlayer();
+       
             if (MediaPlayer == null)
             {
                 Debug.Log("GetAgoraRtcMediaPlayer failed!");
             }
+            MpkEventHandler handler = new MpkEventHandler(this);
+            MediaPlayer.InitEventHandler(handler);
             Debug.Log("playerId id: " + MediaPlayer.GetId());
         }
 
@@ -222,9 +225,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
             {
 #if UNITY_ANDROID && !UNITY_EDITOR
                 // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
-                var filePath = "/assets/img/gif.git";
+                var filePath = "/assets/img/gif.gif";
 #else
-                var filePath = Path.Combine(Application.streamingAssetsPath, "img/gif.git");
+                var filePath = Path.Combine(Application.streamingAssetsPath, "img/gif.gif");
 #endif
                 list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.RTC_IMAGE_GIF_SOURCE, 0, filePath, 360, 0, 360, 240, 1, 1, false));
             }
@@ -260,7 +263,11 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
                 this.Log.UpdateLog("Media palyer ret:" + ret);
                 var sourceId = this.MediaPlayer.GetId();
                 this.Log.UpdateLog("Media palyer ret:" + ret);
-                list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.MEDIA_PLAYER_SOURCE, 0, sourceId.ToString(), 0, 0, 360, 240, 1, 1, false));
+                list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.MEDIA_PLAYER_SOURCE, 0, sourceId.ToString(), 0, 0, 1080, 960, 1, 1, false));
+            }
+            else
+            {
+                this.MediaPlayer.Stop();
             }
 
             var conf = new LocalTranscoderConfiguration();
@@ -342,6 +349,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
         {
             var nRet = RtcEngine.StopLocalVideoTranscoder();
             this.Log.UpdateLog("StopLocalVideoTranscoder:" + nRet);
+            MediaPlayer.Stop();
         }
 
         private void OnDestroy()
@@ -515,7 +523,36 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
                 _sample.RemoteUserUids.Remove(uid);
             }
         }
-
-
     }
+
+
+    internal class MpkEventHandler : IMediaPlayerSourceObserver
+    {
+        private readonly StartLocalVideoTranscoder _sample;
+
+        internal MpkEventHandler(StartLocalVideoTranscoder sample)
+        {
+            _sample = sample;
+        }
+
+        public override void OnPlayerSourceStateChanged(MEDIA_PLAYER_STATE state, MEDIA_PLAYER_ERROR ec)
+        {
+            _sample.Log.UpdateLog(string.Format(
+                "OnPlayerSourceStateChanged state: {0}, ec: {1}, playId: {2}", state, ec, _sample.MediaPlayer.GetId()));
+            Debug.Log("OnPlayerSourceStateChanged");
+            if (state == MEDIA_PLAYER_STATE.PLAYER_STATE_OPEN_COMPLETED)
+            {
+                _sample.MediaPlayer.Play();
+            }
+        }
+
+        public override void OnPlayerEvent(MEDIA_PLAYER_EVENT @event, Int64 elapsedTime, string message)
+        {
+            _sample.Log.UpdateLog(string.Format("OnPlayerEvent state: {0}", @event));
+        }
+    }
+
+
+
+
 }
