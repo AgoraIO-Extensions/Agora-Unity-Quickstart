@@ -4,7 +4,7 @@ using UnityEngine.Serialization;
 using agora.rtc;
 using agora.util;
 using Logger = agora.util.Logger;
-
+using System.IO;
 
 namespace Agora_Plugin.API_Example.examples.basic.VirtualBackground
 {
@@ -86,7 +86,7 @@ namespace Agora_Plugin.API_Example.examples.basic.VirtualBackground
         {
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
-          
+
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             RtcEngine.JoinChannel(_token, _channelName);
         }
@@ -98,6 +98,9 @@ namespace Agora_Plugin.API_Example.examples.basic.VirtualBackground
             var btn = ui.Find("StartButton").GetComponent<Button>();
             btn.onClick.AddListener(OnStartButtonPress);
 
+            btn = ui.Find("StartButton2").GetComponent<Button>();
+            btn.onClick.AddListener(OnStartButtonPress2);
+
             btn = ui.Find("StopButton").GetComponent<Button>();
             btn.onClick.AddListener(OnStopButtonPress);
         }
@@ -106,6 +109,27 @@ namespace Agora_Plugin.API_Example.examples.basic.VirtualBackground
         private void OnStartButtonPress()
         {
             var source = new VirtualBackgroundSource();
+            source.background_source_type = BACKGROUND_SOURCE_TYPE.BACKGROUND_COLOR;
+            source.color = 0xffffff;
+            var segproperty = new SegmentationProperty();
+            var nRet = RtcEngine.EnableVirtualBackground(true, source, segproperty, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
+            this.Log.UpdateLog("EnableVirtualBackground true :" + nRet);
+        }
+
+        private void OnStartButtonPress2()
+        {
+            var source = new VirtualBackgroundSource();
+
+            source.background_source_type = BACKGROUND_SOURCE_TYPE.BACKGROUND_IMG;
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+                // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
+                var filePath = "/assets/img/png.png";
+#else
+            var filePath = Path.Combine(Application.streamingAssetsPath, "img/png.png");
+#endif
+            source.source = filePath;
+
             var segproperty = new SegmentationProperty();
             var nRet = RtcEngine.EnableVirtualBackground(true, source, segproperty, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
             this.Log.UpdateLog("EnableVirtualBackground true :" + nRet);
@@ -115,10 +139,10 @@ namespace Agora_Plugin.API_Example.examples.basic.VirtualBackground
         {
             var source = new VirtualBackgroundSource();
             var segproperty = new SegmentationProperty();
-            var nRet = RtcEngine.EnableVirtualBackground(false, source,segproperty, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
+            var nRet = RtcEngine.EnableVirtualBackground(false, source, segproperty, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
             this.Log.UpdateLog("EnableVirtualBackground false :" + nRet);
         }
-        
+
 
         private void OnDestroy()
         {

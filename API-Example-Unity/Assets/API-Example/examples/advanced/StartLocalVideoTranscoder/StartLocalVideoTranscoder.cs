@@ -118,7 +118,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
         private void InitMediaPlayer()
         {
             MediaPlayer = RtcEngine.CreateMediaPlayer();
-       
+
             if (MediaPlayer == null)
             {
                 Debug.Log("GetAgoraRtcMediaPlayer failed!");
