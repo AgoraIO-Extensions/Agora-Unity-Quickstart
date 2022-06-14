@@ -222,9 +222,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
             {
 #if UNITY_ANDROID && !UNITY_EDITOR
                 // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
-                var filePath = "/assets/img/gif.git";
+                var filePath = "/assets/img/gif.gif";
 #else
-                var filePath = Path.Combine(Application.streamingAssetsPath, "img/gif.git");
+                var filePath = Path.Combine(Application.streamingAssetsPath, "img/gif.gif");
 #endif
                 list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.RTC_IMAGE_GIF_SOURCE, 0, filePath, 0, 0, 476, 280, 1, 1, false));
             }
