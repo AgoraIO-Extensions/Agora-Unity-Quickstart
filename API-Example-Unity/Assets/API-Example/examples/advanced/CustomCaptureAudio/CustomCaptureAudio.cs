@@ -43,7 +43,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
         private bool _startConvertSignal = false;
 
         private Thread _pushAudioFrameThread;
-        private bool _pushAudioFrameThreadSignal = false;
+        private System.Object _pushAudioFrameThreadSignal = new System.Object();
         private int _count;
         private bool _startSignal = false;
 
@@ -130,10 +130,13 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
         {
             Debug.Log("OnDestroy");
             if (RtcEngine == null) return;
-            RtcEngine.InitEventHandler(null);
-            RtcEngine.LeaveChannel();
-            RtcEngine.Dispose();
-            _pushAudioFrameThreadSignal = false;
+            lock (_pushAudioFrameThreadSignal)
+            {
+                RtcEngine.InitEventHandler(null);
+                RtcEngine.LeaveChannel();
+                RtcEngine.Dispose();
+                RtcEngine = null;
+            }
         }
 
         private void PushAudioFrameThread()
@@ -163,40 +166,45 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
                 renderTimeMs = freq
             };
 
-
-            while (_pushAudioFrameThreadSignal)
+            while (true)
             {
-                //if (!_startSignal)
-                //{
-                //    tic = DateTime.Now; //new TimeSpan(DateTime.Now.Ticks);
-                //}
-
-                var toc = DateTime.Now;
-
-                if ((toc - tic).Milliseconds >= freq)
+                lock (_pushAudioFrameThreadSignal)
                 {
-                    lock (_audioBuffer)
+                    if (RtcEngine == null)
                     {
-                        if (_audioBuffer.Size > samples * bytesPerSample * CHANNEL)
-                        {
-                            for (var j = 0; j < samples * bytesPerSample * CHANNEL; j++)
-                            {
-                                buffer[j] = _audioBuffer.Get();
-                            }
-
-                            Marshal.Copy(buffer, 0, audioFrame.bufferPtr, buffer.Length);
-                            var ret = RtcEngine.PushAudioFrame(MEDIA_SOURCE_TYPE.AUDIO_PLAYOUT_SOURCE, audioFrame);
-                            Debug.Log("PushAudioFrame returns: " + ret);
-                            tic = toc;
-                        }
-                        else
-                        {
-                            tic = tic.AddMilliseconds(1);
-                        }
+                        break;
                     }
+                    var toc = DateTime.Now;
 
+                    if ((toc - tic).Milliseconds >= freq)
+                    {
+                        lock (_audioBuffer)
+                        {
+                            if (_audioBuffer.Size > samples * bytesPerSample * CHANNEL)
+                            {
+                                for (var j = 0; j < samples * bytesPerSample * CHANNEL; j++)
+                                {
+                                    buffer[j] = _audioBuffer.Get();
+                                }
+
+                                Marshal.Copy(buffer, 0, audioFrame.bufferPtr, buffer.Length);
+
+                                var ret = RtcEngine.PushAudioFrame(MEDIA_SOURCE_TYPE.AUDIO_PLAYOUT_SOURCE, audioFrame);
+                                Debug.Log("PushAudioFrame returns: " + ret);
+
+                                tic = toc;
+                            }
+                            else
+                            {
+                                tic = tic.AddMilliseconds(1);
+                            }
+                        }
+
+                    }
                 }
+                Thread.Sleep(1);
             }
+
 
             Marshal.FreeHGlobal(audioFrameBuffer);
         }
