@@ -45,7 +45,7 @@ namespace CustomRenderAudio
 
 
         private Thread _pullAudioFrameThread;
-        private bool _pullAudioFrameThreadSignal = true;
+        private System.Object _pullAudioFrameThreadSignal = new System.Object();
 
         private int _writeCount;
         private int _readCount;
@@ -135,11 +135,13 @@ namespace CustomRenderAudio
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
-            if (RtcEngine == null) return;
-            RtcEngine.InitEventHandler(null);
-            RtcEngine.LeaveChannel();
-            RtcEngine.Dispose();
-            _pullAudioFrameThreadSignal = false;
+            lock (_pullAudioFrameThreadSignal)
+            {
+                if (RtcEngine == null) return;
+                RtcEngine.InitEventHandler(null);
+                RtcEngine.LeaveChannel();
+                RtcEngine.Dispose();
+            }
         }
 
 
@@ -160,29 +162,38 @@ namespace CustomRenderAudio
             IntPtr audioFrameBuffer = Marshal.AllocHGlobal(samples * bytesPerSample * channels);
             audioFrame.buffer = (UInt64)audioFrameBuffer;
             audioFrame.bufferPtr = audioFrameBuffer;
-            while (_pullAudioFrameThreadSignal)
+
+            while (true)
             {
-                var toc = new TimeSpan(DateTime.Now.Ticks);
-                if (toc.Subtract(tic).Duration().Milliseconds >= freq)
+                lock (_pullAudioFrameThreadSignal)
                 {
-                    tic = new TimeSpan(DateTime.Now.Ticks);
-                    var ret = RtcEngine.PullAudioFrame(audioFrame);
-
-                    Debug.Log("PullAudioFrame returns: " + ret);
-
-                    if (ret == 0)
+                    if (RtcEngine == null)
                     {
-                        Marshal.Copy((IntPtr)audioFrame.buffer, audioFrame.RawBuffer, 0, audioFrame.RawBuffer.Length);
-                        var floatArray = ConvertByteToFloat16(audioFrame.RawBuffer);
-                        lock (_audioBuffer)
+                        break;
+                    }
+
+                    var toc = new TimeSpan(DateTime.Now.Ticks);
+                    if (toc.Subtract(tic).Duration().Milliseconds >= freq)
+                    {
+                        tic = new TimeSpan(DateTime.Now.Ticks);
+                        var ret = RtcEngine.PullAudioFrame(audioFrame);
+
+                        Debug.Log("PullAudioFrame returns: " + ret);
+
+                        if (ret == 0)
                         {
-                            _audioBuffer.Put(floatArray);
+                            Marshal.Copy((IntPtr)audioFrame.buffer, audioFrame.RawBuffer, 0, audioFrame.RawBuffer.Length);
+                            var floatArray = ConvertByteToFloat16(audioFrame.RawBuffer);
+                            lock (_audioBuffer)
+                            {
+                                _audioBuffer.Put(floatArray);
+                            }
+
+                            _writeCount += floatArray.Length;
                         }
-
-                        _writeCount += floatArray.Length;
-
                     }
                 }
+                Thread.Sleep(1);
             }
 
             Marshal.FreeHGlobal(audioFrameBuffer);
