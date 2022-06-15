@@ -333,7 +333,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MetadataSample
             byte[] strByte = new byte[data.size];
             Marshal.Copy(data.buffer, strByte, 0, (int)data.size);
             string str = System.Text.Encoding.Default.GetString(strByte);
-            Debug.Log(string.Format("OnMetadataReceived uid:{0} buffer:{1}", data.uid, str));
+            _sample.Log.UpdateLog(string.Format("OnMetadataReceived uid:{0} buffer:{1}", data.uid, str));
         }
     }
 
