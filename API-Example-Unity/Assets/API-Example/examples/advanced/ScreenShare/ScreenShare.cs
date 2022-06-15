@@ -40,7 +40,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
         private void Start()
         {
 #if UNITY_IPHONE || UNITY_ANDROID
-            this.LogText.text = "Not Support in this platform!";
+            this.LogText.text = "ios or Android is not supported, but you could see how it works on the Editor for Windows/MacOS";
 #else
             LoadAssetData();
             if (CheckAppId())
