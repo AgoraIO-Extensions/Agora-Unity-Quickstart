@@ -180,7 +180,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: ' Off Voice Beautifier'
+  m_Text: Turn off Voice Beautifier
 --- !u!222 &44031178
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -822,7 +822,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: ' Off Audio Effect'
+  m_Text: Turn off Audio Effect
 --- !u!222 &221456759
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3308,7 +3308,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Off Voice Changer
+  m_Text: Turn off Voice Changer
 --- !u!222 &1725072584
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3601,8 +3601,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1285373779}
   m_HandleRect: {fileID: 1285373778}
   m_Direction: 2
-  m_Value: 0.9999999
-  m_Size: 0.2954
+  m_Value: 1
+  m_Size: 0.29540002
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
