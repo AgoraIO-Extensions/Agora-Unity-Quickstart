@@ -230,6 +230,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
                 RtcEngine.DestroyMediaPlayer(MediaPlayer);
             RtcEngine.InitEventHandler(null);
             RtcEngine.LeaveChannel();
+            RtcEngine.Dispose();
+            RtcEngine = null;
         }
 
 
