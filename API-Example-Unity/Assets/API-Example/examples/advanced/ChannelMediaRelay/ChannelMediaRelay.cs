@@ -133,7 +133,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
             config.destCount = 1;
 
             var nRet = RtcEngine.StartChannelMediaRelay(config);
-            this.Log.UpdateLog("StartChannelMediaRelay nRet:" + nRet);
+            this.Log.UpdateLog("StartChannelMediaRelay nRet:" + nRet + " new ChannelName: " + this._appIdInput.channelName + "_2");
         }
 
         private void onUpdateButtonClick()
@@ -157,7 +157,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
 
             //after StartChannelMediaRelay you can use StartChannelMediaRelay to remove or relay to anthoner channel
             var nRet = RtcEngine.UpdateChannelMediaRelay(config);
-            this.Log.UpdateLog("UpdateChannelMediaRelay nRet:" + nRet);
+            this.Log.UpdateLog("UpdateChannelMediaRelay nRet:" + nRet + " new ChannelName: " + this._appIdInput.channelName + "_3");
         }
 
         private void onPauseAllButtonClick()
@@ -185,9 +185,10 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
             RtcEngine.InitEventHandler(null);
             RtcEngine.LeaveChannel();
             RtcEngine.Dispose();
+            RtcEngine = null;
         }
 
-        internal static void MakeVideoView(uint uid, string channelId = "")
+        internal static void MakeVideoView(uint uid, string channelId = "", VIDEO_SOURCE_TYPE type = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA)
         {
             var go = GameObject.Find(uid.ToString());
             if (!ReferenceEquals(go, null))
@@ -199,14 +200,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
             var videoSurface = MakeImageSurface(uid.ToString());
             if (ReferenceEquals(videoSurface, null)) return;
             // configure videoSurface
-            if (uid == 0)
-            {
-                videoSurface.SetForUser(uid, channelId);
-            }
-            else
-            {
-                videoSurface.SetForUser(uid, channelId, VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE);
-            }
+            videoSurface.SetForUser(uid, channelId, type);
 
             videoSurface.OnTextureSizeModify += (int width, int height) =>
             {
@@ -333,7 +327,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ChannelMediaRelay
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
             _channelMediaRelay.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-            ChannelMediaRelay.MakeVideoView(uid, _channelMediaRelay._channelName);
+            ChannelMediaRelay.MakeVideoView(uid, _channelMediaRelay._channelName, VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE);
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
