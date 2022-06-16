@@ -8,6 +8,7 @@ using agora.rtc;
 using agora.util;
 using Logger = agora.util.Logger;
 using Random = UnityEngine.Random;
+using System.IO;
 
 namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
 {
@@ -45,6 +46,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
         private Button _button3;
         private Button _button4;
         private Button _button5;
+        private Toggle _urlToggle;
 
         // Use this for initialization
         private void Start()
@@ -79,6 +81,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
             _button4.onClick.AddListener(OnResumeButtonPress);
             _button5 = GameObject.Find("Button5").GetComponent<Button>();
             _button5.onClick.AddListener(OnOpenButtonPress);
+            _urlToggle = GameObject.Find("UrlToggle").GetComponent<Toggle>();
         }
 
         public void EnableUI(bool val)
@@ -186,7 +189,22 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
 
         private void OnOpenButtonPress()
         {
-            var ret = MediaPlayer.Open(MPK_URL, 0);
+            string path = null;
+            if (this._urlToggle.isOn)
+            {
+                path = MPK_URL;
+            }
+            else
+            {
+#if UNITY_ANDROID && !UNITY_EDITOR
+                // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
+                path = "/assets/img/MPK.mov";
+#else
+                path = Path.Combine(Application.streamingAssetsPath, "img/MPK.mov");
+#endif
+            }
+            this.Log.UpdateLog("Is opening : " + path);
+            var ret = MediaPlayer.Open(path, 0);
             this.Log.UpdateLog("Open returns: " + ret);
         }
 
@@ -254,7 +272,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
             // configure videoSurface
             videoSurface.SetForUser(uid, channelId, videoSourceType);
             videoSurface.SetEnable(true);
-          
+            
             videoSurface.OnTextureSizeModify += (int width, int height) =>
             {
                 float scale = (float)height / (float)width;
