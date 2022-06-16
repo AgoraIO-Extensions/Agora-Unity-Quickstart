@@ -16,7 +16,7 @@ namespace agora.util
         {
             Debug.Log(logMessage);
             string srcLogMessage = text.text;
-            if (srcLogMessage.Length > 500)
+            if (srcLogMessage.Length > 400)
             {
                 srcLogMessage = srcLogMessage.Substring(srcLogMessage.Length - 50);
             }
