@@ -43,12 +43,17 @@ namespace Agora_Plugin.API_Example.examples.advanced.DualCamera
         // Use this for initialization
         private void Start()
         {
+#if UNITY_IPHONE || UNITY_ANDROID
+            this.LogText.text = "Not Support in this platform!";
+
+#else
             LoadAssetData();
             if (CheckAppId())
             {
                 InitEngine();
                 GetVideoDeviceManager();
             }
+#endif
         }
 
         // Update is called once per frame
