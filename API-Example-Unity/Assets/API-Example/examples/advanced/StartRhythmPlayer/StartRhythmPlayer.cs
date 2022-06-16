@@ -136,11 +136,12 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRhythmPlayer
         {
             AgoraRhythmPlayerConfig config = new AgoraRhythmPlayerConfig()
             {
-                beatsPerMeasure = 4,
+                beatsPerMeasure = 6,
                 beatsPerMinute = 60
             };
             int nRet = RtcEngine.ConfigRhythmPlayer(config);
             this.Log.UpdateLog("ConfigRhythmPlayer nRet:" + nRet);
+            this.Log.UpdateLog("beatsPerMeasure is config from 4 to 6");
         }
 
         private void OnDestroy()
