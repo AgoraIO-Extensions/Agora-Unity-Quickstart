@@ -287,7 +287,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
         private bool StartScreenShare()
         {
 #if UNITY_IPHONE || UNITY_ANDROID
-            this.Log.UpdateLog("Not Support Screen Share in this platform!";
+            this.Log.UpdateLog("Not Support Screen Share in this platform!");
              return false;
 #else
             SIZE t = new SIZE();
@@ -324,7 +324,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
         private void StopScreenShare()
         {
 #if UNITY_IPHONE || UNITY_ANDROID
-            this.Log.UpdateLog("Not Support Screen Share in this platform!";
+            this.Log.UpdateLog("Not Support Screen Share in this platform!");
 #else
             RtcEngine.StopScreenCapture();
 #endif
