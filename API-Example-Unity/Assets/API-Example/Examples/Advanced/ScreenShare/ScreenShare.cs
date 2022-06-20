@@ -138,6 +138,13 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
             if (_winIdSelect == null) return;
             var option = _winIdSelect.options[_winIdSelect.value].text;
             if (string.IsNullOrEmpty(option)) return;
+
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+            var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
+            Log.UpdateLog(string.Format(">>>>> Start sharing {0}", windowId));
+            RtcEngine.StartScreenCaptureByWindowId(ulong.Parse(windowId), default(Rectangle),
+                    default(ScreenCaptureParameters));
+#elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
             if (option.Contains("ScreenCaptureSourceType_Window"))
             {
                 var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
@@ -152,6 +159,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
                 RtcEngine.StartScreenCaptureByDisplayId(dispId, default(Rectangle),
                     new ScreenCaptureParameters { captureMouseCursor = true, frameRate = 30 });
             }
+#endif
         }
 
         private void OnStopShareBtnClick()
