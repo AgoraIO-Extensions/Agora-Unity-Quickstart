@@ -120,7 +120,7 @@ namespace Agora_Plugin.API_Example.examples.basic.SetBeautyEffectOptions
             this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
 #elif UNITY_ANDROID
             var nRet = RtcEngine.LoadExtensionProvider("agora_video_process_extension");
-            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
+            this.Log.UpdateLog("LoadExtensionProvider:" + nRet);
 #endif
             var Ret = RtcEngine.EnableExtension("agora", "beauty", true, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
             this.Log.UpdateLog("EnableExtension:" + Ret);
