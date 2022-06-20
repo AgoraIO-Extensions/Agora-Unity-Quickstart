@@ -112,9 +112,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
         private void JoinChannel()
         {
             RtcEngine.EnableAudio();
-            var options = new ChannelMediaOptions();
-            options.publishCustomAudioTrack.SetValue(true);
-            RtcEngine.JoinChannel(_token, _channelName, 0, options);
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.JoinChannel(_token, _channelName);
         }
 
         #region -- Test Control logic ---
