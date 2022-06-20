@@ -63,3 +63,7 @@ crashlytics-build.properties
 
 .DS_Store
 
+API-Example-Unity/Assets/StreamingAssets/build_info
+API-Example-Unity/Assets/StreamingAssets/build_info.meta
+build_info.meta
+API-Example-Unity/Assets/Agora-RTC-Plugin
