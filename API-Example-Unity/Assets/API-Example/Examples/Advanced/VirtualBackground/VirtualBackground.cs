@@ -41,6 +41,7 @@ namespace Agora_Plugin.API_Example.examples.basic.VirtualBackground
             {
                 InitEngine();
                 SetupUI();
+                EnableExtension();
                 JoinChannel();
             }
         }
@@ -78,17 +79,40 @@ namespace Agora_Plugin.API_Example.examples.basic.VirtualBackground
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
-            var nRet = RtcEngine.EnableExtension("agora_segmentation", "PortraitSegmentation", true, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
-            this.Log.UpdateLog("EnableExtension :" + nRet);
         }
 
         private void JoinChannel()
         {
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
-
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             RtcEngine.JoinChannel(_token, _channelName);
+        }
+
+        private void EnableExtension()
+        {
+#if UNITY_EDITOR_WIN && UNITY_64
+            string libPath = Application.dataPath + "/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/x86_64/libagora_segmentation_extension.dll";
+            var nRet = RtcEngine.LoadExtensionProvider(libPath);
+            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
+#elif UNITY_STANDALONE_WIN && UNITY_64
+            string libPath = Application.dataPath + "/Plugins/x86_64/libagora_segmentation_extension.dll";
+            var nRet = RtcEngine.LoadExtensionProvider(libPath);
+            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
+#elif UNITY_EDITOR_WIN
+            string libPath = Application.dataPath + "/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/x86/libagora_segmentation_extension.dll";
+            var nRet = RtcEngine.LoadExtensionProvider(libPath);
+            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
+#elif UNITY_STANDALONE_WIN
+            string libPath = Application.dataPath + "/Plugins/x86/libagora_segmentation_extension.dll";
+            var nRet = RtcEngine.LoadExtensionProvider(libPath);
+            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
+#elif UNITY_ANDROID
+            var nRet = RtcEngine.LoadExtensionProvider("agora_segmentation_extension");
+            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
+#endif
+            var Ret = RtcEngine.EnableExtension("agora_segmentation", "PortraitSegmentation", true, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
+            this.Log.UpdateLog("EnableExtension :" + Ret);
         }
 
         private void SetupUI()
