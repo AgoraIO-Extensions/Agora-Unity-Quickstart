@@ -295,7 +295,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
             _pushEncodedVideoImage = videoSample;
         }
 
-        public override bool OnEncodedVideoFrame(uint uid, IntPtr imageBufferPtr, UInt64 length, EncodedVideoFrameInfo videoEncodedFrameInfo)
+        public override bool OnEncodedVideoFrameReceived(uint uid, IntPtr imageBufferPtr, UInt64 length, EncodedVideoFrameInfo videoEncodedFrameInfo)
         {
             Debug.Log("OnEncodedVideoImageReceived");
             byte[] imageBuffer = new byte[length];

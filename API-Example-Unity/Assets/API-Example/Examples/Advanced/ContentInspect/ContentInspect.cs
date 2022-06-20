@@ -102,16 +102,11 @@ namespace Agora_Plugin.API_Example.examples.basic.ContentInspect
         private void OnStartButtonClick()
         {
             var config = new ContentInspectConfig();
-            config.ContentWorkType = CONTENT_INSPECT_WORK_TYPE.CONTENT_INSPECT_WORK_DEVICE;
-            config.DeviceworkType = CONTENT_INSPECT_DEVICE_TYPE.CONTENT_INSPECT_DEVICE_AGORA;
             config.modules = new ContentInspectModule[1];
             config.modules[0] = new ContentInspectModule
             {
                 type = CONTENT_INSPECT_TYPE.CONTENT_INSPECT_MODERATION,
-                vendor = CONTENT_INSPECT_VENDOR.CONTENT_INSPECT_VENDOR_AGORA,
-                callbackUrl = "",
-                token = "",
-                frequency = 2
+                interval = 1
             };
             config.moduleCount = 1;
 
@@ -123,16 +118,11 @@ namespace Agora_Plugin.API_Example.examples.basic.ContentInspect
         private void OnStopButtonClick()
         {
             var config = new ContentInspectConfig();
-            config.ContentWorkType = CONTENT_INSPECT_WORK_TYPE.CONTENT_INSPECT_WORK_DEVICE;
-            config.DeviceworkType = CONTENT_INSPECT_DEVICE_TYPE.CONTENT_INSPECT_DEVICE_AGORA;
             config.modules = new ContentInspectModule[1];
             config.modules[0] = new ContentInspectModule
             {
                 type = CONTENT_INSPECT_TYPE.CONTENT_INSPECT_MODERATION,
-                vendor = CONTENT_INSPECT_VENDOR.CONTENT_INSPECT_VENDOR_AGORA,
-                callbackUrl = "",
-                token = "",
-                frequency = 2
+                interval = 1
             };
             config.moduleCount = 1;
 
