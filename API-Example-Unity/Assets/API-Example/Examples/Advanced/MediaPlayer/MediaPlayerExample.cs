@@ -10,7 +10,7 @@ using Logger = Agora.Util.Logger;
 using Random = UnityEngine.Random;
 using System.IO;
 
-namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
 {
     public class MediaPlayerExample : MonoBehaviour
     {

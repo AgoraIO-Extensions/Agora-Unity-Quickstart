@@ -7,7 +7,7 @@ using Agora.Util;
 using Logger = Agora.Util.Logger;
 
 
-namespace Agora_Plugin.API_Example.examples.basic.JoinChannelWithUserAccount
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.JoinChannelWithUserAccount
 {
     public class JoinChannelWithUserAccount : MonoBehaviour
     {

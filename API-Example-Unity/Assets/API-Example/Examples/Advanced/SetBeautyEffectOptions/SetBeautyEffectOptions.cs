@@ -6,7 +6,7 @@ using Agora.Util;
 using Logger = Agora.Util.Logger;
 
 
-namespace Agora_Plugin.API_Example.examples.basic.SetBeautyEffectOptions
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetBeautyEffectOptions
 {
 
     public class SetBeautyEffectOptions : MonoBehaviour

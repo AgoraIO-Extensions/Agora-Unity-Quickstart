@@ -8,7 +8,7 @@ using UnityEngine.Serialization;
 using Logger = Agora.Util.Logger;
 using Random = UnityEngine.Random;
 
-namespace Agora_Plugin.API_Example.examples.advanced.ScreenShareWhileVideoCall
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCall
 {
     public class ScreenShareWhileVideoCall : MonoBehaviour
     {

@@ -9,7 +9,7 @@ using UnityEngine.Serialization;
 using System.Runtime.InteropServices;
 using Logger = Agora.Util.Logger;
 
-namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 {
     public class CustomCaptureAudio : MonoBehaviour
     {

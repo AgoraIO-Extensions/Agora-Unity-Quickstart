@@ -5,7 +5,7 @@ using Agora.Util;
 using UnityEngine.Serialization;
 using Logger = Agora.Util.Logger;
 
-namespace Agora_Plugin.API_Example.examples.advanced.VoiceChanger
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VoiceChanger
 {
 
     public class VoiceChanger : MonoBehaviour

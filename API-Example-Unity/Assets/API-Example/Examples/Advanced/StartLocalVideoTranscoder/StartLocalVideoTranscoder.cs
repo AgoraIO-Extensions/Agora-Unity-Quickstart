@@ -8,7 +8,7 @@ using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Logger = Agora.Util.Logger;
 
-namespace Agora_Plugin.API_Example.examples.advanced.StartLocalVideoTranscoder
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscoder
 {
 
     public class StartLocalVideoTranscoder : MonoBehaviour

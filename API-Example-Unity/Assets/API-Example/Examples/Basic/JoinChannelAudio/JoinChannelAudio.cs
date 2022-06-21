@@ -7,7 +7,7 @@ using UnityEngine.Serialization;
 using Logger = Agora.Util.Logger;
 
 
-namespace Agora_Plugin.API_Example.examples.basic.JoinChannelAudio
+namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
 {
     public class JoinChannelAudio : MonoBehaviour
     {

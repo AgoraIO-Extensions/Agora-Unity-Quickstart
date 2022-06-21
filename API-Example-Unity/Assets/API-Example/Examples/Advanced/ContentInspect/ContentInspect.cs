@@ -5,7 +5,7 @@ using Agora.Rtc;
 using Agora.Util;
 using Logger = Agora.Util.Logger;
 
-namespace Agora_Plugin.API_Example.examples.basic.ContentInspect
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
 {
 
     public class ContentInspect : MonoBehaviour

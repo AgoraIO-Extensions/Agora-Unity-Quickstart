@@ -9,7 +9,7 @@ using Logger = Agora.Util.Logger;
 using System.IO;
 using System;
 
-namespace Agora_Plugin.API_Example.examples.basic.StartRhythmPlayer
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRhythmPlayer
 {
 
     public class StartRhythmPlayer : MonoBehaviour

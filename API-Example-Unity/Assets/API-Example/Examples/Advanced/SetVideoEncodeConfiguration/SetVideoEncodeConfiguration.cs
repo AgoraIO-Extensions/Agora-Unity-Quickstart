@@ -5,7 +5,7 @@ using Agora.Util;
 using UnityEngine.Serialization;
 using Logger = Agora.Util.Logger;
 
-namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetVideoEncodeConfiguration
 {
     public class SetVideoEncodeConfiguration : MonoBehaviour
     {

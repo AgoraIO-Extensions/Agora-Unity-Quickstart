@@ -7,7 +7,7 @@ using Logger = Agora.Util.Logger;
 using System;
 using System.Runtime.InteropServices;
 
-namespace Agora_Plugin.API_Example.examples.advanced.StreamMessage
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StreamMessage
 {
 
     public class StreamMessage : MonoBehaviour

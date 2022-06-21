@@ -7,7 +7,7 @@ using Agora.Util;
 using Logger = Agora.Util.Logger;
 using System.IO;
 
-namespace Agora_Plugin.API_Example.examples.basic.TakeSnapshot
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.TakeSnapshot
 {
 
     public class TakeSnapshot : MonoBehaviour
