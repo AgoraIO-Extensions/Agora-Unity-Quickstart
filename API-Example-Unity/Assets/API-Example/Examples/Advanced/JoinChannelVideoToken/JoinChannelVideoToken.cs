@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using agora.rtc;
-using agora.util;
+using Agora.Rtc;
+using Agora.Util;
 using UnityEngine.Serialization;
-using Logger = agora.util.Logger;
+using Logger = Agora.Util.Logger;
 
 namespace Agora_Plugin.API_Example.examples.advanced.JoinChannelVideoToken
 {
@@ -94,7 +94,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.JoinChannelVideoToken
 
         private void InitEngine()
         {
-            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
