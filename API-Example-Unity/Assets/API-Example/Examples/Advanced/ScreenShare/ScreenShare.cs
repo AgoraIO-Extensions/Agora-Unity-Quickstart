@@ -7,7 +7,7 @@ using Agora.Util;
 using UnityEngine.Serialization;
 using Logger = Agora.Util.Logger;
 
-namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 {
     public class ScreenShare : MonoBehaviour
     {

@@ -6,7 +6,7 @@ using Agora.Util;
 using Logger = Agora.Util.Logger;
 
 
-namespace Agora_Plugin.API_Example.examples.basic.JoinChannelVideo
+namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
 {
     public class JoinChannelVideo : MonoBehaviour
     {

@@ -7,7 +7,7 @@ using Logger = Agora.Util.Logger;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
-namespace Agora_Plugin.API_Example.examples.advanced.RtmpStreaming
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.RtmpStreaming
 {
     public class RtmpStreaming : MonoBehaviour
     {

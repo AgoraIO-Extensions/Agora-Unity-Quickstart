@@ -6,7 +6,7 @@ using Agora.Util;
 using Logger = Agora.Util.Logger;
 using System;
 
-namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetVideoEncodeConfiguration
 {
     public class SpatialAudioWithMediaPlayer : MonoBehaviour
     {

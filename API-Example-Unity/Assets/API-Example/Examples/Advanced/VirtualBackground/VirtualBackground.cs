@@ -6,7 +6,7 @@ using Agora.Util;
 using Logger = Agora.Util.Logger;
 using System.IO;
 
-namespace Agora_Plugin.API_Example.examples.basic.VirtualBackground
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
 {
 
     public class VirtualBackground : MonoBehaviour

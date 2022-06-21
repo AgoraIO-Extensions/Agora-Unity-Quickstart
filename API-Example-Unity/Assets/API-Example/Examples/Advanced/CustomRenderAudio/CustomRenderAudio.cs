@@ -9,7 +9,7 @@ using Agora.Util;
 using System.Runtime.InteropServices;
 using Logger = Agora.Util.Logger;
 
-namespace CustomRenderAudio
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
 {
     public class CustomRenderAudio : MonoBehaviour
     {
