@@ -185,6 +185,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
                     new ScreenCaptureParameters { captureMouseCursor = true, frameRate = 30 });
             }
 #endif
+#endif
         }
 
         private void OnStopShareBtnClick()
