@@ -173,7 +173,7 @@ public class CommandBuild : MonoBehaviour
         BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
         buildPlayerOptions.scenes = GetAllScenes();
         buildPlayerOptions.locationPathName = "../Build/x86_64/x86_64.exe";
-        buildPlayerOptions.target = BuildTarget.StandaloneWindows;
+        buildPlayerOptions.target = BuildTarget.StandaloneWindows64;
         buildPlayerOptions.options = BuildOptions.None;
 
 #if UNITY_2018_4_OR_NEWER
