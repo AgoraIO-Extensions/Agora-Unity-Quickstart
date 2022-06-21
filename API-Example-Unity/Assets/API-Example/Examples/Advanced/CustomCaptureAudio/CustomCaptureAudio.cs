@@ -2,12 +2,12 @@
 using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
-using agora.rtc;
-using agora.util;
+using Agora.Rtc;
+using Agora.Util;
 using RingBuffer;
 using UnityEngine.Serialization;
 using System.Runtime.InteropServices;
-using Logger = agora.util.Logger;
+using Logger = Agora.Util.Logger;
 
 namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
 {
@@ -85,7 +85,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureAudio
 
         private void InitRtcEngine()
         {
-            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
 
             RtcEngineContext context = new RtcEngineContext(_appID, 0,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,

@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
-using agora.rtc;
-using agora.util;
-using Logger = agora.util.Logger;
+using Agora.Rtc;
+using Agora.Util;
+using Logger = Agora.Util.Logger;
 using System;
 
 namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
@@ -85,7 +85,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetVideoEncodeConfiguration
 
         private void InitEngine()
         {
-            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngineEx();
+            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngineEx();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,

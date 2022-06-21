@@ -2,10 +2,10 @@
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using agora.rtc;
-using agora.util;
+using Agora.Rtc;
+using Agora.Util;
 using UnityEngine.Serialization;
-using Logger = agora.util.Logger;
+using Logger = Agora.Util.Logger;
 using Random = UnityEngine.Random;
 
 namespace Agora_Plugin.API_Example.examples.advanced.ScreenShareWhileVideoCall
@@ -111,7 +111,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShareWhileVideoCall
 
         private void InitEngine()
         {
-            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngineEx();
+            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngineEx();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,

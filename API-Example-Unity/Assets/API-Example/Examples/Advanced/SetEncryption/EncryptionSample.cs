@@ -1,10 +1,10 @@
 ﻿using System.Text;
-using agora.rtc;
-using agora.util;
+using Agora.Rtc;
+using Agora.Util;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
-using Logger = agora.util.Logger;
+using Logger = Agora.Util.Logger;
 
 namespace Agora_Plugin.API_Example.examples.advanced.SetEncryption
 {
@@ -71,7 +71,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.SetEncryption
 
         private void InitRtcEngine()
         {
-            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             RtcEngineContext context = new RtcEngineContext(_appID, 0,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
