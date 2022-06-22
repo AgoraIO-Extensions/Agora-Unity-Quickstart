@@ -73,17 +73,23 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            
+
+            var ret = RtcEngine.JoinChannel(_token, _channelName);
+            Debug.Log("JoinChannel returns: " + ret);
+        }
+
+        private void UpdateChannelMediaOptions()
+        {
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.autoSubscribeAudio.SetValue(true);
             options.autoSubscribeVideo.SetValue(true);
             options.publishAudioTrack.SetValue(true);
             options.publishCameraTrack.SetValue(false);
             options.publishScreenTrack.SetValue(true);
-            options.enableAudioRecordingOrPlayout.SetValue(true);
             options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            var ret = RtcEngine.JoinChannel(_token, _channelName, 0, options);
-            Debug.Log("JoinChannel returns: " + ret);
+
+            var ret = RtcEngine.UpdateChannelMediaOptions(options);
+            Debug.Log("UpdateChannelMediaOptions returns: " + ret);
         }
 
         private void InitEngine()
@@ -160,6 +166,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
                     new ScreenCaptureParameters { captureMouseCursor = true, frameRate = 30 });
             }
 #endif
+            UpdateChannelMediaOptions();
         }
 
         private void OnStopShareBtnClick()
