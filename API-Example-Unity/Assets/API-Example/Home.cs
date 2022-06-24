@@ -49,12 +49,13 @@ public class Home : MonoBehaviour
         "SetBeautyEffectOptionsScene",
         "SetEncryptionScene",
         "SetVideoEncodeConfigurationScene",
-        "StartLocalVideoTranscoderScene",
-        "SpatialAudioWithMediaPlayerScene",
+        //"StartLocalVideoTranscoderScene",
+        //"SpatialAudioWithMediaPlayerScene",
+        "StartDirectCdnStreamingScene",
         "StartRhythmPlayerScene",
         "StartRtmpStreamWithTranscodingScene",
         "StreamMessageScene",
-        "TakeSnapshotScene",
+        //"TakeSnapshotScene",
         "VirtualBackgroundScene",
         "VoiceChangerScene"
     };
