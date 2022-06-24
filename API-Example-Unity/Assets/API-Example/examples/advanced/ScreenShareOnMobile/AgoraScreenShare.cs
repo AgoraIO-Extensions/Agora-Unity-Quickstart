@@ -1,12 +1,11 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using agora_gaming_rtc;
 using UnityEngine.UI;
 using System.Runtime.InteropServices;
 using agora_utilities;
 
-public class AgoraScreenShare : MonoBehaviour 
+public class AgoraScreenShare : MonoBehaviour
 {
 
     [SerializeField]
@@ -18,20 +17,24 @@ public class AgoraScreenShare : MonoBehaviour
     [SerializeField]
     public string CHANNEL_NAME = "YOUR_CHANNEL_NAME";
 
-   	public Text LogText;
+    public Text LogText;
+
+    public int BitRate = 2080;
+    public FRAME_RATE FrameRate = FRAME_RATE.FRAME_RATE_FPS_15;
+
     private Logger _logger;
-	public IRtcEngine _rtcEngine = null;
-	private const float _offset = 100;
-	private Texture2D _texture;
-    private Rect _rect;	
+    private IRtcEngine _rtcEngine = null;
+    private const float _offset = 100;
+    private Texture2D _texture;
+    private Rect _rect;
     private WebCamTexture _webCameraTexture;
     public RawImage _rawImage;
-	private Vector2 _cameraSize = new Vector2(640, 480);
-	private int _cameraFPS = 15;
+    private Vector2 _cameraSize = new Vector2(640, 480);
+    private int _cameraFPS = 15;
 
-	// Use this for initialization
-	void Start () 
-	{
+    // Use this for initialization
+    void Start()
+    {
         if (CheckAppId())
         {
             InitCameraDevice();
@@ -39,9 +42,9 @@ public class AgoraScreenShare : MonoBehaviour
             InitEngine();
             JoinChannel();
         }
-	}
+    }
 
-    void Update() 
+    void Update()
     {
         PermissionHelper.RequestMicrophontPermission();
         PermissionHelper.RequestCameraPermission();
@@ -64,10 +67,10 @@ public class AgoraScreenShare : MonoBehaviour
             externalVideoFrame.buffer = bytes;
             externalVideoFrame.stride = (int)_rect.width;
             externalVideoFrame.height = (int)_rect.height;
-            externalVideoFrame.cropLeft = 10;
-            externalVideoFrame.cropTop = 10;
-            externalVideoFrame.cropRight = 10;
-            externalVideoFrame.cropBottom = 10;
+            //externalVideoFrame.cropLeft = 10;
+            //externalVideoFrame.cropTop = 10;
+            //externalVideoFrame.cropRight = 10;
+            //externalVideoFrame.cropBottom = 10;
             externalVideoFrame.rotation = 180;
             externalVideoFrame.timestamp = System.DateTime.Now.Ticks / 10000;
             int a = rtc.PushVideoFrame(externalVideoFrame);
@@ -75,13 +78,23 @@ public class AgoraScreenShare : MonoBehaviour
         }
     }
 
-	void InitEngine()
-	{
+    void InitEngine()
+    {
         _rtcEngine = IRtcEngine.GetEngine(APP_ID);
-		_rtcEngine.SetLogFile("log.txt");
-		_rtcEngine.SetChannelProfile(CHANNEL_PROFILE.CHANNEL_PROFILE_LIVE_BROADCASTING);
-		_rtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-		_rtcEngine.SetExternalVideoSource(true, false);
+        _rtcEngine.SetLogFile("log.txt");
+        _rtcEngine.SetChannelProfile(CHANNEL_PROFILE.CHANNEL_PROFILE_LIVE_BROADCASTING);
+        _rtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+
+        // Set up video encoder so good resolution can be shown, otherwise it is default to 480p
+        _rtcEngine.SetVideoEncoderConfiguration(new VideoEncoderConfiguration
+        {
+            bitrate = BitRate,
+            frameRate = FrameRate,
+            dimensions = new VideoDimensions { width = (int)_rect.width, height = (int)_rect.height }
+        });
+        // Note Agora SDK v3.x only support max resolution 720p encode by default.
+
+        _rtcEngine.SetExternalVideoSource(true, false);
         _rtcEngine.OnJoinChannelSuccess += OnJoinChannelSuccessHandler;
         _rtcEngine.OnLeaveChannel += OnLeaveChannelHandler;
         _rtcEngine.OnWarning += OnSDKWarningHandler;
@@ -89,18 +102,18 @@ public class AgoraScreenShare : MonoBehaviour
         _rtcEngine.OnConnectionLost += OnConnectionLostHandler;
         _rtcEngine.OnUserJoined += OnUserJoinedHandler;
         _rtcEngine.OnUserOffline += OnUserOfflineHandler;
-	}
+    }
 
-	void JoinChannel()
-	{
+    void JoinChannel()
+    {
         _rtcEngine.EnableAudio();
         _rtcEngine.EnableVideo();
         _rtcEngine.EnableVideoObserver();
         int ret = _rtcEngine.JoinChannelByKey(TOKEN, CHANNEL_NAME, "", 0);
-        Debug.Log(string.Format("JoinChannel ret: ${0}", ret));
-	}
+        Debug.Log(string.Format("JoinChannel ret: {0}", ret));
+    }
 
-	bool CheckAppId()
+    bool CheckAppId()
     {
         _logger = new Logger(LogText);
         return _logger.DebugAssert(APP_ID.Length > 10, "Please fill in your appId in Canvas!!!!");
@@ -110,21 +123,23 @@ public class AgoraScreenShare : MonoBehaviour
     {
         _rect = new Rect(0, 0, Screen.width, Screen.height);
         _texture = new Texture2D((int)_rect.width, (int)_rect.height, TextureFormat.RGBA32, false);
+
+        _logger.UpdateLog("_rect = " + _rect);
     }
 
     public void InitCameraDevice()
-    {   
+    {
         WebCamDevice[] devices = WebCamTexture.devices;
         _webCameraTexture = new WebCamTexture(devices[0].name, (int)_cameraSize.x, (int)_cameraSize.y, _cameraFPS);
         _rawImage.texture = _webCameraTexture;
         _webCameraTexture.Play();
     }
-	
-	void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
+
+    void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
     {
-        _logger.UpdateLog(string.Format("sdk version: ${0}", IRtcEngine.GetSdkVersion()));
+        _logger.UpdateLog(string.Format("sdk version: {0}", IRtcEngine.GetSdkVersion()));
         _logger.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", channelName, uid, elapsed));
-     
+
     }
 
     void OnLeaveChannelHandler(RtcStats stats)
@@ -134,13 +149,13 @@ public class AgoraScreenShare : MonoBehaviour
 
     void OnUserJoinedHandler(uint uid, int elapsed)
     {
-        _logger.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+        _logger.UpdateLog(string.Format("OnUserJoined uid: {0} elapsed: {1}", uid, elapsed));
         makeVideoView(uid);
     }
 
     void OnUserOfflineHandler(uint uid, USER_OFFLINE_REASON reason)
     {
-        _logger.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid, (int)reason));
+        _logger.UpdateLog(string.Format("OnUserOffLine uid: {0}, reason: {1}", uid, (int)reason));
         DestroyVideoView(uid);
     }
 
@@ -148,12 +163,12 @@ public class AgoraScreenShare : MonoBehaviour
     {
         _logger.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
     }
-    
+
     void OnSDKErrorHandler(int error, string msg)
     {
         _logger.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
     }
-    
+
     void OnConnectionLostHandler()
     {
         _logger.UpdateLog(string.Format("OnConnectionLost "));
@@ -168,8 +183,8 @@ public class AgoraScreenShare : MonoBehaviour
 
         if (_rtcEngine != null)
         {
-			_rtcEngine.LeaveChannel();
-			_rtcEngine.DisableVideoObserver();
+            _rtcEngine.LeaveChannel();
+            _rtcEngine.DisableVideoObserver();
             IRtcEngine.Destroy();
             _rtcEngine = null;
         }
@@ -200,7 +215,6 @@ public class AgoraScreenShare : MonoBehaviour
             videoSurface.SetForUser(uid);
             videoSurface.SetEnable(true);
             videoSurface.SetVideoSurfaceType(AgoraVideoSurfaceType.RawImage);
-            videoSurface.SetGameFps(30);
         }
     }
 
