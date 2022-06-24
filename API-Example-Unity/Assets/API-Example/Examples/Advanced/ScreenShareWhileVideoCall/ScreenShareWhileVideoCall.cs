@@ -154,7 +154,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
         private void OnStartShareBtnClick()
         {
             if (RtcEngine == null) return;
-            ScreenShareJoinChannel();
+            
 
             if (_startShareBtn != null) _startShareBtn.gameObject.SetActive(false);
             if (_stopShareBtn != null) _stopShareBtn.gameObject.SetActive(true);
@@ -184,6 +184,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
                     new ScreenCaptureParameters { captureMouseCursor = true, frameRate = 30 });
             }
 #endif
+            ScreenShareJoinChannel();
         }
 
         private void OnStopShareBtnClick()
