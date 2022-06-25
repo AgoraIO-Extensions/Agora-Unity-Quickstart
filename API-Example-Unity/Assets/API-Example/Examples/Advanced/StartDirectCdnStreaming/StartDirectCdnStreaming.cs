@@ -90,6 +90,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
         private void StartDirectCdnStreamingCamera()
         {
             DirectCdnStreamingMediaOptions options = new DirectCdnStreamingMediaOptions();
+            options.publishMicrophoneTrack.SetValue(true);
             options.publishCameraTrack.SetValue(true);
             RtcEngine.StartDirectCdnStreaming(PUBLISH_URL, options);
             RtcEngine.SetDirectCdnStreamingVideoConfiguration(new VideoEncoderConfiguration
