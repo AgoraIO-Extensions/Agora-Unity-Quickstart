@@ -89,10 +89,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
 
         private void StartDirectCdnStreamingCamera()
         {
-            DirectCdnStreamingMediaOptions options = new DirectCdnStreamingMediaOptions();
-            options.publishMicrophoneTrack.SetValue(true);
-            options.publishCameraTrack.SetValue(true);
-            RtcEngine.StartDirectCdnStreaming(PUBLISH_URL, options);
             RtcEngine.SetDirectCdnStreamingVideoConfiguration(new VideoEncoderConfiguration
             {
                 dimensions = new VideoDimensions { width = 1280, height = 720 },
@@ -103,6 +99,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
                 codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_H264,
                 mirrorMode = VIDEO_MIRROR_MODE_TYPE.VIDEO_MIRROR_MODE_DISABLED
             });
+            
+            DirectCdnStreamingMediaOptions options = new DirectCdnStreamingMediaOptions();
+            options.publishMicrophoneTrack.SetValue(true);
+            options.publishCameraTrack.SetValue(true);
+            RtcEngine.StartDirectCdnStreaming(PUBLISH_URL, options);
             RtcEngine.StartPreview();
             MakeVideoView(0);
         }
