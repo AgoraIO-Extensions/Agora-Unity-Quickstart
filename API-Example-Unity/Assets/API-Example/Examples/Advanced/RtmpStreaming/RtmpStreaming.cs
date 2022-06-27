@@ -84,64 +84,64 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.RtmpStreaming
 
         private void StartTranscoding(bool ifRemoteUser = false)
         {
-            if (_isStreaming && !ifRemoteUser) return;
-            if (_isStreaming && ifRemoteUser)
-            {
-                RtcEngine.RemovePublishStreamUrl(RTMP_URL);
-            }
+            //if (_isStreaming && !ifRemoteUser) return;
+            //if (_isStreaming && ifRemoteUser)
+            //{
+            //    RtcEngine.RemovePublishStreamUrl(RTMP_URL);
+            //}
 
-            var lt = new LiveTranscoding();
-            lt.videoBitrate = 400;
-            lt.videoCodecProfile = VIDEO_CODEC_PROFILE_TYPE.VIDEO_CODEC_PROFILE_HIGH;
-            lt.videoGop = 30;
-            lt.videoFramerate = 24;
-            lt.lowLatency = false;
-            lt.audioSampleRate = AUDIO_SAMPLE_RATE_TYPE.AUDIO_SAMPLE_RATE_44100;
-            lt.audioBitrate = 48;
-            lt.audioChannels = 1;
-            lt.audioCodecProfile = AUDIO_CODEC_PROFILE_TYPE.AUDIO_CODEC_PROFILE_LC_AAC;
-            //lt.liveStreamAdvancedFeatures = new LiveStreamAdvancedFeature[0];
+            //var lt = new LiveTranscoding();
+            //lt.videoBitrate = 400;
+            //lt.videoCodecProfile = VIDEO_CODEC_PROFILE_TYPE.VIDEO_CODEC_PROFILE_HIGH;
+            //lt.videoGop = 30;
+            //lt.videoFramerate = 24;
+            //lt.lowLatency = false;
+            //lt.audioSampleRate = AUDIO_SAMPLE_RATE_TYPE.AUDIO_SAMPLE_RATE_44100;
+            //lt.audioBitrate = 48;
+            //lt.audioChannels = 1;
+            //lt.audioCodecProfile = AUDIO_CODEC_PROFILE_TYPE.AUDIO_CODEC_PROFILE_LC_AAC;
+            ////lt.liveStreamAdvancedFeatures = new LiveStreamAdvancedFeature[0];
 
-            var localUesr = new TranscodingUser()
-            {
-                uid = 0,
-                x = 0,
-                y = 0,
-                width = 360,
-                height = 640,
-                audioChannel = 0,
-                alpha = 1.0,
-            };
+            //var localUesr = new TranscodingUser()
+            //{
+            //    uid = 0,
+            //    x = 0,
+            //    y = 0,
+            //    width = 360,
+            //    height = 640,
+            //    audioChannel = 0,
+            //    alpha = 1.0,
+            //};
 
-            if (ifRemoteUser)
-            {
-                var remoteUser = new TranscodingUser()
-                {
-                    uid = _remoteUid,
-                    x = 360,
-                    y = 0,
-                    width = 360,
-                    height = 640,
-                    audioChannel = 0,
-                    alpha = 1.0,
-                };
-                lt.userCount = 2;
-                lt.width = 720;
-                lt.height = 640;
-                lt.transcodingUsers = new[] { localUesr, remoteUser };
-            }
-            else
-            {
-                lt.userCount = 1;
-                lt.width = 360;
-                lt.height = 640;
-                lt.transcodingUsers = new[] { localUesr };
-            }
+            //if (ifRemoteUser)
+            //{
+            //    var remoteUser = new TranscodingUser()
+            //    {
+            //        uid = _remoteUid,
+            //        x = 360,
+            //        y = 0,
+            //        width = 360,
+            //        height = 640,
+            //        audioChannel = 0,
+            //        alpha = 1.0,
+            //    };
+            //    lt.userCount = 2;
+            //    lt.width = 720;
+            //    lt.height = 640;
+            //    lt.transcodingUsers = new[] { localUesr, remoteUser };
+            //}
+            //else
+            //{
+            //    lt.userCount = 1;
+            //    lt.width = 360;
+            //    lt.height = 640;
+            //    lt.transcodingUsers = new[] { localUesr };
+            //}
 
-            RtcEngine.SetLiveTranscoding(lt);
+            //RtcEngine.SetLiveTranscoding(lt);
 
-            var rc = RtcEngine.AddPublishStreamUrl(RTMP_URL, true);
-            if (rc == 0) Log.UpdateLog(string.Format("Error in AddPublishStreamUrl: {0}", RTMP_URL));
+            //var rc = RtcEngine.AddPublishStreamUrl(RTMP_URL, true);
+            //if (rc == 0) Log.UpdateLog(string.Format("Error in AddPublishStreamUrl: {0}", RTMP_URL));
         }
 
         private void JoinChannel()
@@ -328,10 +328,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.RtmpStreaming
                 _rtmpStreaming.Log.UpdateLog("OnConnectionLost ");
             }
 
-            public override void OnStreamPublished(string url, int error)
-            {
-                _rtmpStreaming.Log.UpdateLog(string.Format("OnStreamPublished url: {0}, error : {1}", url, error));
-            }
+            //public override void OnStreamPublished(string url, int error)
+            //{
+            //    _rtmpStreaming.Log.UpdateLog(string.Format("OnStreamPublished url: {0}, error : {1}", url, error));
+            //}
 
             public override void OnRtmpStreamingStateChanged(string url, RTMP_STREAM_PUBLISH_STATE state, RTMP_STREAM_PUBLISH_ERROR_TYPE errCode)
             {
