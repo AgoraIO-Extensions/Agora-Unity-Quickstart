@@ -79,7 +79,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
         {
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             RtcEngine.EnableVideo();
-            RtcEngine.SetExternalVideoSource(true, true, EXTERNAL_VIDEO_SOURCE_TYPE.ENCODED_VIDEO_FRAME, new SenderOptions());
+            SenderOptions options = new SenderOptions();
+            options.codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_GENERIC;
+            RtcEngine.SetExternalVideoSource(true, true, EXTERNAL_VIDEO_SOURCE_TYPE.ENCODED_VIDEO_FRAME, options);
 
             var option = new ChannelMediaOptions();
             option.autoSubscribeVideo.SetValue(true);
@@ -190,8 +192,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
                 EncodedVideoFrameInfo encodedVideoFrameInfo = new EncodedVideoFrameInfo()
                 {
                     framesPerSecond = 60,
-                    //dont set codecType = VIDEO_CODEC_GENERIC will crash
-                    codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_GENERIC_H264,
+                    codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_GENERIC,
                     frameType = VIDEO_FRAME_TYPE_NATIVE.VIDEO_FRAME_TYPE_KEY_FRAME
                 };
                 int nRet = this.RtcEngine.PushEncodedVideoImage(data, Convert.ToUInt32(data.Length), encodedVideoFrameInfo);
