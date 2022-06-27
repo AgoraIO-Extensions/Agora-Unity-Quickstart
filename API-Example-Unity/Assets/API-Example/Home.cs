@@ -51,6 +51,7 @@ public class Home : MonoBehaviour
         "SetVideoEncodeConfigurationScene",
         "StartLocalVideoTranscoderScene",
         "SpatialAudioWithMediaPlayerScene",
+        "StartDirectCdnStreamingScene",
         "StartRhythmPlayerScene",
         "StartRtmpStreamWithTranscodingScene",
         "StreamMessageScene",
