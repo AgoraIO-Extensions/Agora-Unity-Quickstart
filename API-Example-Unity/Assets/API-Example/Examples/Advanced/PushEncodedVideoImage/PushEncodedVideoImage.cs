@@ -1,14 +1,14 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using agora.rtc;
-using agora.util;
+using Agora.Rtc;
+using Agora.Util;
 using UnityEngine.Serialization;
-using Logger = agora.util.Logger;
+using Logger = Agora.Util.Logger;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
 {
     public class PushEncodedVideoImage : MonoBehaviour
     {
@@ -65,7 +65,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
 
         private void InitEngine()
         {
-            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
@@ -295,7 +295,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
             _pushEncodedVideoImage = videoSample;
         }
 
-        public override bool OnEncodedVideoFrame(uint uid, IntPtr imageBufferPtr, UInt64 length, EncodedVideoFrameInfo videoEncodedFrameInfo)
+        public override bool OnEncodedVideoFrameReceived(uint uid, IntPtr imageBufferPtr, UInt64 length, EncodedVideoFrameInfo videoEncodedFrameInfo)
         {
             Debug.Log("OnEncodedVideoImageReceived");
             byte[] imageBuffer = new byte[length];

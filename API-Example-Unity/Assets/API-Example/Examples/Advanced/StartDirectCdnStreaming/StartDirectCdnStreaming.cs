@@ -1,14 +1,15 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using Agora.Rtc;
+﻿using Agora.Rtc;
 using Agora.Util;
+using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 using Logger = Agora.Util.Logger;
 
-namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.JoinChannelVideoToken
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
 {
-    public class JoinChannelVideoToken : MonoBehaviour
+    public class StartDirectCdnStreaming : MonoBehaviour
     {
+
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
         private AppIdInput _appIdInput;
@@ -26,40 +27,21 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.JoinChannelVideoToken
         [SerializeField]
         private string _channelName = "";
 
+
+        private const string PUBLISH_URL = "rtmp://push.alexmk.name/live/agora_rtc_unity";
         public Text LogText;
-        private Logger Log;
+        internal Logger Log;
         internal IRtcEngine RtcEngine = null;
 
-        private static string _channelToken = "";
-        private static string _tokenBase = "http://localhost:8080";
-        private CONNECTION_STATE_TYPE _state = CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED;
-
         // Use this for initialization
-        private void Start()
+        void Start()
         {
             LoadAssetData();
             if (CheckAppId())
             {
                 InitEngine();
-                JoinChannel();
-            }
-        }
-
-        private void RenewOrJoinToken(string newToken)
-        {
-            JoinChannelVideoToken._channelToken = newToken;
-            if (_state == CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED
-                || _state == CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED
-                || _state == CONNECTION_STATE_TYPE.CONNECTION_STATE_FAILED
-            )
-            {
-                // If we are not connected yet, connect to the channel as normal
-                JoinChannel();
-            }
-            else
-            {
-                // If we are already connected, we should just update the token
-                UpdateToken();
+                SetProfile();
+                StartDirectCdnStreamingCamera();
             }
         }
 
@@ -68,11 +50,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.JoinChannelVideoToken
         {
             PermissionHelper.RequestMicrophontPermission();
             PermissionHelper.RequestCameraPermission();
-        }
-
-        private void UpdateToken()
-        {
-            RtcEngine.RenewToken(JoinChannelVideoToken._channelToken);
         }
 
         private bool CheckAppId()
@@ -88,7 +65,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.JoinChannelVideoToken
             if (_appIdInput == null) return;
             _appID = _appIdInput.appID;
             _token = _appIdInput.token;
-            _channelToken = _appIdInput.token;
             _channelName = _appIdInput.channelName;
         }
 
@@ -96,26 +72,39 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.JoinChannelVideoToken
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(_appID, 0,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
-            RtcEngine.InitEventHandler(handler);
+            RtcEngine.InitEventHandler(new UserEventHandler(this));
         }
 
-        private void JoinChannel()
+        private void SetProfile()
         {
-            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
-            
-            if (_channelToken.Length == 0)
-            {
-                StartCoroutine(HelperClass.FetchToken(_tokenBase, _channelName, 0, this.RenewOrJoinToken));
-                return;
-            }
+            RtcEngine.SetChannelProfile(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING);
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+        }
 
-            RtcEngine.JoinChannel(_channelToken, _channelName, "");
+        private void StartDirectCdnStreamingCamera()
+        {
+            DirectCdnStreamingMediaOptions options = new DirectCdnStreamingMediaOptions();
+            options.publishMicrophoneTrack.SetValue(true);
+            options.publishCameraTrack.SetValue(true);
+            RtcEngine.StartDirectCdnStreaming(PUBLISH_URL, options);
+            RtcEngine.SetDirectCdnStreamingVideoConfiguration(new VideoEncoderConfiguration
+            {
+                dimensions = new VideoDimensions { width = 1280, height = 720 },
+                frameRate = 30,
+                bitrate = 2260,
+                minBitrate = -1,
+                degradationPreference = DEGRADATION_PREFERENCE.MAINTAIN_QUALITY,
+                codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_H264,
+                mirrorMode = VIDEO_MIRROR_MODE_TYPE.VIDEO_MIRROR_MODE_DISABLED
+            });
+            RtcEngine.StartPreview();
+            MakeVideoView(0);
         }
 
         private void OnDestroy()
@@ -123,7 +112,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.JoinChannelVideoToken
             Debug.Log("OnDestroy");
             if (RtcEngine == null) return;
             RtcEngine.InitEventHandler(null);
-            RtcEngine.LeaveChannel();
+            DestroyVideoView(0);
+            RtcEngine.StopPreview();
+            RtcEngine.StopDirectCdnStreaming();
             RtcEngine.Dispose();
         }
 
@@ -150,7 +141,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.JoinChannelVideoToken
             }
 
             // create a GameObject and assign to this new user
-            VideoSurface videoSurface = MakeImageSurface(uid.ToString());
+            VideoSurface videoSurface = makeImageSurface(uid.ToString());
             if (!ReferenceEquals(videoSurface, null))
             {
                 // configure videoSurface
@@ -175,7 +166,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.JoinChannelVideoToken
         }
 
         // VIDEO TYPE 1: 3D Object
-        public static VideoSurface MakePlaneSurface(string goName)
+        public static VideoSurface makePlaneSurface(string goName)
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
@@ -187,16 +178,18 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.JoinChannelVideoToken
             go.name = goName;
             // set up transform
             go.transform.Rotate(-90.0f, 0.0f, 0.0f);
-            go.transform.position = Vector3.zero;
+            float yPos = Random.Range(3.0f, 5.0f);
+            float xPos = Random.Range(-2.0f, 2.0f);
+            go.transform.position = new Vector3(xPos, yPos, 0f);
             go.transform.localScale = new Vector3(0.25f, 0.5f, .5f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<VideoSurface>();
+            VideoSurface videoSurface = go.AddComponent<VideoSurface>();
             return videoSurface;
         }
 
         // Video TYPE 2: RawImage
-        public static VideoSurface MakeImageSurface(string goName)
+        public static VideoSurface makeImageSurface(string goName)
         {
             GameObject go = new GameObject();
 
@@ -227,84 +220,75 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.JoinChannelVideoToken
             go.transform.localScale = new Vector3(3f, 4f, 1f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<VideoSurface>();
+            VideoSurface videoSurface = go.AddComponent<VideoSurface>();
             return videoSurface;
         }
 
         internal class UserEventHandler : IRtcEngineEventHandler
         {
-            private readonly JoinChannelVideoToken _helloVideoTokenAgora;
+            private readonly StartDirectCdnStreaming _startDirectCdnStreaming;
 
-            internal UserEventHandler(JoinChannelVideoToken helloVideoTokenAgora)
+            internal UserEventHandler(StartDirectCdnStreaming startDirectCdnStreaming)
             {
-                _helloVideoTokenAgora = helloVideoTokenAgora;
-            }
-
-            public override void OnError(int err, string msg)
-            {
-                _helloVideoTokenAgora.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+                _startDirectCdnStreaming = startDirectCdnStreaming;
             }
 
             public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
             {
-                _helloVideoTokenAgora.Log.UpdateLog(string.Format("sdk version: ${0}",
-                    _helloVideoTokenAgora.RtcEngine.GetVersion()));
-                _helloVideoTokenAgora.Log.UpdateLog(
-                    string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
-                        connection.channelId, connection.localUid, elapsed));
-                _helloVideoTokenAgora.Log.UpdateLog(string.Format("New Token: {0}",
-                    JoinChannelVideoToken._channelToken));
-                // HelperClass.FetchToken(tokenBase, channelName, 0, this.RenewOrJoinToken);
-                _helloVideoTokenAgora.MakeVideoView(0);
-            }
-
-            public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
-            {
-                _helloVideoTokenAgora.Log.UpdateLog("OnRejoinChannelSuccess");
+                _startDirectCdnStreaming.Log.UpdateLog(string.Format("sdk version: ${0}",
+                    _startDirectCdnStreaming.RtcEngine.GetVersion()));
+                _startDirectCdnStreaming.Log.UpdateLog(string.Format(
+                    "onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
+                    connection.localUid, elapsed));
+                _startDirectCdnStreaming.MakeVideoView(0);
             }
 
             public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
             {
-                _helloVideoTokenAgora.Log.UpdateLog("OnLeaveChannel");
-                _helloVideoTokenAgora.DestroyVideoView(0);
+                _startDirectCdnStreaming.Log.UpdateLog("OnLeaveChannelSuccess");
+                _startDirectCdnStreaming.DestroyVideoView(0);
             }
 
-            public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole,
-                CLIENT_ROLE_TYPE newRole)
+            public override void OnUserJoined(RtcConnection connection, uint remoteUid, int elapsed)
             {
-                _helloVideoTokenAgora.Log.UpdateLog("OnClientRoleChanged");
+                _startDirectCdnStreaming.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}",
+                    connection.localUid, elapsed));
+                _startDirectCdnStreaming.MakeVideoView(remoteUid, _startDirectCdnStreaming.GetChannelName());
             }
 
-            public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
+            public override void OnUserOffline(RtcConnection connection, uint remoteUid,
+                USER_OFFLINE_REASON_TYPE reason)
             {
-                _helloVideoTokenAgora.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid,
-                    elapsed));
-                _helloVideoTokenAgora.MakeVideoView(uid, _helloVideoTokenAgora.GetChannelName());
-            }
-
-            public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
-            {
-                _helloVideoTokenAgora.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+                _startDirectCdnStreaming.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", remoteUid,
                     (int)reason));
-                _helloVideoTokenAgora.DestroyVideoView(uid);
+                _startDirectCdnStreaming.DestroyVideoView(remoteUid);
             }
 
-            public override void OnTokenPrivilegeWillExpire(RtcConnection connection, string token)
+            public override void OnWarning(int warn, string msg)
             {
-                _helloVideoTokenAgora.StartCoroutine(HelperClass.FetchToken(_tokenBase,
-                    _helloVideoTokenAgora._channelName, 0, _helloVideoTokenAgora.RenewOrJoinToken));
+                _startDirectCdnStreaming.Log.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
             }
 
-            public override void OnConnectionStateChanged(RtcConnection connection, CONNECTION_STATE_TYPE state,
-                CONNECTION_CHANGED_REASON_TYPE reason)
+            public override void OnError(int error, string msg)
             {
-                _helloVideoTokenAgora._state = state;
+                _startDirectCdnStreaming.Log.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
             }
 
             public override void OnConnectionLost(RtcConnection connection)
             {
-                _helloVideoTokenAgora.Log.UpdateLog(string.Format("OnConnectionLost "));
+                _startDirectCdnStreaming.Log.UpdateLog("OnConnectionLost ");
             }
+
+            public override void OnDirectCdnStreamingStateChanged(DIRECT_CDN_STREAMING_STATE state, DIRECT_CDN_STREAMING_ERROR error, string message)
+            {
+                _startDirectCdnStreaming.Log.UpdateLog(string.Format("OnDirectCdnStreamingStateChanged state: {0}, error: {1}", state, error));
+            }
+
+            public override void OnDirectCdnStreamingStats(DirectCdnStreamingStats stats)
+            {
+                _startDirectCdnStreaming.Log.UpdateLog("OnDirectCdnStreamingStats videoHeight:" + stats.videoHeight + " videoWidth:" + stats.videoWidth);
+            }
+
         }
     }
 }

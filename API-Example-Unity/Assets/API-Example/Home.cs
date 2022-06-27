@@ -3,10 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using agora.rtc;
-using agora.util;
+using Agora.Rtc;
+using Agora.Util;
 using UnityEngine.SceneManagement;
-using Logger = agora.util.Logger;
+using Logger = Agora.Util.Logger;
 
 
 public class Home : MonoBehaviour
@@ -51,6 +51,7 @@ public class Home : MonoBehaviour
         "SetVideoEncodeConfigurationScene",
         "StartLocalVideoTranscoderScene",
         "SpatialAudioWithMediaPlayerScene",
+        "StartDirectCdnStreamingScene",
         "StartRhythmPlayerScene",
         "StartRtmpStreamWithTranscodingScene",
         "StreamMessageScene",

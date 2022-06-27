@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
-using agora.rtc;
-using agora.util;
-using Logger = agora.util.Logger;
+using Agora.Rtc;
+using Agora.Util;
+using Logger = Agora.Util.Logger;
 
 
-namespace Agora_Plugin.API_Example.examples.basic.SetBeautyEffectOptions
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetBeautyEffectOptions
 {
 
     public class SetBeautyEffectOptions : MonoBehaviour
@@ -52,6 +52,7 @@ namespace Agora_Plugin.API_Example.examples.basic.SetBeautyEffectOptions
             {
                 SetUpUI();
                 InitEngine();
+                EnableExtension();
                 JoinChannel();
             }
 
@@ -82,7 +83,7 @@ namespace Agora_Plugin.API_Example.examples.basic.SetBeautyEffectOptions
 
         private void InitEngine()
         {
-            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
@@ -95,11 +96,34 @@ namespace Agora_Plugin.API_Example.examples.basic.SetBeautyEffectOptions
         {
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
-            var nRet = RtcEngine.EnableExtension("agora", "beauty", true, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
-            this.Log.UpdateLog("EnableExtension:" + nRet);
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            
             RtcEngine.JoinChannel(_token, _channelName);
+        }
+
+        private void EnableExtension()
+        {
+#if UNITY_EDITOR_WIN && UNITY_64
+            string libPath = Application.dataPath + "/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/x86_64/libagora_video_process_extension.dll";
+            var nRet = RtcEngine.LoadExtensionProvider(libPath);
+            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
+#elif UNITY_STANDALONE_WIN && UNITY_64
+            string libPath = Application.dataPath + "/Plugins/x86_64/libagora_video_process_extension.dll";
+            var nRet = RtcEngine.LoadExtensionProvider(libPath);
+            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
+#elif UNITY_EDITOR_WIN
+            string libPath = Application.dataPath + "/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/x86/libagora_video_process_extension.dll";
+            var nRet = RtcEngine.LoadExtensionProvider(libPath);
+            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
+#elif UNITY_STANDALONE_WIN
+            string libPath = Application.dataPath + "/Plugins/x86/libagora_video_process_extension.dll";
+            var nRet = RtcEngine.LoadExtensionProvider(libPath);
+            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
+#elif UNITY_ANDROID
+            var nRet = RtcEngine.LoadExtensionProvider("agora_video_process_extension");
+            this.Log.UpdateLog("LoadExtensionProvider:" + nRet);
+#endif
+            var Ret = RtcEngine.EnableExtension("agora", "beauty", true, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
+            this.Log.UpdateLog("EnableExtension:" + Ret);
         }
 
         private void SetUpUI()

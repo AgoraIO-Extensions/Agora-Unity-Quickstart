@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
-using agora.rtc;
-using agora.util;
-using Logger = agora.util.Logger;
+using Agora.Rtc;
+using Agora.Util;
+using Logger = Agora.Util.Logger;
 
-namespace Agora_Plugin.API_Example.examples.basic.ContentInspect
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
 {
 
     public class ContentInspect : MonoBehaviour
@@ -71,7 +71,7 @@ namespace Agora_Plugin.API_Example.examples.basic.ContentInspect
 
         private void InitEngine()
         {
-            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
@@ -102,16 +102,11 @@ namespace Agora_Plugin.API_Example.examples.basic.ContentInspect
         private void OnStartButtonClick()
         {
             var config = new ContentInspectConfig();
-            config.ContentWorkType = CONTENT_INSPECT_WORK_TYPE.CONTENT_INSPECT_WORK_DEVICE;
-            config.DeviceworkType = CONTENT_INSPECT_DEVICE_TYPE.CONTENT_INSPECT_DEVICE_AGORA;
             config.modules = new ContentInspectModule[1];
             config.modules[0] = new ContentInspectModule
             {
                 type = CONTENT_INSPECT_TYPE.CONTENT_INSPECT_MODERATION,
-                vendor = CONTENT_INSPECT_VENDOR.CONTENT_INSPECT_VENDOR_AGORA,
-                callbackUrl = "",
-                token = "",
-                frequency = 2
+                interval = 1
             };
             config.moduleCount = 1;
 
@@ -123,16 +118,11 @@ namespace Agora_Plugin.API_Example.examples.basic.ContentInspect
         private void OnStopButtonClick()
         {
             var config = new ContentInspectConfig();
-            config.ContentWorkType = CONTENT_INSPECT_WORK_TYPE.CONTENT_INSPECT_WORK_DEVICE;
-            config.DeviceworkType = CONTENT_INSPECT_DEVICE_TYPE.CONTENT_INSPECT_DEVICE_AGORA;
             config.modules = new ContentInspectModule[1];
             config.modules[0] = new ContentInspectModule
             {
                 type = CONTENT_INSPECT_TYPE.CONTENT_INSPECT_MODERATION,
-                vendor = CONTENT_INSPECT_VENDOR.CONTENT_INSPECT_VENDOR_AGORA,
-                callbackUrl = "",
-                token = "",
-                frequency = 2
+                interval = 1
             };
             config.moduleCount = 1;
 

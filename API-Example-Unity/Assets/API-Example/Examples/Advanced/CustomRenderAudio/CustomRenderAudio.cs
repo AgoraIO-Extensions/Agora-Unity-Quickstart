@@ -4,12 +4,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using RingBuffer;
 using UnityEngine.Serialization;
-using agora.rtc;
-using agora.util;
+using Agora.Rtc;
+using Agora.Util;
 using System.Runtime.InteropServices;
-using Logger = agora.util.Logger;
+using Logger = Agora.Util.Logger;
 
-namespace CustomRenderAudio
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
 {
     public class CustomRenderAudio : MonoBehaviour
     {
@@ -85,7 +85,7 @@ namespace CustomRenderAudio
 
         private void InitRtcEngine()
         {
-            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             //be care, enableAudioDevice need be false
             RtcEngineContext context = new RtcEngineContext(_appID, 0,

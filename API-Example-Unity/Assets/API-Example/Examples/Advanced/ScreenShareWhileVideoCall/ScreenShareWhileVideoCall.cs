@@ -2,13 +2,13 @@
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using agora.rtc;
-using agora.util;
+using Agora.Rtc;
+using Agora.Util;
 using UnityEngine.Serialization;
-using Logger = agora.util.Logger;
+using Logger = Agora.Util.Logger;
 using Random = UnityEngine.Random;
 
-namespace Agora_Plugin.API_Example.examples.advanced.ScreenShareWhileVideoCall
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCall
 {
     public class ScreenShareWhileVideoCall : MonoBehaviour
     {
@@ -111,7 +111,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShareWhileVideoCall
 
         private void InitEngine()
         {
-            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngineEx();
+            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngineEx();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
@@ -154,7 +154,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShareWhileVideoCall
         private void OnStartShareBtnClick()
         {
             if (RtcEngine == null) return;
-            ScreenShareJoinChannel();
+            
 
             if (_startShareBtn != null) _startShareBtn.gameObject.SetActive(false);
             if (_stopShareBtn != null) _stopShareBtn.gameObject.SetActive(true);
@@ -163,6 +163,12 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShareWhileVideoCall
             if (_winIdSelect == null) return;
             var option = _winIdSelect.options[_winIdSelect.value].text;
             if (string.IsNullOrEmpty(option)) return;
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+            var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
+            Log.UpdateLog(string.Format(">>>>> Start sharing {0}", windowId));
+            RtcEngine.StartScreenCaptureByWindowId(ulong.Parse(windowId), default(Rectangle),
+                    default(ScreenCaptureParameters));
+#elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
             if (option.Contains("ScreenCaptureSourceType_Window"))
             {
                 var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
@@ -177,6 +183,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShareWhileVideoCall
                 RtcEngine.StartScreenCaptureByDisplayId(dispId, default(Rectangle),
                     new ScreenCaptureParameters { captureMouseCursor = true, frameRate = 30 });
             }
+#endif
+            ScreenShareJoinChannel();
         }
 
         private void OnStopShareBtnClick()

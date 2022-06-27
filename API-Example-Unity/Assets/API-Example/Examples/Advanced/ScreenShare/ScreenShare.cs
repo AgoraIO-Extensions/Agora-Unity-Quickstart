@@ -2,12 +2,12 @@
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using agora.rtc;
-using agora.util;
+using Agora.Rtc;
+using Agora.Util;
 using UnityEngine.Serialization;
-using Logger = agora.util.Logger;
+using Logger = Agora.Util.Logger;
 
-namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 {
     public class ScreenShare : MonoBehaviour
     {
@@ -39,14 +39,19 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
         // Use this for initialization
         private void Start()
         {
-#if UNITY_IPHONE || UNITY_ANDROID
+#if UNITY_IPHONE 
             this.LogText.text = "ios or Android is not supported, but you could see how it works on the Editor for Windows/MacOS";
 #else
             LoadAssetData();
             if (CheckAppId())
             {
                 InitEngine();
+#if UNITY_ANDROID
+                GameObject.Find("winIdSelect").SetActive(false);
+#else       
                 PrepareScreenCapture();
+#endif
+                EnableUI();
                 JoinChannel();
             }
 #endif
@@ -73,23 +78,36 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            
+
+            var ret = RtcEngine.JoinChannel(_token, _channelName);
+            Debug.Log("JoinChannel returns: " + ret);
+        }
+
+        private void UpdateChannelMediaOptions()
+        {
+
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.autoSubscribeAudio.SetValue(true);
             options.autoSubscribeVideo.SetValue(true);
 
-            //options.publishAudioTrack.SetValue(true);
+           
             options.publishCameraTrack.SetValue(false);
             options.publishScreenTrack.SetValue(true);
-            options.enableAudioRecordingOrPlayout.SetValue(true);
+            
+#if UNITY_ANDROID
+            options.publishScreenCaptureAudio.SetValue(true);
+            options.publishScreenCaptureVideo.SetValue(true);
+#endif
+
             options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            var ret = RtcEngine.JoinChannel(_token, _channelName, 0, options);
-            Debug.Log("JoinChannel returns: " + ret);
+
+            var ret = RtcEngine.UpdateChannelMediaOptions(options);
+            Debug.Log("UpdateChannelMediaOptions returns: " + ret);
         }
 
         private void InitEngine()
         {
-            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
@@ -116,8 +134,13 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
 
             _winIdSelect.AddOptions(info.Select(w =>
                     new Dropdown.OptionData(
-                        string.Format("{0}: {1}-{2} | {3}",w.type, w.sourceName, w.sourceTitle, w.sourceId)))
+                        string.Format("{0}: {1}-{2} | {3}", w.type, w.sourceName, w.sourceTitle, w.sourceId)))
                 .ToList());
+        }
+
+
+        private void EnableUI()
+        {
             _startShareBtn = GameObject.Find("startShareBtn").GetComponent<Button>();
             _stopShareBtn = GameObject.Find("stopShareBtn").GetComponent<Button>();
             if (_startShareBtn != null) _startShareBtn.onClick.AddListener(OnStartShareBtnClick);
@@ -134,11 +157,27 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
 
             if (_startShareBtn != null) _startShareBtn.gameObject.SetActive(false);
             if (_stopShareBtn != null) _stopShareBtn.gameObject.SetActive(true);
-            RtcEngine.StopScreenCapture();
 
+#if UNITY_IPHONE
+            //iPhone not support screen capture       
+#elif UNITY_ANDROID
+            var parameters2 = new ScreenCaptureParameters2();
+            parameters2.captureAudio = true;
+            parameters2.captureVideo = true;
+            var nRet = RtcEngine.StartScreenCapture(parameters2);
+            this.Log.UpdateLog("StartScreenCapture :" + nRet);
+#else
+            RtcEngine.StopScreenCapture();
             if (_winIdSelect == null) return;
             var option = _winIdSelect.options[_winIdSelect.value].text;
             if (string.IsNullOrEmpty(option)) return;
+
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+            var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
+            Log.UpdateLog(string.Format(">>>>> Start sharing {0}", windowId));
+            RtcEngine.StartScreenCaptureByWindowId(ulong.Parse(windowId), default(Rectangle),
+                    default(ScreenCaptureParameters));
+#elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
             if (option.Contains("ScreenCaptureSourceType_Window"))
             {
                 var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
@@ -153,13 +192,24 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
                 RtcEngine.StartScreenCaptureByDisplayId(dispId, default(Rectangle),
                     new ScreenCaptureParameters { captureMouseCursor = true, frameRate = 30 });
             }
+#endif
+
+#endif
+
+            UpdateChannelMediaOptions();
+
         }
 
         private void OnStopShareBtnClick()
         {
             if (_startShareBtn != null) _startShareBtn.gameObject.SetActive(true);
             if (_stopShareBtn != null) _stopShareBtn.gameObject.SetActive(false);
+
+#if UNITY_IPHONE
+            //iPhone do not support screen capture
+#else
             RtcEngine.StopScreenCapture();
+#endif
         }
 
         private void OnDestroy()
@@ -171,7 +221,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
             RtcEngine.Dispose();
         }
 
-      
+
         internal string GetChannelName()
         {
             return _channelName;

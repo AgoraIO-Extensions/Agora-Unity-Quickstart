@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace agora.util
+namespace Agora.Util
 {
     public class UIElementDrag : EventTrigger
     {

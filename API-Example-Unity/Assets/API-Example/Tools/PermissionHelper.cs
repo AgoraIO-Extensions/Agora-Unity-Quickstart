@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Android;
 #endif
 
-namespace agora.util
+namespace Agora.Util
 {
     public class PermissionHelper
     {
