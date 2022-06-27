@@ -1,14 +1,14 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using agora.rtc;
-using agora.util;
+using Agora.Rtc;
+using Agora.Util;
 using UnityEngine.Serialization;
-using Logger = agora.util.Logger;
+using Logger = Agora.Util.Logger;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
 {
     public class PushEncodedVideoImage : MonoBehaviour
     {
@@ -65,7 +65,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
 
         private void InitEngine()
         {
-            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
@@ -79,7 +79,9 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
         {
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             RtcEngine.EnableVideo();
-            RtcEngine.SetExternalVideoSource(true, true, EXTERNAL_VIDEO_SOURCE_TYPE.ENCODED_VIDEO_FRAME, new SenderOptions());
+            SenderOptions options = new SenderOptions();
+            options.codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_GENERIC;
+            RtcEngine.SetExternalVideoSource(true, true, EXTERNAL_VIDEO_SOURCE_TYPE.ENCODED_VIDEO_FRAME, options);
 
             var option = new ChannelMediaOptions();
             option.autoSubscribeVideo.SetValue(true);
@@ -190,8 +192,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.PushEncodedVideoImage
                 EncodedVideoFrameInfo encodedVideoFrameInfo = new EncodedVideoFrameInfo()
                 {
                     framesPerSecond = 60,
-                    //dont set codecType = VIDEO_CODEC_GENERIC will crash
-                    codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_GENERIC_H264,
+                    codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_GENERIC,
                     frameType = VIDEO_FRAME_TYPE_NATIVE.VIDEO_FRAME_TYPE_KEY_FRAME
                 };
                 int nRet = this.RtcEngine.PushEncodedVideoImage(data, Convert.ToUInt32(data.Length), encodedVideoFrameInfo);

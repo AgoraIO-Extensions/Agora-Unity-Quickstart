@@ -1,16 +1,16 @@
 ﻿using System.Collections;
 using UnityEngine;
-using agora.rtc;
+using Agora.Rtc;
 using UnityEngine.UI;
-using agora.util;
+using Agora.Util;
 using UnityEngine.Serialization;
-using Logger = agora.util.Logger;
+using Logger = Agora.Util.Logger;
 
 #if UNITY_2018_1_OR_NEWER
 using Unity.Collections;
 #endif
 
-namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
 {
     public class CustomCaptureVideo : MonoBehaviour
     {
@@ -79,7 +79,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
         private IEnumerator ShareScreen()
         {
             yield return new WaitForEndOfFrame();
-            IRtcEngine rtc = agora.rtc.RtcEngine.Instance;
+            IRtcEngine rtc = Agora.Rtc.RtcEngine.Instance;
             if (rtc != null)
             {
                 _texture.ReadPixels(_rect, 0, 0);
@@ -115,7 +115,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.CustomCaptureVideo
 
         private void InitEngine()
         {
-            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,

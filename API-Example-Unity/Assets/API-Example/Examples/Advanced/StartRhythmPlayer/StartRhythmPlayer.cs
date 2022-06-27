@@ -2,14 +2,14 @@
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using UnityEngine.SceneManagement;
-using agora.rtc;
-using agora.util;
+using Agora.Rtc;
+using Agora.Util;
 
-using Logger = agora.util.Logger;
+using Logger = Agora.Util.Logger;
 using System.IO;
 using System;
 
-namespace Agora_Plugin.API_Example.examples.basic.StartRhythmPlayer
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRhythmPlayer
 {
 
     public class StartRhythmPlayer : MonoBehaviour
@@ -89,7 +89,7 @@ namespace Agora_Plugin.API_Example.examples.basic.StartRhythmPlayer
 
         private void InitEngine()
         {
-            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,

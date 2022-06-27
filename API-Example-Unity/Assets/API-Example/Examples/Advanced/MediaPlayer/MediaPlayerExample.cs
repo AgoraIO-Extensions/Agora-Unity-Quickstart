@@ -4,13 +4,13 @@ using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
-using agora.rtc;
-using agora.util;
-using Logger = agora.util.Logger;
+using Agora.Rtc;
+using Agora.Util;
+using Logger = Agora.Util.Logger;
 using Random = UnityEngine.Random;
 using System.IO;
 
-namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
 {
     public class MediaPlayerExample : MonoBehaviour
     {
@@ -117,7 +117,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.MediaPlayer
 
         private void InitEngine()
         {
-            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,

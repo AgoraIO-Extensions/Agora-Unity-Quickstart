@@ -1,11 +1,11 @@
 using UnityEngine;
 using UnityEngine.UI;
-using agora.rtc;
-using agora.util;
+using Agora.Rtc;
+using Agora.Util;
 using UnityEngine.Serialization;
-using Logger = agora.util.Logger;
+using Logger = Agora.Util.Logger;
 
-namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
 {
     public class AudioMixing : MonoBehaviour
     {
@@ -73,7 +73,7 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
 
         private void InitRtcEngine()
         {
-            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
@@ -112,9 +112,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.AudioMixing
         private void JoinChannel()
         {
             RtcEngine.EnableAudio();
-            var options = new ChannelMediaOptions();
-            options.publishCustomAudioTrack.SetValue(true);
-            RtcEngine.JoinChannel(_token, _channelName, 0, options);
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.JoinChannel(_token, _channelName);
         }
 
         #region -- Test Control logic ---

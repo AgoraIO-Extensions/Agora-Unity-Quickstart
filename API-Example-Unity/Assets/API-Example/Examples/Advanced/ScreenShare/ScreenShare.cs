@@ -2,12 +2,12 @@
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using agora.rtc;
-using agora.util;
+using Agora.Rtc;
+using Agora.Util;
 using UnityEngine.Serialization;
-using Logger = agora.util.Logger;
+using Logger = Agora.Util.Logger;
 
-namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 {
     public class ScreenShare : MonoBehaviour
     {
@@ -73,22 +73,28 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            
+
+            var ret = RtcEngine.JoinChannel(_token, _channelName);
+            Debug.Log("JoinChannel returns: " + ret);
+        }
+
+        private void UpdateChannelMediaOptions()
+        {
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.autoSubscribeAudio.SetValue(true);
             options.autoSubscribeVideo.SetValue(true);
             options.publishAudioTrack.SetValue(true);
             options.publishCameraTrack.SetValue(false);
             options.publishScreenTrack.SetValue(true);
-            options.enableAudioRecordingOrPlayout.SetValue(true);
             options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            var ret = RtcEngine.JoinChannel(_token, _channelName, 0, options);
-            Debug.Log("JoinChannel returns: " + ret);
+
+            var ret = RtcEngine.UpdateChannelMediaOptions(options);
+            Debug.Log("UpdateChannelMediaOptions returns: " + ret);
         }
 
         private void InitEngine()
         {
-            RtcEngine = agora.rtc.RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
@@ -138,6 +144,13 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
             if (_winIdSelect == null) return;
             var option = _winIdSelect.options[_winIdSelect.value].text;
             if (string.IsNullOrEmpty(option)) return;
+
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+            var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
+            Log.UpdateLog(string.Format(">>>>> Start sharing {0}", windowId));
+            RtcEngine.StartScreenCaptureByWindowId(ulong.Parse(windowId), default(Rectangle),
+                    default(ScreenCaptureParameters));
+#elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
             if (option.Contains("ScreenCaptureSourceType_Window"))
             {
                 var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
@@ -152,6 +165,8 @@ namespace Agora_Plugin.API_Example.examples.advanced.ScreenShare
                 RtcEngine.StartScreenCaptureByDisplayId(dispId, default(Rectangle),
                     new ScreenCaptureParameters { captureMouseCursor = true, frameRate = 30 });
             }
+#endif
+            UpdateChannelMediaOptions();
         }
 
         private void OnStopShareBtnClick()
