@@ -92,7 +92,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(_appID, 0, true,
+            RtcEngineContext context = new RtcEngineContext(_appID, 0,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
@@ -173,12 +173,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
             {
                 _agoraVideoRawData = agoraVideoRawData;
             }
-
-            public override void OnWarning(int warn, string msg)
-            {
-                _agoraVideoRawData.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
-            }
-
             public override void OnError(int err, string msg)
             {
                 _agoraVideoRawData.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
@@ -225,10 +219,17 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
         internal class AudioFrameObserver : IAudioFrameObserver
         {
             private readonly ProcessAudioRawData _agoraAudioRawData;
+            private AudioParams _audioParams;
+
 
             internal AudioFrameObserver(ProcessAudioRawData agoraAudioRawData)
             {
                 _agoraAudioRawData = agoraAudioRawData;
+                _audioParams = new AudioParams();
+                _audioParams.sample_rate = 16000;
+                _audioParams.channels = 2;
+                _audioParams.mode = RAW_AUDIO_FRAME_OP_MODE_TYPE.RAW_AUDIO_FRAME_OP_MODE_READ_ONLY;
+                _audioParams.samples_per_call = 1024;
             }
 
             public override bool OnRecordAudioFrame(string channelId, AudioFrame audioFrame)
@@ -254,6 +255,49 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
                 }
                 return true;
             }
+
+         
+            public override AUDIO_FRAME_POSITION GetObservedAudioFramePosition()
+            {
+                Debug.Log("GetObservedAudioFramePosition-----------");
+                return AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_NONE;
+            }
+
+            public override AudioParams GetPlaybackAudioParams()
+            {
+                Debug.Log("GetPlaybackAudioParams-----------");
+                return this._audioParams;
+            }
+
+            public override AudioParams GetRecordAudioParams()
+            {
+                Debug.Log("GetRecordAudioParams-----------");
+                return this._audioParams;
+            }
+
+            public override AudioParams GetMixedAudioParams()
+            {
+                Debug.Log("GetMixedAudioParams-----------");
+                return this._audioParams;
+            }
+
+
+            public override bool OnPlaybackAudioFrameBeforeMixing(string channel_id,
+                                                            uint uid,
+                                                            AudioFrame audio_frame)
+            {
+                Debug.Log("OnPlaybackAudioFrameBeforeMixing-----------");
+                return false;
+            }
+
+            public override bool OnPlaybackAudioFrameBeforeMixing(string channel_id,
+                                                            string uid,
+                                                            AudioFrame audio_frame)
+            {
+                Debug.Log("OnPlaybackAudioFrameBeforeMixing2-----------");
+                return false;
+            }
+
         }
     }
 }

@@ -41,6 +41,7 @@ public class Home : MonoBehaviour
         "JoinChannelWithUserAccountScene",
         "MediaPlayerScene",
         "MetadataScene",
+        "ProcessAudioRawDataScene",
         "ProcessRawDataScene",
         "PushEncodedVideoImageScene",
         "RtmpStreamingScene",
