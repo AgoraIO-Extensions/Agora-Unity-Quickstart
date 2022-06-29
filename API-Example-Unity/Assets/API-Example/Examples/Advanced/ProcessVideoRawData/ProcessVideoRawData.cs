@@ -38,7 +38,45 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
         internal byte[] VideoBuffer = new byte[0];
 
         private int _videoFrameWidth = 1080;
+        public int VideoFrameWidth
+        {
+            set
+            {
+                if (value != _videoFrameWidth)
+                {
+                    _videoFrameWidth = value;
+                    _needResize = true;
+                }
+
+            }
+        
+            get
+            {
+                return _videoFrameWidth;
+            }
+        }
+
         private int _videoFrameHeight = 720;
+        public int VideoFrameHeight
+        {
+            set
+            {
+                if (value != _videoFrameHeight)
+                {
+                    _videoFrameHeight = value;
+                    _needResize = true;
+                }
+
+            }
+
+            get
+            {
+                return _videoFrameHeight;
+
+            }
+        }
+
+        private bool _needResize = false;
         public GameObject VideoView;
         private Texture2D _texture;
         private bool _isTextureAttach = false;
@@ -67,13 +105,19 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
                 rd.texture = _texture;
                 _isTextureAttach = true;
             }
-            else if (VideoBuffer != null && VideoBuffer.Length != 0)
+            else if (VideoBuffer != null && VideoBuffer.Length != 0 && !_needResize)
             {
                 lock (VideoBuffer)
                 {
                     _texture.LoadRawTextureData(VideoBuffer);
                     _texture.Apply();
                 }
+            }
+            else if(_needResize)
+            {
+                _texture.Resize(_videoFrameWidth, _videoFrameHeight);
+                _texture.Apply();
+                _needResize = false;
             }
         }
 
@@ -140,17 +184,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
                 RtcEngine.LeaveChannel();
                 RtcEngine.Dispose();
             }
-        }
-
-        private static float[] ConvertByteToFloat16(byte[] byteArray)
-        {
-            var floatArray = new float[byteArray.Length / 2];
-            for (var i = 0; i < floatArray.Length; i++)
-            {
-                floatArray[i] = System.BitConverter.ToInt16(byteArray, i * 2) / 32768f; // -Int16.MinValue
-            }
-
-            return floatArray;
         }
 
         internal class UserEventHandler : IRtcEngineEventHandler
@@ -223,7 +256,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
             {
                 Debug.Log("OnCaptureVideoFrame-----------" + " width:" + videoFrame.width + " height:" +
                           videoFrame.height);
-
+                _agoraVideoRawData.VideoFrameWidth = videoFrame.width;
+                _agoraVideoRawData.VideoFrameHeight = videoFrame.height;
                 lock (_agoraVideoRawData.VideoBuffer)
                 {
                     _agoraVideoRawData.VideoBuffer = videoFrame.yBuffer;
