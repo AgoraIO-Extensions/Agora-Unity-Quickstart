@@ -54,7 +54,7 @@ EditorBuildSettings:
     path: Assets/API-Example/Examples/Advanced/ProcessAudioRawData/ProcessAudioRawDataScene.unity
     guid: 5bad6ee5650d5460aad18db072946cc3
   - enabled: 1
-    path: Assets/API-Example/Examples/Advanced/ProcessRawData/ProcessRawDataScene.unity
+    path: Assets/API-Example/Examples/Advanced/ProcessVideoRawData/ProcessVideoRawDataScene.unity
     guid: 95956702ec8f74758ac3a0ad4e4c457c
   - enabled: 1
     path: Assets/API-Example/Examples/Advanced/PushEncodedVideoImage/PushEncodedVideoImageScene.unity
