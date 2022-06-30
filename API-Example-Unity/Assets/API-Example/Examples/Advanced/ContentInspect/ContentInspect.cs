@@ -102,9 +102,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
         private void OnStartButtonClick()
         {
             var config = new ContentInspectConfig();
-            config.enable = true;
-            config.DeviceWork = true;
-            config.CloudWork = false;
             config.extraInfo = "";
             config.DeviceworkType = CONTENT_INSPECT_DEVICE_TYPE.CONTENT_INSPECT_DEVICE_AGORA;
             config.modules = new ContentInspectModule[1];
@@ -115,7 +112,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
             };
             config.moduleCount = 1;
 
-            var nRet = RtcEngine.SetContentInspect(config);
+            var nRet = RtcEngine.EnableContentInspect(true, config);
             this.Log.UpdateLog("StartContentInspect: " + nRet);
         }
 
@@ -123,9 +120,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
         private void OnStopButtonClick()
         {
             var config = new ContentInspectConfig();
-            config.enable = false;
-            config.DeviceWork = true;
-            config.CloudWork = false;
             config.extraInfo = "";
             config.DeviceworkType = CONTENT_INSPECT_DEVICE_TYPE.CONTENT_INSPECT_DEVICE_AGORA;
             config.modules = new ContentInspectModule[1];
@@ -136,7 +130,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
             };
             config.moduleCount = 1;
 
-            var nRet = RtcEngine.SetContentInspect(config);
+            var nRet = RtcEngine.EnableContentInspect(false, config);
             this.Log.UpdateLog("StopContentInspect: " + nRet);
         }
 

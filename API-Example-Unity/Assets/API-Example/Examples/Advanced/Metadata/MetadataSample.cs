@@ -309,7 +309,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MetadataSample
 
         public override int GetMaxMetadataSize()
         {
-            return (int)MAX_METADATA_SIZE_TYPE.DEFAULT_METADATA_SIZE_IN_BYTE;
+            return (int)MAX_METADATA_SIZE_TYPE.MAX_METADATA_SIZE_IN_BYTE;
         }
 
         public override bool OnReadyToSendMetadata(ref Metadata metadata, VIDEO_SOURCE_TYPE source_type)

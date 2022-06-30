@@ -110,13 +110,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.TakeSnapshot
             //uid 0 means self. you can get other user uid in OnUserJoined()
             uint uid = 0;
             string filePath = Path.Combine(Application.persistentDataPath, "takeSnapshot.jpg");
-            var config = new SnapShotConfig()
-            {
-                channel = this._channelName,
-                uid = uid,
-                filePath = filePath
-            };
-            int nRet = RtcEngine.TakeSnapshot(config);
+
+            int nRet = RtcEngine.TakeSnapshot(uid, filePath);
             this.Log.UpdateLog("TakeSnapshot nRet: " + nRet);
             this.Log.UpdateLog("TakeSnapshot in " + filePath);
         }
@@ -292,7 +287,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.TakeSnapshot
             TakeSnapshot.DestroyVideoView(uid);
         }
 
-        public override void OnSnapshotTaken(string channel, uint uid, string filePath, int width, int height, int errCode)
+        public override void OnSnapshotTaken(uint uid, string filePath, int width, int height, int errCode)
         {
             _takeSnapshot.Log.UpdateLog(string.Format("OnSnapshotTaken: {0},{1},{2},{3}", filePath, width, height, errCode));
         }
