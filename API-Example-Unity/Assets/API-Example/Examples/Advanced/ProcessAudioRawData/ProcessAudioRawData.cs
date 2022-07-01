@@ -114,7 +114,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
             Debug.Log("OnDestroy");
             if (RtcEngine != null)
             {
-                RtcEngine.UnRegisterVideoFrameObserver();
+                RtcEngine.UnRegisterAudioFrameObserver();
                 RtcEngine.InitEventHandler(null);
                 RtcEngine.LeaveChannel();
                 RtcEngine.Dispose();
