@@ -13,4 +13,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   appID: 
   token: 
-  channelName: 
+  channelName: Unity_Channel
