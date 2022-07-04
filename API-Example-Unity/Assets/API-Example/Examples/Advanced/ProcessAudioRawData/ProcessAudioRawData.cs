@@ -257,10 +257,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
             }
 
          
-            public override AUDIO_FRAME_POSITION GetObservedAudioFramePosition()
+            public override int GetObservedAudioFramePosition()
             {
                 Debug.Log("GetObservedAudioFramePosition-----------");
-                return AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_NONE;
+                return (int)(AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_PLAYBACK |
+                    AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_RECORD |
+                    AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_BEFORE_MIXING |
+                    AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_MIXED);
             }
 
             public override AudioParams GetPlaybackAudioParams()

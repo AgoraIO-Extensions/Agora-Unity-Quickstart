@@ -93,18 +93,22 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
         {
 #if UNITY_EDITOR_WIN && UNITY_64
             string libPath = Application.dataPath + "/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/x86_64/libagora_segmentation_extension.dll";
+            libPath = libPath.Replace('/', '\\');
             var nRet = RtcEngine.LoadExtensionProvider(libPath);
             this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
 #elif UNITY_STANDALONE_WIN && UNITY_64
             string libPath = Application.dataPath + "/Plugins/x86_64/libagora_segmentation_extension.dll";
+            libPath = libPath.Replace('/', '\\');
             var nRet = RtcEngine.LoadExtensionProvider(libPath);
             this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
 #elif UNITY_EDITOR_WIN
             string libPath = Application.dataPath + "/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/x86/libagora_segmentation_extension.dll";
+            libPath = libPath.Replace('/', '\\');
             var nRet = RtcEngine.LoadExtensionProvider(libPath);
             this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
 #elif UNITY_STANDALONE_WIN
             string libPath = Application.dataPath + "/Plugins/x86/libagora_segmentation_extension.dll";
+            libPath = libPath.Replace('/', '\\');
             var nRet = RtcEngine.LoadExtensionProvider(libPath);
             this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
 #elif UNITY_ANDROID
