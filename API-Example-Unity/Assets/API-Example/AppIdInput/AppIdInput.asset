@@ -14,5 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   appID: 
   token: 
-  channelName: 
-  isHomeStart: 0
+  channelName: Unity_Channel
