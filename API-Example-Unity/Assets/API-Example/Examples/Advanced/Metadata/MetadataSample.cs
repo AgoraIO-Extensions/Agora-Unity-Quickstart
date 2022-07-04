@@ -333,7 +333,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MetadataSample
             byte[] strByte = new byte[data.size];
             Marshal.Copy(data.buffer, strByte, 0, (int)data.size);
             string str = System.Text.Encoding.Default.GetString(strByte);
-            _sample.Log.UpdateLog(string.Format("OnMetadataReceived uid:{0} buffer:{1}", data.uid, str));
+            Debug.Log(string.Format("OnMetadataReceived uid:{0} buffer:{1}", data.uid, str));
         }
     }
 

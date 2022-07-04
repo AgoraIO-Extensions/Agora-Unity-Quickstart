@@ -47,7 +47,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             {
                 InitEngine();
                 PrepareScreenCapture();
-                JoinChannel();
             }
 #endif
         }
@@ -74,12 +73,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
 
-            var ret = RtcEngine.JoinChannel(_token, _channelName);
-            Debug.Log("JoinChannel returns: " + ret);
-        }
-
-        private void UpdateChannelMediaOptions()
-        {
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.autoSubscribeAudio.SetValue(true);
             options.autoSubscribeVideo.SetValue(true);
@@ -88,8 +81,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             options.publishScreenTrack.SetValue(true);
             options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
 
-            var ret = RtcEngine.UpdateChannelMediaOptions(options);
-            Debug.Log("UpdateChannelMediaOptions returns: " + ret);
+            var ret = RtcEngine.JoinChannel(_token, _channelName, 0, options);
+            Debug.Log("JoinChannel returns: " + ret);
         }
 
         private void InitEngine()
@@ -166,7 +159,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
                     new ScreenCaptureParameters { captureMouseCursor = true, frameRate = 30 });
             }
 #endif
-            UpdateChannelMediaOptions();
+            JoinChannel();
         }
 
         private void OnStopShareBtnClick()
@@ -174,6 +167,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             if (_startShareBtn != null) _startShareBtn.gameObject.SetActive(true);
             if (_stopShareBtn != null) _stopShareBtn.gameObject.SetActive(false);
             RtcEngine.StopScreenCapture();
+            RtcEngine.LeaveChannel();
         }
 
         private void OnDestroy()
@@ -330,14 +324,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
             _desktopScreenShare.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-            ScreenShare.MakeVideoView(uid, _desktopScreenShare.GetChannelName(), VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE);
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
         {
             _desktopScreenShare.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                 (int)reason));
-            ScreenShare.DestroyVideoView(uid);
         }
     }
 }
