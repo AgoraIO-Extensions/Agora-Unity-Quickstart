@@ -2336,7 +2336,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'SDK Version: 3.8.201.2'
+  m_Text: 'SDK Version: 3.8.202'
 --- !u!222 &2136347559
 CanvasRenderer:
   m_ObjectHideFlags: 0
