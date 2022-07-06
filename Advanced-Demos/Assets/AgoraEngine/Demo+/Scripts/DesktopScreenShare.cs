@@ -110,6 +110,8 @@ public class DesktopScreenShare : PlayerViewControllerBase
 #endif
     }
 
+//changes made by Arjun@agora.io
+//Changed the method from StartScreenCapturebyScreenRect to StartScreenCaptureByDisplayId to allow the screen share on windows OS screens.
     void ShareWinDisplayScreen(int index)
     {
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
@@ -122,8 +124,10 @@ public class DesktopScreenShare : PlayerViewControllerBase
         };
         Debug.Log(string.Format(">>>>> Start sharing display {0}: {1} {2} {3} {4}", index, screenRect.x,
             screenRect.y, screenRect.width, screenRect.height));
-        var ret = mRtcEngine.StartScreenCaptureByScreenRect(screenRect,
-            new Rectangle { x = 0, y = 0, width = 0, height = 0 }, default(ScreenCaptureParameters));
+        // var ret = mRtcEngine.StartScreenCaptureByScreenRect(screenRect,
+        //     new Rectangle { x = 0, y = 0, width = 0, height = 0 }, default(ScreenCaptureParameters));
+        uint displayIDWindows = System.Convert.ToUInt32(index);
+        var ret = mRtcEngine.StartScreenCaptureByDisplayId(displayIDWindows, screenRect, default(ScreenCaptureParameters));
 #endif
     }
 
