@@ -43,6 +43,7 @@ public class DesktopScreenShare : PlayerViewControllerBase
             {
                 foreach (var dpInfo in winDispInfoList)
                 {
+                    Debug.Log("Adding display:" + WinDisplays.Count);
                     WinDisplays.Add(dpInfo.MonitorInfo.monitor);
                 }
             }
@@ -90,7 +91,6 @@ public class DesktopScreenShare : PlayerViewControllerBase
         }
     }
 
-    int displayID0or1 = 0;
     void ShareDisplayScreen()
     {
         ScreenCaptureParameters sparams = new ScreenCaptureParameters
@@ -105,39 +105,9 @@ public class DesktopScreenShare : PlayerViewControllerBase
         mRtcEngine.StartScreenCaptureByDisplayId(MacDisplays[CurrentDisplay], default(Rectangle), sparams); 
         CurrentDisplay = (CurrentDisplay + 1) % MacDisplays.Count;
 #elif UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-        ShareWinDisplayScreen(CurrentDisplay);
+        mRtcEngine.StartScreenCaptureByDisplayId((uint)CurrentDisplay, default(Rectangle), sparams); 
         CurrentDisplay = (CurrentDisplay + 1) % WinDisplays.Count;
 #endif
-    }
-
-    void ShareWinDisplayScreen(int index)
-    {
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-        var screenRect = new Rectangle
-        {
-            x = WinDisplays[index].left,
-            y = WinDisplays[index].top,
-            width = WinDisplays[index].right - WinDisplays[index].left,
-            height = WinDisplays[index].bottom - WinDisplays[index].top
-        };
-        Debug.Log(string.Format(">>>>> Start sharing display {0}: {1} {2} {3} {4}", index, screenRect.x,
-            screenRect.y, screenRect.width, screenRect.height));
-        var ret = mRtcEngine.StartScreenCaptureByScreenRect(screenRect,
-            new Rectangle { x = 0, y = 0, width = 0, height = 0 }, default(ScreenCaptureParameters));
-#endif
-    }
-
-    void TestRectCrop(int order)
-    {
-        // Assuming you have two display monitors, each of 1920x1080, position left to right:
-        Rectangle screenRect = new Rectangle() { x = 0, y = 0, width = 1920 * 2, height = 1080 };
-        Rectangle regionRect = new Rectangle() { x = order * 1920, y = 0, width = 1920, height = 1080 };
-
-        int rc = mRtcEngine.StartScreenCaptureByScreenRect(screenRect,
-            regionRect,
-            default(ScreenCaptureParameters)
-            );
-        if (rc != 0) Debug.LogWarning("rc = " + rc);
     }
 
     void OnShareWindowClick()
