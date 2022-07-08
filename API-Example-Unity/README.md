@@ -70,7 +70,7 @@ Then do the following:
 
     a. From Unity Asset Store download and import [the Agora Video SDK](https://assetstore.unity.com/packages/tools/video/agora-video-chat-sdk-for-unity-134502)
     
-    b. Download the ******Agora Video SDK****** from [Agora.io SDK](https://docs.agora.io/en/Video/downloads?platform=Unity). Unzip the downloaded SDK package and import into Unity project
+    b. Download the ******Agora Video SDK****** from [Agora.io SDK](https://docs.agora.io/en/video-call-4.x-beta/landing-page?platform=Unity). Unzip the downloaded SDK package and import into Unity project
 
 4.  Fill your App ID into the ******API-Example-Unity/Assets/API-Example/appIdInput/AppIdInput.asset****** 
 
@@ -86,9 +86,7 @@ If you have any problems or suggestions regarding the sample projects, feel free
 
 ## Reference
 
-- You can find full API document at [Document Center](https://docs.agora.io/en/Video/API%20Reference/unity/index.html)
-- You can file issues about this demo at [issue](https://github.com/AgoraIO/Voice-Call-for-Mobile-Gaming/issues)
-- For advanced features such as screensharing and transcoding, please refer to [this repo](https://bit.ly/2RRP5tK), which implements [advanced guides](https://docs.agora.io/en/Interactive%20Broadcast/media_relay_unity?platform=Unity) in the documentation.
+- You can find full API document at [Document Center](https://docs-preprod.agora.io/en/live-streaming-standard-4.x-beta/API%20Reference/unity_en/v4.0.0-beta.1/API/rtc_api_data_type.html)
 
 ## Related resources
 
