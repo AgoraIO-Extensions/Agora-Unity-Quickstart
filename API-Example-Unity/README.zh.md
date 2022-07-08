@@ -63,7 +63,7 @@
 
 * 首先在 [Agora.io 注册](https://dashboard.agora.io/cn/signup/) 注册账号，并创建自己的测试项目，获取到 AppID。
 
-* 然后在 [Agora.io SDK](https://docs.agora.io/cn/Agora%20Platform/downloads) 下载 **Unity SDK**，解压后把 sdk 包中的 unitypackage文件导入工程
+* 然后在 [Agora.io SDK](https://docs.agora.io/cn/video-call-4.x-beta/landing-page?platform=Unity) 下载 **Unity SDK**，解压后把 sdk 包中的 unitypackage文件导入工程
 
 * 最后使用 Unity 打开本项目, 将获取到的AppID填入******API-Example-Unity/Assets/API-Example/appIdInput/AppIdInput.asset*****中
 
@@ -77,9 +77,7 @@
 
 ## 参考文档
 
-- 您可以在 [文档中心](https://docs.agora.io/cn/Video/API%20Reference/unity/index.html)找到完整的API文档
-
-- 有关屏幕共享和转码等高级功能，请参阅 [this repo](https://bit.ly/2RRP5tK), 文档 [advanced guides](https://docs.agora.io/en/Interactive%20Broadcast/media_relay_unity?platform=Unity) 
+- 您可以在 [文档中心](https://docs.agora.io/cn/video-call-4.x-beta/API%20Reference/unity_ng/API/rtc_api_overview_ng.html)找到完整的API文档
 
 ## 相关资源
 
