@@ -208,13 +208,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
             this.Log.UpdateLog("Open returns: " + ret);
         }
 
-        private void OnOpenWithCustomSource()
-        {
-            var ret = MediaPlayer.OpenWithCustomSource(0, new UserPlayerCustomDataProvider(this));
-            this.Log.UpdateLog("OpenWithCustomSource" + ret);
-        }
-
-
         private void TestMediaPlayer()
         {
             long duration = 0;
