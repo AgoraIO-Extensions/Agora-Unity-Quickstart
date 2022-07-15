@@ -9,92 +9,95 @@ EditorBuildSettings:
     path: Assets/API-Example/HomeScene.unity
     guid: afbde366e660d4272b8d45e2d7d96f50
   - enabled: 1
-    path: Assets/API-Example/examples/basic/JoinChannelAudio/BasicAudioCallScene.unity
+    path: Assets/API-Example/Examples/Basic/JoinChannelAudio/BasicAudioCallScene.unity
     guid: 1af6c3e08db844534ad959cdf0127444
   - enabled: 1
-    path: Assets/API-Example/examples/basic/JoinChannelVideo/BasicVideoCallScene.unity
+    path: Assets/API-Example/Examples/Basic/JoinChannelVideo/BasicVideoCallScene.unity
     guid: 3f201b178f99f4b41a325391c1b284b8
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/AudioMixing/AudioMixingScene.unity
+    path: Assets/API-Example/Examples/Advanced/AudioMixing/AudioMixingScene.unity
     guid: 8cb5873d5ce2441c58f975843144f122
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/ChannelMediaRelay/ChannelMediaRelayScene.unity
+    path: Assets/API-Example/Examples/Advanced/ChannelMediaRelay/ChannelMediaRelayScene.unity
     guid: 6fe4259f41e8b4ebc9988a4776c0b73f
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/ContentInspect/ContentInspectScene.unity
+    path: Assets/API-Example/Examples/Advanced/ContentInspect/ContentInspectScene.unity
     guid: d3418a868ac044da7bbfcfd80cda8e9f
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/CustomCaptureAudio/CustomCaptureAudioScene.unity
+    path: Assets/API-Example/Examples/Advanced/CustomCaptureAudio/CustomCaptureAudioScene.unity
     guid: b9bb49b57ed774507b9e5d93624c57f6
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/CustomCaptureVideo/CustomCaptureVideoScene.unity
+    path: Assets/API-Example/Examples/Advanced/CustomCaptureVideo/CustomCaptureVideoScene.unity
     guid: fe8f82a41e3634955919d48ad07fbe8e
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/CustomRenderAudio/CustomRenderAudioScene.unity
+    path: Assets/API-Example/Examples/Advanced/CustomRenderAudio/CustomRenderAudioScene.unity
     guid: 41608019a4839450bbb216fbcfcf92e3
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/DeviceManager/DeviceManagerScene.unity
+    path: Assets/API-Example/Examples/Advanced/DeviceManager/DeviceManagerScene.unity
     guid: b2ad0a9d64e7648aab82923c04bdc9ac
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/DualCamera/DualCameraScene.unity
+    path: Assets/API-Example/Examples/Advanced/DualCamera/DualCameraScene.unity
     guid: ac201fe1bea7741e99a36ffc2f2685f6
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/JoinChannelVideoToken/JoinChannelVideoTokenScene.unity
+    path: Assets/API-Example/Examples/Advanced/JoinChannelVideoToken/JoinChannelVideoTokenScene.unity
     guid: 84f4d732120eb41a4934ec95f53c58d7
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/JoinChannelWithUserAccount/JoinChannelWithUserAccountScene.unity
+    path: Assets/API-Example/Examples/Advanced/JoinChannelWithUserAccount/JoinChannelWithUserAccountScene.unity
     guid: 502801de36f36427db552a920ec9ebe1
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/MediaPlayer/MediaPlayerScene.unity
+    path: Assets/API-Example/Examples/Advanced/MediaPlayer/MediaPlayerScene.unity
     guid: 992f3a816b8f149ef914d0779f89ac3a
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/Metadata/MetadataScene.unity
+    path: Assets/API-Example/Examples/Advanced/Metadata/MetadataScene.unity
     guid: becddf48094e546e7aa03d144e6439fd
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/ProcessRawData/ProcessRawDataScene.unity
+    path: Assets/API-Example/Examples/Advanced/ProcessAudioRawData/ProcessAudioRawDataScene.unity
+    guid: 5bad6ee5650d5460aad18db072946cc3
+  - enabled: 1
+    path: Assets/API-Example/Examples/Advanced/ProcessVideoRawData/ProcessVideoRawDataScene.unity
     guid: 95956702ec8f74758ac3a0ad4e4c457c
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/PushEncodedVideoImage/PushEncodedVideoImageScene.unity
+    path: Assets/API-Example/Examples/Advanced/PushEncodedVideoImage/PushEncodedVideoImageScene.unity
     guid: 7a3330e99946a4ef6b4dd2ba142aeb93
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/RtmpStreaming/RtmpStreamingScene.unity
+    path: Assets/API-Example/Examples/Advanced/RtmpStreaming/RtmpStreamingScene.unity
     guid: 306a24989d16a409ead7cc1a7406bf1d
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/ScreenShare/ScreenShareScene.unity
+    path: Assets/API-Example/Examples/Advanced/ScreenShare/ScreenShareScene.unity
     guid: 808bde60265534ed88253e319faab94a
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/ScreenShareWhileVideoCall/ScreenShareWhileVideoCallScene.unity
+    path: Assets/API-Example/Examples/Advanced/ScreenShareWhileVideoCall/ScreenShareWhileVideoCallScene.unity
     guid: fe14a5ceabe1e471c9bdef42d8069bc8
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/SetBeautyEffectOptions/SetBeautyEffectOptionsScene.unity
+    path: Assets/API-Example/Examples/Advanced/SetBeautyEffectOptions/SetBeautyEffectOptionsScene.unity
     guid: 36fd8120d7d7e48abaddc96da3a6cbff
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/SetEncryption/SetEncryptionScene.unity
+    path: Assets/API-Example/Examples/Advanced/SetEncryption/SetEncryptionScene.unity
     guid: ad19d2d806ae74e639ef435f7861382a
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/SetVideoEncodeConfiguration/SetVideoEncodeConfigurationScene.unity
+    path: Assets/API-Example/Examples/Advanced/SetVideoEncodeConfiguration/SetVideoEncodeConfigurationScene.unity
     guid: 5c01eb765ee294766a2926c4d0861fdf
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/SpatialAudioWithMediaPlayer/SpatialAudioWithMediaPlayerScene.unity
+    path: Assets/API-Example/Examples/Advanced/SpatialAudioWithMediaPlayer/SpatialAudioWithMediaPlayerScene.unity
     guid: 86cef631ac3c244318f423dd6eaf47d3
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/StartLocalVideoTranscoder/StartLocalVideoTranscoderScene.unity
+    path: Assets/API-Example/Examples/Advanced/StartLocalVideoTranscoder/StartLocalVideoTranscoderScene.unity
     guid: 48d77a7c2db3043fab75e6063f691cde
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/StartRhythmPlayer/StartRhythmPlayerScene.unity
+    path: Assets/API-Example/Examples/Advanced/StartRhythmPlayer/StartRhythmPlayerScene.unity
     guid: 346412a7123af442c980f394327ebb7f
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/StartRtmpStreamWithTranscoding/StartRtmpStreamWithTranscodingScene.unity
+    path: Assets/API-Example/Examples/Advanced/StartRtmpStreamWithTranscoding/StartRtmpStreamWithTranscodingScene.unity
     guid: c5fb0859bf77346a5ab0a0af50a14231
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/StreamMessage/StreamMessageScene.unity
+    path: Assets/API-Example/Examples/Advanced/StreamMessage/StreamMessageScene.unity
     guid: e5426a5a947d64c998eccdf724c9973e
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/TakeSnapshot/TakeSnapshotScene.unity
+    path: Assets/API-Example/Examples/Advanced/TakeSnapshot/TakeSnapshotScene.unity
     guid: 49d61b9ad1b4d41c0be0f71894bca71e
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/VirtualBackground/VirtualBackgroundScene.unity
+    path: Assets/API-Example/Examples/Advanced/VirtualBackground/VirtualBackgroundScene.unity
     guid: 5b10ad6c190314ef581e0a6b00b6761e
   - enabled: 1
-    path: Assets/API-Example/examples/advanced/VoiceChanger/VoiceChangerScene.unity
+    path: Assets/API-Example/Examples/Advanced/VoiceChanger/VoiceChangerScene.unity
     guid: 5e00dd36388ca4686be1bdf82e52b79d

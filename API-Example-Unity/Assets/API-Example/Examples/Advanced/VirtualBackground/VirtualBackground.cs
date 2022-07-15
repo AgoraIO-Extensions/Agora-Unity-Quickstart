@@ -93,25 +93,29 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
         {
 #if UNITY_EDITOR_WIN && UNITY_64
             string libPath = Application.dataPath + "/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/x86_64/libagora_segmentation_extension.dll";
+            libPath = libPath.Replace('/', '\\');
             var nRet = RtcEngine.LoadExtensionProvider(libPath);
             this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
 #elif UNITY_STANDALONE_WIN && UNITY_64
             string libPath = Application.dataPath + "/Plugins/x86_64/libagora_segmentation_extension.dll";
+            libPath = libPath.Replace('/', '\\');
             var nRet = RtcEngine.LoadExtensionProvider(libPath);
             this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
 #elif UNITY_EDITOR_WIN
             string libPath = Application.dataPath + "/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/x86/libagora_segmentation_extension.dll";
+            libPath = libPath.Replace('/', '\\');
             var nRet = RtcEngine.LoadExtensionProvider(libPath);
             this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
 #elif UNITY_STANDALONE_WIN
             string libPath = Application.dataPath + "/Plugins/x86/libagora_segmentation_extension.dll";
+            libPath = libPath.Replace('/', '\\');
             var nRet = RtcEngine.LoadExtensionProvider(libPath);
             this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
 #elif UNITY_ANDROID
             var nRet = RtcEngine.LoadExtensionProvider("agora_segmentation_extension");
             this.Log.UpdateLog("LoadExtensionProvider:" + nRet);
 #endif
-            var Ret = RtcEngine.EnableExtension("agora_segmentation", "PortraitSegmentation", true, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
+            var Ret = RtcEngine.EnableExtension("agora_video_filters_segmentation", "portrait_segmentation", true, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
             this.Log.UpdateLog("EnableExtension :" + Ret);
         }
 

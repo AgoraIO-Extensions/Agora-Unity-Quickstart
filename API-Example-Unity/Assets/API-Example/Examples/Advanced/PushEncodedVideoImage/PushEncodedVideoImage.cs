@@ -256,13 +256,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
 
 
             //you must set options.encodedFrameOnly = true when you receive other 
-            // VideoSubscriptionOptions options = new VideoSubscriptionOptions
-            // {
-            //     type = VIDEO_STREAM_TYPE.VIDEO_STREAM_HIGH,
-            //     encodedFrameOnly = true
-            // };
-            //int nRet = _pushEncodedVideoImage.mRtcEngine.SetRemoteVideoSubscriptionOptions(uid, options);
-            //_pushEncodedVideoImage.logger.UpdateLog("SetRemoteVideoSubscriptionOptions nRet:" + nRet);
+            VideoSubscriptionOptions options = new VideoSubscriptionOptions();
+            options.encodedFrameOnly.SetValue(true);
+            int nRet = _pushEncodedVideoImage.RtcEngine.SetRemoteVideoSubscriptionOptions(uid, options);
+            _pushEncodedVideoImage.Log.UpdateLog("SetRemoteVideoSubscriptionOptions nRet:" + nRet);
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)

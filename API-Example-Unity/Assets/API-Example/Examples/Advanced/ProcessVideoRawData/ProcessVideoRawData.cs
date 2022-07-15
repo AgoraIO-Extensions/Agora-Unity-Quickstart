@@ -1,15 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
 using Agora.Util;
 using Logger = Agora.Util.Logger;
 
-namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessRawData
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
 {
-    public class ProcessRawData : MonoBehaviour
+    public class ProcessVideoRawData : MonoBehaviour
     {
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
@@ -32,12 +30,64 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessRawData
         private Logger Log;
         private IRtcEngine RtcEngine;
 
+        internal int Count;
+
+        internal int WriteCount;
+        internal int ReadCount;
+
+        internal byte[] VideoBuffer = new byte[0];
+
+        private int _videoFrameWidth = 1080;
+        public int VideoFrameWidth
+        {
+            set
+            {
+                if (value != _videoFrameWidth)
+                {
+                    _videoFrameWidth = value;
+                    _needResize = true;
+                }
+
+            }
+        
+            get
+            {
+                return _videoFrameWidth;
+            }
+        }
+
+        private int _videoFrameHeight = 720;
+        public int VideoFrameHeight
+        {
+            set
+            {
+                if (value != _videoFrameHeight)
+                {
+                    _videoFrameHeight = value;
+                    _needResize = true;
+                }
+
+            }
+
+            get
+            {
+                return _videoFrameHeight;
+
+            }
+        }
+
+        private bool _needResize = false;
+        public GameObject VideoView;
+        private Texture2D _texture;
+        private bool _isTextureAttach = false;
+
 
         void Start()
         {
             LoadAssetData();
             if (CheckAppId())
             {
+                SetUpUI();
                 InitEngine();
                 JoinChannel();
             }
@@ -48,6 +98,27 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessRawData
         {
             PermissionHelper.RequestMicrophontPermission();
             PermissionHelper.RequestCameraPermission();
+
+            if (!_isTextureAttach)
+            {
+                var rd = VideoView.GetComponent<RawImage>();
+                rd.texture = _texture;
+                _isTextureAttach = true;
+            }
+            else if (VideoBuffer != null && VideoBuffer.Length != 0 && !_needResize)
+            {
+                lock (VideoBuffer)
+                {
+                    _texture.LoadRawTextureData(VideoBuffer);
+                    _texture.Apply();
+                }
+            }
+            else if(_needResize)
+            {
+                _texture.Resize(_videoFrameWidth, _videoFrameHeight);
+                _texture.Apply();
+                _needResize = false;
+            }
         }
 
         bool CheckAppId()
@@ -66,6 +137,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessRawData
             _channelName = _appIdInput.channelName;
         }
 
+        void SetUpUI()
+        {
+            var bufferLength = _videoFrameHeight * _videoFrameWidth * 4;
+            _texture = new Texture2D(_videoFrameWidth, _videoFrameHeight, TextureFormat.RGBA32, false);
+            _texture.Apply();
+        }
+
         void InitEngine()
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
@@ -80,10 +158,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessRawData
 
         void JoinChannel()
         {
+            VideoEncoderConfiguration config = new VideoEncoderConfiguration();
+            config.dimensions = new VideoDimensions(_videoFrameWidth, _videoFrameHeight);
+            RtcEngine.SetVideoEncoderConfiguration(config);
+
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
-            RtcEngine.JoinChannel(_token, _channelName, "");
+            RtcEngine.JoinChannel(_token, _channelName);
         }
 
         private void OnDestroy()
@@ -91,6 +173,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessRawData
             Debug.Log("OnDestroy");
             if (RtcEngine != null)
             {
+                if (_texture != null)
+                {
+                    GameObject.Destroy(_texture);
+                    _texture = null;
+                }
+
                 RtcEngine.UnRegisterVideoFrameObserver();
                 RtcEngine.InitEventHandler(null);
                 RtcEngine.LeaveChannel();
@@ -98,14 +186,30 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessRawData
             }
         }
 
+        private static float[] ConvertByteToFloat16(byte[] byteArray)
+        {
+            var floatArray = new float[byteArray.Length / 2];
+            for (var i = 0; i < floatArray.Length; i++)
+            {
+                floatArray[i] = System.BitConverter.ToInt16(byteArray, i * 2) / 32768f; // -Int16.MinValue
+            }
+
+            return floatArray;
+        }
+
         internal class UserEventHandler : IRtcEngineEventHandler
         {
-            private readonly ProcessRawData _agoraVideoRawData;
+            private readonly ProcessVideoRawData _agoraVideoRawData;
 
-            internal UserEventHandler(ProcessRawData agoraVideoRawData)
+            internal UserEventHandler(ProcessVideoRawData agoraVideoRawData)
             {
                 _agoraVideoRawData = agoraVideoRawData;
             }
+
+            //public override void OnWarning(int warn, string msg)
+            //{
+            //    _agoraVideoRawData.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
+            //}
 
             public override void OnError(int err, string msg)
             {
@@ -152,9 +256,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessRawData
 
         internal class VideoFrameObserver : IVideoFrameObserver
         {
-            private readonly ProcessRawData _agoraVideoRawData;
+            private readonly ProcessVideoRawData _agoraVideoRawData;
 
-            internal VideoFrameObserver(ProcessRawData agoraVideoRawData)
+            internal VideoFrameObserver(ProcessVideoRawData agoraVideoRawData)
             {
                 _agoraVideoRawData = agoraVideoRawData;
             }
@@ -163,16 +267,26 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessRawData
             {
                 Debug.Log("OnCaptureVideoFrame-----------" + " width:" + videoFrame.width + " height:" +
                           videoFrame.height);
+                _agoraVideoRawData.VideoFrameWidth = videoFrame.width;
+                _agoraVideoRawData.VideoFrameHeight = videoFrame.height;
+                lock (_agoraVideoRawData.VideoBuffer)
+                {
+                    _agoraVideoRawData.VideoBuffer = videoFrame.yBuffer;
+                }
                 return true;
             }
 
-            public override bool OnRenderVideoFrame(uint uid, VideoFrame videoFrame)
+            public override bool OnRenderVideoFrame(string channelId, uint uid, VideoFrame videoFrame)
             {
                 Debug.Log("OnRenderVideoFrameHandler-----------" + " uid:" + uid + " width:" + videoFrame.width +
                           " height:" + videoFrame.height);
                 return true;
             }
 
+            public override VIDEO_OBSERVER_FRAME_TYPE GetVideoFormatPreference()
+            {
+                return VIDEO_OBSERVER_FRAME_TYPE.FRAME_TYPE_RGBA;
+            }
         }
     }
 }
