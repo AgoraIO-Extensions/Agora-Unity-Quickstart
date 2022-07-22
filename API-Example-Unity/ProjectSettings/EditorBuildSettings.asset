@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/API-Example/HomeScene.unity
     guid: 084e1d83cf0da44d9914c062273cb970
   - enabled: 1
+    path: Assets/API-Example/Examples/Advanced/MusicPlayer/MusicPlayerScene.unity
+    guid: b46889af087d845f4af2ce967803faa6
+  - enabled: 1
     path: Assets/API-Example/Examples/Basic/JoinChannelAudio/BasicAudioCallScene.unity
     guid: 1af6c3e08db844534ad959cdf0127444
   - enabled: 1
