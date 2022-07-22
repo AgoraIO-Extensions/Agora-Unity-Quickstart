@@ -43,11 +43,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
         internal Button PreloadButton;
         internal Button OpenButton;
         internal Button GetLyricButton;
-       
+        internal Button SearchSongButton;
 
-        public string rtmToken;
-        public MusicChartsResult musicChartsResult = null;
-        public MusicListResult musicListResult = null;
+        internal MusicChartsResult musicChartsResult = null;
+        internal MusicListResult musicListResult = null;
 
         private void Start()
         {
@@ -56,6 +55,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             {
                 SetUpUI();
                 InitEngine();
+                EnableExtension();
                 JoinChannelWithMPK();
             }
         }
@@ -70,12 +70,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
         {
             GetMusicChartsButton = GameObject.Find("GetMusicCharts").GetComponent<Button>();
             GetMusicChartsButton.onClick.AddListener(OnGetMusicChartsButtonClick);
-            GetMusicChartsButton.gameObject.SetActive(false); 
+            GetMusicChartsButton.gameObject.SetActive(false);
 
             GetMusicChartButton = GameObject.Find("GetMusicChart").GetComponent<Button>();
             GetMusicChartButton.onClick.AddListener(OnGetMusicChartButtonClick);
             GetMusicChartButton.gameObject.SetActive(false);
-
 
             PreloadButton = GameObject.Find("Preload").GetComponent<Button>();
             PreloadButton.onClick.AddListener(OnPreloadButtonClick);
@@ -89,9 +88,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             GetLyricButton.onClick.AddListener(OnGetLyricButtonClick);
             GetLyricButton.gameObject.SetActive(false);
 
+            SearchSongButton = GameObject.Find("SearchSong").GetComponent<Button>();
+            SearchSongButton.onClick.AddListener(OnSearchSongButtonClick);
+            SearchSongButton.gameObject.SetActive(false);
+
         }
 
-      
+
         private bool CheckAppId()
         {
             Log = new Logger(LogText);
@@ -105,6 +108,17 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
 
+            var appId = "695752b975654e44bea00137d084c71c";
+            var rtmToken = "006695752b975654e44bea00137d084c71cIABeSzqxEMqi3KHh56IJ6W93gaJeVV5AOO1NDJ46yIWWCgAAAADSY0iICgAGoU4C0EXaYgAA";
+            uint uid = 123;
+            MusicContentCenter = RtcEngine.GetMusicContentCenter();
+            AgoraMusicContentCenterConfiguration config = new AgoraMusicContentCenterConfiguration(appId, rtmToken, uid);
+            var Ret = MusicContentCenter.Initialize(config);
+            this.Log.UpdateLog("MusicContentCenter.Initialize: " + Ret);
+            MusicContentCenter.RegisterEventHandler(new UserMusicContentCenterEventHandler(this));
+            MusicPlayer = MusicContentCenter.CreateMusicPlayer();
+
+
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.autoSubscribeAudio.SetValue(true);
             options.autoSubscribeVideo.SetValue(true);
@@ -113,6 +127,20 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             options.publishMediaPlayerAudioTrack.SetValue(true);
             options.publishMediaPlayerVideoTrack.SetValue(true);
             options.enableAudioRecordingOrPlayout.SetValue(true);
+            if (MusicPlayer != null)
+            {
+                options.publishMediaPlayerId.SetValue(MusicPlayer.GetId());
+                this.Log.UpdateLog("MusicPlayer id:" + MusicPlayer.GetId());
+
+                MusicPlayer.InitEventHandler(new MpkEventHandler(this));
+            }
+            else
+            {
+                this.Log.UpdateLog("MusicPlayer failed");
+            }
+
+
+
             options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             var ret = RtcEngine.JoinChannel(_token, _channelName, 0, options);
             this.Log.UpdateLog("RtcEngineController JoinChannel_MPK returns: " + ret);
@@ -137,27 +165,55 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
+            var logPath = Application.persistentDataPath + "/rtc.log";
+            RtcEngine.SetLogFile(logPath);
+            this.Log.UpdateLog(logPath);
         }
 
-        public void InitMusicPlayer(UInt64 uid)
-        {
-            MusicContentCenter = RtcEngine.GetMusicContentCenter();
-            AgoraMusicContentCenterConfiguration config = new AgoraMusicContentCenterConfiguration(_appID, rtmToken, uid);
-            MusicContentCenter.Initialize(config);
-            MusicContentCenter.RegisterEventHandler(new UserMusicContentCenterEventHandler(this));
+        //public void InitMusicPlayer()
+        //{
+        //    //rtm appid and uid and token 
+        //    var appId = "695752b975654e44bea00137d084c71c";
+        //    var rtmToken = "006695752b975654e44bea00137d084c71cIABeSzqxEMqi3KHh56IJ6W93gaJeVV5AOO1NDJ46yIWWCgAAAADSY0iICgAGoU4C0EXaYgAA";
+        //    uint uid = 123;
+        //    MusicContentCenter = RtcEngine.GetMusicContentCenter();
+        //    AgoraMusicContentCenterConfiguration config = new AgoraMusicContentCenterConfiguration(appId, rtmToken, uid);
+        //    var Ret = MusicContentCenter.Initialize(config);
+        //    this.Log.UpdateLog("MusicContentCenter.Initialize: " + Ret);
+        //    MusicContentCenter.RegisterEventHandler(new UserMusicContentCenterEventHandler(this));
 
-            MusicPlayer = MusicContentCenter.CreateMusicPlayer();
-            ChannelMediaOptions options = new ChannelMediaOptions();
-            options.publishMediaPlayerId.SetValue(MusicPlayer.GetId());
-            var ret = RtcEngine.UpdateChannelMediaOptions(options);
-            this.Log.UpdateLog("UpdateChannelMediaOptions ret:" + ret);
+        //    MusicPlayer = MusicContentCenter.CreateMusicPlayer();
+        //    if (MusicPlayer != null)
+        //    {
 
-        }
+        //        ChannelMediaOptions options = new ChannelMediaOptions();
+        //        //options.autoSubscribeAudio.SetValue(true);
+        //        //options.autoSubscribeVideo.SetValue(true);
+        //        //options.publishAudioTrack.SetValue(false);
+        //        //options.publishCameraTrack.SetValue(false);
+        //        //options.publishMediaPlayerAudioTrack.SetValue(true);
+        //        //options.publishMediaPlayerVideoTrack.SetValue(true);
+        //        //options.enableAudioRecordingOrPlayout.SetValue(true);
+        //        options.publishMediaPlayerId.SetValue(MusicPlayer.GetId());
+        //        this.Log.UpdateLog("UpdateChannelMediaOptions before");
+        //        var ret = RtcEngine.UpdateChannelMediaOptions(options);
+        //        this.Log.UpdateLog("UpdateChannelMediaOptions ret:" + ret);
+
+        //        MusicPlayer.InitEventHandler(new MpkEventHandler(this));
+        //        this.Log.UpdateLog("MusicPlayerId: " + MusicPlayer.GetId());
+        //    }
+        //    else
+        //    {
+        //        this.Log.UpdateLog("CreateMusicPlayer Failed");
+        //    }
+        //}
 
         void OnGetMusicChartsButtonClick()
         {
-            var ret = MusicContentCenter.GetMusicCharts("1");
+            string requestId = "";
+            var ret = MusicContentCenter.GetMusicCharts(ref requestId);
             this.Log.UpdateLog("GetMusicCharts: " + ret);
+            this.Log.UpdateLog("requestId: " + requestId);
         }
 
         void OnGetMusicChartButtonClick()
@@ -168,9 +224,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
                 return;
             }
 
-            MusicChartsType chartType = this.musicChartsResult.musicChart[0];
-            var ret = MusicContentCenter.GetMusicChart("2", chartType.id, 3, 5, "");
+            MusicChartsType chartType = this.musicChartsResult.type[0];
+            string requestId = "";
+            var ret = MusicContentCenter.GetMusicChart(ref requestId, chartType.id, 0, 10, "");
             this.Log.UpdateLog("GetMusicChart: " + ret);
+            this.Log.UpdateLog("requestId: " + requestId);
         }
 
         void OnPreloadButtonClick()
@@ -182,7 +240,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             }
 
             Music music = this.musicListResult.music[0];
-            var ret = MusicContentCenter.Preload(music.songCode, AgoraMediaType.AgoraMediaType_mv, "");
+            var ret = MusicContentCenter.Preload(music.songCode, AgoraMediaType.AgoraMediaType_audio, "");
             this.Log.UpdateLog("Preload: " + ret);
         }
 
@@ -195,10 +253,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             }
 
             Music music = this.musicListResult.music[0];
-            var ret = MusicContentCenter.IsPreloaded(music.songCode, AgoraMediaType.AgoraMediaType_mv, "");
+            var ret = MusicContentCenter.IsPreloaded(music.songCode, AgoraMediaType.AgoraMediaType_audio, "");
             this.Log.UpdateLog("IsPreloaded: " + ret);
 
-            ret = MusicPlayer.Open(music.songCode, AgoraMediaType.AgoraMediaType_mv, "", 0);
+            ret = MusicPlayer.Open(music.songCode, AgoraMediaType.AgoraMediaType_audio, "", 0);
             this.Log.UpdateLog("MusicPlayer.Open: " + ret);
 
             MusicPlayerExample.MakeVideoView((uint)MusicPlayer.GetId(), "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_MEDIA_PLAYER);
@@ -213,8 +271,61 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             }
 
             Music music = this.musicListResult.music[0];
-            var ret = MusicContentCenter.GetLyric("3", music.songCode, 0);
+            string requestId = "";
+            var ret = MusicContentCenter.GetLyric(ref requestId, music.songCode, 0);
             this.Log.UpdateLog("GetLyric: " + ret);
+            this.Log.UpdateLog("requestId: " + requestId);
+        }
+
+
+        void OnSearchSongButtonClick()
+        {
+            string requestId = "";
+            var nRet = MusicContentCenter.SearchSong(ref requestId, "周杰伦", 0, 10, "");
+            this.Log.UpdateLog("SearchSong: " + nRet);
+            this.Log.UpdateLog("requestId: " + requestId);
+        }
+
+        private void EnableExtension()
+        {
+#if UNITY_EDITOR_WIN && UNITY_64
+            string libPath = Application.dataPath + "/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/x86_64/agora_drm_loader.dll";
+             libPath = libPath.Replace('/', '\\');
+            var nRet = RtcEngine.LoadExtensionProvider(libPath);
+            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
+#elif UNITY_STANDALONE_WIN && UNITY_64
+            string libPath = Application.dataPath + "/Plugins/x86_64/agora_drm_loader.dll";
+             libPath = libPath.Replace('/', '\\');
+            var nRet = RtcEngine.LoadExtensionProvider(libPath);
+            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
+#elif UNITY_EDITOR_WIN
+            string libPath = Application.dataPath + "/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/x86/agora_drm_loader.dll";
+             libPath = libPath.Replace('/', '\\');
+            var nRet = RtcEngine.LoadExtensionProvider(libPath);
+            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
+#elif UNITY_STANDALONE_WIN
+            string libPath = Application.dataPath + "/Plugins/x86/agora_drm_loader.dll";
+             libPath = libPath.Replace('/', '\\');
+            var nRet = RtcEngine.LoadExtensionProvider(libPath);
+            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
+#elif UNITY_ANDROID
+            var nRet = RtcEngine.LoadExtensionProvider("agora_drm_loader");
+            this.Log.UpdateLog("LoadExtensionProvider:" + nRet);
+#endif
+        }
+
+        private void OnDestroy()
+        {
+            Debug.Log("OnDestroy");
+            if (RtcEngine == null) return;
+
+            if (MusicPlayer != null)
+                MusicContentCenter.DestroyMusicPlayer(MusicPlayer);
+
+            RtcEngine.InitEventHandler(null);
+            RtcEngine.LeaveChannel();
+            RtcEngine.Dispose();
+            RtcEngine = null;
         }
 
         internal static void MakeVideoView(uint uid, string channelId = "", VIDEO_SOURCE_TYPE videoSourceType = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA)
@@ -334,8 +445,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             _sample.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                     connection.channelId, connection.localUid, elapsed));
-            _sample.InitMusicPlayer(connection.localUid);
-          
+           
+            _sample.GetMusicChartsButton.gameObject.SetActive(true);
 
         }
 
@@ -391,6 +502,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             Debug.Log(str);
 
             this._sample.GetMusicChartButton.gameObject.SetActive(true);
+            this._sample.SearchSongButton.gameObject.SetActive(true);
             this._sample.musicChartsResult = result;
         }
 
@@ -401,24 +513,63 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             Debug.Log(str);
 
             this._sample.PreloadButton.gameObject.SetActive(true);
+            this._sample.OpenButton.gameObject.SetActive(true);
+            this._sample.GetLyricButton.gameObject.SetActive(true);
+
             this._sample.musicListResult = result;
-           
+
         }
 
         public override void OnPreLoadEvent(long songCode, int percent, PreloadStatusCode status, string msg, string lyricUrl)
         {
-            this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} status:{2}, msg:{3}, string:{4}", songCode, percent, status, msg, lyricUrl));
+            Debug.Log("OnPreLoadEvent percent:" + percent);
             if (status == PreloadStatusCode.PreloadStatusCode_ok)
             {
+                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} status:{2}, msg:{3}, string:{4}", songCode, percent, status, msg, lyricUrl));
+
                 this._sample.OpenButton.gameObject.SetActive(true);
                 this._sample.GetLyricButton.gameObject.SetActive(true);
             }
             else if (status == PreloadStatusCode.PreloadStatusCode_err)
             {
+                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} status:{2}, msg:{3}, string:{4}", songCode, percent, status, msg, lyricUrl));
+
                 this._sample.Log.UpdateLog("PreLoad Error, Please click PreLoad Button again");
             }
         }
 
 
     }
+
+    internal class MpkEventHandler : IMediaPlayerSourceObserver
+    {
+        private readonly MusicPlayerExample _sample;
+
+        internal MpkEventHandler(MusicPlayerExample sample)
+        {
+            _sample = sample;
+        }
+
+        public override void OnPlayerSourceStateChanged(MEDIA_PLAYER_STATE state, MEDIA_PLAYER_ERROR ec)
+        {
+            _sample.Log.UpdateLog(string.Format(
+                "OnPlayerSourceStateChanged state: {0}, ec: {1}, playId: {2}", state, ec, _sample.MusicPlayer.GetId()));
+            Debug.Log("OnPlayerSourceStateChanged");
+            if (state == MEDIA_PLAYER_STATE.PLAYER_STATE_OPEN_COMPLETED)
+            {
+                _sample.MusicPlayer.Play();
+                //_sample.Log.UpdateLog("Open Complete. Click start to play media");
+            }
+            else if (state == MEDIA_PLAYER_STATE.PLAYER_STATE_STOPPED)
+            {
+
+            }
+        }
+
+        public override void OnPlayerEvent(MEDIA_PLAYER_EVENT @event, Int64 elapsedTime, string message)
+        {
+            _sample.Log.UpdateLog(string.Format("OnPlayerEvent state: {0}", @event));
+        }
+    }
+
 }
