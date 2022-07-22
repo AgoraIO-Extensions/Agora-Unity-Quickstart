@@ -108,8 +108,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
 
-            var appId = "695752b975654e44bea00137d084c71c";
-            var rtmToken = "006695752b975654e44bea00137d084c71cIABeSzqxEMqi3KHh56IJ6W93gaJeVV5AOO1NDJ46yIWWCgAAAADSY0iICgAGoU4C0EXaYgAA";
+            var appId = "appid";
+            var rtmToken = "rtmToken";
             uint uid = 123;
             MusicContentCenter = RtcEngine.GetMusicContentCenter();
             AgoraMusicContentCenterConfiguration config = new AgoraMusicContentCenterConfiguration(appId, rtmToken, uid);
