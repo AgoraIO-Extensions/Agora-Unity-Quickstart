@@ -444,13 +444,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
             _sample = sample;
         }
 
-        public override Int64 OnSeek(Int64 offset, int whence, int playerId)
+        public override Int64 OnSeek(Int64 offset, int whence)
         {
             Debug.Log("UserPlayerCustomDataProvider OnSeek");
             return 0;
         }
 
-        public override int OnReadData(IntPtr bufferPtr, int bufferSize, int playerId)
+        public override int OnReadData(IntPtr bufferPtr, int bufferSize)
         {
             Debug.Log("UserPlayerCustomDataProvider OnReadData");
             return 0;

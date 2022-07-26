@@ -122,7 +122,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
         {
             Debug.Log("Playing with " + (_urlToggle.isOn ? "URL" : "local file"));
 
-            var ret = RtcEngine.StartAudioMixing(_urlToggle.isOn ? Sound_URL : _localPath, _loopbackToggle.isOn, false, -1);
+            var ret = RtcEngine.StartAudioMixing(_urlToggle.isOn ? Sound_URL : _localPath, _loopbackToggle.isOn, 1);
             Debug.Log("StartAudioMixing returns: " + ret);
         }
 
