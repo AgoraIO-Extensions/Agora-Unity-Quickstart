@@ -172,12 +172,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             var option = _winIdSelect.options[_winIdSelect.value].text;
             if (string.IsNullOrEmpty(option)) return;
 
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-            var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
-            Log.UpdateLog(string.Format(">>>>> Start sharing {0}", windowId));
-            RtcEngine.StartScreenCaptureByWindowId(ulong.Parse(windowId), default(Rectangle),
-                    default(ScreenCaptureParameters));
-#elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
+//#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+//            var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
+//            Log.UpdateLog(string.Format(">>>>> Start sharing {0}", windowId));
+//            RtcEngine.StartScreenCaptureByWindowId(ulong.Parse(windowId), default(Rectangle),
+//                    default(ScreenCaptureParameters));
+//#elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
             if (option.Contains("ScreenCaptureSourceType_Window"))
             {
                 var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
@@ -192,7 +192,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
                 RtcEngine.StartScreenCaptureByDisplayId(dispId, default(Rectangle),
                     new ScreenCaptureParameters { captureMouseCursor = true, frameRate = 30 });
             }
-#endif
+//#endif
 
 #endif
 
@@ -210,6 +210,35 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 #else
             RtcEngine.StopScreenCapture();
 #endif
+        }
+
+        private void EnableExtension()
+        {
+#if UNITY_EDITOR_WIN && UNITY_64
+            string libPath = Application.dataPath + "/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/x86_64/libagora_screen_capture_extension.dll";
+            libPath = libPath.Replace('/', '\\');
+            var nRet = RtcEngine.LoadExtensionProvider(libPath);
+            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
+#elif UNITY_STANDALONE_WIN && UNITY_64
+            string libPath = Application.dataPath + "/Plugins/x86_64/libagora_screen_capture_extension.dll";
+            libPath = libPath.Replace('/', '\\');
+            var nRet = RtcEngine.LoadExtensionProvider(libPath);
+            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
+#elif UNITY_EDITOR_WIN
+            string libPath = Application.dataPath + "/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/x86/libagora_screen_capture_extension.dll";
+            libPath = libPath.Replace('/', '\\');
+            var nRet = RtcEngine.LoadExtensionProvider(libPath);
+            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
+#elif UNITY_STANDALONE_WIN
+            string libPath = Application.dataPath + "/Plugins/x86/libagora_screen_capture_extension.dll";
+            libPath = libPath.Replace('/', '\\');
+            var nRet = RtcEngine.LoadExtensionProvider(libPath);
+            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
+#elif UNITY_ANDROID
+            //var nRet = RtcEngine.LoadExtensionProvider("agora_video_process_extension");
+            //this.Log.UpdateLog("LoadExtensionProvider:" + nRet);
+#endif
+           
         }
 
         private void OnDestroy()

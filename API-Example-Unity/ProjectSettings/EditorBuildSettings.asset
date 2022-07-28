@@ -81,6 +81,9 @@ EditorBuildSettings:
     path: Assets/API-Example/Examples/Advanced/SpatialAudioWithMediaPlayer/SpatialAudioWithMediaPlayerScene.unity
     guid: 86cef631ac3c244318f423dd6eaf47d3
   - enabled: 1
+    path: Assets/API-Example/Examples/Advanced/StartDirectCdnStreaming/StartDirectCdnStreamingScene.unity
+    guid: 3fd0564918e57416dbfd67a6db145893
+  - enabled: 1
     path: Assets/API-Example/Examples/Advanced/StartLocalVideoTranscoder/StartLocalVideoTranscoderScene.unity
     guid: 48d77a7c2db3043fab75e6063f691cde
   - enabled: 1

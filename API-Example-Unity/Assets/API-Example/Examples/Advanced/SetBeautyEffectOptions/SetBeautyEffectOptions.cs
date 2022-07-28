@@ -52,7 +52,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetBeautyEffectOptions
             {
                 SetUpUI();
                 InitEngine();
-                EnableExtension();
+                InitLogFilePath();
+                //EnableExtension();
                 JoinChannel();
             }
 
@@ -128,6 +129,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetBeautyEffectOptions
 #endif
             var Ret = RtcEngine.EnableExtension("agora", "beauty", true, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
             this.Log.UpdateLog("EnableExtension:" + Ret);
+        }
+
+        private void InitLogFilePath()
+        {
+            var path = Application.persistentDataPath + "/rtc.log";
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+             path = path.Replace('/', '\\');
+#endif
+            var nRet = RtcEngine.SetLogFile(path);
+            this.Log.UpdateLog(string.Format("logPath:{0},nRet:{1}", path, nRet));
         }
 
         private void SetUpUI()
