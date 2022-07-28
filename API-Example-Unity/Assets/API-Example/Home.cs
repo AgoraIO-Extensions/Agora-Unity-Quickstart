@@ -30,6 +30,7 @@ public class Home : MonoBehaviour
 
     private string[] _advancedNameList = {
         "AudioMixingScene",
+        "AudioSpectrumScene",
         "ChannelMediaRelayScene",
         "ContentInspectScene",
         "CustomCaptureAudioScene",
@@ -40,6 +41,7 @@ public class Home : MonoBehaviour
         "JoinChannelVideoTokenScene",
         "JoinChannelWithUserAccountScene",
         "MediaPlayerScene",
+        "MediaRecorderScene",
         "MetadataScene",
         "ProcessAudioRawDataScene",
         "ProcessVideoRawDataScene",

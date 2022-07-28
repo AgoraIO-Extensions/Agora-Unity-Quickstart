@@ -19,6 +19,7 @@ public class CommandBuild : MonoBehaviour
             "Assets/API-Example/Examples/Basic/JoinChannelAudio/BasicAudioCallScene.unity",
 
             "Assets/API-Example/Examples/Advanced/AudioMixing/AudioMixingScene.unity",
+            "Assets/API-Example/Examples/Advanced/AudioSpectrum/AudioSpectrumScene.unity",
             "Assets/API-Example/Examples/Advanced/ChannelMediaRelay/ChannelMediaRelayScene.unity",
             "Assets/API-Example/Examples/Advanced/ContentInspect/ContentInspectScene.unity",
             "Assets/API-Example/Examples/Advanced/CustomCaptureAudio/CustomCaptureAudioScene.unity",
@@ -29,6 +30,7 @@ public class CommandBuild : MonoBehaviour
             "Assets/API-Example/Examples/Advanced/JoinChannelVideoToken/JoinChannelVideoTokenScene.unity",
             "Assets/API-Example/Examples/Advanced/JoinChannelWithUserAccount/JoinChannelWithUserAccountScene.unity",
             "Assets/API-Example/Examples/Advanced/MediaPlayer/MediaPlayerScene.unity",
+            "Assets/API-Example/Examples/Advanced/MediaRecorder/MediaRecorderScene.unity",
             "Assets/API-Example/Examples/Advanced/Metadata/MetadataScene.unity",
             "Assets/API-Example/Examples/Advanced/ProcessAudioRawData/ProcessAudioRawDataScene.unity",
             "Assets/API-Example/Examples/Advanced/ProcessVideoRawData/ProcessVideoRawDataScene.unity",
@@ -40,6 +42,7 @@ public class CommandBuild : MonoBehaviour
             "Assets/API-Example/Examples/Advanced/SetEncryption/SetEncryptionScene.unity",
             "Assets/API-Example/Examples/Advanced/SetVideoEncodeConfiguration/SetVideoEncodeConfigurationScene.unity",
             "Assets/API-Example/Examples/Advanced/SpatialAudioWithMediaPlayer/SpatialAudioWithMediaPlayerScene.unity",
+            "Assets/API-Example/Examples/Advanced/StartDirectCdnStreaming/StartDirectCdnStreamingScene.unity",
             "Assets/API-Example/Examples/Advanced/StartLocalVideoTranscoder/StartLocalVideoTranscoderScene.unity",
             "Assets/API-Example/Examples/Advanced/StartRhythmPlayer/StartRhythmPlayerScene.unity",
             "Assets/API-Example/Examples/Advanced/StartRtmpStreamWithTranscoding/StartRtmpStreamWithTranscodingScene.unity",

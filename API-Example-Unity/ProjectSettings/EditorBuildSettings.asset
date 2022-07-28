@@ -18,6 +18,9 @@ EditorBuildSettings:
     path: Assets/API-Example/Examples/Advanced/AudioMixing/AudioMixingScene.unity
     guid: 8cb5873d5ce2441c58f975843144f122
   - enabled: 1
+    path: Assets/API-Example/Examples/Advanced/AudioSpectrum/AudioSpectrumScene.unity
+    guid: e7f9d4a77dbeb41539e70c7a152c663b
+  - enabled: 1
     path: Assets/API-Example/Examples/Advanced/ChannelMediaRelay/ChannelMediaRelayScene.unity
     guid: 6fe4259f41e8b4ebc9988a4776c0b73f
   - enabled: 1
@@ -47,6 +50,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/API-Example/Examples/Advanced/MediaPlayer/MediaPlayerScene.unity
     guid: 992f3a816b8f149ef914d0779f89ac3a
+  - enabled: 1
+    path: Assets/API-Example/Examples/Advanced/MediaRecorder/MediaRecorderScene.unity
+    guid: 0af7980e500ce43a8b758b586053fd37
   - enabled: 1
     path: Assets/API-Example/Examples/Advanced/Metadata/MetadataScene.unity
     guid: becddf48094e546e7aa03d144e6439fd
