@@ -92,6 +92,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(new UserEventHandler(this));
+            RtcEngine.SetDefaultAudioRouteToSpeakerphone(true);
         }
 
         private void SetExternalAudioSource()

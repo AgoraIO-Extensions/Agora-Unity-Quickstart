@@ -83,7 +83,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
 
         private void EnableExtension()
         {
-#elif UNITY_ANDROID
+#if UNITY_ANDROID
             var nRet = RtcEngine.LoadExtensionProvider("agora_content_inspect_extension");
             this.Log.UpdateLog("LoadExtensionProvider:" + nRet);
 #endif
