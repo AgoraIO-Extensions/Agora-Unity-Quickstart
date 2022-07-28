@@ -40,6 +40,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
             if (CheckAppId())
             {
                 InitEngine();
+                EnableExtension();
                 JoinChannel();
                 SetupUI();
             }
@@ -78,6 +79,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
+        }
+
+        private void EnableExtension()
+        {
+#elif UNITY_ANDROID
+            var nRet = RtcEngine.LoadExtensionProvider("agora_content_inspect_extension");
+            this.Log.UpdateLog("LoadExtensionProvider:" + nRet);
+#endif
+            var Ret = RtcEngine.EnableExtension("agora_custom_content_inspect", "agora_content_inspect_io_agora", true, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
+            this.Log.UpdateLog("EnableExtension:" + Ret);
         }
 
         private void JoinChannel()

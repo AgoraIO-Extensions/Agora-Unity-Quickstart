@@ -40,7 +40,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
         private void Start()
         {
 #if UNITY_IPHONE 
-            this.LogText.text = "ios or Android is not supported, but you could see how it works on the Editor for Windows/MacOS";
+            this.LogText.text = "ios is not supported, but you could see how it works on the Editor for Windows/MacOS/Android";
 #else
             LoadAssetData();
             if (CheckAppId())
@@ -48,6 +48,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
                 InitEngine();
 #if UNITY_ANDROID
                 GameObject.Find("winIdSelect").SetActive(false);
+                var Ret = RtcEngine.LoadExtensionProvider("agora_screen_capture_extension");
+                this.Log.UpdateLog("LoadExtensionProvider:" + Ret);
 #else       
                 PrepareScreenCapture();
 #endif
