@@ -493,17 +493,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
 
         public override bool OnLocalAudioSpectrum(AudioSpectrumData data)
         {
-            if (s)
-            {
-               
-                Debug.Log("OnLocalAudioSpectrum");
-                Debug.Log(AgoraJson.ToJson(data));
-                //Debug.Log(data.audioSpectrumData[1]);
-                //Debug.Log(data.audioSpectrumData[2]);
-                //Debug.Log(data.audioSpectrumData[3]);
-                s = false;
-            }
-
             if (data.dataLength > 0)
             {
                 lock (this._sample.data)

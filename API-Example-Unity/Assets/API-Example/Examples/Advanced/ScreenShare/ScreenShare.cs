@@ -172,27 +172,22 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             var option = _winIdSelect.options[_winIdSelect.value].text;
             if (string.IsNullOrEmpty(option)) return;
 
-//#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-//            var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
-//            Log.UpdateLog(string.Format(">>>>> Start sharing {0}", windowId));
-//            RtcEngine.StartScreenCaptureByWindowId(ulong.Parse(windowId), default(Rectangle),
-//                    default(ScreenCaptureParameters));
-//#elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
             if (option.Contains("ScreenCaptureSourceType_Window"))
             {
                 var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
                 Log.UpdateLog(string.Format(">>>>> Start sharing {0}", windowId));
-                RtcEngine.StartScreenCaptureByWindowId(ulong.Parse(windowId), default(Rectangle),
+                var nRet= RtcEngine.StartScreenCaptureByWindowId(ulong.Parse(windowId), default(Rectangle),
                         default(ScreenCaptureParameters));
+                this.Log.UpdateLog("StartScreenCaptureByWindowId:" + nRet);
             }
             else
             {
                 var dispId = uint.Parse(option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1]);
                 Log.UpdateLog(string.Format(">>>>> Start sharing display {0}", dispId));
-                RtcEngine.StartScreenCaptureByDisplayId(dispId, default(Rectangle),
+                var nRet = RtcEngine.StartScreenCaptureByDisplayId(dispId, default(Rectangle),
                     new ScreenCaptureParameters { captureMouseCursor = true, frameRate = 30 });
+                this.Log.UpdateLog("StartScreenCaptureByDisplayId:" + nRet);
             }
-//#endif
 
 #endif
 

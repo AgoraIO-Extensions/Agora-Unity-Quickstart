@@ -107,7 +107,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
             _audioBuffer = new RingBuffer<byte>(bufferLength, true);
             _startConvertSignal = true;
 
-            _pushAudioFrameThreadSignal = true;
             _pushAudioFrameThread = new Thread(PushAudioFrameThread);
             _pushAudioFrameThread.Start();
         }
