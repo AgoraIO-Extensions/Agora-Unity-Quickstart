@@ -79,7 +79,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
         {
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             RtcEngine.EnableVideo();
-            RtcEngine.SetExternalVideoSource(true, true, EXTERNAL_VIDEO_SOURCE_TYPE.ENCODED_VIDEO_FRAME, new SenderOptions());
+
+            SenderOptions senderOptions = new SenderOptions();
+            senderOptions.codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_GENERIC;
+            RtcEngine.SetExternalVideoSource(true, true, EXTERNAL_VIDEO_SOURCE_TYPE.ENCODED_VIDEO_FRAME, senderOptions);
 
             var option = new ChannelMediaOptions();
             option.autoSubscribeVideo.SetValue(true);
@@ -191,7 +194,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
                 {
                     framesPerSecond = 60,
                     //dont set codecType = VIDEO_CODEC_GENERIC will crash
-                    codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_GENERIC_H264,
+                    codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_GENERIC,
                     frameType = VIDEO_FRAME_TYPE_NATIVE.VIDEO_FRAME_TYPE_KEY_FRAME
                 };
                 int nRet = this.RtcEngine.PushEncodedVideoImage(data, Convert.ToUInt32(data.Length), encodedVideoFrameInfo);
@@ -284,7 +287,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
 
     internal class VideoEncodedImageReceiver : IVideoEncodedFrameObserver
     {
-
         private readonly PushEncodedVideoImage _pushEncodedVideoImage;
 
         internal VideoEncodedImageReceiver(PushEncodedVideoImage videoSample)
@@ -294,13 +296,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
 
         public override bool OnEncodedVideoFrameReceived(uint uid, IntPtr imageBufferPtr, UInt64 length, EncodedVideoFrameInfo videoEncodedFrameInfo)
         {
-            Debug.Log("OnEncodedVideoImageReceived");
             byte[] imageBuffer = new byte[length];
             Marshal.Copy(imageBufferPtr, imageBuffer, 0, (int)length);
             string str = System.Text.Encoding.Default.GetString(imageBuffer);
             var pos = JsonUtility.FromJson<Vector3>(str);
             var uidStr = uid.ToString();
-
+            Debug.Log("OnEncodedVideoImageReceived" + uid + " pos" + str);
             //this called is not in Unity MainThread.we need push data in this dic. And read it in Update()
             lock (_pushEncodedVideoImage.RolePositionDic)
             {
