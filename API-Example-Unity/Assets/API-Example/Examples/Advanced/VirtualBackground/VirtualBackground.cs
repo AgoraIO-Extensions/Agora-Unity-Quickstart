@@ -40,8 +40,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
             if (CheckAppId())
             {
                 InitEngine();
+                InitLogFilePath();
                 SetupUI();
-                EnableExtension();
+                //EnableExtension();
                 JoinChannel();
             }
         }
@@ -117,6 +118,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
 #endif
             var Ret = RtcEngine.EnableExtension("agora_video_filters_segmentation", "portrait_segmentation", true, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
             this.Log.UpdateLog("EnableExtension :" + Ret);
+        }
+
+        private void InitLogFilePath()
+        {
+            var path = Application.persistentDataPath + "/rtc.log";
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+             path = path.Replace('/', '\\');
+#endif
+            var nRet = RtcEngine.SetLogFile(path);
+            this.Log.UpdateLog(string.Format("logPath:{0},nRet:{1}", path, nRet));
         }
 
         private void SetupUI()

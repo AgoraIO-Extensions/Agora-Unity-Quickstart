@@ -133,7 +133,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            RtcEngine.StartPreview(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_TRANSCODED);
             MakeVideoView(0, "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_TRANSCODED);
 
             var options = new ChannelMediaOptions();
@@ -335,8 +334,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
             var conf = this.GenerateLocalTranscoderConfiguration();
             var nRet = RtcEngine.StartLocalVideoTranscoder(conf);
             this.Log.UpdateLog("StartLocalVideoTranscoder:" + nRet);
-        }
 
+            var options = new ChannelMediaOptions();
+            options.publishCameraTrack.SetValue(false);
+            options.publishSecondaryCameraTrack.SetValue(false);
+            options.publishTrancodedVideoTrack.SetValue(true);
+            RtcEngine.UpdateChannelMediaOptions(options);
+        }
 
         private void OnUpdateButtonPress()
         {
@@ -520,7 +524,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
         }
     }
 
-
     internal class MpkEventHandler : IMediaPlayerSourceObserver
     {
         private readonly StartLocalVideoTranscoder _sample;
@@ -546,8 +549,4 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
             _sample.Log.UpdateLog(string.Format("OnPlayerEvent state: {0}", @event));
         }
     }
-
-
-
-
 }

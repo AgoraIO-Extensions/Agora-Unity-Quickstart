@@ -1,15 +1,19 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
 using Agora.Util;
 using Logger = Agora.Util.Logger;
+using Random = UnityEngine.Random;
+using System.IO;
 
-namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
 {
-
-    public class ContentInspect : MonoBehaviour
-    {
+	public class MediaRecorder : MonoBehaviour
+	{
 
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
@@ -31,7 +35,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
         public Text LogText;
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
+        internal IMediaPlayer MediaPlayer = null;
+        internal RtcConnection SelfConnection = null;
+        internal IMediaRecorder Recorder = null;
 
+        private Button _button1;
+        private Button _button2;
+   
 
         // Use this for initialization
         private void Start()
@@ -39,10 +49,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
             LoadAssetData();
             if (CheckAppId())
             {
+                SetUpUI();
+                EnableUI(false);
                 InitEngine();
-                EnableExtension();
                 JoinChannel();
-                SetupUI();
             }
         }
 
@@ -51,6 +61,30 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
         {
             PermissionHelper.RequestMicrophontPermission();
             PermissionHelper.RequestCameraPermission();
+        }
+
+        private void SetUpUI()
+        {
+            _button1 = GameObject.Find("Button1").GetComponent<Button>();
+            _button1.onClick.AddListener(OnStartButtonPress);
+            _button2 = GameObject.Find("Button2").GetComponent<Button>();
+            _button2.onClick.AddListener(OnStopButtonPress);
+            
+        }
+
+        public void EnableUI(bool val)
+        {
+            var obj = this.transform.Find("Button1").gameObject;
+            obj.SetActive(val);
+
+            obj = this.transform.Find("Button2").gameObject;
+            obj.SetActive(val);
+        }
+
+        private bool CheckAppId()
+        {
+            Log = new Logger(LogText);
+            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
         //Show data in AgoraBasicProfile
@@ -63,32 +97,22 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
             _channelName = _appIdInput.channelName;
         }
 
-
-        private bool CheckAppId()
-        {
-            Log = new Logger(LogText);
-            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
-        }
-
         private void InitEngine()
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0,
-                                        CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
-                                        AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
+                CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
+                AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
         }
 
-        private void EnableExtension()
+        internal void InitMediaRecorder()
         {
-#if UNITY_ANDROID
-            var nRet = RtcEngine.LoadExtensionProvider("agora_content_inspect_extension");
-            this.Log.UpdateLog("LoadExtensionProvider:" + nRet);
-#endif
-            var Ret = RtcEngine.EnableExtension("agora_custom_content_inspect", "agora_content_inspect_io_agora", true, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
-            this.Log.UpdateLog("EnableExtension:" + Ret);
+            Recorder = RtcEngine.GetMediaRecorder();
+            var nRet = Recorder.SetMediaRecorderObserver(SelfConnection, new MediaRecorderObserver(this));
+            this.Log.UpdateLog("SetMediaRecorderObserver:" + nRet);
         }
 
         private void JoinChannel()
@@ -96,66 +120,54 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            RtcEngine.JoinChannel(_token, _channelName);
+
+            ChannelMediaOptions options = new ChannelMediaOptions();
+            options.autoSubscribeAudio.SetValue(true);
+            options.autoSubscribeVideo.SetValue(true);
+            options.publishCameraTrack.SetValue(true);
+            options.publishMicrophoneTrack.SetValue(true);
+            options.enableAudioRecordingOrPlayout.SetValue(true);
+            options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            var ret = RtcEngine.JoinChannel(_token, _channelName, 0, options);
+
+            this.Log.UpdateLog("RtcEngineController JoinChannel_MPK returns: " + ret);
         }
 
-        private void SetupUI()
+        private void OnStartButtonPress()
         {
-            var ui = this.transform.Find("UI");
-
-            var btn = ui.Find("StartButton").GetComponent<Button>();
-            btn.onClick.AddListener(OnStartButtonClick);
-
-            btn = ui.Find("StopButton").GetComponent<Button>();
-            btn.onClick.AddListener(OnStopButtonClick);
+            var config = new MediaRecorderConfiguration();
+            config.storagePath = Application.persistentDataPath + "/record.mp4";
+            config.recorderInfoUpdateInterval = 5;
+            var nRet = Recorder.StartRecording(this.SelfConnection, config);
+            this.Log.UpdateLog("StartRecording:" + nRet);
+            this.Log.UpdateLog("storagePath: " + config.storagePath);
         }
 
-        private void OnStartButtonClick()
+        private void OnStopButtonPress()
         {
-            var config = new ContentInspectConfig();
-            config.modules = new ContentInspectModule[1];
-            config.modules[0] = new ContentInspectModule
-            {
-                type = CONTENT_INSPECT_TYPE.CONTENT_INSPECT_MODERATION,
-                interval = 1
-            };
-            config.moduleCount = 1;
-
-            var nRet = RtcEngine.EnableContentInspect(true, config);
-            this.Log.UpdateLog("StartContentInspect: " + nRet);
+            var nRet = Recorder.StopRecording(this.SelfConnection);
+            this.Log.UpdateLog("StopRecording:" + nRet);
         }
 
-
-        private void OnStopButtonClick()
-        {
-            var config = new ContentInspectConfig();
-            config.modules = new ContentInspectModule[1];
-            config.modules[0] = new ContentInspectModule
-            {
-                type = CONTENT_INSPECT_TYPE.CONTENT_INSPECT_MODERATION,
-                interval = 1
-            };
-            config.moduleCount = 1;
-
-            var nRet = RtcEngine.EnableContentInspect(false, config);
-            this.Log.UpdateLog("StopContentInspect: " + nRet);
-        }
-
+    
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
             if (RtcEngine == null) return;
+
             RtcEngine.InitEventHandler(null);
             RtcEngine.LeaveChannel();
             RtcEngine.Dispose();
+            RtcEngine = null;
         }
+
 
         internal string GetChannelName()
         {
             return _channelName;
         }
 
-        internal static void MakeVideoView(uint uid, string channelId = "")
+        internal static void MakeVideoView(uint uid, string channelId = "", VIDEO_SOURCE_TYPE videoSourceType = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA)
         {
             var go = GameObject.Find(uid.ToString());
             if (!ReferenceEquals(go, null))
@@ -167,14 +179,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
             var videoSurface = MakeImageSurface(uid.ToString());
             if (ReferenceEquals(videoSurface, null)) return;
             // configure videoSurface
-            if (uid == 0)
-            {
-                videoSurface.SetForUser(uid, channelId);
-            }
-            else
-            {
-                videoSurface.SetForUser(uid, channelId, VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE);
-            }
+            videoSurface.SetForUser(uid, channelId, videoSourceType);
+            videoSurface.SetEnable(true);
 
             videoSurface.OnTextureSizeModify += (int width, int height) =>
             {
@@ -182,12 +188,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
                 videoSurface.transform.localScale = new Vector3(-5, 5 * scale, 1);
                 Debug.Log("OnTextureSizeModify: " + width + "  " + height);
             };
-
-            videoSurface.SetEnable(true);
         }
 
         // VIDEO TYPE 1: 3D Object
-        private static VideoSurface MakePlaneSurface(string goName)
+        private VideoSurface MakePlaneSurface(string goName)
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
@@ -199,10 +203,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
             go.name = goName;
             // set up transform
             go.transform.Rotate(-90.0f, 0.0f, 0.0f);
-            var yPos = Random.Range(3.0f, 5.0f);
-            var xPos = Random.Range(-2.0f, 2.0f);
             go.transform.position = Vector3.zero;
-            go.transform.localScale = new Vector3(0.25f, 0.5f, 0.5f);
+            go.transform.localScale = new Vector3(1.0f, 1.333f, 0.5f);
 
             // configure videoSurface
             var videoSurface = go.AddComponent<VideoSurface>();
@@ -238,7 +240,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
             // set up transform
             go.transform.Rotate(0f, 0.0f, 180.0f);
             go.transform.localPosition = Vector3.zero;
-            go.transform.localScale = new Vector3(2f, 3f, 1f);
+            go.transform.localScale = new Vector3(4.5f, 3f, 1f);
 
             // configure videoSurface
             var videoSurface = go.AddComponent<VideoSurface>();
@@ -255,11 +257,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
         }
     }
 
+  
+
     internal class UserEventHandler : IRtcEngineEventHandler
     {
-        private readonly ContentInspect _sample;
+        private readonly MediaRecorder _sample;
 
-        internal UserEventHandler(ContentInspect sample)
+        internal UserEventHandler(MediaRecorder sample)
         {
             _sample = sample;
         }
@@ -271,14 +275,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            Debug.Log("Agora: OnJoinChannelSuccess ");
             _sample.Log.UpdateLog(string.Format("sdk version: ${0}",
                 _sample.RtcEngine.GetVersion()));
             _sample.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
-                                connection.channelId, connection.localUid, elapsed));
-
-            ContentInspect.MakeVideoView(0);
+                    connection.channelId, connection.localUid, elapsed));
+            _sample.SelfConnection = connection;
+            _sample.EnableUI(true);
+            MediaRecorder.MakeVideoView(0);
+            _sample.InitMediaRecorder();
         }
 
         public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
@@ -289,10 +294,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
         public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
         {
             _sample.Log.UpdateLog("OnLeaveChannel");
-            ContentInspect.DestroyVideoView(0);
+            MediaRecorder.DestroyVideoView(0);
         }
 
-        public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
+        public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole,
+            CLIENT_ROLE_TYPE newRole)
         {
             _sample.Log.UpdateLog("OnClientRoleChanged");
         }
@@ -300,20 +306,34 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
             _sample.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-            ContentInspect.MakeVideoView(uid, _sample.GetChannelName());
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
         {
             _sample.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                 (int)reason));
-            ContentInspect.DestroyVideoView(uid);
+            MediaRecorder.DestroyVideoView(uid);
         }
+    }
 
-        public override void OnContentInspectResult(CONTENT_INSPECT_RESULT result)
+    internal class MediaRecorderObserver : IMediaRecorderObserver
+    {
+        private readonly MediaRecorder _sample;
+
+        internal MediaRecorderObserver(MediaRecorder sample)
         {
-            _sample.Log.UpdateLog("OnContentInspectResult :" + result);
+            _sample = sample;
         }
 
+        public override void OnRecorderInfoUpdated(RecorderInfo info)
+        {
+            _sample.Log.UpdateLog(string.Format("OnRecorderInfoUpdated fileName: {0}, durationMs: {1} fileSize：{2}", info.fileName, info.durationMs, info.fileSize));
+        }
+
+        public override void OnRecorderStateChanged(RecorderState state, RecorderErrorCode error)
+        {
+            _sample.Log.UpdateLog(string.Format("OnRecorderStateChanged state: {0}, error: {1}", state, error));
+
+        }
     }
 }
