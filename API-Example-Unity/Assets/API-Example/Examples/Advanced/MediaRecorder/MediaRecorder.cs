@@ -37,6 +37,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
         internal IRtcEngine RtcEngine = null;
         internal IMediaPlayer MediaPlayer = null;
         internal RtcConnection SelfConnection = null;
+        internal IMediaRecorder Recorder = null;
 
         private Button _button1;
         private Button _button2;
@@ -107,7 +108,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
             RtcEngine.InitEventHandler(handler);
         }
 
-      
+        internal void InitMediaRecorder()
+        {
+            Recorder = RtcEngine.GetMediaRecorder();
+            var nRet = Recorder.SetMediaRecorderObserver(SelfConnection, new MediaRecorderObserver(this));
+            this.Log.UpdateLog("SetMediaRecorderObserver:" + nRet);
+        }
+
         private void JoinChannel()
         {
             RtcEngine.EnableAudio();
@@ -131,14 +138,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
             var config = new MediaRecorderConfiguration();
             config.storagePath = Application.persistentDataPath + "/record.mp4";
             config.recorderInfoUpdateInterval = 5;
-            var nRet = RtcEngine.StartRecording(this.SelfConnection, config);
+            var nRet = Recorder.StartRecording(this.SelfConnection, config);
             this.Log.UpdateLog("StartRecording:" + nRet);
             this.Log.UpdateLog("storagePath: " + config.storagePath);
         }
 
         private void OnStopButtonPress()
         {
-            var nRet = RtcEngine.StopRecording(this.SelfConnection);
+            var nRet = Recorder.StopRecording(this.SelfConnection);
             this.Log.UpdateLog("StopRecording:" + nRet);
         }
 
@@ -276,7 +283,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
             _sample.SelfConnection = connection;
             _sample.EnableUI(true);
             MediaRecorder.MakeVideoView(0);
-
+            _sample.InitMediaRecorder();
         }
 
         public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
@@ -307,6 +314,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
                 (int)reason));
             MediaRecorder.DestroyVideoView(uid);
         }
+    }
+
+    internal class MediaRecorderObserver : IMediaRecorderObserver
+    {
+        private readonly MediaRecorder _sample;
+
+        internal MediaRecorderObserver(MediaRecorder sample)
+        {
+            _sample = sample;
+        }
 
         public override void OnRecorderInfoUpdated(RecorderInfo info)
         {
@@ -319,6 +336,4 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
 
         }
     }
-
- 
 }
