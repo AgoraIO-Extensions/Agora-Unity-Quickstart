@@ -193,7 +193,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
                 EncodedVideoFrameInfo encodedVideoFrameInfo = new EncodedVideoFrameInfo()
                 {
                     framesPerSecond = 60,
-                    //dont set codecType = VIDEO_CODEC_GENERIC will crash
                     codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_GENERIC,
                     frameType = VIDEO_FRAME_TYPE_NATIVE.VIDEO_FRAME_TYPE_KEY_FRAME
                 };
