@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
 using Agora.Util;
 using Logger = Agora.Util.Logger;
-using Random = UnityEngine.Random;
-using System.IO;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
 {
 	public class MediaRecorder : MonoBehaviour
 	{
-
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
         private AppIdInput _appIdInput;
@@ -161,11 +155,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
             RtcEngine = null;
         }
 
-
         internal string GetChannelName()
         {
             return _channelName;
         }
+
+        #region -- Video Render UI Logic ---
 
         internal static void MakeVideoView(uint uid, string channelId = "", VIDEO_SOURCE_TYPE videoSourceType = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA)
         {
@@ -255,9 +250,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
                 Destroy(go);
             }
         }
+
+        #endregion
     }
 
-  
+    #region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -336,4 +333,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
 
         }
     }
+
+    #endregion
 }

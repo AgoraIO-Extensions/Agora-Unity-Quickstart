@@ -120,6 +120,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetEncryption
             RtcEngine.Dispose();
         }
 
+        #region -- Video Render UI Logic ---
 
         internal static void MakeVideoView(uint uid, string channelId = "")
         {
@@ -220,11 +221,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetEncryption
             }
         }
 
+        #endregion
+
         internal string GetChannelName()
         {
             return _channelName;
         }
     }
+
+    #region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -279,4 +284,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetEncryption
             _encryptionSample.Log.UpdateLog("OnEncryptionError: " + errorType);
         }
     }
+
+    #endregion
 }

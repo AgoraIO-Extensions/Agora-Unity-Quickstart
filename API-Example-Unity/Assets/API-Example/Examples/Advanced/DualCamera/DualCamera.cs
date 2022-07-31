@@ -44,7 +44,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
         private void Start()
         {
 #if UNITY_IPHONE || UNITY_ANDROID
-            this.LogText.text = "Not Support in this platform!";
+            this.LogText.text = "iOS/Android is not supported, but you could see how it works on the Editor for Windows/MacOS";
 
 #else
             LoadAssetData();
@@ -170,6 +170,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             return _channelName;
         }
 
+        #region -- Video Render UI Logic ---
+
         internal static void MakeVideoView(uint uid, string channelId = "", VIDEO_SOURCE_TYPE videoSourceType = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA)
         {
             var go = GameObject.Find(uid.ToString());
@@ -279,7 +281,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
                 Destroy(go);
             }
         }
+
+        #endregion
     }
+
+    #region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -360,4 +366,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             }
         }
     }
+
+    #endregion
 }

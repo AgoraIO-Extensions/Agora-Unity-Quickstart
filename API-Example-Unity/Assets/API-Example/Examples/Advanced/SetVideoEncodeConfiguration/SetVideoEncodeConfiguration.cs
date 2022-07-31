@@ -27,7 +27,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetVideoEncodeConfigura
         private string _channelName = "";
 
         public Text LogText;
-        private Logger Log;
+        internal Logger Log;
         internal IRtcEngine RtcEngine = null;
 
 
@@ -56,11 +56,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetVideoEncodeConfigura
         {
             PermissionHelper.RequestMicrophontPermission();
             PermissionHelper.RequestCameraPermission();
-        }
-
-        internal string GetChannelName()
-        {
-            return _channelName;
         }
 
         private bool CheckAppId()
@@ -129,6 +124,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetVideoEncodeConfigura
             RtcEngine.Dispose();
         }
 
+        internal string GetChannelName()
+        {
+            return _channelName;
+        }
+
+        #region -- Video Render UI Logic ---
+
         internal static void MakeVideoView(uint uid, string channelId = "")
         {
             var go = GameObject.Find(uid.ToString());
@@ -160,7 +162,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetVideoEncodeConfigura
         }
 
         // VIDEO TYPE 1: 3D Object
-        private VideoSurface MakePlaneSurface(string goName)
+        private static VideoSurface MakePlaneSurface(string goName)
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
@@ -225,56 +227,61 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetVideoEncodeConfigura
             }
         }
 
+        #endregion
+    }
 
-        internal class UserEventHandler : IRtcEngineEventHandler
+    #region -- Agora Event ---
+
+    internal class UserEventHandler : IRtcEngineEventHandler
+    {
+        private readonly SetVideoEncodeConfiguration _videoEncoderConfiguration;
+
+        internal UserEventHandler(SetVideoEncodeConfiguration videoEncoderConfiguration)
         {
-            private readonly SetVideoEncodeConfiguration _videoEncoderConfiguration;
+            _videoEncoderConfiguration = videoEncoderConfiguration;
+        }
 
-            internal UserEventHandler(SetVideoEncodeConfiguration videoEncoderConfiguration)
-            {
-                _videoEncoderConfiguration = videoEncoderConfiguration;
-            }
+        public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
+        {
+            _videoEncoderConfiguration.Log.UpdateLog(string.Format("sdk version: ${0}",
+                _videoEncoderConfiguration.RtcEngine.GetVersion()));
+            _videoEncoderConfiguration.Log.UpdateLog(string.Format(
+                "onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
+                connection.localUid, elapsed));
+            SetVideoEncodeConfiguration.MakeVideoView(0);
+        }
 
-            public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
-            {
-                _videoEncoderConfiguration.Log.UpdateLog(string.Format("sdk version: ${0}",
-                    _videoEncoderConfiguration.RtcEngine.GetVersion()));
-                _videoEncoderConfiguration.Log.UpdateLog(string.Format(
-                    "onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
-                    connection.localUid, elapsed));
-                MakeVideoView(0);
-            }
+        public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
+        {
+            _videoEncoderConfiguration.Log.UpdateLog("OnLeaveChannelSuccess");
+            SetVideoEncodeConfiguration.DestroyVideoView(0);
+        }
 
-            public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
-            {
-                _videoEncoderConfiguration.Log.UpdateLog("OnLeaveChannelSuccess");
-                DestroyVideoView(0);
-            }
+        public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
+        {
+            _videoEncoderConfiguration.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid,
+                elapsed));
+            SetVideoEncodeConfiguration.MakeVideoView(uid, _videoEncoderConfiguration.GetChannelName());
+        }
 
-            public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
-            {
-                _videoEncoderConfiguration.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid,
-                    elapsed));
-                MakeVideoView(uid, _videoEncoderConfiguration.GetChannelName());
-            }
+        public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
+        {
+            _videoEncoderConfiguration.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+                (int)reason));
+            SetVideoEncodeConfiguration.DestroyVideoView(uid);
+        }
 
-            public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
-            {
-                _videoEncoderConfiguration.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
-                    (int)reason));
-                DestroyVideoView(uid);
-            }
+        public override void OnError(int error, string msg)
+        {
+            _videoEncoderConfiguration.Log.UpdateLog(
+                string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
+        }
 
-            public override void OnError(int error, string msg)
-            {
-                _videoEncoderConfiguration.Log.UpdateLog(
-                    string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
-            }
-
-            public override void OnConnectionLost(RtcConnection connection)
-            {
-                _videoEncoderConfiguration.Log.UpdateLog(string.Format("OnConnectionLost "));
-            }
+        public override void OnConnectionLost(RtcConnection connection)
+        {
+            _videoEncoderConfiguration.Log.UpdateLog(string.Format("OnConnectionLost "));
         }
     }
+
+    #endregion
 }

@@ -253,14 +253,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             return _channelName;
         }
 
-        internal static void DestroyVideoView(uint uid)
-        {
-            var go = GameObject.Find(uid.ToString());
-            if (!ReferenceEquals(go, null))
-            {
-                Destroy(go);
-            }
-        }
+        #region -- Video Render UI Logic ---
 
         internal static void MakeVideoView(uint uid, string channelId = "", VIDEO_SOURCE_TYPE videoSourceType = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA)
         {
@@ -341,7 +334,20 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             var videoSurface = go.AddComponent<VideoSurface>();
             return videoSurface;
         }
+
+        internal static void DestroyVideoView(uint uid)
+        {
+            var go = GameObject.Find(uid.ToString());
+            if (!ReferenceEquals(go, null))
+            {
+                Destroy(go);
+            }
+        }
+
+        #endregion
     }
+
+    #region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -397,4 +403,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             ScreenShare.DestroyVideoView(uid);
         }
     }
+
+    #endregion
 }

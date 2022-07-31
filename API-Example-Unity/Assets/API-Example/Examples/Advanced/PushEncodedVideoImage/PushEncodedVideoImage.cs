@@ -120,7 +120,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
             RtcEngine.Dispose();
         }
 
-
         public void CreateRole(string uid, bool isLocal)
         {
             var role = Instantiate(this.RolePrefab, this.transform);
@@ -168,13 +167,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
             }
         }
 
-
         public void StartPushEncodeVideoImage()
         {
             this.InvokeRepeating("UpdateForPushEncodeVideoImage", 0, 0.1f);
             this.Log.UpdateLog("Start PushEncodeVideoImage in every frame");
         }
-
 
         public void StopPushEncodeVideoImage()
         {
@@ -202,8 +199,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
         }
     }
 
-
-
+    #region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -316,4 +312,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
             return true;
         }
     }
+
+    #endregion
 }

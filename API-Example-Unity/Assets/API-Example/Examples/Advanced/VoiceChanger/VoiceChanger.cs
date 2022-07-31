@@ -1,16 +1,14 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Serialization;
 using Agora.Rtc;
 using Agora.Util;
-using UnityEngine.Serialization;
 using Logger = Agora.Util.Logger;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VoiceChanger
 {
-
     public class VoiceChanger : MonoBehaviour
     {
-
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
         private AppIdInput _appIdInput;
@@ -42,7 +40,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VoiceChanger
                 JoinChannel();
             }
         }
-
 
         [ContextMenu("ShowAgoraBasicProfileData")]
         public void LoadAssetData()
@@ -258,55 +255,56 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VoiceChanger
             this.Log.UpdateLog(string.Format("SetLocalVoiceReverb nRet:{0}", nRet));
         }
         #endregion
+    }
 
+    #region -- Agora Event ---
 
-        internal class UserEventHandler : IRtcEngineEventHandler
+    internal class UserEventHandler : IRtcEngineEventHandler
+    {
+        private readonly VoiceChanger _voiceChanger;
+
+        internal UserEventHandler(VoiceChanger voiceChanger)
         {
-            private readonly VoiceChanger _voiceChanger;
-
-            internal UserEventHandler(VoiceChanger voiceChanger)
-            {
-                _voiceChanger = voiceChanger;
-            }
-
-            public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
-            {
-                _voiceChanger.Log.UpdateLog(string.Format("sdk version: ${0}",
-                    _voiceChanger.RtcEngine.GetVersion()));
-                _voiceChanger.Log.UpdateLog(string.Format(
-                    "onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
-                    connection.localUid, elapsed));
-            }
-
-            public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
-            {
-                _voiceChanger.Log.UpdateLog("OnLeaveChannelSuccess");
-            }
-
-            public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
-            {
-                _voiceChanger.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid,
-                    elapsed));
-            }
-
-            public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
-            {
-                _voiceChanger.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
-                    (int)reason));
-            }
-
-            public override void OnError(int error, string msg)
-            {
-                _voiceChanger.Log.UpdateLog(
-                    string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
-            }
-
-            public override void OnConnectionLost(RtcConnection connection)
-            {
-                _voiceChanger.Log.UpdateLog(string.Format("OnConnectionLost "));
-            }
+            _voiceChanger = voiceChanger;
         }
 
+        public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
+        {
+            _voiceChanger.Log.UpdateLog(string.Format("sdk version: ${0}",
+                _voiceChanger.RtcEngine.GetVersion()));
+            _voiceChanger.Log.UpdateLog(string.Format(
+                "onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
+                connection.localUid, elapsed));
+        }
 
+        public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
+        {
+            _voiceChanger.Log.UpdateLog("OnLeaveChannelSuccess");
+        }
+
+        public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
+        {
+            _voiceChanger.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid,
+                elapsed));
+        }
+
+        public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
+        {
+            _voiceChanger.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+                (int)reason));
+        }
+
+        public override void OnError(int error, string msg)
+        {
+            _voiceChanger.Log.UpdateLog(
+                string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
+        }
+
+        public override void OnConnectionLost(RtcConnection connection)
+        {
+            _voiceChanger.Log.UpdateLog(string.Format("OnConnectionLost "));
+        }
     }
+
+    #endregion
 }

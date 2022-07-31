@@ -1,11 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
 using Agora.Util;
 using Logger = Agora.Util.Logger;
 using RingBuffer;
-using System;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
 {
@@ -29,8 +29,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
         private string _channelName = "";
 
         public Text LogText;
-        private Logger Log;
-        private IRtcEngine RtcEngine;
+        internal Logger Log;
+        internal IRtcEngine RtcEngine;
 
         private const int CHANNEL = 1;
         private const int PULL_FREQ_PER_SEC = 100;
@@ -154,7 +154,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
             Debug.LogFormat("buffer length remains: {0}", _writeCount - _readCount);
         }
 
-        private static float[] ConvertByteToFloat16(byte[] byteArray)
+        internal static float[] ConvertByteToFloat16(byte[] byteArray)
         {
             var floatArray = new float[byteArray.Length / 2];
             for (var i = 0; i < floatArray.Length; i++)
@@ -164,143 +164,144 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
 
             return floatArray;
         }
+    }
 
-        internal class UserEventHandler : IRtcEngineEventHandler
+    #region -- Agora Event ---
+
+    internal class UserEventHandler : IRtcEngineEventHandler
+    {
+        private readonly ProcessAudioRawData _agoraVideoRawData;
+
+        internal UserEventHandler(ProcessAudioRawData agoraVideoRawData)
         {
-            private readonly ProcessAudioRawData _agoraVideoRawData;
-
-            internal UserEventHandler(ProcessAudioRawData agoraVideoRawData)
-            {
-                _agoraVideoRawData = agoraVideoRawData;
-            }
-            public override void OnError(int err, string msg)
-            {
-                _agoraVideoRawData.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
-            }
-
-            public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
-            {
-                _agoraVideoRawData.Log.UpdateLog(string.Format("sdk version: ${0}",
-                    _agoraVideoRawData.RtcEngine.GetVersion()));
-                _agoraVideoRawData.Log.UpdateLog(
-                    string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
-                        connection.channelId, connection.localUid, elapsed));
-            }
-
-            public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
-            {
-                _agoraVideoRawData.Log.UpdateLog("OnRejoinChannelSuccess");
-            }
-
-            public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
-            {
-                _agoraVideoRawData.Log.UpdateLog("OnLeaveChannel");
-            }
-
-            public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole,
-                CLIENT_ROLE_TYPE newRole)
-            {
-                _agoraVideoRawData.Log.UpdateLog("OnClientRoleChanged");
-            }
-
-            public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
-            {
-                _agoraVideoRawData.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid,
-                    elapsed));
-            }
-
-            public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
-            {
-                _agoraVideoRawData.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
-                    (int)reason));
-            }
+            _agoraVideoRawData = agoraVideoRawData;
+        }
+        public override void OnError(int err, string msg)
+        {
+            _agoraVideoRawData.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
         }
 
-        internal class AudioFrameObserver : IAudioFrameObserver
+        public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            private readonly ProcessAudioRawData _agoraAudioRawData;
-            private AudioParams _audioParams;
+            _agoraVideoRawData.Log.UpdateLog(string.Format("sdk version: ${0}",
+                _agoraVideoRawData.RtcEngine.GetVersion()));
+            _agoraVideoRawData.Log.UpdateLog(
+                string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
+                    connection.channelId, connection.localUid, elapsed));
+        }
 
+        public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
+        {
+            _agoraVideoRawData.Log.UpdateLog("OnRejoinChannelSuccess");
+        }
 
-            internal AudioFrameObserver(ProcessAudioRawData agoraAudioRawData)
-            {
-                _agoraAudioRawData = agoraAudioRawData;
-                _audioParams = new AudioParams();
-                _audioParams.sample_rate = 16000;
-                _audioParams.channels = 2;
-                _audioParams.mode = RAW_AUDIO_FRAME_OP_MODE_TYPE.RAW_AUDIO_FRAME_OP_MODE_READ_ONLY;
-                _audioParams.samples_per_call = 1024;
-            }
+        public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
+        {
+            _agoraVideoRawData.Log.UpdateLog("OnLeaveChannel");
+        }
 
-            public override bool OnRecordAudioFrame(string channelId, AudioFrame audioFrame)
-            {
-                Debug.Log("OnRecordAudioFrame-----------");
-                return true;
-            }
+        public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole,
+            CLIENT_ROLE_TYPE newRole)
+        {
+            _agoraVideoRawData.Log.UpdateLog("OnClientRoleChanged");
+        }
 
-            public override bool OnPlaybackAudioFrame(string channelId, AudioFrame audioFrame)
-            {
-                Debug.Log("OnPlaybackAudioFrame-----------");
-                if (_agoraAudioRawData._count == 1)
-                {
-                    Debug.LogWarning("audioFrame = " + audioFrame);
-                }
-                var floatArray = ConvertByteToFloat16(audioFrame.RawBuffer);
+        public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
+        {
+            _agoraVideoRawData.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid,
+                elapsed));
+        }
 
-                lock (_agoraAudioRawData._audioBuffer)
-                {
-                    _agoraAudioRawData._audioBuffer.Put(floatArray);
-                    _agoraAudioRawData._writeCount += floatArray.Length;
-                    _agoraAudioRawData._count++;
-                }
-                return true;
-            }
-
-         
-            public override int GetObservedAudioFramePosition()
-            {
-                Debug.Log("GetObservedAudioFramePosition-----------");
-                return (int)(AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_PLAYBACK |
-                    AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_RECORD |
-                    AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_BEFORE_MIXING |
-                    AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_MIXED);
-            }
-
-            public override AudioParams GetPlaybackAudioParams()
-            {
-                Debug.Log("GetPlaybackAudioParams-----------");
-                return this._audioParams;
-            }
-
-            public override AudioParams GetRecordAudioParams()
-            {
-                Debug.Log("GetRecordAudioParams-----------");
-                return this._audioParams;
-            }
-
-            public override AudioParams GetMixedAudioParams()
-            {
-                Debug.Log("GetMixedAudioParams-----------");
-                return this._audioParams;
-            }
-
-
-            public override bool OnPlaybackAudioFrameBeforeMixing(string channel_id,
-                                                            uint uid,
-                                                            AudioFrame audio_frame)
-            {
-                Debug.Log("OnPlaybackAudioFrameBeforeMixing-----------");
-                return false;
-            }
-
-            public override bool OnPlaybackAudioFrameBeforeMixing(string channel_id,
-                                                            string uid,
-                                                            AudioFrame audio_frame)
-            {
-                Debug.Log("OnPlaybackAudioFrameBeforeMixing2-----------");
-                return false;
-            }
-
+        public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
+        {
+            _agoraVideoRawData.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+                (int)reason));
         }
     }
+
+    internal class AudioFrameObserver : IAudioFrameObserver
+    {
+        private readonly ProcessAudioRawData _agoraAudioRawData;
+        private AudioParams _audioParams;
+
+
+        internal AudioFrameObserver(ProcessAudioRawData agoraAudioRawData)
+        {
+            _agoraAudioRawData = agoraAudioRawData;
+            _audioParams = new AudioParams();
+            _audioParams.sample_rate = 16000;
+            _audioParams.channels = 2;
+            _audioParams.mode = RAW_AUDIO_FRAME_OP_MODE_TYPE.RAW_AUDIO_FRAME_OP_MODE_READ_ONLY;
+            _audioParams.samples_per_call = 1024;
+        }
+
+        public override bool OnRecordAudioFrame(string channelId, AudioFrame audioFrame)
+        {
+            Debug.Log("OnRecordAudioFrame-----------");
+            return true;
+        }
+
+        public override bool OnPlaybackAudioFrame(string channelId, AudioFrame audioFrame)
+        {
+            Debug.Log("OnPlaybackAudioFrame-----------");
+            if (_agoraAudioRawData._count == 1)
+            {
+                Debug.LogWarning("audioFrame = " + audioFrame);
+            }
+            var floatArray = ProcessAudioRawData.ConvertByteToFloat16(audioFrame.RawBuffer);
+
+            lock (_agoraAudioRawData._audioBuffer)
+            {
+                _agoraAudioRawData._audioBuffer.Put(floatArray);
+                _agoraAudioRawData._writeCount += floatArray.Length;
+                _agoraAudioRawData._count++;
+            }
+            return true;
+        }
+        
+        public override int GetObservedAudioFramePosition()
+        {
+            Debug.Log("GetObservedAudioFramePosition-----------");
+            return (int)(AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_PLAYBACK |
+                AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_RECORD |
+                AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_BEFORE_MIXING |
+                AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_MIXED);
+        }
+
+        public override AudioParams GetPlaybackAudioParams()
+        {
+            Debug.Log("GetPlaybackAudioParams-----------");
+            return this._audioParams;
+        }
+
+        public override AudioParams GetRecordAudioParams()
+        {
+            Debug.Log("GetRecordAudioParams-----------");
+            return this._audioParams;
+        }
+
+        public override AudioParams GetMixedAudioParams()
+        {
+            Debug.Log("GetMixedAudioParams-----------");
+            return this._audioParams;
+        }
+
+        public override bool OnPlaybackAudioFrameBeforeMixing(string channel_id,
+                                                        uint uid,
+                                                        AudioFrame audio_frame)
+        {
+            Debug.Log("OnPlaybackAudioFrameBeforeMixing-----------");
+            return false;
+        }
+
+        public override bool OnPlaybackAudioFrameBeforeMixing(string channel_id,
+                                                        string uid,
+                                                        AudioFrame audio_frame)
+        {
+            Debug.Log("OnPlaybackAudioFrameBeforeMixing2-----------");
+            return false;
+        }
+    }
+
+    #endregion
 }

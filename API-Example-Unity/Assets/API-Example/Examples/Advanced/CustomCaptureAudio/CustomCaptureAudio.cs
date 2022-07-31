@@ -2,12 +2,12 @@
 using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
-using Agora.Rtc;
-using Agora.Util;
-using RingBuffer;
 using UnityEngine.Serialization;
 using System.Runtime.InteropServices;
+using Agora.Rtc;
+using Agora.Util;
 using Logger = Agora.Util.Logger;
+using RingBuffer;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 {
@@ -231,39 +231,43 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
             //_count += 1;
             //if (_count == 20) _startSignal = true;
         }
+    }
 
-        internal class UserEventHandler : IRtcEngineEventHandler
+    #region -- Agora Event ---
+
+    internal class UserEventHandler : IRtcEngineEventHandler
+    {
+        private readonly CustomCaptureAudio _customAudioSource;
+
+        internal UserEventHandler(CustomCaptureAudio customAudioSource)
         {
-            private readonly CustomCaptureAudio _customAudioSource;
+            _customAudioSource = customAudioSource;
+        }
 
-            internal UserEventHandler(CustomCaptureAudio customAudioSource)
-            {
-                _customAudioSource = customAudioSource;
-            }
+        public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
+        {
+            _customAudioSource.Log.UpdateLog(string.Format("sdk version: {0}",
+                _customAudioSource.RtcEngine.GetVersion()));
+            _customAudioSource.Log.UpdateLog(string.Format(
+                "onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
+                connection.localUid, elapsed));
+        }
 
-            public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
-            {
-                _customAudioSource.Log.UpdateLog(string.Format("sdk version: {0}",
-                    _customAudioSource.RtcEngine.GetVersion()));
-                _customAudioSource.Log.UpdateLog(string.Format(
-                    "onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
-                    connection.localUid, elapsed));
-            }
+        public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
+        {
+            _customAudioSource.Log.UpdateLog("OnLeaveChannelSuccess");
+        }
 
-            public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
-            {
-                _customAudioSource.Log.UpdateLog("OnLeaveChannelSuccess");
-            }
+        public override void OnError(int error, string msg)
+        {
+            _customAudioSource.Log.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
+        }
 
-            public override void OnError(int error, string msg)
-            {
-                _customAudioSource.Log.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
-            }
-
-            public override void OnConnectionLost(RtcConnection connection)
-            {
-                _customAudioSource.Log.UpdateLog(string.Format("OnConnectionLost "));
-            }
+        public override void OnConnectionLost(RtcConnection connection)
+        {
+            _customAudioSource.Log.UpdateLog(string.Format("OnConnectionLost "));
         }
     }
+
+    #endregion
 }
