@@ -90,7 +90,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             RtcEngine.InitEventHandler(handler);
         }
 
-        private void MainCameraJoinChannel()
+        public void MainCameraJoinChannel()
         {
             RtcEngine.StartPreview();
             RtcEngine.EnableAudio();
@@ -111,7 +111,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             Debug.Log("MainCameraJoinChannel returns: " + ret);
         }
 
-        private void SecondCameraJoinChannel()
+        public void MainCameraLeaveChannel()
+        {
+            RtcEngine.StopPrimaryCameraCapture();
+            var ret = RtcEngine.LeaveChannel();
+            Debug.Log("MainCameraLeaveChannel returns: " + ret);
+        }
+
+        public void SecondCameraJoinChannel()
         {
             var ret = RtcEngine.StartSecondaryCameraCapture(_config2);
             Log.UpdateLog(
@@ -126,6 +133,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             options2.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             ret = RtcEngine.JoinChannelEx(_token, new RtcConnection(_channelName, UID2), options2);
             Debug.Log("JoinChannelEx returns: " + ret);
+        }
+
+        public void SecondCameraLeaveChannel()
+        {
+            RtcEngine.StopSecondaryCameraCapture();
+            var ret = RtcEngine.LeaveChannelEx(new RtcConnection(_channelName, 456));
+            Debug.Log("SecondCameraLeaveChannel returns: " + ret);
         }
 
         private void GetVideoDeviceManager()
@@ -158,10 +172,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             Debug.Log("OnDestroy");
             if (RtcEngine == null) return;
             RtcEngine.InitEventHandler(null);
-            RtcEngine.LeaveChannel();
             RtcEngine.StopSecondaryCameraCapture();
             RtcEngine.StopPrimaryCameraCapture();
             RtcEngine.LeaveChannelEx(new RtcConnection(_channelName, 456));
+            RtcEngine.LeaveChannel();
             RtcEngine.Dispose();
         }
 
