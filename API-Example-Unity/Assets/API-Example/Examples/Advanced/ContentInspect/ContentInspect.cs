@@ -7,10 +7,8 @@ using Logger = Agora.Util.Logger;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
 {
-
     public class ContentInspect : MonoBehaviour
     {
-
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
         private AppIdInput _appIdInput;
@@ -62,7 +60,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
             _token = _appIdInput.token;
             _channelName = _appIdInput.channelName;
         }
-
 
         private bool CheckAppId()
         {
@@ -125,7 +122,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
             this.Log.UpdateLog("StartContentInspect: " + nRet);
         }
 
-
         private void OnStopButtonClick()
         {
             var config = new ContentInspectConfig();
@@ -154,6 +150,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
         {
             return _channelName;
         }
+
+        #region -- Video Render UI Logic ---
 
         internal static void MakeVideoView(uint uid, string channelId = "")
         {
@@ -253,7 +251,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
                 Destroy(go);
             }
         }
+
+        #endregion
     }
+
+    #region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -314,6 +316,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
         {
             _sample.Log.UpdateLog("OnContentInspectResult :" + result);
         }
-
     }
+
+    #endregion
 }

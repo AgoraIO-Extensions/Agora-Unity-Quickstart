@@ -1,12 +1,12 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
 using Agora.Util;
 using Logger = Agora.Util.Logger;
-using System;
 
-namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetVideoEncodeConfiguration
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPlayer
 {
     public class SpatialAudioWithMediaPlayer : MonoBehaviour
     {
@@ -206,6 +206,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetVideoEncodeConfigura
             return _channelName;
         }
 
+        #region -- Video Render UI Logic ---
+
         internal static void MakeVideoView(uint uid, string channelId = "")
         {
             var go = GameObject.Find(uid.ToString());
@@ -293,7 +295,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetVideoEncodeConfigura
                 Destroy(go);
             }
         }
+
+        #endregion
     }
+
+    #region -- Agora Event ---
 
     internal class MpkEventHandler : IMediaPlayerSourceObserver
     {
@@ -395,4 +401,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetVideoEncodeConfigura
             SpatialAudioWithMediaPlayer.DestroyVideoView(uid);
         }
     }
+
+    #endregion
 }

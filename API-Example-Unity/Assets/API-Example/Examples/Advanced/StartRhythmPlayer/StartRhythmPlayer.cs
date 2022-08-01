@@ -4,18 +4,14 @@ using UnityEngine.Serialization;
 using UnityEngine.SceneManagement;
 using Agora.Rtc;
 using Agora.Util;
-
 using Logger = Agora.Util.Logger;
 using System.IO;
 using System;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRhythmPlayer
 {
-
     public class StartRhythmPlayer : MonoBehaviour
     {
-
-
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
         private AppIdInput _appIdInput;
@@ -31,7 +27,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRhythmPlayer
 
         [FormerlySerializedAs("CHANNEL_NAME")]
         [SerializeField]
-        public string _channelName = "";
+        private string _channelName = "";
 
         public Text LogText;
         internal Logger Log;
@@ -67,13 +63,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRhythmPlayer
             _channelName = _appIdInput.channelName;
         }
 
-
         private bool CheckAppId()
         {
             Log = new Logger(LogText);
             return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
-
 
         private void SetupUI()
         {
@@ -153,63 +147,72 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRhythmPlayer
             RtcEngine.Dispose();
         }
 
-        internal class UserEventHandler : IRtcEngineEventHandler
+        internal string GetChannelName()
         {
-            private readonly StartRhythmPlayer _startRhythmPlayer;
-
-            internal UserEventHandler(StartRhythmPlayer videoSample)
-            {
-                _startRhythmPlayer = videoSample;
-            }
-
-            public override void OnError(int err, string msg)
-            {
-                _startRhythmPlayer.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
-            }
-
-            public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
-            {
-                Debug.Log("Agora: OnJoinChannelSuccess ");
-                _startRhythmPlayer.Log.UpdateLog(string.Format("sdk version: ${0}",
-                    _startRhythmPlayer.RtcEngine.GetVersion()));
-                _startRhythmPlayer.Log.UpdateLog(
-                    string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
-                                    connection.channelId, connection.localUid, elapsed));
-            }
-
-            public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
-            {
-                _startRhythmPlayer.Log.UpdateLog("OnRejoinChannelSuccess");
-            }
-
-            public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
-            {
-                _startRhythmPlayer.Log.UpdateLog("OnLeaveChannel");
-
-            }
-
-            public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
-            {
-                _startRhythmPlayer.Log.UpdateLog("OnClientRoleChanged");
-            }
-
-            public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
-            {
-                _startRhythmPlayer.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-
-            }
-
-            public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
-            {
-                _startRhythmPlayer.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
-                    (int)reason));
-            }
-
-            public override void OnRhythmPlayerStateChanged(RHYTHM_PLAYER_STATE_TYPE state, RHYTHM_PLAYER_ERROR_TYPE errorCode)
-            {
-                _startRhythmPlayer.Log.UpdateLog(string.Format("OnRhythmPlayerStateChanged {0},{1}", state, errorCode));
-            }
-
+            return _channelName;
         }
     }
+
+    #region -- Agora Event ---
+
+    internal class UserEventHandler : IRtcEngineEventHandler
+    {
+        private readonly StartRhythmPlayer _startRhythmPlayer;
+
+        internal UserEventHandler(StartRhythmPlayer videoSample)
+        {
+            _startRhythmPlayer = videoSample;
+        }
+
+        public override void OnError(int err, string msg)
+        {
+            _startRhythmPlayer.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+        }
+
+        public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
+        {
+            Debug.Log("Agora: OnJoinChannelSuccess ");
+            _startRhythmPlayer.Log.UpdateLog(string.Format("sdk version: ${0}",
+                _startRhythmPlayer.RtcEngine.GetVersion()));
+            _startRhythmPlayer.Log.UpdateLog(
+                string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
+                                connection.channelId, connection.localUid, elapsed));
+        }
+
+        public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
+        {
+            _startRhythmPlayer.Log.UpdateLog("OnRejoinChannelSuccess");
+        }
+
+        public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
+        {
+            _startRhythmPlayer.Log.UpdateLog("OnLeaveChannel");
+
+        }
+
+        public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
+        {
+            _startRhythmPlayer.Log.UpdateLog("OnClientRoleChanged");
+        }
+
+        public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
+        {
+            _startRhythmPlayer.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+
+        }
+
+        public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
+        {
+            _startRhythmPlayer.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+                (int)reason));
+        }
+
+        public override void OnRhythmPlayerStateChanged(RHYTHM_PLAYER_STATE_TYPE state, RHYTHM_PLAYER_ERROR_TYPE errorCode)
+        {
+            _startRhythmPlayer.Log.UpdateLog(string.Format("OnRhythmPlayerStateChanged {0},{1}", state, errorCode));
+        }
+
+    }
+
+    #endregion
 }

@@ -1,9 +1,8 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Serialization;
 using Agora.Rtc;
 using Agora.Util;
-using UnityEngine.Serialization;
 using Logger = Agora.Util.Logger;
 
 
@@ -98,6 +97,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
         }
     }
 
+    #region -- Agora Event ---
+
     internal class UserEventHandler : IRtcEngineEventHandler
     {
         private readonly JoinChannelAudio _audioSample;
@@ -148,4 +149,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
                 (int)reason));
         }
     }
+
+    #endregion
 }

@@ -197,6 +197,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
             return _channelName;
         }
 
+        #region -- Video Render UI Logic ---
+
         internal static void MakeVideoView(uint uid, string channelId = "")
         {
             var go = GameObject.Find(uid.ToString());
@@ -295,7 +297,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
                 Destroy(go);
             }
         }
+
+        #endregion
     }
+
+    #region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -353,4 +359,5 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
         }
     }
 
+    #endregion
 }

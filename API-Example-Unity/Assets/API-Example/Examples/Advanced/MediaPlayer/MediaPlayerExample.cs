@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
 using Agora.Util;
 using Logger = Agora.Util.Logger;
-using Random = UnityEngine.Random;
-using System.IO;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
 {
@@ -252,11 +249,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
             RtcEngine = null;
         }
 
-
         internal string GetChannelName()
         {
             return _channelName;
         }
+
+        #region -- Video Render UI Logic ---
 
         internal static void MakeVideoView(uint uid, string channelId = "", VIDEO_SOURCE_TYPE videoSourceType = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA)
         {
@@ -346,7 +344,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
                 Destroy(go);
             }
         }
+
+        #endregion
     }
+
+    #region -- Agora Event ---
 
     internal class MpkEventHandler : IMediaPlayerSourceObserver
     {
@@ -436,7 +438,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
 
     internal class UserPlayerCustomDataProvider : IMediaPlayerCustomDataProvider
     {
-
         MediaPlayerExample _sample;
 
         internal UserPlayerCustomDataProvider(MediaPlayerExample sample)
@@ -456,4 +457,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
             return 0;
         }
     }
+
+    #endregion
 }

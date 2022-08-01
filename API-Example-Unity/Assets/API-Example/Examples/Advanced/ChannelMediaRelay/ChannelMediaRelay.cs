@@ -7,13 +7,11 @@ using Logger = Agora.Util.Logger;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ChannelMediaRelay
 {
-
     public class ChannelMediaRelay : MonoBehaviour
     {
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
         private AppIdInput _appIdInput;
-
 
         [Header("_____________Basic Configuration_____________")]
         [FormerlySerializedAs("APP_ID")]
@@ -105,7 +103,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ChannelMediaRelay
             btn.onClick.AddListener(OnResumeAllButtonClick);
         }
 
-
         public void EnableUI(bool visible)
         {
             var ui = this.transform.Find("UI");
@@ -187,6 +184,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ChannelMediaRelay
             RtcEngine.Dispose();
             RtcEngine = null;
         }
+
+        #region -- Video Render UI Logic ---
 
         internal static void MakeVideoView(uint uid, string channelId = "", VIDEO_SOURCE_TYPE type = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA)
         {
@@ -277,8 +276,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ChannelMediaRelay
                 Destroy(go);
             }
         }
-
+        
+        #endregion
     }
+
+    #region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -348,4 +350,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ChannelMediaRelay
             _channelMediaRelay.Log.UpdateLog(string.Format("OnChannelMediaRelayStateChanged state: {0}, code: {1}", state, code));
         }
     }
+
+    #endregion
 }

@@ -1,18 +1,15 @@
-﻿using UnityEngine;
+﻿using System.IO;
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
-using UnityEngine.SceneManagement;
 using Agora.Rtc;
 using Agora.Util;
 using Logger = Agora.Util.Logger;
-using System.IO;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.TakeSnapshot
 {
-
     public class TakeSnapshot : MonoBehaviour
     {
-
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
         private AppIdInput _appIdInput;
@@ -124,6 +121,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.TakeSnapshot
             RtcEngine.Dispose();
         }
 
+        #region -- Video Render UI Logic ---
 
         internal static void MakeVideoView(uint uid, string channelId = "")
         {
@@ -221,7 +219,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.TakeSnapshot
                 Destroy(go);
             }
         }
+
+        #endregion
     }
+
+    #region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -288,4 +290,5 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.TakeSnapshot
 
     }
 
+    #endregion
 }

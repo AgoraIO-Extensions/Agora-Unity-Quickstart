@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using Agora.Rtc;
 using Agora.Util;
 using UnityEngine;
@@ -10,10 +10,8 @@ using Logger = Agora.Util.Logger;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscoder
 {
-
     public class StartLocalVideoTranscoder : MonoBehaviour
     {
-
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
         private AppIdInput _appIdInput;
@@ -365,6 +363,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
             RtcEngine.Dispose();
         }
 
+        internal string GetChannelName()
+        {
+            return _channelName;
+        }
+
+        #region -- Video Render UI Logic ---
 
         internal static VideoSurface MakeVideoView(uint uid, string channelId = "", VIDEO_SOURCE_TYPE source = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA)
         {
@@ -463,64 +467,68 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
             }
         }
 
-        internal class UserEventHandler : IRtcEngineEventHandler
+        #endregion
+    }
+
+    #region -- Agora Event ---
+
+    internal class UserEventHandler : IRtcEngineEventHandler
+    {
+        private readonly StartLocalVideoTranscoder _sample;
+
+        internal UserEventHandler(StartLocalVideoTranscoder sample)
         {
-            private readonly StartLocalVideoTranscoder _sample;
+            _sample = sample;
+        }
 
-            internal UserEventHandler(StartLocalVideoTranscoder sample)
-            {
-                _sample = sample;
-            }
+        public override void OnError(int err, string msg)
+        {
+            _sample.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+        }
 
-            public override void OnError(int err, string msg)
-            {
-                _sample.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
-            }
+        public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
+        {
+            Debug.Log("Agora: OnJoinChannelSuccess ");
+            _sample.Log.UpdateLog(string.Format("sdk version: ${0}",
+                _sample.RtcEngine.GetVersion()));
+            _sample.Log.UpdateLog(
+                string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
+                                connection.channelId, connection.localUid, elapsed));
 
-            public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
-            {
-                Debug.Log("Agora: OnJoinChannelSuccess ");
-                _sample.Log.UpdateLog(string.Format("sdk version: ${0}",
-                    _sample.RtcEngine.GetVersion()));
-                _sample.Log.UpdateLog(
-                    string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
-                                    connection.channelId, connection.localUid, elapsed));
+            StartLocalVideoTranscoder.MakeVideoView(0);
+        }
 
-                StartLocalVideoTranscoder.MakeVideoView(0);
-            }
+        public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
+        {
+            _sample.Log.UpdateLog("OnRejoinChannelSuccess");
+        }
 
-            public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
-            {
-                _sample.Log.UpdateLog("OnRejoinChannelSuccess");
-            }
+        public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
+        {
+            _sample.Log.UpdateLog("OnLeaveChannel");
+            StartLocalVideoTranscoder.DestroyVideoView(0);
+        }
 
-            public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
-            {
-                _sample.Log.UpdateLog("OnLeaveChannel");
-                StartLocalVideoTranscoder.DestroyVideoView(0);
-            }
+        public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
+        {
+            _sample.Log.UpdateLog("OnClientRoleChanged");
+        }
 
-            public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
-            {
-                _sample.Log.UpdateLog("OnClientRoleChanged");
-            }
+        public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
+        {
+            _sample.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+            StartLocalVideoTranscoder.MakeVideoView(uid, _sample.GetChannelName());
 
-            public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
-            {
-                _sample.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-                StartLocalVideoTranscoder.MakeVideoView(uid, _sample._channelName);
+            if (_sample.RemoteUserUids.Contains(uid) == false)
+                _sample.RemoteUserUids.Add(uid);
+        }
 
-                if (_sample.RemoteUserUids.Contains(uid) == false)
-                    _sample.RemoteUserUids.Add(uid);
-            }
-
-            public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
-            {
-                _sample.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
-                    (int)reason));
-                StartLocalVideoTranscoder.DestroyVideoView(uid);
-                _sample.RemoteUserUids.Remove(uid);
-            }
+        public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
+        {
+            _sample.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+                (int)reason));
+            StartLocalVideoTranscoder.DestroyVideoView(uid);
+            _sample.RemoteUserUids.Remove(uid);
         }
     }
 
@@ -549,4 +557,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
             _sample.Log.UpdateLog(string.Format("OnPlayerEvent state: {0}", @event));
         }
     }
+
+    #endregion
 }

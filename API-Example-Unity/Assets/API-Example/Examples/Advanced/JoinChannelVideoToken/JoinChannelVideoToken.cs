@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Serialization;
 using Agora.Rtc;
 using Agora.Util;
-using UnityEngine.Serialization;
 using Logger = Agora.Util.Logger;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.JoinChannelVideoToken
@@ -27,12 +27,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.JoinChannelVideoToken
         private string _channelName = "";
 
         public Text LogText;
-        private Logger Log;
+        internal Logger Log;
         internal IRtcEngine RtcEngine = null;
 
-        private static string _channelToken = "";
-        private static string _tokenBase = "http://localhost:8080";
-        private CONNECTION_STATE_TYPE _state = CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED;
+        internal static string _channelToken = "";
+        internal static string _tokenBase = "http://localhost:8080";
+        internal CONNECTION_STATE_TYPE _state = CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED;
 
         // Use this for initialization
         private void Start()
@@ -45,7 +45,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.JoinChannelVideoToken
             }
         }
 
-        private void RenewOrJoinToken(string newToken)
+        internal void RenewOrJoinToken(string newToken)
         {
             JoinChannelVideoToken._channelToken = newToken;
             if (_state == CONNECTION_STATE_TYPE.CONNECTION_STATE_DISCONNECTED
@@ -132,16 +132,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.JoinChannelVideoToken
             return _channelName;
         }
 
-        private void DestroyVideoView(uint uid)
-        {
-            GameObject go = GameObject.Find(uid.ToString());
-            if (!ReferenceEquals(go, null))
-            {
-                Object.Destroy(go);
-            }
-        }
+        #region -- Video Render UI Logic ---
 
-        private void MakeVideoView(uint uid, string channelId = "")
+        internal static void MakeVideoView(uint uid, string channelId = "")
         {
             GameObject go = GameObject.Find(uid.ToString());
             if (!ReferenceEquals(go, null))
@@ -175,7 +168,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.JoinChannelVideoToken
         }
 
         // VIDEO TYPE 1: 3D Object
-        public static VideoSurface MakePlaneSurface(string goName)
+        private static VideoSurface MakePlaneSurface(string goName)
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
@@ -196,7 +189,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.JoinChannelVideoToken
         }
 
         // Video TYPE 2: RawImage
-        public static VideoSurface MakeImageSurface(string goName)
+        private static VideoSurface MakeImageSurface(string goName)
         {
             GameObject go = new GameObject();
 
@@ -231,80 +224,95 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.JoinChannelVideoToken
             return videoSurface;
         }
 
-        internal class UserEventHandler : IRtcEngineEventHandler
+        internal static void DestroyVideoView(uint uid)
         {
-            private readonly JoinChannelVideoToken _helloVideoTokenAgora;
-
-            internal UserEventHandler(JoinChannelVideoToken helloVideoTokenAgora)
+            GameObject go = GameObject.Find(uid.ToString());
+            if (!ReferenceEquals(go, null))
             {
-                _helloVideoTokenAgora = helloVideoTokenAgora;
-            }
-
-            public override void OnError(int err, string msg)
-            {
-                _helloVideoTokenAgora.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
-            }
-
-            public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
-            {
-                _helloVideoTokenAgora.Log.UpdateLog(string.Format("sdk version: ${0}",
-                    _helloVideoTokenAgora.RtcEngine.GetVersion()));
-                _helloVideoTokenAgora.Log.UpdateLog(
-                    string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
-                        connection.channelId, connection.localUid, elapsed));
-                _helloVideoTokenAgora.Log.UpdateLog(string.Format("New Token: {0}",
-                    JoinChannelVideoToken._channelToken));
-                // HelperClass.FetchToken(tokenBase, channelName, 0, this.RenewOrJoinToken);
-                _helloVideoTokenAgora.MakeVideoView(0);
-            }
-
-            public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
-            {
-                _helloVideoTokenAgora.Log.UpdateLog("OnRejoinChannelSuccess");
-            }
-
-            public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
-            {
-                _helloVideoTokenAgora.Log.UpdateLog("OnLeaveChannel");
-                _helloVideoTokenAgora.DestroyVideoView(0);
-            }
-
-            public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole,
-                CLIENT_ROLE_TYPE newRole)
-            {
-                _helloVideoTokenAgora.Log.UpdateLog("OnClientRoleChanged");
-            }
-
-            public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
-            {
-                _helloVideoTokenAgora.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid,
-                    elapsed));
-                _helloVideoTokenAgora.MakeVideoView(uid, _helloVideoTokenAgora.GetChannelName());
-            }
-
-            public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
-            {
-                _helloVideoTokenAgora.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
-                    (int)reason));
-                _helloVideoTokenAgora.DestroyVideoView(uid);
-            }
-
-            public override void OnTokenPrivilegeWillExpire(RtcConnection connection, string token)
-            {
-                _helloVideoTokenAgora.StartCoroutine(HelperClass.FetchToken(_tokenBase,
-                    _helloVideoTokenAgora._channelName, 0, _helloVideoTokenAgora.RenewOrJoinToken));
-            }
-
-            public override void OnConnectionStateChanged(RtcConnection connection, CONNECTION_STATE_TYPE state,
-                CONNECTION_CHANGED_REASON_TYPE reason)
-            {
-                _helloVideoTokenAgora._state = state;
-            }
-
-            public override void OnConnectionLost(RtcConnection connection)
-            {
-                _helloVideoTokenAgora.Log.UpdateLog(string.Format("OnConnectionLost "));
+                Object.Destroy(go);
             }
         }
+
+        #endregion
     }
+
+    #region -- Agora Event ---
+
+    internal class UserEventHandler : IRtcEngineEventHandler
+    {
+        private readonly JoinChannelVideoToken _helloVideoTokenAgora;
+
+        internal UserEventHandler(JoinChannelVideoToken helloVideoTokenAgora)
+        {
+            _helloVideoTokenAgora = helloVideoTokenAgora;
+        }
+
+        public override void OnError(int err, string msg)
+        {
+            _helloVideoTokenAgora.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+        }
+
+        public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
+        {
+            _helloVideoTokenAgora.Log.UpdateLog(string.Format("sdk version: ${0}",
+                _helloVideoTokenAgora.RtcEngine.GetVersion()));
+            _helloVideoTokenAgora.Log.UpdateLog(
+                string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
+                    connection.channelId, connection.localUid, elapsed));
+            _helloVideoTokenAgora.Log.UpdateLog(string.Format("New Token: {0}",
+                JoinChannelVideoToken._channelToken));
+            // HelperClass.FetchToken(tokenBase, channelName, 0, this.RenewOrJoinToken);
+            JoinChannelVideoToken.MakeVideoView(0);
+        }
+
+        public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
+        {
+            _helloVideoTokenAgora.Log.UpdateLog("OnRejoinChannelSuccess");
+        }
+
+        public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
+        {
+            _helloVideoTokenAgora.Log.UpdateLog("OnLeaveChannel");
+            JoinChannelVideoToken.DestroyVideoView(0);
+        }
+
+        public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole,
+            CLIENT_ROLE_TYPE newRole)
+        {
+            _helloVideoTokenAgora.Log.UpdateLog("OnClientRoleChanged");
+        }
+
+        public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
+        {
+            _helloVideoTokenAgora.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid,
+                elapsed));
+            JoinChannelVideoToken.MakeVideoView(uid, _helloVideoTokenAgora.GetChannelName());
+        }
+
+        public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
+        {
+            _helloVideoTokenAgora.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+                (int)reason));
+            JoinChannelVideoToken.DestroyVideoView(uid);
+        }
+
+        public override void OnTokenPrivilegeWillExpire(RtcConnection connection, string token)
+        {
+            _helloVideoTokenAgora.StartCoroutine(HelperClass.FetchToken(JoinChannelVideoToken._tokenBase,
+                _helloVideoTokenAgora.GetChannelName(), 0, _helloVideoTokenAgora.RenewOrJoinToken));
+        }
+
+        public override void OnConnectionStateChanged(RtcConnection connection, CONNECTION_STATE_TYPE state,
+            CONNECTION_CHANGED_REASON_TYPE reason)
+        {
+            _helloVideoTokenAgora._state = state;
+        }
+
+        public override void OnConnectionLost(RtcConnection connection)
+        {
+            _helloVideoTokenAgora.Log.UpdateLog(string.Format("OnConnectionLost "));
+        }
+    }
+
+    #endregion
 }

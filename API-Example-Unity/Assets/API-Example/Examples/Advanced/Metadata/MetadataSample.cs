@@ -1,12 +1,12 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using Agora.Rtc;
-using Agora.Util;
-using UnityEngine.Serialization;
-using Logger = Agora.Util.Logger;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.Serialization;
+using Agora.Rtc;
+using Agora.Util;
+using Logger = Agora.Util.Logger;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MetadataSample
 {
@@ -56,9 +56,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MetadataSample
             _token = _appIdInput.token;
             _channelName = _appIdInput.channelName;
         }
-
-
-
 
         private bool CheckAppId()
         {
@@ -125,6 +122,22 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MetadataSample
             this.Log.UpdateLog("Sending: false");
         }
 
+        private void OnDestroy()
+        {
+            Debug.Log("OnDestroy");
+            if (RtcEngine == null) return;
+            RtcEngine.InitEventHandler(null);
+            RtcEngine.UnregisterMediaMetadataObserver();
+            RtcEngine.LeaveChannel();
+            RtcEngine.Dispose();
+        }
+
+        public string GetChannelName()
+        {
+            return this._channelName;
+        }
+
+         #region -- Video Render UI Logic ---
 
         internal static void MakeVideoView(uint uid, string channelId = "")
         {
@@ -223,22 +236,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MetadataSample
             }
         }
 
-        private void OnDestroy()
-        {
-            Debug.Log("OnDestroy");
-            if (RtcEngine == null) return;
-            RtcEngine.InitEventHandler(null);
-            RtcEngine.UnregisterMediaMetadataObserver();
-            RtcEngine.LeaveChannel();
-            RtcEngine.Dispose();
-        }
-
-        public string GetChannelName()
-        {
-            return this._channelName;
-        }
+        #endregion
     }
 
+    #region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -348,4 +349,5 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MetadataSample
         }
     }
 
+    #endregion
 }

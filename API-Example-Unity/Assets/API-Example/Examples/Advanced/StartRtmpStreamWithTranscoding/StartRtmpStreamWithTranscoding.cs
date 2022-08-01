@@ -7,7 +7,6 @@ using Logger = Agora.Util.Logger;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRtmpStreamWithTranscoding
 {
-
     public class StartRtmpStreamWithTranscoding : MonoBehaviour
     {
         [FormerlySerializedAs("appIdInput")]
@@ -87,7 +86,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRtmpStreamWithTran
             RtcEngine.JoinChannel(_token, _channelName);
         }
 
-
         private void SetUpUI()
         {
             var btn = this.transform.Find("StartButton").GetComponent<Button>();
@@ -166,7 +164,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRtmpStreamWithTran
             this.Log.UpdateLog("StopRtmpStream:" + nRet);
         }
 
-
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
@@ -176,11 +173,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRtmpStreamWithTran
             RtcEngine.Dispose();
         }
 
-        
         internal string GetChannelName()
         {
             return _channelName;
         }
+
+        #region -- Video Render UI Logic ---
 
         internal static void MakeVideoView(uint uid, string channelId = "")
         {
@@ -280,7 +278,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRtmpStreamWithTran
                 Destroy(go);
             }
         }
+
+        #endregion
     }
+
+    #region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -347,4 +349,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRtmpStreamWithTran
             _sample.Log.UpdateLog(string.Format("OnTranscodingUpdated"));
         }
     }
+
+    #endregion
 }

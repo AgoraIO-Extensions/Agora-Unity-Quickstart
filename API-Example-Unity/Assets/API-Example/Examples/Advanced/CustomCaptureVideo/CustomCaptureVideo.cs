@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using UnityEngine;
-using Agora.Rtc;
 using UnityEngine.UI;
-using Agora.Util;
 using UnityEngine.Serialization;
+using Agora.Rtc;
+using Agora.Util;
 using Logger = Agora.Util.Logger;
 
 #if UNITY_2018_1_OR_NEWER
@@ -176,16 +176,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
             return _channelName;
         }
 
-        private void DestroyVideoView(uint uid)
-        {
-            GameObject go = GameObject.Find(uid.ToString());
-            if (!ReferenceEquals(go, null))
-            {
-                Destroy(go);
-            }
-        }
+        #region -- Video Render UI Logic ---
 
-        public void MakeVideoView(uint uid, string channelId = "")
+        internal static void MakeVideoView(uint uid, string channelId = "")
         {
             GameObject go = GameObject.Find(uid.ToString());
             if (!ReferenceEquals(go, null))
@@ -275,59 +268,73 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
             return videoSurface;
         }
 
-        internal class UserEventHandler : IRtcEngineEventHandler
+        internal static void DestroyVideoView(uint uid)
         {
-            private readonly CustomCaptureVideo _customCaptureVideo;
-
-            internal UserEventHandler(CustomCaptureVideo customCaptureVideo)
+            GameObject go = GameObject.Find(uid.ToString());
+            if (!ReferenceEquals(go, null))
             {
-                _customCaptureVideo = customCaptureVideo;
+                Destroy(go);
             }
+        }
 
-            public override void OnError(int err, string msg)
-            {
-                _customCaptureVideo.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
-            }
+        #endregion
+    }
 
-            public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
-            {
-                _customCaptureVideo.Log.UpdateLog(string.Format("sdk version: ${0}",
-                    _customCaptureVideo.RtcEngine.GetVersion()));
-                _customCaptureVideo.Log.UpdateLog(
-                    string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
-                        connection.channelId, connection.localUid, elapsed));
-            }
+    #region -- Agora Event ---
 
-            public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
-            {
-                _customCaptureVideo.Log.UpdateLog("OnRejoinChannelSuccess");
-            }
+    internal class UserEventHandler : IRtcEngineEventHandler
+    {
+        private readonly CustomCaptureVideo _customCaptureVideo;
 
-            public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
-            {
-                _customCaptureVideo.Log.UpdateLog("OnLeaveChannel");
-            }
+        internal UserEventHandler(CustomCaptureVideo customCaptureVideo)
+        {
+            _customCaptureVideo = customCaptureVideo;
+        }
 
-            public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole,
-                CLIENT_ROLE_TYPE newRole)
-            {
-                _customCaptureVideo.Log.UpdateLog("OnClientRoleChanged");
-            }
+        public override void OnError(int err, string msg)
+        {
+            _customCaptureVideo.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));
+        }
 
-            public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
-            {
-                _customCaptureVideo.Log.UpdateLog(
-                    string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-                _customCaptureVideo.MakeVideoView(uid, _customCaptureVideo.GetChannelName());
-            }
+        public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
+        {
+            _customCaptureVideo.Log.UpdateLog(string.Format("sdk version: ${0}",
+                _customCaptureVideo.RtcEngine.GetVersion()));
+            _customCaptureVideo.Log.UpdateLog(
+                string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
+                    connection.channelId, connection.localUid, elapsed));
+        }
 
-            public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
-            {
-                _customCaptureVideo.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
-                    (int)reason));
-                _customCaptureVideo.DestroyVideoView(uid);
-            }
+        public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
+        {
+            _customCaptureVideo.Log.UpdateLog("OnRejoinChannelSuccess");
+        }
 
+        public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
+        {
+            _customCaptureVideo.Log.UpdateLog("OnLeaveChannel");
+        }
+
+        public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole,
+            CLIENT_ROLE_TYPE newRole)
+        {
+            _customCaptureVideo.Log.UpdateLog("OnClientRoleChanged");
+        }
+
+        public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
+        {
+            _customCaptureVideo.Log.UpdateLog(
+                string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+            CustomCaptureVideo.MakeVideoView(uid, _customCaptureVideo.GetChannelName());
+        }
+
+        public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
+        {
+            _customCaptureVideo.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
+                (int)reason));
+            CustomCaptureVideo.DestroyVideoView(uid);
         }
     }
+
+    #endregion
 }

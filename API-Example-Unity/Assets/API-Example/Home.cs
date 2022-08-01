@@ -1,20 +1,14 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Agora.Rtc;
-using Agora.Util;
 using UnityEngine.SceneManagement;
-using Logger = Agora.Util.Logger;
-
+using Agora.Util;
 
 public class Home : MonoBehaviour
 {
     public InputField AppIdInupt;
     public InputField ChannelInput;
     public InputField TokenInput;
-
 
     public AppIdInput AppInputConfig;
     public GameObject CasePanel;
@@ -63,14 +57,10 @@ public class Home : MonoBehaviour
         "VoiceChangerScene"
     };
 
-
-
     private void Awake()
     {
-#if (UNITY_2018_3_OR_NEWER && UNITY_ANDROID)
         PermissionHelper.RequestMicrophontPermission();
         PermissionHelper.RequestCameraPermission();
-#endif
 
         GameObject content = GameObject.Find("Content");
         var contentRectTrans = content.GetComponent<RectTransform>();

@@ -1,21 +1,17 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
 using Agora.Util;
 using Logger = Agora.Util.Logger;
-using Random = UnityEngine.Random;
-using System.IO;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
 {
-
     public class AudioSpectrum : MonoBehaviour
     {
-
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
         private AppIdInput _appIdInput;
@@ -39,8 +35,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
         internal IMediaPlayer MediaPlayer = null;
-
-
 
         private const string MPK_URL =
             "https://agora-adc-artifacts.oss-cn-beijing.aliyuncs.com/video/meta_live_mpk.mov";
@@ -86,7 +80,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
                 }
                 data.Clear();
             }
-
         }
 
         private void SetUpUI()
@@ -160,9 +153,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
             this.Log.UpdateLog("playerId id: " + MediaPlayer.GetId());
 
             MediaPlayer.RegisterMediaPlayerAudioSpectrumObserver(new UserAudioSpectrumObserver(this), 16);
-
         }
-
 
         private void JoinChannelWithMPK()
         {
@@ -231,13 +222,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
             this.Log.UpdateLog("Open returns: " + ret);
         }
 
-        private void OnOpenWithCustomSource()
-        {
-            var ret = MediaPlayer.OpenWithCustomSource(0, new UserPlayerCustomDataProvider(this));
-            this.Log.UpdateLog("OpenWithCustomSource" + ret);
-        }
-
-
         private void TestMediaPlayer()
         {
             long duration = 0;
@@ -275,11 +259,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
             RtcEngine = null;
         }
 
-
         internal string GetChannelName()
         {
             return _channelName;
         }
+
+        #region -- Video Render UI Logic ---
 
         internal static void MakeVideoView(uint uid, string channelId = "", VIDEO_SOURCE_TYPE videoSourceType = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA)
         {
@@ -369,7 +354,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
                 Destroy(go);
             }
         }
+
+        #endregion
     }
+
+    #region -- Agora Event ---
 
     internal class MpkEventHandler : IMediaPlayerSourceObserver
     {
@@ -459,7 +448,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
 
     internal class UserPlayerCustomDataProvider : IMediaPlayerCustomDataProvider
     {
-
         AudioSpectrum _sample;
 
         internal UserPlayerCustomDataProvider(AudioSpectrum sample)
@@ -482,7 +470,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
 
     internal class UserAudioSpectrumObserver : IAudioSpectrumObserver
     {
-
         AudioSpectrum _sample;
         bool s = true;
 
@@ -511,9 +498,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
 
         public override bool OnRemoteAudioSpectrum(UserAudioSpectrumInfo[] spectrums, uint spectrumNumber)
         {
-            //Debug.Log(AgoraJson.ToJson(data));
             return true;
         }
     }
 
+    #endregion
 }

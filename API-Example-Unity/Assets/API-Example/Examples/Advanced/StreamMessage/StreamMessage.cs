@@ -1,15 +1,13 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Serialization;
 using Agora.Rtc;
 using Agora.Util;
-using UnityEngine.Serialization;
 using Logger = Agora.Util.Logger;
 using System;
-using System.Runtime.InteropServices;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StreamMessage
 {
-
     public class StreamMessage : MonoBehaviour
     {
         [FormerlySerializedAs("appIdInput")]
@@ -100,7 +98,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StreamMessage
             ui.gameObject.SetActive(visible);
         }
 
-
         private void onSendButtonPress()
         {
             var text = this.transform.Find("UI/InputField").GetComponent<InputField>();
@@ -135,7 +132,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StreamMessage
             return _streamId;
         }
 
-
         private void SendStreamMessage(int streamId, string message)
         {
             byte[] byteArray = System.Text.Encoding.Default.GetBytes(message);
@@ -153,6 +149,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StreamMessage
         }
     }
 
+    #region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -218,7 +215,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StreamMessage
         {
             _streamMessage.Log.UpdateLog(string.Format("OnStreamMessageError remoteUid: {0}, streamId: {1}, code: {2}, missed: {3}, cached: {4}", remoteUid, streamId, code, missed, cached));
         }
-
     }
 
+    #endregion
 }

@@ -131,6 +131,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             videoSurface.SetEnable(true);
         }
 
+        #region -- Video Render UI Logic ---
+
         // VIDEO TYPE 1: 3D Object
         private static VideoSurface MakePlaneSurface(string goName)
         {
@@ -198,7 +200,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
                 Destroy(go);
             }
         }
+
+        # endregion
     }
+
+    #region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -265,4 +271,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             _videoSample.Log.UpdateLog("OnDownlinkNetworkInfoUpdated");
         }
     }
+
+    # endregion
 }
