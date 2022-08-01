@@ -87,12 +87,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 
         private void UpdateChannelMediaOptions()
         {
-
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.autoSubscribeAudio.SetValue(true);
             options.autoSubscribeVideo.SetValue(true);
 
-           
             options.publishCameraTrack.SetValue(false);
             options.publishScreenTrack.SetValue(true);
             
@@ -209,35 +207,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 #endif
         }
 
-        private void EnableExtension()
-        {
-#if UNITY_EDITOR_WIN && UNITY_64
-            string libPath = Application.dataPath + "/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/x86_64/libagora_screen_capture_extension.dll";
-            libPath = libPath.Replace('/', '\\');
-            var nRet = RtcEngine.LoadExtensionProvider(libPath);
-            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
-#elif UNITY_STANDALONE_WIN && UNITY_64
-            string libPath = Application.dataPath + "/Plugins/x86_64/libagora_screen_capture_extension.dll";
-            libPath = libPath.Replace('/', '\\');
-            var nRet = RtcEngine.LoadExtensionProvider(libPath);
-            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
-#elif UNITY_EDITOR_WIN
-            string libPath = Application.dataPath + "/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/x86/libagora_screen_capture_extension.dll";
-            libPath = libPath.Replace('/', '\\');
-            var nRet = RtcEngine.LoadExtensionProvider(libPath);
-            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
-#elif UNITY_STANDALONE_WIN
-            string libPath = Application.dataPath + "/Plugins/x86/libagora_screen_capture_extension.dll";
-            libPath = libPath.Replace('/', '\\');
-            var nRet = RtcEngine.LoadExtensionProvider(libPath);
-            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
-#elif UNITY_ANDROID
-            //var nRet = RtcEngine.LoadExtensionProvider("agora_video_process_extension");
-            //this.Log.UpdateLog("LoadExtensionProvider:" + nRet);
-#endif
-           
-        }
-
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
@@ -246,7 +215,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             RtcEngine.LeaveChannel();
             RtcEngine.Dispose();
         }
-
 
         internal string GetChannelName()
         {
