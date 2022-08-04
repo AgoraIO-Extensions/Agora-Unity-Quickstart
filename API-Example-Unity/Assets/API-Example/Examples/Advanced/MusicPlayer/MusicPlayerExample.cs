@@ -195,7 +195,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
 
             var chartType = this.musicChartCollection.musicChartInfo[0];
             string requestId = "";
-            var ret = MusicContentCenter.GetMusicCollectionByMusicChartId(ref requestId, chartType.id, 1, 50, "");
+            var ret = MusicContentCenter.GetMusicCollectionByMusicChartId(ref requestId, chartType.id, 0, 5, "");
             this.Log.UpdateLog("GetMusicCollectionByMusicChartId: " + ret);
             this.Log.UpdateLog("requestId: " + requestId);
         }
@@ -247,7 +247,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
         void OnSearchMusicButtonClick()
         {
             string requestId = "";
-            var nRet = MusicContentCenter.SearchMusic(ref requestId, "周杰伦", 0, 10, "");
+            var nRet = MusicContentCenter.SearchMusic(ref requestId, "周杰伦", 0, 5, "");
             this.Log.UpdateLog("SearchSong: " + nRet);
             this.Log.UpdateLog("requestId: " + requestId);
         }
