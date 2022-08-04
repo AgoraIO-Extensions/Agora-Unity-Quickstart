@@ -477,7 +477,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
 
         public override void OnMusicChartsResult(string requestId, MusicContentCenterStatusCode status, MusicChartCollection result)
         {
-            this._sample.Log.UpdateLog(string.Format("OnMusicChartsTypeResult requestId:{0} CopyRightMusicStatusCode:{1} result.count:{2}", requestId, status, result.count));
+            this._sample.Log.UpdateLog(string.Format("OnMusicChartsResult requestId:{0} CopyRightMusicStatusCode:{1} result.count:{2}", requestId, status, result.count));
             var str = AgoraJson.ToJson<MusicChartCollection>(result);
             Debug.Log(str);
 
@@ -488,14 +488,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
 
         public override void OnMusicCollectionResult(string requestId, MusicContentCenterStatusCode status, MusicCollection result)
         {
-            this._sample.Log.UpdateLog(string.Format("OnSongListResult requestId:{0} status:{1} result.count:{2}", requestId, status, result.count));
+            this._sample.Log.UpdateLog(string.Format("OnMusicCollectionResult requestId:{0} status:{1} result.count:{2}", requestId, status, result.count));
             var str = AgoraJson.ToJson<MusicCollection>(result);
             Debug.Log(str);
 
             this._sample.PreloadButton.gameObject.SetActive(true);
             this._sample.OpenButton.gameObject.SetActive(true);
             this._sample.GetLyricButton.gameObject.SetActive(true);
-            this._sample.PreloadButton.gameObject.SetActive(true);
+            this._sample.IsPreloadButton.gameObject.SetActive(true);
 
             this._sample.musicCollection = result;
 
