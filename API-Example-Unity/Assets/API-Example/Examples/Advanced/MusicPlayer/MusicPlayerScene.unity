@@ -199,7 +199,7 @@ GameObject:
   - component: {fileID: 78665501}
   - component: {fileID: 78665500}
   m_Layer: 5
-  m_Name: SearchSong
+  m_Name: SearchMusic
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -926,7 +926,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: SearchSong
+  m_Text: SearchMusic
 --- !u!222 &1300483603
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1007,7 +1007,7 @@ GameObject:
   - component: {fileID: 1387658495}
   - component: {fileID: 1387658494}
   m_Layer: 5
-  m_Name: GetMusicChart
+  m_Name: GetMusicCollection
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1284,7 +1284,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: GetMusicChart
+  m_Text: 'GetMusicCollection
+
+'
 --- !u!222 &1572771577
 CanvasRenderer:
   m_ObjectHideFlags: 0
