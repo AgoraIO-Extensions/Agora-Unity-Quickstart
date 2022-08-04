@@ -39,12 +39,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
         internal IMusicPlayer MusicPlayer = null;
 
         internal Button GetMusicChartsButton;
-        internal Button GetMusicChartButton;
+        internal Button GetMusicCollectionButton;
         internal Button PreloadButton;
         internal Button IsPreloadButton;
         internal Button OpenButton;
         internal Button GetLyricButton;
-        internal Button SearchSongButton;
+        internal Button SearchMusicButton;
 
         internal MusicChartCollection musicChartCollection = null;
         internal MusicCollection musicCollection = null;
@@ -73,9 +73,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             GetMusicChartsButton.onClick.AddListener(OnGetMusicChartsButtonClick);
             GetMusicChartsButton.gameObject.SetActive(false);
 
-            GetMusicChartButton = GameObject.Find("GetMusicChart").GetComponent<Button>();
-            GetMusicChartButton.onClick.AddListener(OnMusicCollectionButtonClick);
-            GetMusicChartButton.gameObject.SetActive(false);
+            GetMusicCollectionButton = GameObject.Find("GetMusicCollection").GetComponent<Button>();
+            GetMusicCollectionButton.onClick.AddListener(OnMusicCollectionButtonClick);
+            GetMusicCollectionButton.gameObject.SetActive(false);
 
             PreloadButton = GameObject.Find("Preload").GetComponent<Button>();
             PreloadButton.onClick.AddListener(OnPreloadButtonClick);
@@ -89,11 +89,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             GetLyricButton.onClick.AddListener(OnGetLyricButtonClick);
             GetLyricButton.gameObject.SetActive(false);
 
-            SearchSongButton = GameObject.Find("SearchSong").GetComponent<Button>();
-            SearchSongButton.onClick.AddListener(OnSearchMusicButtonClick);
-            SearchSongButton.gameObject.SetActive(false);
+            SearchMusicButton = GameObject.Find("SearchMusic").GetComponent<Button>();
+            SearchMusicButton.onClick.AddListener(OnSearchMusicButtonClick);
+            SearchMusicButton.gameObject.SetActive(false);
 
-            IsPreloadButton = GameObject.Find("IsPreloadButton").GetComponent<Button>();
+            IsPreloadButton = GameObject.Find("IsPreload").GetComponent<Button>();
             IsPreloadButton.onClick.AddListener(OnIsPrelaodButtonClick);
             IsPreloadButton.gameObject.SetActive(false);
 
@@ -481,8 +481,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             var str = AgoraJson.ToJson<MusicChartCollection>(result);
             Debug.Log(str);
 
-            this._sample.GetMusicChartButton.gameObject.SetActive(true);
-            this._sample.SearchSongButton.gameObject.SetActive(true);
+            this._sample.GetMusicCollectionButton.gameObject.SetActive(true);
+            this._sample.SearchMusicButton.gameObject.SetActive(true);
             this._sample.musicChartCollection = result;
         }
 
