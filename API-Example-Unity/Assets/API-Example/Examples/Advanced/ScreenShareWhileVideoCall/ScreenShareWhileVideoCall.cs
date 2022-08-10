@@ -42,14 +42,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
         // Use this for initialization
         private void Start()
         {
-#if UNITY_IPHONE
-           this.LogText.text = "ios or Android is not supported, but you can see how it works on the Editor for Windows/MacOS/Android";
-#else
             LoadAssetData();
             if (CheckAppId())
             {
                 InitEngine();
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_IPHONE
                 GameObject.Find("winIdSelect").SetActive(false);
                 var Ret = RtcEngine.LoadExtensionProvider("agora_screen_capture_extension");
                 this.Log.UpdateLog("LoadExtensionProvider:" + Ret);
@@ -59,7 +56,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
                 EnableUI();
                 JoinChannel();
             }
-#endif
         }
 
         private bool CheckAppId()
@@ -101,11 +97,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.autoSubscribeAudio.SetValue(false);
             options.autoSubscribeVideo.SetValue(false);
-            //options.publishAudioTrack.SetValue(false);
             options.publishCameraTrack.SetValue(false);
             options.publishScreenTrack.SetValue(true);
             options.enableAudioRecordingOrPlayout.SetValue(false);
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_IPHONE
             options.publishScreenCaptureAudio.SetValue(true);
             options.publishScreenCaptureVideo.SetValue(true);
 #endif
@@ -128,7 +123,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
             options.publishCameraTrack.SetValue(false);
             options.publishScreenTrack.SetValue(true);
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_IPHONE
             options.publishScreenCaptureAudio.SetValue(true);
             options.publishScreenCaptureVideo.SetValue(true);
 #endif
@@ -190,10 +185,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
 
             if (_startShareBtn != null) _startShareBtn.gameObject.SetActive(false);
             if (_stopShareBtn != null) _stopShareBtn.gameObject.SetActive(true);
-
-#if UNITY_IPHONE
-            //iPhone not support screen capture       
-#elif UNITY_ANDROID
+      
+#if UNITY_ANDROID || UNITY_IPHONE
             var parameters2 = new ScreenCaptureParameters2();
             parameters2.captureAudio = true;
             parameters2.captureVideo = true;
@@ -221,7 +214,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
                     new ScreenCaptureParameters { captureMouseCursor = true, frameRate = 30 });
                 this.Log.UpdateLog("StartScreenCaptureByDisplayId:" + nRet);
             }
-
 #endif
 
             ScreenShareJoinChannel();
