@@ -69,9 +69,6 @@ EditorBuildSettings:
     path: Assets/API-Example/Examples/Advanced/PushEncodedVideoImage/PushEncodedVideoImageScene.unity
     guid: 7a3330e99946a4ef6b4dd2ba142aeb93
   - enabled: 1
-    path: Assets/API-Example/Examples/Advanced/RtmpStreaming/RtmpStreamingScene.unity
-    guid: 306a24989d16a409ead7cc1a7406bf1d
-  - enabled: 1
     path: Assets/API-Example/Examples/Advanced/ScreenShare/ScreenShareScene.unity
     guid: 808bde60265534ed88253e319faab94a
   - enabled: 1

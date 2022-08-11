@@ -41,7 +41,6 @@ public class Home : MonoBehaviour
         "ProcessAudioRawDataScene",
         "ProcessVideoRawDataScene",
         "PushEncodedVideoImageScene",
-        "RtmpStreamingScene",
         "ScreenShareScene",
         "ScreenShareWhileVideoCallScene",
         "SetBeautyEffectOptionsScene",
