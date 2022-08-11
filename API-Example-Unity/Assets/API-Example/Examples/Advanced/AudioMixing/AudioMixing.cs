@@ -1,8 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Serialization;
 using Agora.Rtc;
 using Agora.Util;
-using UnityEngine.Serialization;
 using Logger = Agora.Util.Logger;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
@@ -27,8 +27,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
         private string _channelName = "";
 
         [SerializeField] public string Sound_URL = "";
-
-
 
         private string _localPath = "";
 
@@ -91,10 +89,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
             _urlToggle = GameObject.Find("Toggle").GetComponent<Toggle>();
             _loopbackToggle = GameObject.Find("Loopback").GetComponent<Toggle>();
 
-          
 
 #if UNITY_ANDROID && !UNITY_EDITOR
-        // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
+            // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
             _localPath = "/assets/audio/Agora.io-Interactions.mp3";
 #else
             _localPath = Application.streamingAssetsPath + "/audio/" + "Agora.io-Interactions.mp3";
@@ -129,13 +126,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
         private void PlayEffectTest()
         {
             Debug.Log("Playing with " + (_urlToggle.isOn ? "URL" : "local file"));
-            //IAudioEffectManager effectManager = mRtcEngine.GetAudioEffectManager();
             RtcEngine.PlayEffect(1, _urlToggle.isOn ? Sound_URL : _localPath, 1, 1.0, 0, 100, true);
         }
 
         private void StopEffectTest()
         {
-            //IAudioEffectManager effectManager = mRtcEngine.GetAudioEffectManager();
             RtcEngine.StopAllEffects();
         }
 
@@ -209,6 +204,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
         #endregion
     }
 
+    #region -- Agora Event ---
+
     internal class UserEventHandler : IRtcEngineEventHandler
     {
         private readonly AudioMixing _audioMixing;
@@ -266,4 +263,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
                 state, errorCode));
         }
     }
+
+    #endregion
 }

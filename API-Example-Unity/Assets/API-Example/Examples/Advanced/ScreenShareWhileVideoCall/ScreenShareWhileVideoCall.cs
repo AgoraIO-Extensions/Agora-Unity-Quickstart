@@ -6,7 +6,6 @@ using Agora.Rtc;
 using Agora.Util;
 using UnityEngine.Serialization;
 using Logger = Agora.Util.Logger;
-using Random = UnityEngine.Random;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCall
 {
@@ -43,17 +42,20 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
         // Use this for initialization
         private void Start()
         {
-#if UNITY_IPHONE || UNITY_ANDROID
-           this.LogText.text = "ios or Android is not supported, but you can see how it works on the Editor for Windows/MacOS";
-#else
             LoadAssetData();
             if (CheckAppId())
             {
                 InitEngine();
+#if UNITY_ANDROID || UNITY_IPHONE
+                GameObject.Find("winIdSelect").SetActive(false);
+                var Ret = RtcEngine.LoadExtensionProvider("agora_screen_capture_extension");
+                this.Log.UpdateLog("LoadExtensionProvider:" + Ret);
+#else       
                 PrepareScreenCapture();
+#endif
+                EnableUI();
                 JoinChannel();
             }
-#endif
         }
 
         private bool CheckAppId()
@@ -95,10 +97,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.autoSubscribeAudio.SetValue(false);
             options.autoSubscribeVideo.SetValue(false);
-            //options.publishAudioTrack.SetValue(false);
             options.publishCameraTrack.SetValue(false);
             options.publishScreenTrack.SetValue(true);
             options.enableAudioRecordingOrPlayout.SetValue(false);
+#if UNITY_ANDROID || UNITY_IPHONE
+            options.publishScreenCaptureAudio.SetValue(true);
+            options.publishScreenCaptureVideo.SetValue(true);
+#endif
             options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             var ret = RtcEngine.JoinChannelEx(_token, new RtcConnection(_channelName, this.Uid2), options);
             Debug.Log("JoinChannelEx returns: " + ret);
@@ -107,6 +112,26 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
         private void ScreenShareLeaveChannel()
         {
             RtcEngine.LeaveChannelEx(new RtcConnection(_channelName, Uid2));
+        }
+
+        private void UpdateChannelMediaOptions()
+        {
+            ChannelMediaOptions options = new ChannelMediaOptions();
+            options.autoSubscribeAudio.SetValue(false);
+            options.autoSubscribeVideo.SetValue(false);
+
+            options.publishCameraTrack.SetValue(false);
+            options.publishScreenTrack.SetValue(true);
+
+#if UNITY_ANDROID || UNITY_IPHONE
+            options.publishScreenCaptureAudio.SetValue(true);
+            options.publishScreenCaptureVideo.SetValue(true);
+#endif
+
+            options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+
+            var ret = RtcEngine.UpdateChannelMediaOptions(options);
+            Debug.Log("UpdateChannelMediaOptions returns: " + ret);
         }
 
         private void InitEngine()
@@ -119,7 +144,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(new UserEventHandler(this));
         }
-
 
         private void PrepareScreenCapture()
         {
@@ -139,8 +163,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
 
             _winIdSelect.AddOptions(info.Select(w =>
                     new Dropdown.OptionData(
-                        string.Format("{0}: {1}-{2} | {3}",w.type, w.sourceName, w.sourceTitle, w.sourceId)))
+                        string.Format("{0}: {1}-{2} | {3}", w.type, w.sourceName, w.sourceTitle, w.sourceId)))
                 .ToList());
+        }
+
+        private void EnableUI()
+        {
             _startShareBtn = GameObject.Find("startShareBtn").GetComponent<Button>();
             _stopShareBtn = GameObject.Find("stopShareBtn").GetComponent<Button>();
             if (_startShareBtn != null) _startShareBtn.onClick.AddListener(OnStartShareBtnClick);
@@ -154,36 +182,40 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
         private void OnStartShareBtnClick()
         {
             if (RtcEngine == null) return;
-            
 
             if (_startShareBtn != null) _startShareBtn.gameObject.SetActive(false);
             if (_stopShareBtn != null) _stopShareBtn.gameObject.SetActive(true);
+      
+#if UNITY_ANDROID || UNITY_IPHONE
+            var parameters2 = new ScreenCaptureParameters2();
+            parameters2.captureAudio = true;
+            parameters2.captureVideo = true;
+            var nRet = RtcEngine.StartScreenCapture(parameters2);
+            this.Log.UpdateLog("StartScreenCapture :" + nRet);
+#else
             RtcEngine.StopScreenCapture();
-
             if (_winIdSelect == null) return;
             var option = _winIdSelect.options[_winIdSelect.value].text;
             if (string.IsNullOrEmpty(option)) return;
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-            var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
-            Log.UpdateLog(string.Format(">>>>> Start sharing {0}", windowId));
-            RtcEngine.StartScreenCaptureByWindowId(ulong.Parse(windowId), default(Rectangle),
-                    default(ScreenCaptureParameters));
-#elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
+
             if (option.Contains("ScreenCaptureSourceType_Window"))
             {
                 var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
                 Log.UpdateLog(string.Format(">>>>> Start sharing {0}", windowId));
-                RtcEngine.StartScreenCaptureByWindowId(ulong.Parse(windowId), default(Rectangle),
+                var nRet = RtcEngine.StartScreenCaptureByWindowId(ulong.Parse(windowId), default(Rectangle),
                         default(ScreenCaptureParameters));
+                this.Log.UpdateLog("StartScreenCaptureByWindowId:" + nRet);
             }
             else
             {
                 var dispId = uint.Parse(option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1]);
                 Log.UpdateLog(string.Format(">>>>> Start sharing display {0}", dispId));
-                RtcEngine.StartScreenCaptureByDisplayId(dispId, default(Rectangle),
+                var nRet = RtcEngine.StartScreenCaptureByDisplayId(dispId, default(Rectangle),
                     new ScreenCaptureParameters { captureMouseCursor = true, frameRate = 30 });
+                this.Log.UpdateLog("StartScreenCaptureByDisplayId:" + nRet);
             }
 #endif
+
             ScreenShareJoinChannel();
         }
 
@@ -209,14 +241,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
             return _channelName;
         }
 
-        internal static void DestroyVideoView(string name)
-        {
-            var go = GameObject.Find(name);
-            if (!ReferenceEquals(go, null))
-            {
-                Destroy(go);
-            }
-        }
+        #region -- Video Render UI Logic ---
 
         internal static void MakeVideoView(uint uid, string channelId = "", VIDEO_SOURCE_TYPE videoSourceType = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA)
         {
@@ -310,7 +335,20 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
             var videoSurface = go.AddComponent<VideoSurface>();
             return videoSurface;
         }
+
+        internal static void DestroyVideoView(string name)
+        {
+            var go = GameObject.Find(name);
+            if (!ReferenceEquals(go, null))
+            {
+                Destroy(go);
+            }
+        }
+
+        #endregion
     }
+
+    #region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -385,4 +423,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
             }
         }
     }
+
+    #endregion
 }

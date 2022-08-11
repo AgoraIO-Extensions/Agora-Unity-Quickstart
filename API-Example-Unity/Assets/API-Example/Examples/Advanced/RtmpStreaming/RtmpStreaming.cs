@@ -34,7 +34,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.RtmpStreaming
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
       
-        private uint _remoteUid = 0;
+        internal uint _remoteUid = 0;
         private bool _isStreaming = false;
 
         // Use this for initialization
@@ -82,7 +82,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.RtmpStreaming
             RtcEngine.InitEventHandler(new UserEventHandler(this));
         }
 
-        private void StartTranscoding(bool ifRemoteUser = false)
+        internal void StartTranscoding(bool ifRemoteUser = false)
         {
             //if (_isStreaming && !ifRemoteUser) return;
             //if (_isStreaming && ifRemoteUser)
@@ -173,16 +173,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.RtmpStreaming
             return _channelName;
         }
 
-        private void DestroyVideoView(uint uid)
-        {
-            GameObject go = GameObject.Find(uid.ToString());
-            if (!ReferenceEquals(go, null))
-            {
-                Object.Destroy(go);
-            }
-        }
+        #region -- Video Render UI Logic ---
 
-        private void MakeVideoView(uint uid, string channelId = "")
+        internal static void MakeVideoView(uint uid, string channelId = "")
         {
             GameObject go = GameObject.Find(uid.ToString());
             if (!ReferenceEquals(go, null))
@@ -274,75 +267,90 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.RtmpStreaming
             return videoSurface;
         }
 
-        internal class UserEventHandler : IRtcEngineEventHandler
+        internal static void DestroyVideoView(uint uid)
         {
-            private readonly RtmpStreaming _rtmpStreaming;
-
-            internal UserEventHandler(RtmpStreaming rtmpStreaming)
+            GameObject go = GameObject.Find(uid.ToString());
+            if (!ReferenceEquals(go, null))
             {
-                _rtmpStreaming = rtmpStreaming;
+                Object.Destroy(go);
             }
-
-            public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
-            {
-                _rtmpStreaming.Log.UpdateLog(string.Format("sdk version: ${0}",
-                    _rtmpStreaming.RtcEngine.GetVersion()));
-                _rtmpStreaming.Log.UpdateLog(string.Format(
-                    "onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
-                    connection.localUid, elapsed));
-                _rtmpStreaming.MakeVideoView(0);
-                _rtmpStreaming.StartTranscoding();
-            }
-
-            public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
-            {
-                _rtmpStreaming.Log.UpdateLog("OnLeaveChannelSuccess");
-                _rtmpStreaming.DestroyVideoView(0);
-            }
-
-            public override void OnUserJoined(RtcConnection connection, uint remoteUid, int elapsed)
-            {
-                if (_rtmpStreaming._remoteUid == 0) _rtmpStreaming._remoteUid = remoteUid;
-                _rtmpStreaming.StartTranscoding(true);
-                _rtmpStreaming.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}",
-                    connection.localUid, elapsed));
-                _rtmpStreaming.MakeVideoView(remoteUid, _rtmpStreaming.GetChannelName());
-            }
-
-            public override void OnUserOffline(RtcConnection connection, uint remoteUid,
-                USER_OFFLINE_REASON_TYPE reason)
-            {
-                _rtmpStreaming._remoteUid = 0;
-                _rtmpStreaming.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", remoteUid,
-                    (int)reason));
-                _rtmpStreaming.DestroyVideoView(remoteUid);
-            }
-
-            public override void OnError(int error, string msg)
-            {
-                _rtmpStreaming.Log.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
-            }
-
-            public override void OnConnectionLost(RtcConnection connection)
-            {
-                _rtmpStreaming.Log.UpdateLog("OnConnectionLost ");
-            }
-
-            //public override void OnStreamPublished(string url, int error)
-            //{
-            //    _rtmpStreaming.Log.UpdateLog(string.Format("OnStreamPublished url: {0}, error : {1}", url, error));
-            //}
-
-            public override void OnRtmpStreamingStateChanged(string url, RTMP_STREAM_PUBLISH_STATE state, RTMP_STREAM_PUBLISH_ERROR_TYPE errCode)
-            {
-                _rtmpStreaming.Log.UpdateLog(string.Format(
-                    "OnRtmpStreamingStateChanged url: {0}, state:{1} code: {2}", url, state, errCode));
-            }
-
-            // public override void OnRtmpStreamingEvent(string url, RTMP_STREAMING_EVENT code)
-            // {
-            //     _rtmpStreaming.Logger.UpdateLog(string.Format("OnRtmpStreamingEvent url: {0}, code: {1}", url, code));
-            // }
         }
+
+        #endregion
     }
+
+    #region -- Agora Event ---
+
+    internal class UserEventHandler : IRtcEngineEventHandler
+    {
+        private readonly RtmpStreaming _rtmpStreaming;
+
+        internal UserEventHandler(RtmpStreaming rtmpStreaming)
+        {
+            _rtmpStreaming = rtmpStreaming;
+        }
+
+        public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
+        {
+            _rtmpStreaming.Log.UpdateLog(string.Format("sdk version: ${0}",
+                _rtmpStreaming.RtcEngine.GetVersion()));
+            _rtmpStreaming.Log.UpdateLog(string.Format(
+                "onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
+                connection.localUid, elapsed));
+            RtmpStreaming.MakeVideoView(0);
+            _rtmpStreaming.StartTranscoding();
+        }
+
+        public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
+        {
+            _rtmpStreaming.Log.UpdateLog("OnLeaveChannelSuccess");
+            RtmpStreaming.DestroyVideoView(0);
+        }
+
+        public override void OnUserJoined(RtcConnection connection, uint remoteUid, int elapsed)
+        {
+            if (_rtmpStreaming._remoteUid == 0) _rtmpStreaming._remoteUid = remoteUid;
+            _rtmpStreaming.StartTranscoding(true);
+            _rtmpStreaming.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}",
+                connection.localUid, elapsed));
+            RtmpStreaming.MakeVideoView(remoteUid, _rtmpStreaming.GetChannelName());
+        }
+
+        public override void OnUserOffline(RtcConnection connection, uint remoteUid,
+            USER_OFFLINE_REASON_TYPE reason)
+        {
+            _rtmpStreaming._remoteUid = 0;
+            _rtmpStreaming.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", remoteUid,
+                (int)reason));
+            RtmpStreaming.DestroyVideoView(remoteUid);
+        }
+
+        public override void OnError(int error, string msg)
+        {
+            _rtmpStreaming.Log.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
+        }
+
+        public override void OnConnectionLost(RtcConnection connection)
+        {
+            _rtmpStreaming.Log.UpdateLog("OnConnectionLost ");
+        }
+
+        //public override void OnStreamPublished(string url, int error)
+        //{
+        //    _rtmpStreaming.Log.UpdateLog(string.Format("OnStreamPublished url: {0}, error : {1}", url, error));
+        //}
+
+        public override void OnRtmpStreamingStateChanged(string url, RTMP_STREAM_PUBLISH_STATE state, RTMP_STREAM_PUBLISH_ERROR_TYPE errCode)
+        {
+            _rtmpStreaming.Log.UpdateLog(string.Format(
+                "OnRtmpStreamingStateChanged url: {0}, state:{1} code: {2}", url, state, errCode));
+        }
+
+        // public override void OnRtmpStreamingEvent(string url, RTMP_STREAMING_EVENT code)
+        // {
+        //     _rtmpStreaming.Logger.UpdateLog(string.Format("OnRtmpStreamingEvent url: {0}, code: {1}", url, code));
+        // }
+    }
+
+    #endregion
 }

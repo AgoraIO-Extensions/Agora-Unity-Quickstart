@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Serialization;
 using Agora.Rtc;
 using Agora.Util;
-using UnityEngine.Serialization;
 using Logger = Agora.Util.Logger;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DeviceManager
@@ -42,7 +42,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DeviceManager
         private void Start()
         {
 #if UNITY_IPHONE || UNITY_ANDROID
-            this.LogText.text = "Not Support in this platform!";
+            this.LogText.text = "iOS/Android is not supported, but you could see how it works on the Editor for Windows/MacOS";
 
 #else
             LoadAssetData();
@@ -51,7 +51,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DeviceManager
                 CheckAppId();
                 InitRtcEngine();
                 CallDeviceManagerApi();
-                //JoinChannel();
             }
 #endif
         }
@@ -146,18 +145,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DeviceManager
                 var ret = _videoDeviceManager.SetDevice(_videoDeviceInfos[DEVICE_INDEX].deviceId);
                 Debug.Log("SetDevice returns: " + ret);
             }
-
         }
 
         private void SetCurrentDeviceVolume()
         {
             if (_audioDeviceManager != null) _audioDeviceManager.SetRecordingDeviceVolume(100);
             if (_audioDeviceManager != null) _audioDeviceManager.SetPlaybackDeviceVolume(100);
-        }
-
-        private void JoinChannel()
-        {
-            RtcEngine.JoinChannel(_token, _channelName, "");
         }
 
         private void OnDestroy()
@@ -169,6 +162,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DeviceManager
             RtcEngine.Dispose();
         }
     }
+
+    #region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -219,4 +214,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DeviceManager
                 (int)reason));
         }
     }
+
+    #endregion
 }

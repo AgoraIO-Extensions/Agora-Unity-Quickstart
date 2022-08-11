@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Threading;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.UI;
-using RingBuffer;
 using UnityEngine.Serialization;
 using Agora.Rtc;
 using Agora.Util;
-using System.Runtime.InteropServices;
 using Logger = Agora.Util.Logger;
+using RingBuffer;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
 {
@@ -145,7 +145,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
             }
         }
 
-
         private void PullAudioFrameThread()
         {
             var avsync_type = 0;
@@ -211,7 +210,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
             return floatArray;
         }
 
-
         private void OnAudioRead(float[] data)
         {
             //if (!_startSignal) return;
@@ -235,6 +233,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
             Debug.LogFormat("buffer length remains: {0}", _writeCount - _readCount);
         }
     }
+
+    #region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -267,4 +267,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
             _customAudioSinkSample.Log.UpdateLog(string.Format("OnConnectionLost "));
         }
     }
+
+    #endregion
 }

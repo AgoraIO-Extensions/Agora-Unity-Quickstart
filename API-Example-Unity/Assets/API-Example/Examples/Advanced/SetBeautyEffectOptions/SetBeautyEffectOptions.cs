@@ -5,13 +5,10 @@ using Agora.Rtc;
 using Agora.Util;
 using Logger = Agora.Util.Logger;
 
-
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetBeautyEffectOptions
 {
-
     public class SetBeautyEffectOptions : MonoBehaviour
     {
-
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
         private AppIdInput _appIdInput;
@@ -52,7 +49,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetBeautyEffectOptions
             {
                 SetUpUI();
                 InitEngine();
-                EnableExtension();
+                InitLogFilePath();
+                //EnableExtension();
                 JoinChannel();
             }
 
@@ -103,31 +101,41 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetBeautyEffectOptions
         private void EnableExtension()
         {
 #if UNITY_EDITOR_WIN && UNITY_64
-            string libPath = Application.dataPath + "/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/x86_64/libagora_video_process_extension.dll";
+            string libPath = Application.dataPath + "/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/x86_64/libagora_clear_vision_extension.dll";
             libPath = libPath.Replace('/', '\\');
             var nRet = RtcEngine.LoadExtensionProvider(libPath);
             this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
 #elif UNITY_STANDALONE_WIN && UNITY_64
-            string libPath = Application.dataPath + "/Plugins/x86_64/libagora_video_process_extension.dll";
+            string libPath = Application.dataPath + "/Plugins/x86_64/libagora_clear_vision_extension.dll";
             libPath = libPath.Replace('/', '\\');
             var nRet = RtcEngine.LoadExtensionProvider(libPath);
             this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
 #elif UNITY_EDITOR_WIN
-            string libPath = Application.dataPath + "/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/x86/libagora_video_process_extension.dll";
+            string libPath = Application.dataPath + "/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/x86/libagora_clear_vision_extension.dll";
             libPath = libPath.Replace('/', '\\');
             var nRet = RtcEngine.LoadExtensionProvider(libPath);
             this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
 #elif UNITY_STANDALONE_WIN
-            string libPath = Application.dataPath + "/Plugins/x86/libagora_video_process_extension.dll";
+            string libPath = Application.dataPath + "/Plugins/x86/libagora_clear_vision_extension.dll";
             libPath = libPath.Replace('/', '\\');
             var nRet = RtcEngine.LoadExtensionProvider(libPath);
             this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
 #elif UNITY_ANDROID
-            var nRet = RtcEngine.LoadExtensionProvider("agora_video_process_extension");
+            var nRet = RtcEngine.LoadExtensionProvider("agora_clear_vision_extension");
             this.Log.UpdateLog("LoadExtensionProvider:" + nRet);
 #endif
-            var Ret = RtcEngine.EnableExtension("agora", "beauty", true, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
+            var Ret = RtcEngine.EnableExtension("agora_video_filters_clear_vision", "clear_vision", true, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
             this.Log.UpdateLog("EnableExtension:" + Ret);
+        }
+
+        private void InitLogFilePath()
+        {
+            var path = Application.persistentDataPath + "/rtc.log";
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+             path = path.Replace('/', '\\');
+#endif
+            var nRet = RtcEngine.SetLogFile(path);
+            this.Log.UpdateLog(string.Format("logPath:{0},nRet:{1}", path, nRet));
         }
 
         private void SetUpUI()
@@ -196,11 +204,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetBeautyEffectOptions
             RtcEngine.Dispose();
         }
 
-
         internal string GetChannelName()
         {
             return _channelName;
         }
+
+        #region -- Video Render UI Logic ---
 
         internal static void MakeVideoView(uint uid, string channelId = "")
         {
@@ -300,7 +309,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetBeautyEffectOptions
                 Destroy(go);
             }
         }
+
+        #endregion
     }
+
+    #region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -357,4 +370,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetBeautyEffectOptions
             SetBeautyEffectOptions.DestroyVideoView(uid);
         }
     }
+
+    #endregion
 }

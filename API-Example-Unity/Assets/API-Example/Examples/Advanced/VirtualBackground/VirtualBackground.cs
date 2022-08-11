@@ -40,8 +40,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
             if (CheckAppId())
             {
                 InitEngine();
+                InitLogFilePath();
                 SetupUI();
-                EnableExtension();
+                //EnableExtension();
                 JoinChannel();
             }
         }
@@ -119,6 +120,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
             this.Log.UpdateLog("EnableExtension :" + Ret);
         }
 
+        private void InitLogFilePath()
+        {
+            var path = Application.persistentDataPath + "/rtc.log";
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+             path = path.Replace('/', '\\');
+#endif
+            var nRet = RtcEngine.SetLogFile(path);
+            this.Log.UpdateLog(string.Format("logPath:{0},nRet:{1}", path, nRet));
+        }
+
         private void SetupUI()
         {
             var ui = this.transform.Find("UI");
@@ -185,6 +196,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
         {
             return _channelName;
         }
+
+        #region -- Video Render UI Logic ---
 
         internal static void MakeVideoView(uint uid, string channelId = "")
         {
@@ -284,7 +297,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
                 Destroy(go);
             }
         }
+
+        #endregion
     }
+
+    #region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -342,4 +359,5 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
         }
     }
 
+    #endregion
 }

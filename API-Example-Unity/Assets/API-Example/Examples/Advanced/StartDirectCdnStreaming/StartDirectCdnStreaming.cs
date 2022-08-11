@@ -9,7 +9,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
 {
     public class StartDirectCdnStreaming : MonoBehaviour
     {
-
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
         private AppIdInput _appIdInput;
@@ -123,16 +122,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
             return _channelName;
         }
 
-        private void DestroyVideoView(uint uid)
-        {
-            GameObject go = GameObject.Find(uid.ToString());
-            if (!ReferenceEquals(go, null))
-            {
-                Object.Destroy(go);
-            }
-        }
+        #region -- Video Render UI Logic ---
 
-        private void MakeVideoView(uint uid, string channelId = "")
+        internal static void MakeVideoView(uint uid, string channelId = "")
         {
             GameObject go = GameObject.Find(uid.ToString());
             if (!ReferenceEquals(go, null))
@@ -141,7 +133,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
             }
 
             // create a GameObject and assign to this new user
-            VideoSurface videoSurface = makeImageSurface(uid.ToString());
+            VideoSurface videoSurface = MakeImageSurface(uid.ToString());
             if (!ReferenceEquals(videoSurface, null))
             {
                 // configure videoSurface
@@ -166,7 +158,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
         }
 
         // VIDEO TYPE 1: 3D Object
-        public static VideoSurface makePlaneSurface(string goName)
+        private static VideoSurface MakePlaneSurface(string goName)
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
@@ -189,7 +181,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
         }
 
         // Video TYPE 2: RawImage
-        public static VideoSurface makeImageSurface(string goName)
+        private static VideoSurface MakeImageSurface(string goName)
         {
             GameObject go = new GameObject();
 
@@ -224,71 +216,80 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
             return videoSurface;
         }
 
-        internal class UserEventHandler : IRtcEngineEventHandler
+        internal static void DestroyVideoView(uint uid)
         {
-            private readonly StartDirectCdnStreaming _startDirectCdnStreaming;
-
-            internal UserEventHandler(StartDirectCdnStreaming startDirectCdnStreaming)
+            GameObject go = GameObject.Find(uid.ToString());
+            if (!ReferenceEquals(go, null))
             {
-                _startDirectCdnStreaming = startDirectCdnStreaming;
+                Object.Destroy(go);
             }
+        }
 
-            public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
-            {
-                _startDirectCdnStreaming.Log.UpdateLog(string.Format("sdk version: ${0}",
-                    _startDirectCdnStreaming.RtcEngine.GetVersion()));
-                _startDirectCdnStreaming.Log.UpdateLog(string.Format(
-                    "onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
-                    connection.localUid, elapsed));
-                _startDirectCdnStreaming.MakeVideoView(0);
-            }
+        #endregion
+    }
 
-            public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
-            {
-                _startDirectCdnStreaming.Log.UpdateLog("OnLeaveChannelSuccess");
-                _startDirectCdnStreaming.DestroyVideoView(0);
-            }
+    #region -- Agora Event ---
 
-            public override void OnUserJoined(RtcConnection connection, uint remoteUid, int elapsed)
-            {
-                _startDirectCdnStreaming.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}",
-                    connection.localUid, elapsed));
-                _startDirectCdnStreaming.MakeVideoView(remoteUid, _startDirectCdnStreaming.GetChannelName());
-            }
+    internal class UserEventHandler : IRtcEngineEventHandler
+    {
+        private readonly StartDirectCdnStreaming _startDirectCdnStreaming;
 
-            public override void OnUserOffline(RtcConnection connection, uint remoteUid,
-                USER_OFFLINE_REASON_TYPE reason)
-            {
-                _startDirectCdnStreaming.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", remoteUid,
-                    (int)reason));
-                _startDirectCdnStreaming.DestroyVideoView(remoteUid);
-            }
+        internal UserEventHandler(StartDirectCdnStreaming startDirectCdnStreaming)
+        {
+            _startDirectCdnStreaming = startDirectCdnStreaming;
+        }
 
-            //public override void OnWarning(int warn, string msg)
-            //{
-            //    _startDirectCdnStreaming.Log.UpdateLog(string.Format("OnSDKWarning warn: {0}, msg: {1}", warn, msg));
-            //}
+        public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
+        {
+            _startDirectCdnStreaming.Log.UpdateLog(string.Format("sdk version: ${0}",
+                _startDirectCdnStreaming.RtcEngine.GetVersion()));
+            _startDirectCdnStreaming.Log.UpdateLog(string.Format(
+                "onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
+                connection.localUid, elapsed));
+            StartDirectCdnStreaming.MakeVideoView(0);
+        }
 
-            public override void OnError(int error, string msg)
-            {
-                _startDirectCdnStreaming.Log.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
-            }
+        public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
+        {
+            _startDirectCdnStreaming.Log.UpdateLog("OnLeaveChannelSuccess");
+            StartDirectCdnStreaming.DestroyVideoView(0);
+        }
 
-            public override void OnConnectionLost(RtcConnection connection)
-            {
-                _startDirectCdnStreaming.Log.UpdateLog("OnConnectionLost ");
-            }
+        public override void OnUserJoined(RtcConnection connection, uint remoteUid, int elapsed)
+        {
+            _startDirectCdnStreaming.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}",
+                connection.localUid, elapsed));
+            StartDirectCdnStreaming.MakeVideoView(remoteUid, _startDirectCdnStreaming.GetChannelName());
+        }
 
-            public override void OnDirectCdnStreamingStateChanged(DIRECT_CDN_STREAMING_STATE state, DIRECT_CDN_STREAMING_ERROR error, string message)
-            {
-                _startDirectCdnStreaming.Log.UpdateLog(string.Format("OnDirectCdnStreamingStateChanged state: {0}, error: {1}", state, error));
-            }
+        public override void OnUserOffline(RtcConnection connection, uint remoteUid,
+            USER_OFFLINE_REASON_TYPE reason)
+        {
+            _startDirectCdnStreaming.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", remoteUid,
+                (int)reason));
+            StartDirectCdnStreaming.DestroyVideoView(remoteUid);
+        }
 
-            public override void OnDirectCdnStreamingStats(DirectCdnStreamingStats stats)
-            {
-                _startDirectCdnStreaming.Log.UpdateLog("OnDirectCdnStreamingStats videoHeight:" + stats.videoHeight + " videoWidth:" + stats.videoWidth);
-            }
+        public override void OnError(int error, string msg)
+        {
+            _startDirectCdnStreaming.Log.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
+        }
 
+        public override void OnConnectionLost(RtcConnection connection)
+        {
+            _startDirectCdnStreaming.Log.UpdateLog("OnConnectionLost ");
+        }
+
+        public override void OnDirectCdnStreamingStateChanged(DIRECT_CDN_STREAMING_STATE state, DIRECT_CDN_STREAMING_ERROR error, string message)
+        {
+            _startDirectCdnStreaming.Log.UpdateLog(string.Format("OnDirectCdnStreamingStateChanged state: {0}, error: {1}", state, error));
+        }
+
+        public override void OnDirectCdnStreamingStats(DirectCdnStreamingStats stats)
+        {
+            _startDirectCdnStreaming.Log.UpdateLog("OnDirectCdnStreamingStats videoHeight:" + stats.videoHeight + " videoWidth:" + stats.videoWidth);
         }
     }
+
+    #endregion
 }

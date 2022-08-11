@@ -7,10 +7,8 @@ using Logger = Agora.Util.Logger;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
 {
-
     public class ContentInspect : MonoBehaviour
     {
-
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
         private AppIdInput _appIdInput;
@@ -40,6 +38,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
             if (CheckAppId())
             {
                 InitEngine();
+                EnableExtension();
                 JoinChannel();
                 SetupUI();
             }
@@ -62,7 +61,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
             _channelName = _appIdInput.channelName;
         }
 
-
         private bool CheckAppId()
         {
             Log = new Logger(LogText);
@@ -78,6 +76,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
+        }
+
+        private void EnableExtension()
+        {
+#if UNITY_ANDROID
+            var nRet = RtcEngine.LoadExtensionProvider("agora_content_inspect_extension");
+            this.Log.UpdateLog("LoadExtensionProvider:" + nRet);
+#endif
+            var Ret = RtcEngine.EnableExtension("agora_custom_content_inspect", "agora_content_inspect_io_agora", true, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
+            this.Log.UpdateLog("EnableExtension:" + Ret);
         }
 
         private void JoinChannel()
@@ -114,7 +122,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
             this.Log.UpdateLog("StartContentInspect: " + nRet);
         }
 
-
         private void OnStopButtonClick()
         {
             var config = new ContentInspectConfig();
@@ -143,6 +150,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
         {
             return _channelName;
         }
+
+        #region -- Video Render UI Logic ---
 
         internal static void MakeVideoView(uint uid, string channelId = "")
         {
@@ -242,7 +251,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
                 Destroy(go);
             }
         }
+
+        #endregion
     }
+
+    #region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -303,6 +316,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
         {
             _sample.Log.UpdateLog("OnContentInspectResult :" + result);
         }
-
     }
+
+    #endregion
 }

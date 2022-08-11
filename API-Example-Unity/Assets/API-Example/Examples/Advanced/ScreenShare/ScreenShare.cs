@@ -39,22 +39,20 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
         // Use this for initialization
         private void Start()
         {
-#if UNITY_IPHONE 
-            this.LogText.text = "ios or Android is not supported, but you could see how it works on the Editor for Windows/MacOS";
-#else
             LoadAssetData();
             if (CheckAppId())
             {
                 InitEngine();
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_IPHONE
                 GameObject.Find("winIdSelect").SetActive(false);
+                var Ret = RtcEngine.LoadExtensionProvider("agora_screen_capture_extension");
+                this.Log.UpdateLog("LoadExtensionProvider:" + Ret);
 #else       
                 PrepareScreenCapture();
 #endif
                 EnableUI();
                 JoinChannel();
             }
-#endif
         }
 
         private bool CheckAppId()
@@ -85,16 +83,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 
         private void UpdateChannelMediaOptions()
         {
-
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.autoSubscribeAudio.SetValue(true);
             options.autoSubscribeVideo.SetValue(true);
 
-           
             options.publishCameraTrack.SetValue(false);
             options.publishScreenTrack.SetValue(true);
-            
-#if UNITY_ANDROID
+
+#if UNITY_ANDROID || UNITY_IPHONE
             options.publishScreenCaptureAudio.SetValue(true);
             options.publishScreenCaptureVideo.SetValue(true);
 #endif
@@ -157,10 +153,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 
             if (_startShareBtn != null) _startShareBtn.gameObject.SetActive(false);
             if (_stopShareBtn != null) _stopShareBtn.gameObject.SetActive(true);
-
-#if UNITY_IPHONE
-            //iPhone not support screen capture       
-#elif UNITY_ANDROID
+      
+#if UNITY_ANDROID || UNITY_IPHONE
             var parameters2 = new ScreenCaptureParameters2();
             parameters2.captureAudio = true;
             parameters2.captureVideo = true;
@@ -172,27 +166,22 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             var option = _winIdSelect.options[_winIdSelect.value].text;
             if (string.IsNullOrEmpty(option)) return;
 
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-            var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
-            Log.UpdateLog(string.Format(">>>>> Start sharing {0}", windowId));
-            RtcEngine.StartScreenCaptureByWindowId(ulong.Parse(windowId), default(Rectangle),
-                    default(ScreenCaptureParameters));
-#elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
             if (option.Contains("ScreenCaptureSourceType_Window"))
             {
                 var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
                 Log.UpdateLog(string.Format(">>>>> Start sharing {0}", windowId));
-                RtcEngine.StartScreenCaptureByWindowId(ulong.Parse(windowId), default(Rectangle),
+                var nRet= RtcEngine.StartScreenCaptureByWindowId(ulong.Parse(windowId), default(Rectangle),
                         default(ScreenCaptureParameters));
+                this.Log.UpdateLog("StartScreenCaptureByWindowId:" + nRet);
             }
             else
             {
                 var dispId = uint.Parse(option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1]);
                 Log.UpdateLog(string.Format(">>>>> Start sharing display {0}", dispId));
-                RtcEngine.StartScreenCaptureByDisplayId(dispId, default(Rectangle),
+                var nRet = RtcEngine.StartScreenCaptureByDisplayId(dispId, default(Rectangle),
                     new ScreenCaptureParameters { captureMouseCursor = true, frameRate = 30 });
+                this.Log.UpdateLog("StartScreenCaptureByDisplayId:" + nRet);
             }
-#endif
 
 #endif
 
@@ -205,11 +194,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             if (_startShareBtn != null) _startShareBtn.gameObject.SetActive(true);
             if (_stopShareBtn != null) _stopShareBtn.gameObject.SetActive(false);
 
-#if UNITY_IPHONE
-            //iPhone do not support screen capture
-#else
             RtcEngine.StopScreenCapture();
-#endif
         }
 
         private void OnDestroy()
@@ -221,20 +206,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             RtcEngine.Dispose();
         }
 
-
         internal string GetChannelName()
         {
             return _channelName;
         }
 
-        internal static void DestroyVideoView(uint uid)
-        {
-            var go = GameObject.Find(uid.ToString());
-            if (!ReferenceEquals(go, null))
-            {
-                Destroy(go);
-            }
-        }
+        #region -- Video Render UI Logic ---
 
         internal static void MakeVideoView(uint uid, string channelId = "", VIDEO_SOURCE_TYPE videoSourceType = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA)
         {
@@ -315,7 +292,20 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             var videoSurface = go.AddComponent<VideoSurface>();
             return videoSurface;
         }
+
+        internal static void DestroyVideoView(uint uid)
+        {
+            var go = GameObject.Find(uid.ToString());
+            if (!ReferenceEquals(go, null))
+            {
+                Destroy(go);
+            }
+        }
+
+        #endregion
     }
+
+    #region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -371,4 +361,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             ScreenShare.DestroyVideoView(uid);
         }
     }
+
+    #endregion
 }
