@@ -43,6 +43,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
         private Button _button3;
         private Button _button4;
         private Button _button5;
+        private Button _button6;
+        private Button _button7;
         private Toggle _urlToggle;
 
         // Use this for initialization
@@ -78,6 +80,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
             _button4.onClick.AddListener(OnResumeButtonPress);
             _button5 = GameObject.Find("Button5").GetComponent<Button>();
             _button5.onClick.AddListener(OnOpenButtonPress);
+            _button6 = GameObject.Find("Button6").GetComponent<Button>();
+            _button6.onClick.AddListener(OnPreloadSrcButtonClick);
+            _button7 = GameObject.Find("Button7").GetComponent<Button>();
+            _button7.onClick.AddListener(OnPlayPreloadButtonClick);
+
+
             _urlToggle = GameObject.Find("UrlToggle").GetComponent<Toggle>();
         }
 
@@ -121,6 +129,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
+            var logFile = Application.persistentDataPath + "/rtc.log";
+            RtcEngine.SetLogFile(logFile);
+            this.Log.UpdateLog("logFile:" + logFile);
         }
 
         private void InitMediaPlayer()
@@ -209,6 +220,46 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
         {
             var ret = MediaPlayer.OpenWithCustomSource(0, new UserPlayerCustomDataProvider(this));
             this.Log.UpdateLog("OpenWithCustomSource" + ret);
+        }
+
+
+        private void OnPreloadSrcButtonClick() {
+            string path = null;
+            if (this._urlToggle.isOn)
+            {
+                path = MPK_URL;
+            }
+            else
+            {
+#if UNITY_ANDROID && !UNITY_EDITOR
+                // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
+                path = "/assets/img/MPK.mov";
+#else
+                path = Path.Combine(Application.streamingAssetsPath, "img/MPK.mov");
+#endif
+            }
+            var nRet = MediaPlayer.PreloadSrc(path,0);
+            this.Log.UpdateLog("PreloadSrc: " + nRet);
+        }
+
+        private void OnPlayPreloadButtonClick() {
+            string path = null;
+            if (this._urlToggle.isOn)
+            {
+                path = MPK_URL;
+            }
+            else
+            {
+#if UNITY_ANDROID && !UNITY_EDITOR
+                // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
+                path = "/assets/img/MPK.mov";
+#else
+                path = Path.Combine(Application.streamingAssetsPath, "img/MPK.mov");
+#endif
+            }
+            this.Log.UpdateLog("path: " + path);
+            var nRet = MediaPlayer.PlayPreloadedSrc(path);
+            this.Log.UpdateLog("PlayPreloadedSrc: " + nRet);
         }
 
 
@@ -380,6 +431,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
         public override void OnPlayerEvent(MEDIA_PLAYER_EVENT @event, Int64 elapsedTime, string message)
         {
             _sample.Log.UpdateLog(string.Format("OnPlayerEvent state: {0}", @event));
+        }
+
+        public override void OnPreloadEvent(string src, PLAYER_PRELOAD_EVENT @event)
+        {
+            _sample.Log.UpdateLog(string.Format("OnPreloadEvent src: {0}, @event: {1}", src, @event));
         }
     }
 
