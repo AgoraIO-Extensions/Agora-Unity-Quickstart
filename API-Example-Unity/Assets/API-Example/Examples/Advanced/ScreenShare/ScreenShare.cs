@@ -39,14 +39,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
         // Use this for initialization
         private void Start()
         {
-#if UNITY_IPHONE 
-            this.LogText.text = "ios is not supported, but you could see how it works on the Editor for Windows/MacOS/Android";
-#else
             LoadAssetData();
             if (CheckAppId())
             {
                 InitEngine();
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_IPHONE
                 GameObject.Find("winIdSelect").SetActive(false);
                 var Ret = RtcEngine.LoadExtensionProvider("agora_screen_capture_extension");
                 this.Log.UpdateLog("LoadExtensionProvider:" + Ret);
@@ -56,7 +53,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
                 EnableUI();
                 JoinChannel();
             }
-#endif
         }
 
         private bool CheckAppId()
@@ -93,8 +89,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 
             options.publishCameraTrack.SetValue(false);
             options.publishScreenTrack.SetValue(true);
-            
-#if UNITY_ANDROID
+
+#if UNITY_ANDROID || UNITY_IPHONE
             options.publishScreenCaptureAudio.SetValue(true);
             options.publishScreenCaptureVideo.SetValue(true);
 #endif
@@ -157,10 +153,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 
             if (_startShareBtn != null) _startShareBtn.gameObject.SetActive(false);
             if (_stopShareBtn != null) _stopShareBtn.gameObject.SetActive(true);
-
-#if UNITY_IPHONE
-            //iPhone not support screen capture       
-#elif UNITY_ANDROID
+      
+#if UNITY_ANDROID || UNITY_IPHONE
             var parameters2 = new ScreenCaptureParameters2();
             parameters2.captureAudio = true;
             parameters2.captureVideo = true;
@@ -200,11 +194,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             if (_startShareBtn != null) _startShareBtn.gameObject.SetActive(true);
             if (_stopShareBtn != null) _stopShareBtn.gameObject.SetActive(false);
 
-#if UNITY_IPHONE
-            //iPhone do not support screen capture
-#else
             RtcEngine.StopScreenCapture();
-#endif
         }
 
         private void OnDestroy()
