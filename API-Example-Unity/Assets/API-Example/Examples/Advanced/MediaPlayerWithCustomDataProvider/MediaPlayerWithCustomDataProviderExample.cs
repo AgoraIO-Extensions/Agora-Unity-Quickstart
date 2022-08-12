@@ -44,7 +44,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
         private Button _button3;
         private Button _button4;
         private Button _button5;
-      
+
 
         // Use this for initialization
         private void Start()
@@ -197,9 +197,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
 #else
             file = Application.streamingAssetsPath + "/img/" + "mpk.mov";
 #endif
-            this.customDataProvider.open(file);
+            this.customDataProvider.Open(file);
             var ret = MediaPlayer.OpenWithCustomSource(0, this.customDataProvider);
-            this.Log.UpdateLog("OpenWithCustomSource" + ret);
+            this.Log.UpdateLog("OpenWithCustomSource: " + ret);
         }
 
 
@@ -233,7 +233,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
             if (RtcEngine == null) return;
 
             if (customDataProvider != null)
-                customDataProvider.close();
+                customDataProvider.Close();
 
             if (MediaPlayer != null)
                 RtcEngine.DestroyMediaPlayer(MediaPlayer);
@@ -430,7 +430,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
     {
 
         MediaPlayerWithCustomDataProviderExample _sample;
-        private StreamReader fis = null;
+        private FileStream fis = null;
+
         private Int64 fileSize = 0;
 
 
@@ -440,14 +441,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
 
         }
 
-        public bool open(string file)
+        public bool Open(string file)
         {
             try
             {
                 if (File.Exists(file))
                 {
-                    fis = new StreamReader(file);
-                    fileSize = fis.BaseStream.Length;
+                    fis = new FileStream(file, FileMode.Open, FileAccess.Read);
+                    fileSize = fis.Length;
                     this._sample.Log.UpdateLog("open file sucess size: " + fileSize);
                 }
 
@@ -461,7 +462,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
 
         }
 
-        public void close()
+        public void Close()
         {
             if (fis == null)
             {
@@ -492,7 +493,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
                     {
                         return -1;
                     }
-                    fis.BaseStream.Seek(offset, SeekOrigin.Begin);
+                    fis.Seek(offset, SeekOrigin.Begin);
                 }
                 catch (Exception e)
                 {
@@ -518,7 +519,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
             {
                 return -1;
             }
-            char[] byte_buffer = new char[bufferSize];
+            byte[] byte_buffer = new byte[bufferSize];
             int read_count = -1;
             try
             {
@@ -535,7 +536,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
                 Debug.Log("onseek catch exception " + e);
                 return -1;
             }
-     
+
             return read_count;
         }
 
