@@ -50,11 +50,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DeviceManager
             {
                 CheckAppId();
                 InitRtcEngine();
+#if !UNITY_WEBGL
+                //in webgl you should call this on OnDeviceEnumerated
                 CallDeviceManagerApi();
+#endif
                 //JoinChannel();
             }
 #endif
-        }
+            }
 
         private void Update()
         {
@@ -88,7 +91,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DeviceManager
             RtcEngine.InitEventHandler(handler);
         }
 
-        private void CallDeviceManagerApi()
+        internal void CallDeviceManagerApi()
         {
             GetAudioRecordingDevice();
             GetAudioPlaybackDevice();
@@ -177,6 +180,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DeviceManager
         internal UserEventHandler(DeviceManager deviceManagerSample)
         {
             _deviceManagerSample = deviceManagerSample;
+        }
+
+        public override void OnDeviceEnumerated()
+        {
+#if UNITY_WEBGL
+            _deviceManagerSample.CallDeviceManagerApi();
+#endif
         }
 
         public override void OnWarning(int warn, string msg)

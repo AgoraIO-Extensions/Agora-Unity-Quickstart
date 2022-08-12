@@ -52,6 +52,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
 
         private void Start()
         {
+#if UNITY_WEBGL
+            this.LogText.text = "Not Support in this platform!";
+#else
             LoadAssetData();
             if (CheckAppId())
             {
@@ -60,6 +63,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
                 var aud = InitAudioSource();
                 StartPullAudioFrame(aud, "externalClip");
             }
+#endif
         }
 
         private void Update()

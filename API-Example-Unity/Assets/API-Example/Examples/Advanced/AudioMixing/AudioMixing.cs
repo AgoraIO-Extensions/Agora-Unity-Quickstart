@@ -39,15 +39,23 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
         // Start is called before the first frame update
         private void Start()
         {
+#if UNITY_WEBGL
+            this.LogText.text = "Not Support in this platform!";
+#else
+
             LoadAssetData();
             if (CheckAppId())
             {
+
+
                 InitRtcEngine();
                 SetupUI();
                 // enable it after joining
                 EnableUI(false);
                 JoinChannel();
+
             }
+#endif
         }
 
         private void Update()
@@ -91,7 +99,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
             _urlToggle = GameObject.Find("Toggle").GetComponent<Toggle>();
             _loopbackToggle = GameObject.Find("Loopback").GetComponent<Toggle>();
 
-          
+
 
 #if UNITY_ANDROID && !UNITY_EDITOR
         // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
@@ -202,7 +210,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
             _effectButton.GetComponentInChildren<Text>().text = (_effectOn ? "Stop Effect" : "Play Effect");
         }
 
-       
+
         private Toggle _urlToggle { get; set; }
         private Toggle _loopbackToggle { get; set; }
 

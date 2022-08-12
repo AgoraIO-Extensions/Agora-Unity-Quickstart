@@ -126,6 +126,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
 
             if (_winIdSelect == null || RtcEngine == null) return;
 
+#if UNITY_WEBGL
+            _winIdSelect.gameObject.SetActive(false);
+#else
             _winIdSelect.ClearOptions();
 
             SIZE t = new SIZE();
@@ -148,6 +151,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
                 _stopShareBtn.onClick.AddListener(OnStopShareBtnClick);
                 _stopShareBtn.gameObject.SetActive(false);
             }
+#endif
         }
 
         private void OnStartShareBtnClick()
@@ -182,6 +186,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
                 RtcEngine.StartScreenCaptureByDisplayId(dispId, default(Rectangle),
                     new ScreenCaptureParameters { captureMouseCursor = true, frameRate = 30 });
             }
+#elif UNITY_WEBGL
+            RtcEngine.StartScreenCapture(null, new ScreenCaptureParameters { captureMouseCursor = true, frameRate = 30 });
 #endif
             ScreenShareJoinChannel();
         }

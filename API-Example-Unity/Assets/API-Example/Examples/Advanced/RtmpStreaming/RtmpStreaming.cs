@@ -40,12 +40,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.RtmpStreaming
         // Use this for initialization
         private void Start()
         {
+#if UNITY_WEBGL
+            this.LogText.text = "Not Support in this platform!";
+#else
             LoadAssetData();
             if (CheckAppId())
             {
                 InitEngine();
                 JoinChannel();
             }
+#endif
         }
 
         // Update is called once per frame

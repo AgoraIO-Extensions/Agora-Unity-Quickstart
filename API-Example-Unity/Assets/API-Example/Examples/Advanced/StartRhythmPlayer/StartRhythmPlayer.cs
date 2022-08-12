@@ -40,6 +40,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRhythmPlayer
         // Use this for initialization
         private void Start()
         {
+#if UNITY_WEBGL
+            this.LogText.text = "Not Support in this platform!";
+#else
             LoadAssetData();
             if (CheckAppId())
             {
@@ -47,7 +50,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRhythmPlayer
                 InitEngine();
                 JoinChannel();
             }
-           
+#endif
+
         }
 
         private void Update()

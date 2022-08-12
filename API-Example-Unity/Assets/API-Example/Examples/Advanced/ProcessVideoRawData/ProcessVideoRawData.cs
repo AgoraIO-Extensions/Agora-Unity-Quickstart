@@ -84,6 +84,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
 
         void Start()
         {
+#if UNITY_WEBGL
+            this.LogText.text = "Not Support in this platform!";
+#else
             LoadAssetData();
             if (CheckAppId())
             {
@@ -91,6 +94,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
                 InitEngine();
                 JoinChannel();
             }
+#endif
         }
 
         // Update is called once per frame

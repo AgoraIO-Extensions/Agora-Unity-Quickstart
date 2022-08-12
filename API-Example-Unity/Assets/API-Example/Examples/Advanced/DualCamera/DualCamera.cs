@@ -51,7 +51,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             if (CheckAppId())
             {
                 InitEngine();
+#if !UNITY_WEBGL
                 GetVideoDeviceManager();
+#endif
             }
 #endif
         }
@@ -129,7 +131,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             Debug.Log("JoinChannelEx returns: " + ret);
         }
 
-        private void GetVideoDeviceManager()
+        internal void GetVideoDeviceManager()
         {
             _videoDeviceManager = RtcEngine.GetVideoDeviceManager();
             _videoDeviceInfos = _videoDeviceManager.EnumerateVideoDevices();
@@ -176,6 +178,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             var go = GameObject.Find(uid.ToString());
             if (!ReferenceEquals(go, null))
             {
+                Debug.Log(go.name + "already in screen");
                 return; // reuse
             }
 
@@ -213,7 +216,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
         private static VideoSurface MakePlaneSurface(string goName)
         {
             var go = GameObject.Find(goName);
-            if (!ReferenceEquals(go, null))
+            if (ReferenceEquals(go, null))
             {
                 return null; // reuse
             }
@@ -291,6 +294,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             _videoSample = videoSample;
         }
 
+        public override void OnDeviceEnumerated()
+        {
+#if UNITY_WEBGL
+            _videoSample.GetVideoDeviceManager();
+#endif
+        }
+
+
         public override void OnWarning(int warn, string msg)
         {
             _videoSample.Log.UpdateLog(string.Format("OnWarning warn: {0}, msg: {1}", warn, msg));
@@ -312,7 +323,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
 
             if (connection.localUid == _videoSample.UID1)
             {
-                DualCamera.MakeVideoView(0);
+                DualCamera.MakeVideoView(0,"", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA);
             }
 
             if (connection.localUid == _videoSample.UID2)
@@ -352,7 +363,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             _videoSample.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
             if (uid != _videoSample.UID1 && uid != _videoSample.UID2)
             {
-                DualCamera.MakeVideoView(uid, _videoSample.GetChannelName());
+                DualCamera.MakeVideoView(uid, _videoSample.GetChannelName(),VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE);
             }
         }
 

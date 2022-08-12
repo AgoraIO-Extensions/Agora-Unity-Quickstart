@@ -53,6 +53,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
 
         private void Start()
         {
+#if UNITY_WEBGL
+            this.LogText.text = "Not Support in this platform!";
+#else
             LoadAssetData();
             if (CheckAppId())
             {
@@ -61,6 +64,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
                 InitMediaPlayer();
                 JoinChannel();
             }
+#endif
         }
 
 
