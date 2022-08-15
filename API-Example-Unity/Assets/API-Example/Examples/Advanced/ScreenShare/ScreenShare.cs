@@ -104,8 +104,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 
 #if UNITY_WEBGL
             _winIdSelect.gameObject.SetActive(false);
-#else
 
+#else
             _winIdSelect.ClearOptions();
 
             SIZE t = new SIZE();
@@ -120,6 +120,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
                     new Dropdown.OptionData(
                         string.Format("{0}: {1}-{2} | {3}",w.type, w.sourceName, w.sourceTitle, w.sourceId)))
                 .ToList());
+#endif
+
             _startShareBtn = GameObject.Find("startShareBtn").GetComponent<Button>();
             _stopShareBtn = GameObject.Find("stopShareBtn").GetComponent<Button>();
             if (_startShareBtn != null) _startShareBtn.onClick.AddListener(OnStartShareBtnClick);
@@ -128,7 +130,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
                 _stopShareBtn.onClick.AddListener(OnStopShareBtnClick);
                 _stopShareBtn.gameObject.SetActive(false);
             }
-#endif
+   
+
         }
 
         private void OnStartShareBtnClick()
@@ -140,15 +143,18 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             RtcEngine.StopScreenCapture();
 
             if (_winIdSelect == null) return;
-            var option = _winIdSelect.options[_winIdSelect.value].text;
-            if (string.IsNullOrEmpty(option)) return;
+
 
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+            var option = _winIdSelect.options[_winIdSelect.value].text;
+            if (string.IsNullOrEmpty(option)) return;
             var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
             Log.UpdateLog(string.Format(">>>>> Start sharing {0}", windowId));
             RtcEngine.StartScreenCaptureByWindowId(ulong.Parse(windowId), default(Rectangle),
                     default(ScreenCaptureParameters));
 #elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
+            var option = _winIdSelect.options[_winIdSelect.value].text;
+            if (string.IsNullOrEmpty(option)) return;
             if (option.Contains("ScreenCaptureSourceType_Window"))
             {
                 var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
