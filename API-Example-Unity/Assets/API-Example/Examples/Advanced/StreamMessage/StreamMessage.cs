@@ -167,9 +167,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StreamMessage
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
+            int build = 0;
             Debug.Log("Agora: OnJoinChannelSuccess ");
             _streamMessage.Log.UpdateLog(string.Format("sdk version: ${0}",
-                _streamMessage.RtcEngine.GetVersion()));
+                _streamMessage.RtcEngine.GetVersion(ref build)));
             _streamMessage.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));

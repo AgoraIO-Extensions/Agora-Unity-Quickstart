@@ -241,9 +241,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.TakeSnapshot
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
+            int build = 0;
             Debug.Log("Agora: OnJoinChannelSuccess ");
             _takeSnapshot.Log.UpdateLog(string.Format("sdk version: ${0}",
-                _takeSnapshot.RtcEngine.GetVersion()));
+                _takeSnapshot.RtcEngine.GetVersion(ref build)));
             _takeSnapshot.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));

@@ -331,9 +331,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetBeautyEffectOptions
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
+            int build = 0;
             Debug.Log("Agora: OnJoinChannelSuccess ");
             _sample.Log.UpdateLog(string.Format("sdk version: ${0}",
-                _sample.RtcEngine.GetVersion()));
+                _sample.RtcEngine.GetVersion(ref build)));
             _sample.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));

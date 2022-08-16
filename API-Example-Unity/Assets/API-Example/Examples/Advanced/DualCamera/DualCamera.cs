@@ -317,9 +317,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
+            int build = 0;
             _videoSample.IsChannelJoined = true;
             _videoSample.Log.UpdateLog(string.Format("sdk version: ${0}",
-                _videoSample.RtcEngine.GetVersion()));
+                _videoSample.RtcEngine.GetVersion(ref build)));
             _videoSample.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                     connection.channelId, connection.localUid, elapsed));

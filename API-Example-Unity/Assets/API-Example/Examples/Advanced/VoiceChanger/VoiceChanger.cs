@@ -270,8 +270,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VoiceChanger
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
+            int build = 0;
             _voiceChanger.Log.UpdateLog(string.Format("sdk version: ${0}",
-                _voiceChanger.RtcEngine.GetVersion()));
+                _voiceChanger.RtcEngine.GetVersion(ref build)));
             _voiceChanger.Log.UpdateLog(string.Format(
                 "onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
                 connection.localUid, elapsed));

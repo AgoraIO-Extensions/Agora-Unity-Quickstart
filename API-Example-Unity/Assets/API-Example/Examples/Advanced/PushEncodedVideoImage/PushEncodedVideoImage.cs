@@ -217,9 +217,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
+            int build = 0;
             Debug.Log("Agora: OnJoinChannelSuccess ");
             _pushEncodedVideoImage.Log.UpdateLog(string.Format("sdk version: ${0}",
-                _pushEncodedVideoImage.RtcEngine.GetVersion()));
+                _pushEncodedVideoImage.RtcEngine.GetVersion(ref build)));
             _pushEncodedVideoImage.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));
