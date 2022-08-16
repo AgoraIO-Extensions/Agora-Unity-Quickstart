@@ -91,17 +91,18 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
             DirectCdnStreamingMediaOptions options = new DirectCdnStreamingMediaOptions();
             options.publishMicrophoneTrack.SetValue(true);
             options.publishCameraTrack.SetValue(true);
-            RtcEngine.StartDirectCdnStreaming(PUBLISH_URL, options);
+           
             RtcEngine.SetDirectCdnStreamingVideoConfiguration(new VideoEncoderConfiguration
             {
                 dimensions = new VideoDimensions { width = 1280, height = 720 },
-                frameRate = 30,
+                frameRate = 15,
                 bitrate = 2260,
                 minBitrate = -1,
                 degradationPreference = DEGRADATION_PREFERENCE.MAINTAIN_QUALITY,
                 codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_H264,
                 mirrorMode = VIDEO_MIRROR_MODE_TYPE.VIDEO_MIRROR_MODE_DISABLED
             });
+            RtcEngine.StartDirectCdnStreaming(PUBLISH_URL, options);
             RtcEngine.StartPreview();
             MakeVideoView(0);
         }
@@ -241,8 +242,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
+            int build = 0;
             _startDirectCdnStreaming.Log.UpdateLog(string.Format("sdk version: ${0}",
-                _startDirectCdnStreaming.RtcEngine.GetVersion()));
+                _startDirectCdnStreaming.RtcEngine.GetVersion(ref build)));
             _startDirectCdnStreaming.Log.UpdateLog(string.Format(
                 "onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
                 connection.localUid, elapsed));
@@ -288,6 +290,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
         public override void OnDirectCdnStreamingStats(DirectCdnStreamingStats stats)
         {
             _startDirectCdnStreaming.Log.UpdateLog("OnDirectCdnStreamingStats videoHeight:" + stats.videoHeight + " videoWidth:" + stats.videoWidth);
+            _startDirectCdnStreaming.Log.UpdateLog("OnDirectCdnStreamingStats fps:" + stats.fps);
         }
     }
 

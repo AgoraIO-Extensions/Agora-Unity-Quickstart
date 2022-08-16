@@ -108,7 +108,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.JoinChannelVideoToken
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
-            
+
             if (_channelToken.Length == 0)
             {
                 StartCoroutine(HelperClass.FetchToken(_tokenBase, _channelName, 0, this.RenewOrJoinToken));
@@ -254,8 +254,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.JoinChannelVideoToken
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
+            int build = 0;
             _helloVideoTokenAgora.Log.UpdateLog(string.Format("sdk version: ${0}",
-                _helloVideoTokenAgora.RtcEngine.GetVersion()));
+                _helloVideoTokenAgora.RtcEngine.GetVersion(ref build)));
             _helloVideoTokenAgora.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                     connection.channelId, connection.localUid, elapsed));

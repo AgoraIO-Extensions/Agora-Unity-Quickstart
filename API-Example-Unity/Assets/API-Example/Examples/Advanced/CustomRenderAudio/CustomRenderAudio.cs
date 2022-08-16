@@ -247,7 +247,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
-            _customAudioSinkSample.Log.UpdateLog(string.Format("sdk version: {0}", _customAudioSinkSample.RtcEngine.GetVersion()));
+            int build = 0;
+            _customAudioSinkSample.Log.UpdateLog(string.Format("sdk version: {0}", _customAudioSinkSample.RtcEngine.GetVersion(ref build)));
             _customAudioSinkSample.Log.UpdateLog(string.Format("onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
                 connection.localUid, elapsed));
         }

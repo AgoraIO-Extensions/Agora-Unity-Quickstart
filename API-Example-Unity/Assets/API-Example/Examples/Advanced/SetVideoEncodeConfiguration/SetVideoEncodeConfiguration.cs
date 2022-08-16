@@ -243,8 +243,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetVideoEncodeConfigura
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
+            int build = 0;
             _videoEncoderConfiguration.Log.UpdateLog(string.Format("sdk version: ${0}",
-                _videoEncoderConfiguration.RtcEngine.GetVersion()));
+                _videoEncoderConfiguration.RtcEngine.GetVersion(ref build)));
             _videoEncoderConfiguration.Log.UpdateLog(string.Format(
                 "onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
                 connection.localUid, elapsed));

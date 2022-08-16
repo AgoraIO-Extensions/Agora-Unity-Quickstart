@@ -301,8 +301,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRtmpStreamWithTran
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
             Debug.Log("Agora: OnJoinChannelSuccess ");
+            int build = 0;
             _sample.Log.UpdateLog(string.Format("sdk version: ${0}",
-                _sample.RtcEngine.GetVersion()));
+                _sample.RtcEngine.GetVersion(ref build)));
             _sample.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));

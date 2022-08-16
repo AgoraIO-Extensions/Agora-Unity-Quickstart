@@ -181,8 +181,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DeviceManager
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
+            int build = 0;
             _deviceManagerSample.Log.UpdateLog(string.Format("sdk version: ${0}",
-                _deviceManagerSample.RtcEngine.GetVersion()));
+                _deviceManagerSample.RtcEngine.GetVersion(ref build)));
             _deviceManagerSample.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));

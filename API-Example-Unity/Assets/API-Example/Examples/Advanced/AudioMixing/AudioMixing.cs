@@ -222,8 +222,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
+            int build = 0;
             _audioMixing.Log.UpdateLog(string.Format("sdk version: ${0}",
-                _audioMixing.RtcEngine.GetVersion()));
+                _audioMixing.RtcEngine.GetVersion(ref build)));
             _audioMixing.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                     connection.channelId, connection.localUid, elapsed));

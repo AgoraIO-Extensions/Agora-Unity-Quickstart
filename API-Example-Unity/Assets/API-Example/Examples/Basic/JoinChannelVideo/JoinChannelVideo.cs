@@ -222,9 +222,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
 
         public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
         {
+            int build = 0;
             Debug.Log("Agora: OnJoinChannelSuccess ");
             _videoSample.Log.UpdateLog(string.Format("sdk version: ${0}",
-                _videoSample.RtcEngine.GetVersion()));
+                _videoSample.RtcEngine.GetVersion(ref build)));
+            _videoSample.Log.UpdateLog(string.Format("sdk build: ${0}",
+              build));
             _videoSample.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));
