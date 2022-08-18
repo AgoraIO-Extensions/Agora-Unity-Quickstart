@@ -122,8 +122,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DeviceManager
 
         private void GetVideoDeviceManager()
         {
-            var nRet = RtcEngine.StartPreview();
-            this.Log.UpdateLog("StartPreview: nRet" + nRet);
             _videoDeviceManager = RtcEngine.GetVideoDeviceManager();
             _videoDeviceInfos = _videoDeviceManager.EnumerateVideoDevices();
             Log.UpdateLog(string.Format("VideoDeviceManager count: {0}", _videoDeviceInfos.Length));

@@ -84,7 +84,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
             options.autoSubscribeAudio.SetValue(true);
             options.autoSubscribeVideo.SetValue(true);
 
-            //options.publishAudioTrack.SetValue(true);
             options.publishCameraTrack.SetValue(true);
             options.publishScreenTrack.SetValue(false);
             options.enableAudioRecordingOrPlayout.SetValue(true);

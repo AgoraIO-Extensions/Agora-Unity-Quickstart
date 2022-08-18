@@ -53,6 +53,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
             {
                 SetUpUI();
                 InitEngine();
+                // Only Android need enable extension
+                EnableExtension();
                 InitMediaPlayer();
                 InitSpatialAudioEngine();
                 JoinChannelEx(_channelName, UidUseInEx);
@@ -89,10 +91,20 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
-                                        AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
+                                        AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
             var ret = RtcEngine.Initialize(context);
             Debug.Log("Agora: Initialize " + ret);
             RtcEngine.InitEventHandler(handler);
+        }
+
+        private void EnableExtension()
+        {
+#if UNITY_ANDROID
+            var nRet = RtcEngine.LoadExtensionProvider("agora_spatial_audio_extension");
+            this.Log.UpdateLog("LoadExtensionProvider:" + nRet);
+#endif
+            var Ret = RtcEngine.EnableExtension("agora_audio_filters_spatial_audio", "agora_spatial_audio_io_agora");
+            this.Log.UpdateLog("EnableExtension :" + Ret);
         }
 
         private void InitMediaPlayer()
@@ -138,7 +150,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
             Debug.Log("RtcEngineController JoinChannelEx returns: " + ret);
         }
 
-
         private void JoinChannelExWithMPK(string channelName, uint uid, int playerId)
         {
             RtcConnection connection = new RtcConnection();
@@ -158,7 +169,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
             RtcEngine.UpdateChannelMediaOptionsEx(options, connection);
             Debug.Log("RtcEngineController JoinChannelEx_MPK returns: " + ret);
         }
-
 
         private void SetUpUI()
         {
@@ -322,16 +332,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
                 Debug.Log("Play return" + ret);
                 SpatialAudioWithMediaPlayer.MakeVideoView(_spatialAudio.UidUseInMPK, _spatialAudio.GetChannelName());
             }
-            else if (state == MEDIA_PLAYER_STATE.PLAYER_STATE_STOPPED)
-            {
-
-            }
-        }
-
-        public override void OnPlayerEvent(MEDIA_PLAYER_EVENT @event, Int64 elapsedTime, string message)
-        {
-
-
         }
     }
 

@@ -38,6 +38,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
             if (CheckAppId())
             {
                 InitEngine();
+                // Only Android need enable extension
                 EnableExtension();
                 JoinChannel();
                 SetupUI();

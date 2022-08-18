@@ -30,7 +30,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetBeautyEffectOptions
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
 
-
         public Text TextLighteningLevel;
         public Text TextSmoothnessLevel;
         public Text TextRednessLevel;
@@ -41,7 +40,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetBeautyEffectOptions
         public Slider SliderRednessLevel;
         public Slider SliderSharpnessLevel;
 
-
         private void Start()
         {
             LoadAssetData();
@@ -50,10 +48,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetBeautyEffectOptions
                 SetUpUI();
                 InitEngine();
                 InitLogFilePath();
-                //EnableExtension();
+                // Only Android need enable extension
+                EnableExtension();
                 JoinChannel();
             }
-
         }
 
         // Update is called once per frame
@@ -100,27 +98,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetBeautyEffectOptions
 
         private void EnableExtension()
         {
-#if UNITY_EDITOR_WIN && UNITY_64
-            string libPath = Application.dataPath + "/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/x86_64/libagora_clear_vision_extension.dll";
-            libPath = libPath.Replace('/', '\\');
-            var nRet = RtcEngine.LoadExtensionProvider(libPath);
-            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
-#elif UNITY_STANDALONE_WIN && UNITY_64
-            string libPath = Application.dataPath + "/Plugins/x86_64/libagora_clear_vision_extension.dll";
-            libPath = libPath.Replace('/', '\\');
-            var nRet = RtcEngine.LoadExtensionProvider(libPath);
-            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
-#elif UNITY_EDITOR_WIN
-            string libPath = Application.dataPath + "/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/x86/libagora_clear_vision_extension.dll";
-            libPath = libPath.Replace('/', '\\');
-            var nRet = RtcEngine.LoadExtensionProvider(libPath);
-            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
-#elif UNITY_STANDALONE_WIN
-            string libPath = Application.dataPath + "/Plugins/x86/libagora_clear_vision_extension.dll";
-            libPath = libPath.Replace('/', '\\');
-            var nRet = RtcEngine.LoadExtensionProvider(libPath);
-            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
-#elif UNITY_ANDROID
+#if UNITY_ANDROID
             var nRet = RtcEngine.LoadExtensionProvider("agora_clear_vision_extension");
             this.Log.UpdateLog("LoadExtensionProvider:" + nRet);
 #endif
