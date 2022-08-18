@@ -37,6 +37,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VoiceChanger
             {
                 InitEngine();
                 SetupUI();
+                // Only Android need enable extension
+                EnableExtension();
                 JoinChannel();
             }
         }
@@ -67,6 +69,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VoiceChanger
             RtcEngine.InitEventHandler(handler);
         }
 
+        private void EnableExtension()
+        {
+#if UNITY_ANDROID
+            var nRet = RtcEngine.LoadExtensionProvider("agora_audio_beauty_extension");
+            this.Log.UpdateLog("LoadExtensionProvider:" + nRet);
+#endif
+        }
+
         private void JoinChannel()
         {
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
@@ -95,7 +105,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VoiceChanger
             but = content.Find("OffVoiceBeautifierButton").GetComponent<Button>();
             but.onClick.AddListener(OnOffVoiceBeautifierButtonPress);
 
-
             but = content.Find("StyleTransformationButton").GetComponent<Button>();
             but.onClick.AddListener(OnStyleTransformationButtonPress);
 
@@ -108,13 +117,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VoiceChanger
             but = content.Find("OffAudioEffectButton").GetComponent<Button>();
             but.onClick.AddListener(OnOffAudioEffectButtonPress);
 
-
             but = content.Find("VoiceChangerButton").GetComponent<Button>();
             but.onClick.AddListener(OnVoiceChangerButtonPress);
 
             but = content.Find("OffVoiceChangerButton").GetComponent<Button>();
             but.onClick.AddListener(OnOffVoiceChangerButtonPress);
-
 
             but = content.Find("CustomVocalEffectsButton").GetComponent<Button>();
             but.onClick.AddListener(OnCustomVocalEffectsButtonPress);
@@ -128,8 +135,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VoiceChanger
             RtcEngine.LeaveChannel();
             RtcEngine.Dispose();
         }
-
-
 
         #region VoiceBeautifier
         private void OnChatBeautifierButtonPress()
