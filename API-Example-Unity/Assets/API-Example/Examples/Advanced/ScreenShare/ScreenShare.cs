@@ -148,8 +148,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
                 _stopShareBtn.gameObject.SetActive(false);
             }
 
-            _updateShareBtn = GameObject.Find("updateShareBtn").GetComponent<Button>();
-            _updateShareBtn.onClick.AddListener(OnUpdateShareBtnClick);
+            var gameObject = GameObject.Find("updateShareBtn");
+            if (gameObject != null)
+            {
+                _updateShareBtn = gameObject.GetComponent<Button>();
+                _updateShareBtn.onClick.AddListener(OnUpdateShareBtnClick);
+            }
 
         }
 
@@ -159,7 +163,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 
             if (_startShareBtn != null) _startShareBtn.gameObject.SetActive(false);
             if (_stopShareBtn != null) _stopShareBtn.gameObject.SetActive(true);
-      
+
 #if UNITY_ANDROID || UNITY_IPHONE
             var parameters2 = new ScreenCaptureParameters2();
             parameters2.captureAudio = true;
@@ -176,7 +180,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             {
                 var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
                 Log.UpdateLog(string.Format(">>>>> Start sharing {0}", windowId));
-                var nRet= RtcEngine.StartScreenCaptureByWindowId(ulong.Parse(windowId), default(Rectangle),
+                var nRet = RtcEngine.StartScreenCaptureByWindowId(ulong.Parse(windowId), default(Rectangle),
                         default(ScreenCaptureParameters));
                 this.Log.UpdateLog("StartScreenCaptureByWindowId:" + nRet);
             }
@@ -211,7 +215,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             config.captureVideo = true;
             config.videoParams.dimensions.width = 960;
             config.videoParams.dimensions.height = 640;
-            var nRet= RtcEngine.UpdateScreenCapture(config);
+            var nRet = RtcEngine.UpdateScreenCapture(config);
             this.Log.UpdateLog("UpdateScreenCapture: " + nRet);
         }
 
