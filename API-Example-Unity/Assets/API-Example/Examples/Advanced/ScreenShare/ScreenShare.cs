@@ -147,6 +147,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
                 _stopShareBtn.onClick.AddListener(OnStopShareBtnClick);
                 _stopShareBtn.gameObject.SetActive(false);
             }
+
+            _updateShareBtn = GameObject.Find("updateShareBtn").GetComponent<Button>();
+            _updateShareBtn.onClick.AddListener(OnUpdateShareBtnClick);
+
         }
 
         private void OnStartShareBtnClick()
