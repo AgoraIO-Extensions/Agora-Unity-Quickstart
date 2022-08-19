@@ -38,6 +38,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
         private const string MPK_URL =
             "https://big-class-test.oss-cn-hangzhou.aliyuncs.com/61102.1592987815092.mp4";
 
+        private const string PRELOAD_URL = "https://agora-adc-artifacts.oss-cn-beijing.aliyuncs.com/video/meta_live_mpk.mov";
+
         private Button _button1;
         private Button _button2;
         private Button _button3;
@@ -223,45 +225,19 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
         }
 
 
-        private void OnPreloadSrcButtonClick() {
-            string path = null;
-            if (this._urlToggle.isOn)
-            {
-                path = MPK_URL;
-            }
-            else
-            {
-#if UNITY_ANDROID && !UNITY_EDITOR
-                // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
-                path = "/assets/img/MPK.mov";
-#else
-                path = Path.Combine(Application.streamingAssetsPath, "img/MPK.mov");
-#endif
-            }
-            var nRet = MediaPlayer.PreloadSrc(path,0);
+        private void OnPreloadSrcButtonClick()
+        {
+
+            var nRet = MediaPlayer.PreloadSrc(PRELOAD_URL, 0);
             this.Log.UpdateLog("PreloadSrc: " + nRet);
         }
 
-        private void OnPlayPreloadButtonClick() {
-            string path = null;
-            if (this._urlToggle.isOn)
-            {
-                path = MPK_URL;
-            }
-            else
-            {
-#if UNITY_ANDROID && !UNITY_EDITOR
-                // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
-                path = "/assets/img/MPK.mov";
-#else
-                path = Path.Combine(Application.streamingAssetsPath, "img/MPK.mov");
-#endif
-            }
-            this.Log.UpdateLog("path: " + path);
-            var nRet = MediaPlayer.PlayPreloadedSrc(path);
+        private void OnPlayPreloadButtonClick()
+        {
+
+            var nRet = MediaPlayer.PlayPreloadedSrc(PRELOAD_URL);
             this.Log.UpdateLog("PlayPreloadedSrc: " + nRet);
         }
-
 
         private void TestMediaPlayer()
         {
@@ -321,7 +297,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
             // configure videoSurface
             videoSurface.SetForUser(uid, channelId, videoSourceType);
             videoSurface.SetEnable(true);
-            
+
             videoSurface.OnTextureSizeModify += (int width, int height) =>
             {
                 float scale = (float)height / (float)width;
