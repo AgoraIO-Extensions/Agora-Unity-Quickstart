@@ -35,6 +35,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
         private Dropdown _winIdSelect;
         private Button _startShareBtn;
         private Button _stopShareBtn;
+        private Button _updateShareBtn;
 
         // Use this for initialization
         private void Start()
@@ -47,7 +48,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
                 GameObject.Find("winIdSelect").SetActive(false);
                 var Ret = RtcEngine.LoadExtensionProvider("agora_screen_capture_extension");
                 this.Log.UpdateLog("LoadExtensionProvider:" + Ret);
-#else       
+#else
+                GameObject.Find("updateShareBtn").SetActive(false);
                 PrepareScreenCapture();
 #endif
                 EnableUI();
@@ -195,6 +197,18 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             if (_stopShareBtn != null) _stopShareBtn.gameObject.SetActive(false);
 
             RtcEngine.StopScreenCapture();
+        }
+
+        private void OnUpdateShareBtnClick()
+        {
+            //only work in ios or android
+            var config = new ScreenCaptureParameters2();
+            config.captureAudio = true;
+            config.captureVideo = true;
+            config.videoParams.dimensions.width = 960;
+            config.videoParams.dimensions.height = 640;
+            var nRet= RtcEngine.UpdateScreenCapture(config);
+            this.Log.UpdateLog("UpdateScreenCapture: " + nRet);
         }
 
         private void OnDestroy()
