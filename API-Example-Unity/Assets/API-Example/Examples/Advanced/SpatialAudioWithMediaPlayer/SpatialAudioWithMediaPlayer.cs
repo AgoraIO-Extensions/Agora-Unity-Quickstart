@@ -53,8 +53,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
             {
                 SetUpUI();
                 InitEngine();
-                // Only Android need enable extension
-                EnableExtension();
                 InitMediaPlayer();
                 InitSpatialAudioEngine();
                 JoinChannelEx(_channelName, UidUseInEx);
@@ -95,16 +93,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
             var ret = RtcEngine.Initialize(context);
             Debug.Log("Agora: Initialize " + ret);
             RtcEngine.InitEventHandler(handler);
-        }
-
-        private void EnableExtension()
-        {
-#if UNITY_ANDROID
-            var nRet = RtcEngine.LoadExtensionProvider("agora_spatial_audio_extension");
-            this.Log.UpdateLog("LoadExtensionProvider:" + nRet);
-#endif
-            var Ret = RtcEngine.EnableExtension("agora_audio_filters_spatial_audio", "agora_spatial_audio_io_agora");
-            this.Log.UpdateLog("EnableExtension :" + Ret);
         }
 
         private void InitMediaPlayer()
