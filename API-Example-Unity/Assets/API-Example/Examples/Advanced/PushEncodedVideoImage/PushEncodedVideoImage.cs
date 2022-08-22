@@ -1,12 +1,12 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using Agora.Rtc;
-using Agora.Util;
-using UnityEngine.Serialization;
-using Logger = Agora.Util.Logger;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Agora.Rtc;
+using Agora.Util;
+using UnityEngine;
+using UnityEngine.Serialization;
+using UnityEngine.UI;
+using Logger = Agora.Util.Logger;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
 {
@@ -34,17 +34,26 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
 
         public Text LogText;
         internal Logger Log;
-        internal IRtcEngine RtcEngine = null;
+        internal IRtcEngineEx RtcEngine = null;
 
         public Dictionary<string, Vector3> RolePositionDic = new Dictionary<string, Vector3>();
+
+
+
+        internal uint Uid1;
+        internal uint Uid2;
+        private System.Random _random = new System.Random();
 
         private void Start()
         {
             LoadAssetData();
             if (CheckAppId())
             {
+                Uid1 = (uint)(_random.Next() % 1000);
+                Uid2 = (uint)(_random.Next() % 1000 + 1000);
                 InitEngine();
-                JoinChannel();
+                JoinChannel1();
+                JoinChannel2();
             }
         }
 
@@ -65,7 +74,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
 
         private void InitEngine()
         {
-            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngineEx();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
@@ -75,7 +84,30 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
             RtcEngine.RegisterVideoEncodedFrameObserver(new VideoEncodedImageReceiver(this), OBSERVER_MODE.INTPTR);
         }
 
-        private void JoinChannel()
+        private void JoinChannel1()
+        {
+
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            RtcEngine.EnableVideo();
+
+            var option = new ChannelMediaOptions();
+            option.autoSubscribeVideo.SetValue(true);
+            option.autoSubscribeAudio.SetValue(true);
+            option.publishCameraTrack.SetValue(true);
+            option.publishMicrophoneTrack.SetValue(true);
+            option.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            option.channelProfile.SetValue(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING);
+
+
+            var connection = new RtcConnection();
+            connection.channelId = _channelName;
+            connection.localUid = Uid1;
+
+            var nRet = RtcEngine.JoinChannelEx(_token, connection, option);
+            this.Log.UpdateLog("joinChanne1: nRet" + nRet + " uid1:" + Uid1);
+        }
+
+        private void JoinChannel2()
         {
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             RtcEngine.EnableVideo();
@@ -94,7 +126,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
             option.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             option.channelProfile.SetValue(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING);
 
-            RtcEngine.JoinChannel(_token, _channelName, 0, option);
+
+            var connection = new RtcConnection();
+            connection.channelId = _channelName;
+            connection.localUid = Uid2;
+
+            var nRet = RtcEngine.JoinChannelEx(_token, connection, option);
+            this.Log.UpdateLog("joinChanne1: nRet" + nRet + " uid2:" + Uid2);
         }
 
         private void Update()
@@ -116,12 +154,28 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
             Debug.Log("OnDestroy");
             if (RtcEngine == null) return;
             RtcEngine.InitEventHandler(null);
-            RtcEngine.LeaveChannel();
+
+            RtcEngine.UnRegisterVideoEncodedFrameObserver();
+
+            var connection = new RtcConnection();
+            connection.channelId = _channelName;
+
+            connection.localUid = Uid1;
+            RtcEngine.LeaveChannelEx(connection);
+
+            connection.localUid = Uid2;
+            RtcEngine.LeaveChannelEx(connection);
+
             RtcEngine.Dispose();
         }
 
         public void CreateRole(string uid, bool isLocal)
         {
+            if (GameObject.Find("Role" + uid) != null)
+            {
+                return;
+            }
+
             var role = Instantiate(this.RolePrefab, this.transform);
             role.name = "Role" + uid;
             var text = role.transform.Find("Text").GetComponent<Text>();
@@ -179,6 +233,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
             this.Log.UpdateLog("Stop PushEncodeVideoImage");
         }
 
+        internal string GetChannelName()
+        {
+            return _channelName;
+        }
+
         private void UpdateForPushEncodeVideoImage()
         {
             //you can send any data not just  video image byte
@@ -197,6 +256,109 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
                 Debug.Log("PushEncodedVideoImage: " + nRet);
             }
         }
+
+
+        internal static void MakeVideoView(uint uid, string channelId = "")
+        {
+            var go = GameObject.Find(uid.ToString());
+            if (!ReferenceEquals(go, null))
+            {
+                return; // reuse
+            }
+
+            // create a GameObject and assign to this new user
+            var videoSurface = MakeImageSurface(uid.ToString());
+            if (ReferenceEquals(videoSurface, null)) return;
+            // configure videoSurface
+            if (uid == 0)
+            {
+                videoSurface.SetForUser(uid, channelId);
+            }
+            else
+            {
+                videoSurface.SetForUser(uid, channelId, VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE);
+            }
+
+            videoSurface.OnTextureSizeModify += (int width, int height) =>
+            {
+                float scale = (float)height / (float)width;
+                videoSurface.transform.localScale = new Vector3(-5, 5 * scale, 1);
+                Debug.Log("OnTextureSizeModify: " + width + "  " + height);
+            };
+
+            videoSurface.SetEnable(true);
+        }
+
+
+
+        // VIDEO TYPE 1: 3D Object
+        private static VideoSurface MakePlaneSurface(string goName)
+        {
+            var go = GameObject.CreatePrimitive(PrimitiveType.Plane);
+
+            if (go == null)
+            {
+                return null;
+            }
+
+            go.name = goName;
+            // set up transform
+            go.transform.Rotate(-90.0f, 0.0f, 0.0f);
+            var yPos = UnityEngine.Random.Range(3.0f, 5.0f);
+            var xPos = UnityEngine.Random.Range(-2.0f, 2.0f);
+            go.transform.position = Vector3.zero;
+            go.transform.localScale = new Vector3(0.25f, 0.5f, 0.5f);
+
+            // configure videoSurface
+            var videoSurface = go.AddComponent<VideoSurface>();
+            return videoSurface;
+        }
+
+        // Video TYPE 2: RawImage
+        private static VideoSurface MakeImageSurface(string goName)
+        {
+            GameObject go = new GameObject();
+
+            if (go == null)
+            {
+                return null;
+            }
+
+            go.name = goName;
+            // to be renderered onto
+            go.AddComponent<RawImage>();
+            // make the object draggable
+            go.AddComponent<UIElementDrag>();
+            var canvas = GameObject.Find("VideoCanvas");
+            if (canvas != null)
+            {
+                go.transform.parent = canvas.transform;
+                Debug.Log("add video view");
+            }
+            else
+            {
+                Debug.Log("Canvas is null video view");
+            }
+
+            // set up transform
+            go.transform.Rotate(0f, 0.0f, 180.0f);
+            go.transform.localPosition = Vector3.zero;
+            go.transform.localScale = new Vector3(2f, 3f, 1f);
+
+            // configure videoSurface
+            var videoSurface = go.AddComponent<VideoSurface>();
+            return videoSurface;
+        }
+
+        internal static void DestroyVideoView(uint uid)
+        {
+            var go = GameObject.Find(uid.ToString());
+            if (!ReferenceEquals(go, null))
+            {
+                Destroy(go);
+            }
+        }
+
     }
 
     #region -- Agora Event ---
@@ -226,9 +388,17 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
                                 connection.channelId, connection.localUid, elapsed));
 
 
-            _pushEncodedVideoImage.CreateRole(connection.localUid.ToString(), true);
-            _pushEncodedVideoImage.Log.UpdateLog("you can drag your role to every where");
-            _pushEncodedVideoImage.StartPushEncodeVideoImage();
+
+            if (connection.localUid >= 1000)
+            {
+                _pushEncodedVideoImage.CreateRole(connection.localUid.ToString(), true);
+                _pushEncodedVideoImage.Log.UpdateLog("you can drag your role to every where");
+                _pushEncodedVideoImage.StartPushEncodeVideoImage();
+            }
+            else
+            {
+                PushEncodedVideoImage.MakeVideoView(0);
+            }
         }
 
         public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
@@ -239,8 +409,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
         public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
         {
             _pushEncodedVideoImage.Log.UpdateLog("OnLeaveChannel");
-            _pushEncodedVideoImage.DestroyRole(connection.localUid.ToString(), true);
-            _pushEncodedVideoImage.StopPushEncodeVideoImage();
+
+            if (connection.localUid >= 1000)
+            {
+                _pushEncodedVideoImage.DestroyRole(connection.localUid.ToString(), true);
+                _pushEncodedVideoImage.StopPushEncodeVideoImage();
+            }
+            else
+            {
+                PushEncodedVideoImage.DestroyVideoView(0);
+            }
         }
 
         public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
@@ -251,21 +429,44 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
             _pushEncodedVideoImage.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-            _pushEncodedVideoImage.CreateRole(uid.ToString(), false);
 
 
-            //you must set options.encodedFrameOnly = true when you receive other 
-            VideoSubscriptionOptions options = new VideoSubscriptionOptions();
-            options.encodedFrameOnly.SetValue(true);
-            int nRet = _pushEncodedVideoImage.RtcEngine.SetRemoteVideoSubscriptionOptions(uid, options);
-            _pushEncodedVideoImage.Log.UpdateLog("SetRemoteVideoSubscriptionOptions nRet:" + nRet);
+            if (uid == _pushEncodedVideoImage.Uid1 || uid == _pushEncodedVideoImage.Uid2)
+                return;
+
+            if (uid >= 1000)
+            {
+                _pushEncodedVideoImage.CreateRole(uid.ToString(), false);
+                //you must set options.encodedFrameOnly = true when you receive other 
+                VideoSubscriptionOptions options = new VideoSubscriptionOptions();
+                options.encodedFrameOnly.SetValue(true);
+                int nRet = _pushEncodedVideoImage.RtcEngine.SetRemoteVideoSubscriptionOptionsEx(uid, options, connection);
+                _pushEncodedVideoImage.Log.UpdateLog("SetRemoteVideoSubscriptionOptions nRet:" + nRet);
+            }
+            else
+            {
+                PushEncodedVideoImage.MakeVideoView(uid, _pushEncodedVideoImage.GetChannelName());
+            }
+
+
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
         {
             _pushEncodedVideoImage.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                 (int)reason));
-            _pushEncodedVideoImage.DestroyRole(uid.ToString(), false);
+
+            if (uid == _pushEncodedVideoImage.Uid1 || uid == _pushEncodedVideoImage.Uid2)
+                return;
+
+            if (uid >= 1000)
+            {
+                _pushEncodedVideoImage.DestroyRole(uid.ToString(), false);
+            }
+            else
+            {
+                PushEncodedVideoImage.DestroyVideoView(uid);
+            }
         }
 
         public override void OnChannelMediaRelayEvent(int code)
@@ -316,3 +517,4 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
 
     #endregion
 }
+
