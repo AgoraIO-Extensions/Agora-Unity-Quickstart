@@ -46,8 +46,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
                 InitEngine();
 #if UNITY_ANDROID || UNITY_IPHONE
                 GameObject.Find("winIdSelect").SetActive(false);
-                var Ret = RtcEngine.LoadExtensionProvider("agora_screen_capture_extension");
-                this.Log.UpdateLog("LoadExtensionProvider:" + Ret);
 #else
                 GameObject.Find("updateShareBtn").SetActive(false);
                 PrepareScreenCapture();

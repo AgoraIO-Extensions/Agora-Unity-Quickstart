@@ -48,8 +48,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetBeautyEffectOptions
                 SetUpUI();
                 InitEngine();
                 InitLogFilePath();
-                // Only Android need enable extension
-                EnableExtension();
                 JoinChannel();
             }
         }
@@ -94,16 +92,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetBeautyEffectOptions
             RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             RtcEngine.JoinChannel(_token, _channelName);
-        }
-
-        private void EnableExtension()
-        {
-#if UNITY_ANDROID
-            var nRet = RtcEngine.LoadExtensionProvider("agora_clear_vision_extension");
-            this.Log.UpdateLog("LoadExtensionProvider:" + nRet);
-#endif
-            var Ret = RtcEngine.EnableExtension("agora_video_filters_clear_vision", "clear_vision", true, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
-            this.Log.UpdateLog("EnableExtension:" + Ret);
         }
 
         private void InitLogFilePath()
