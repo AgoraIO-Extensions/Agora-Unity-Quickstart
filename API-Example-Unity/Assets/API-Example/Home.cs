@@ -14,6 +14,8 @@ public class Home : MonoBehaviour
     public GameObject CasePanel;
     public GameObject CaseScrollerView;
 
+    public GameObject EventSystem;
+
     private string _playSceneName = "";
 
 
@@ -124,6 +126,7 @@ public class Home : MonoBehaviour
         {
             AsyncOperation async = SceneManager.UnloadSceneAsync(_playSceneName);
             yield return async;
+            EventSystem.gameObject.SetActive(true);
         }
     }
 
@@ -136,8 +139,11 @@ public class Home : MonoBehaviour
         var button = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
         var sceneName = button.transform.parent.Find("Text").gameObject.GetComponent<Text>().text;
 
+        EventSystem.gameObject.SetActive(false);
+
         SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
         this._playSceneName = sceneName;
+
     }
 
     public void SetScolllerActive()

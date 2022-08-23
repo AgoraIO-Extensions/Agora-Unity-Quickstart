@@ -444,6 +444,7 @@ MonoBehaviour:
   AppInputConfig: {fileID: 11400000, guid: 300c6525f002a4dbaac41a5c4b054e35, type: 2}
   CasePanel: {fileID: 1036881438794844, guid: 2496050ad79454c69b7285bad8bdc7d5, type: 2}
   CaseScrollerView: {fileID: 1783804913}
+  EventSystem: {fileID: 260626451}
 --- !u!1 &237592858
 GameObject:
   m_ObjectHideFlags: 0
