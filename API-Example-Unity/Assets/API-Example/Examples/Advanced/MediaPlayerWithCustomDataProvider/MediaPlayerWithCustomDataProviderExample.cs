@@ -172,6 +172,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
         {
             var ret = MediaPlayer.Stop();
             this.Log.UpdateLog("Stop return" + ret);
+            this.customDataProvider.Close();
         }
 
         private void OnPauseButtonPress()
