@@ -172,6 +172,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
         {
             var ret = MediaPlayer.Stop();
             this.Log.UpdateLog("Stop return" + ret);
+            this.customDataProvider.Close();
         }
 
         private void OnPauseButtonPress()
@@ -198,8 +199,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
             file = Application.streamingAssetsPath + "/img/" + "MPK.mov";
 #endif
             this.customDataProvider.Open(file);
-            var ret = MediaPlayer.OpenWithCustomSource(0, this.customDataProvider);
-            this.Log.UpdateLog("OpenWithCustomSource: " + ret);
+
+            //var ret = MediaPlayer.OpenWithCustomSource(0, this.customDataProvider);
+            //this.Log.UpdateLog("OpenWithCustomSource: " + ret);
+
+
+            var source = new MediaSource();
+            source.provider = this.customDataProvider;
+            source.autoPlay = false;
+            var ret = MediaPlayer.OpenWithMediaSource(source);
+            this.Log.UpdateLog("OpenWithMediaSource: " + ret);
         }
 
 
@@ -232,11 +241,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
             Debug.Log("OnDestroy");
             if (RtcEngine == null) return;
 
+
+            if (MediaPlayer != null)
+            {
+                MediaPlayer.Stop();
+                RtcEngine.DestroyMediaPlayer(MediaPlayer);
+            }
+
             if (customDataProvider != null)
                 customDataProvider.Close();
 
-            if (MediaPlayer != null)
-                RtcEngine.DestroyMediaPlayer(MediaPlayer);
             RtcEngine.InitEventHandler(null);
             RtcEngine.LeaveChannel();
             RtcEngine.Dispose();
