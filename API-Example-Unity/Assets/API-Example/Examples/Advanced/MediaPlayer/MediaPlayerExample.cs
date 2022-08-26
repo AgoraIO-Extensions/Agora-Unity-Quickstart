@@ -36,7 +36,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
 
 
         private const string MPK_URL =
-            "https://big-class-test.oss-cn-hangzhou.aliyuncs.com/61102.1592987815092.mp4";
+            "https://download.agora.io/demo/test/fiture265_60_4.flv";
 
         private const string PRELOAD_URL = "https://agora-adc-artifacts.oss-cn-beijing.aliyuncs.com/video/meta_live_mpk.mov";
 
