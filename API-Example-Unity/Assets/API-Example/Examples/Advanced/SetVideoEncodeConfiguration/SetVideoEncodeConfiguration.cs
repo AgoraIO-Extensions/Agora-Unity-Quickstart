@@ -105,7 +105,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetVideoEncodeConfigura
             {
                 dimensions = _dimensions[dim],
                 frameRate = 15,
-                codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_GENERIC_H264,
+                codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_H264,
                 bitrate = 0,
                 minBitrate = 1,
                 orientationMode = ORIENTATION_MODE.ORIENTATION_MODE_ADAPTIVE,
