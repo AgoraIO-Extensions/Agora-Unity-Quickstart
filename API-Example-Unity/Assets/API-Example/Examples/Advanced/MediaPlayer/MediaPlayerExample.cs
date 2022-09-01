@@ -36,7 +36,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
 
 
         private const string MPK_URL =
-            "https://big-class-test.oss-cn-hangzhou.aliyuncs.com/61102.1592987815092.mp4";
+            "https://download.agora.io/demo/test/fiture265_60_4.flv";
 
         private const string PRELOAD_URL = "https://agora-adc-artifacts.oss-cn-beijing.aliyuncs.com/video/meta_live_mpk.mov";
 
@@ -48,6 +48,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
         private Button _button6;
         private Button _button7;
         private Toggle _urlToggle;
+        private Toggle _loopToggle;
+        private InputField _inputField;
 
         // Use this for initialization
         private void Start()
@@ -87,8 +89,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
             _button7 = GameObject.Find("Button7").GetComponent<Button>();
             _button7.onClick.AddListener(OnPlayPreloadButtonClick);
 
-
             _urlToggle = GameObject.Find("UrlToggle").GetComponent<Toggle>();
+            _loopToggle = GameObject.Find("LoopToggle").GetComponent<Toggle>();
+            _inputField = GameObject.Find("InputField").GetComponent<InputField>();
         }
 
         public void EnableUI(bool val)
@@ -173,6 +176,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
 
         private void OnPlayButtonPress()
         {
+            if (this.IsLoop())
+            {
+                MediaPlayer.SetLoopCount(-1);
+            }
+            else
+            {
+                MediaPlayer.SetLoopCount(0);
+            }
             var ret = MediaPlayer.Play();
             this.Log.UpdateLog("Play return" + ret);
             this.TestMediaPlayer();
@@ -202,7 +213,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
             string path = null;
             if (this._urlToggle.isOn)
             {
-                path = MPK_URL;
+                if (this._inputField.text == "")
+                {
+                    path = MPK_URL;
+                }
+                else
+                {
+                    path = this._inputField.text;
+                }
             }
             else
             {
@@ -279,6 +297,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
         internal string GetChannelName()
         {
             return _channelName;
+        }
+
+        internal bool IsLoop()
+        {
+            return this._loopToggle.isOn;
         }
 
         #region -- Video Render UI Logic ---
