@@ -357,7 +357,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
         }
 
         public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole,
-            CLIENT_ROLE_TYPE newRole)
+            CLIENT_ROLE_TYPE newRole, ClientRoleOptions newRoleOptions)
         {
             _videoSample.Log.UpdateLog("OnClientRoleChanged");
         }

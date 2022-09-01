@@ -82,7 +82,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
         {
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
+            VideoEncoderConfiguration config = new VideoEncoderConfiguration();
+            config.dimensions = new VideoDimensions(640, 360);
+            config.frameRate = 15;
+            config.bitrate = 0;
+            RtcEngine.SetVideoEncoderConfiguration(config);
+            RtcEngine.SetChannelProfile(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_COMMUNICATION);
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            
             RtcEngine.JoinChannel(_token, _channelName);
         }
 
@@ -246,7 +253,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             JoinChannelVideo.DestroyVideoView(0);
         }
 
-        public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
+        public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole, ClientRoleOptions newRoleOptions)
         {
             _videoSample.Log.UpdateLog("OnClientRoleChanged");
         }
