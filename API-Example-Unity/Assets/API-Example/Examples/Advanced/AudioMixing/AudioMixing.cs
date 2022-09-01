@@ -241,7 +241,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
             _audioMixing.Log.UpdateLog("OnLeaveChannel");
         }
 
-        public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole, ClientRoleOptions newRoleOptions)
+        public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
         {
             _audioMixing.Log.UpdateLog("OnClientRoleChanged");
         }

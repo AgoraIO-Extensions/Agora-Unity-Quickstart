@@ -317,7 +317,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
         }
 
         public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole,
-            CLIENT_ROLE_TYPE newRole, ClientRoleOptions newRoleOptions)
+            CLIENT_ROLE_TYPE newRole)
         {
             _customCaptureVideo.Log.UpdateLog("OnClientRoleChanged");
         }
