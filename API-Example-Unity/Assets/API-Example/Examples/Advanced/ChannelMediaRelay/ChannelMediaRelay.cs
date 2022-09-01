@@ -322,7 +322,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ChannelMediaRelay
             ChannelMediaRelay.DestroyVideoView(0);
         }
 
-        public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole, ClientRoleOptions newRoleOptions)
+        public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
         {
             _channelMediaRelay.Log.UpdateLog(string.Format("OnClientRoleChanged {0}, {1}", oldRole, newRole));
         }
