@@ -182,10 +182,32 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DeviceManager
             _deviceManagerSample = deviceManagerSample;
         }
 
-        public override void OnDeviceEnumerated()
+        public override void OnDevicesEnumerated()
         {
 #if UNITY_WEBGL
             _deviceManagerSample.CallDeviceManagerApi();
+#endif
+        }
+
+        public override void OnPlaybackDevicesEnumerated(DeviceInfo[] devices)
+        {
+#if UNITY_WEBGL
+            _deviceManagerSample.Log.UpdateLog(string.Format("OnPlaybackDevicesEnumerated length: {0}", devices.Length));
+#endif
+        }
+
+        public override void OnRecordingDevicesEnumerated(DeviceInfo[] devices)
+        {
+#if UNITY_WEBGL
+            _deviceManagerSample.Log.UpdateLog(string.Format("OnRecordingDevicesEnumerated length: {0}", devices.Length));
+#endif
+        }
+
+
+        public override void OnVideoDevicesEnumerated(DeviceInfo[] devices)
+        {
+#if UNITY_WEBGL
+            _deviceManagerSample.Log.UpdateLog(string.Format("OnVideoDevicesEnumerated length: {0}", devices.Length));
 #endif
         }
 

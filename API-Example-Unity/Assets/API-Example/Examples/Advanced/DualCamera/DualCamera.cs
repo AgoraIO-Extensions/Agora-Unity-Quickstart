@@ -300,7 +300,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             _videoSample = videoSample;
         }
 
-        public override void OnDeviceEnumerated()
+        public override void OnDevicesEnumerated()
         {
 #if UNITY_WEBGL
             _videoSample.GetVideoDeviceManager();
