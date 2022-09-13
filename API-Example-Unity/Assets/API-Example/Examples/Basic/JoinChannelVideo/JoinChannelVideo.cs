@@ -30,7 +30,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
         public Text LogText;
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
-       
+
+        private Button _stopPublishButton;
+        public Button _startPublishButton;
 
         // Use this for initialization
         private void Start()
@@ -40,6 +42,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             {
                 InitEngine();
                 JoinChannel();
+                SetupUI();
             }
         }
 
@@ -91,6 +94,40 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             
             RtcEngine.JoinChannel(_token, _channelName);
+        }
+
+        private void SetupUI()
+        {
+            _stopPublishButton = GameObject.Find("StopButton").GetComponent<Button>();
+            _stopPublishButton.onClick.AddListener(StopPublish);
+
+            _startPublishButton = GameObject.Find("StartButton").GetComponent<Button>();
+            _startPublishButton.onClick.AddListener(StartPublish);
+            _startPublishButton.gameObject.SetActive(false);
+        }
+
+        private void StopPublish()
+        {
+            var options = new ChannelMediaOptions();
+            options.publishMicrophoneTrack.SetValue(false);
+            options.publishCameraTrack.SetValue(false);
+            var nRet = RtcEngine.UpdateChannelMediaOptions(options);
+            this.Log.UpdateLog("UpdateChannelMediaOptions: " + nRet);
+
+            _stopPublishButton.gameObject.SetActive(false);
+            _startPublishButton.gameObject.SetActive(true);
+        }
+
+        private void StartPublish()
+        {
+            var options = new ChannelMediaOptions();
+            options.publishMicrophoneTrack.SetValue(true);
+            options.publishCameraTrack.SetValue(true);
+            var nRet = RtcEngine.UpdateChannelMediaOptions(options);
+            this.Log.UpdateLog("UpdateChannelMediaOptions: " + nRet);
+
+            _stopPublishButton.gameObject.SetActive(true);
+            _startPublishButton.gameObject.SetActive(false);
         }
 
         private void OnDestroy()
