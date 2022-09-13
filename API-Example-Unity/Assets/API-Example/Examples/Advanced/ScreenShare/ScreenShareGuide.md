@@ -11,11 +11,11 @@ Agora provides C# API for screen sharing since 4.0.0. This article describes how
 
 ## Preconditions
 
-Before use screen sharing, make sure you have implemented basic real-time audio and video functionality in your project. For details, see [Start audio and video call]() or [Start interactive live broadcast]().
+Before use screen sharing, make sure you have implemented basic real-time audio and video functionality in your project. For details, see [Start audio and video call](https://docs.agora.io/en/video-call-4.x/start_call_unity_ng?platform=Unity) or [Start interactive live broadcast](https://docs.agora.io/en/live-streaming-premium-4.x/start_live_unity_ng?platform=Unity).
 
 ## Android Platform
 
-When use screen sharing on the Android platform, you only need to call `startScreenCapture` to enable screen sharing. You can refer to [agora-unity-example](https://github.com/AgoraIO-Community/Agora-Unity-RTC-QuickStart-NG/tree/release/4.0.0/API-Example-Unity/Assets/API -Example/Examples/Advanced/ScreenShare) `ScreenShare.cs` implements screen sharing.
+When use screen sharing on the Android platform, you only need to call `startScreenCapture` to enable screen sharing. You can refer to [agora-unity-example](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/release/4.0.0/API-Example-Unity/Assets/API-Example/Examples/Advanced/ScreenShare) `ScreenShare.cs` implements screen sharing.
 
 ## iOS Platform
 
@@ -142,7 +142,7 @@ Screen sharing on the iOS side is achieved by recording the screen using the iOS
 
 ### Example Project
 
-Agora in [agora-unity-example](https://github.com/AgoraIO-Community/Agora-Unity-RTC-QuickStart-NG/tree/release/4.0.0/API-Example-Unity/Assets/API- Example/Examples/Advanced/ScreenShare) provides examples of screen sharing, you can refer to the following files to achieve screen sharing:
+Agora in [agora-unity-example](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/release/4.0.0/API-Example-Unity/Assets/API-Example/Examples/Advanced/ScreenShare) provides examples of screen sharing, you can refer to the following files to achieve screen sharing:
 
 - `ScreenShare.cs`
 
