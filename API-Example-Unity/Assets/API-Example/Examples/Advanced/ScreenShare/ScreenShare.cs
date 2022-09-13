@@ -36,6 +36,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
         private Button _startShareBtn;
         private Button _stopShareBtn;
         private Button _updateShareBtn;
+        private Button _publishBtn;
+        private Button _unpublishBtn;
 
         // Use this for initialization
         private void Start()
@@ -43,14 +45,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             LoadAssetData();
             if (CheckAppId())
             {
+                EnableUI();
                 InitEngine();
 #if UNITY_ANDROID || UNITY_IPHONE
                 GameObject.Find("winIdSelect").SetActive(false);
+                _updateShareBtn.gameObject.SetActive(true);
 #else
-                GameObject.Find("updateShareBtn").SetActive(false);
+                _updateShareBtn.gameObject.SetActive(false);
                 PrepareScreenCapture();
 #endif
-                EnableUI();
                 JoinChannel();
             }
         }
@@ -81,12 +84,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             Debug.Log("JoinChannel returns: " + ret);
         }
 
-        private void UpdateChannelMediaOptions()
+        private void OnPublishButtonClick()
         {
             ChannelMediaOptions options = new ChannelMediaOptions();
-            options.autoSubscribeAudio.SetValue(true);
-            options.autoSubscribeVideo.SetValue(true);
-
             options.publishCameraTrack.SetValue(false);
             options.publishScreenTrack.SetValue(true);
 
@@ -94,11 +94,28 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             options.publishScreenCaptureAudio.SetValue(true);
             options.publishScreenCaptureVideo.SetValue(true);
 #endif
-
-            options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-
             var ret = RtcEngine.UpdateChannelMediaOptions(options);
             Debug.Log("UpdateChannelMediaOptions returns: " + ret);
+
+            _publishBtn.gameObject.SetActive(false);
+            _unpublishBtn.gameObject.SetActive(true);
+        }
+
+        private void OnUnplishButtonClick()
+        {
+            ChannelMediaOptions options = new ChannelMediaOptions();
+            options.publishCameraTrack.SetValue(true);
+            options.publishScreenTrack.SetValue(false);
+
+#if UNITY_ANDROID || UNITY_IPHONE
+            options.publishScreenCaptureAudio.SetValue(false);
+            options.publishScreenCaptureVideo.SetValue(false);
+#endif
+            var ret = RtcEngine.UpdateChannelMediaOptions(options);
+            Debug.Log("UpdateChannelMediaOptions returns: " + ret);
+
+            _publishBtn.gameObject.SetActive(true);
+            _unpublishBtn.gameObject.SetActive(false);
         }
 
         private void InitEngine()
@@ -153,6 +170,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
                 _updateShareBtn.onClick.AddListener(OnUpdateShareBtnClick);
             }
 
+            _publishBtn = GameObject.Find("publishBtn").GetComponent<Button>();
+            _publishBtn.onClick.AddListener(OnPublishButtonClick);
+            _publishBtn.gameObject.SetActive(false);
+
+            _unpublishBtn = GameObject.Find("unpublishBtn").GetComponent<Button>();
+            _unpublishBtn.onClick.AddListener(OnUnplishButtonClick);
+            _unpublishBtn.gameObject.SetActive(false);
         }
 
         private void OnStartShareBtnClick()
@@ -193,7 +217,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 
 #endif
 
-            UpdateChannelMediaOptions();
+            OnPublishButtonClick();
 
         }
 
@@ -201,6 +225,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
         {
             if (_startShareBtn != null) _startShareBtn.gameObject.SetActive(true);
             if (_stopShareBtn != null) _stopShareBtn.gameObject.SetActive(false);
+
+
+            _publishBtn.gameObject.SetActive(false);
+            _unpublishBtn.gameObject.SetActive(false);
 
             RtcEngine.StopScreenCapture();
         }

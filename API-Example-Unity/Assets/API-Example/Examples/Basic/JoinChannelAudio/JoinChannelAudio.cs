@@ -31,6 +31,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
 
+        private Button _stopPublishButton;
+        public Button _startPublishButton;
+
+
         // Start is called before the first frame update
         private void Start()
         {
@@ -39,6 +43,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
             {
                 InitRtcEngine();
                 JoinChannel();
+                SetupUI();
             }
         }
 
@@ -81,6 +86,38 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
             RtcEngine.JoinChannel(_token, _channelName);
         }
 
+        private void SetupUI()
+        {
+            _stopPublishButton = GameObject.Find("StopButton").GetComponent<Button>();
+            _stopPublishButton.onClick.AddListener(StopPublishAudio);
+
+            _startPublishButton = GameObject.Find("StartButton").GetComponent<Button>();
+            _startPublishButton.onClick.AddListener(StartPublishAudio);
+            _startPublishButton.gameObject.SetActive(false);
+        }
+
+        private void StopPublishAudio()
+        {
+            var options = new ChannelMediaOptions();
+            options.publishMicrophoneTrack.SetValue(false);
+            var nRet =  RtcEngine.UpdateChannelMediaOptions(options);
+            this.Log.UpdateLog("UpdateChannelMediaOptions: " + nRet);
+
+            _stopPublishButton.gameObject.SetActive(false);
+            _startPublishButton.gameObject.SetActive(true);
+        }
+
+        private void StartPublishAudio()
+        {
+            var options = new ChannelMediaOptions();
+            options.publishMicrophoneTrack.SetValue(true);
+            var nRet = RtcEngine.UpdateChannelMediaOptions(options);
+            this.Log.UpdateLog("UpdateChannelMediaOptions: " + nRet);
+
+            _stopPublishButton.gameObject.SetActive(true);
+            _startPublishButton.gameObject.SetActive(false);
+        }
+
         private void OnLeaveBtnClick()
         {
             RtcEngine.InitEventHandler(null);
@@ -108,7 +145,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
             _audioSample = audioSample;
         }
 
-    
+
         public override void OnError(int err, string msg)
         {
             _audioSample.Log.UpdateLog(string.Format("OnError err: {0}, msg: {1}", err, msg));

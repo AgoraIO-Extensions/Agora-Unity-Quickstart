@@ -35,10 +35,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
 
 
 
-        private const string MPK_URL =
-            "https://download.agora.io/demo/test/fiture265_60_4.flv";
+        private const string MPK_URL ="https://agora-adc-artifacts.oss-cn-beijing.aliyuncs.com/video/meta_live_mpk.mov";
 
-        private const string PRELOAD_URL = "https://agora-adc-artifacts.oss-cn-beijing.aliyuncs.com/video/meta_live_mpk.mov";
+        private const string PRELOAD_URL = "https://web-cdn.agora.io/website-files/images/meta.mp4";
 
         private Button _button1;
         private Button _button2;
@@ -47,9 +46,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
         private Button _button5;
         private Button _button6;
         private Button _button7;
+        private Button _button8;
+        private Button _button9;
         private Toggle _urlToggle;
         private Toggle _loopToggle;
         private InputField _inputField;
+       
 
         // Use this for initialization
         private void Start()
@@ -88,6 +90,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
             _button6.onClick.AddListener(OnPreloadSrcButtonClick);
             _button7 = GameObject.Find("Button7").GetComponent<Button>();
             _button7.onClick.AddListener(OnPlayPreloadButtonClick);
+            _button8 = GameObject.Find("Button8").GetComponent<Button>();
+            _button8.onClick.AddListener(OnStartPublishButtonClick);
+            _button8.gameObject.SetActive(false);
+            _button9 = GameObject.Find("Button9").GetComponent<Button>();
+            _button9.onClick.AddListener(OnStopPublishButtonClick);
+         
 
             _urlToggle = GameObject.Find("UrlToggle").GetComponent<Toggle>();
             _loopToggle = GameObject.Find("LoopToggle").GetComponent<Toggle>();
@@ -279,6 +287,34 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
 
             Debug.Log("SDK Version:" + MediaPlayer.GetPlayerSdkVersion());
             Debug.Log("GetPlaySrc:" + MediaPlayer.GetPlaySrc());
+        }
+
+        private void OnStartPublishButtonClick()
+        {
+            var options = new ChannelMediaOptions();
+            options.publishMediaPlayerVideoTrack.SetValue(true);
+            options.publishMediaPlayerAudioTrack.SetValue(true);
+            options.publishMediaPlayerId.SetValue(MediaPlayer.GetId());
+            var nRet = RtcEngine.UpdateChannelMediaOptions(options);
+            this.Log.UpdateLog("UpdateChannelMediaOptions: " + nRet);
+
+            _button8.gameObject.SetActive(false);
+            _button9.gameObject.SetActive(true);
+        }
+
+        private void OnStopPublishButtonClick()
+        {
+            var options = new ChannelMediaOptions();
+            options.publishMediaPlayerVideoTrack.SetValue(false);
+            options.publishMediaPlayerAudioTrack.SetValue(false);
+            options.publishMediaPlayerId.SetValue(MediaPlayer.GetId());
+
+            options.publishCameraTrack.SetValue(false);
+            var nRet = RtcEngine.UpdateChannelMediaOptions(options);
+            this.Log.UpdateLog("UpdateChannelMediaOptions: " + nRet);
+
+            _button8.gameObject.SetActive(true);
+            _button9.gameObject.SetActive(false);
         }
 
         private void OnDestroy()

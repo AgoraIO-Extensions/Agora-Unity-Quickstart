@@ -34,6 +34,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
 
+        private Toggle _urlToggle;
+        private Toggle _loopbackToggle;
+    
         // Start is called before the first frame update
         private void Start()
         {
@@ -119,14 +122,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
         {
             Debug.Log("Playing with " + (_urlToggle.isOn ? "URL" : "local file"));
 
-            var ret = RtcEngine.StartAudioMixing(_urlToggle.isOn ? Sound_URL : _localPath, _loopbackToggle.isOn, 1);
+            var ret = RtcEngine.StartAudioMixing(_urlToggle.isOn ? Sound_URL : _localPath, !_loopbackToggle.isOn, 1);
             Debug.Log("StartAudioMixing returns: " + ret);
         }
 
+      
         private void PlayEffectTest()
         {
             Debug.Log("Playing with " + (_urlToggle.isOn ? "URL" : "local file"));
-            RtcEngine.PlayEffect(1, _urlToggle.isOn ? Sound_URL : _localPath, 1, 1.0, 0, 100, true);
+            RtcEngine.PlayEffect(1, _urlToggle.isOn ? Sound_URL : _localPath, 1, 1.0, 0, 100, _loopbackToggle.isOn, 0);
         }
 
         private void StopEffectTest()
@@ -198,8 +202,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
         }
 
        
-        private Toggle _urlToggle { get; set; }
-        private Toggle _loopbackToggle { get; set; }
+      
 
         #endregion
     }

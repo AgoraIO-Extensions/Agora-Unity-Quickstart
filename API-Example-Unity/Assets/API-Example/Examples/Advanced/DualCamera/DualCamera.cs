@@ -40,6 +40,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
         public uint UID1 = 123;
         public uint UID2 = 456;
 
+        public Button MainPublishButton;
+        public Button MainUnpublishButton;
+        public Button SecondPublishButton;
+        public Button SecondUnpublishButton;
+
         // Use this for initialization
         private void Start()
         {
@@ -96,7 +101,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            
+
             var ret = RtcEngine.StartPrimaryCameraCapture(_config1);
             Log.UpdateLog(
                 string.Format("StartPrimaryCameraCapture returns: {0}", ret));
@@ -117,6 +122,37 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             var ret = RtcEngine.LeaveChannel();
             Debug.Log("MainCameraLeaveChannel returns: " + ret);
         }
+
+        public void MainCameraPublish()
+        {
+            ChannelMediaOptions options1 = new ChannelMediaOptions();
+            options1.publishCameraTrack.SetValue(true);
+            options1.publishMicrophoneTrack.SetValue(true);
+            var connection = new RtcConnection();
+            connection.channelId = _channelName;
+            connection.localUid = UID1;
+            RtcEngine.UpdateChannelMediaOptionsEx(options1, connection);
+
+
+            MainPublishButton.gameObject.SetActive(false);
+            MainUnpublishButton.gameObject.SetActive(true);
+
+        }
+
+        public void MainCameraUnPublish()
+        {
+            ChannelMediaOptions options1 = new ChannelMediaOptions();
+            options1.publishCameraTrack.SetValue(false);
+            options1.publishMicrophoneTrack.SetValue(false);
+            var connection = new RtcConnection();
+            connection.channelId = _channelName;
+            connection.localUid = UID1;
+            RtcEngine.UpdateChannelMediaOptions(options1);
+
+            MainPublishButton.gameObject.SetActive(true);
+            MainUnpublishButton.gameObject.SetActive(false);
+        }
+
 
         public void SecondCameraJoinChannel()
         {
@@ -141,6 +177,36 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             var ret = RtcEngine.LeaveChannelEx(new RtcConnection(_channelName, 456));
             Debug.Log("SecondCameraLeaveChannel returns: " + ret);
         }
+
+        public void SecondCameraPublish()
+        {
+            ChannelMediaOptions options1 = new ChannelMediaOptions();
+            options1.publishSecondaryCameraTrack.SetValue(true);
+
+            var connection = new RtcConnection();
+            connection.channelId = _channelName;
+            connection.localUid = UID2;
+            RtcEngine.UpdateChannelMediaOptionsEx(options1, connection);
+
+            SecondPublishButton.gameObject.SetActive(false);
+            SecondUnpublishButton.gameObject.SetActive(true);
+
+        }
+
+        public void SecondCameraUnpublish()
+        {
+            ChannelMediaOptions options1 = new ChannelMediaOptions();
+            options1.publishSecondaryCameraTrack.SetValue(false);
+
+            var connection = new RtcConnection();
+            connection.channelId = _channelName;
+            connection.localUid = UID2;
+            RtcEngine.UpdateChannelMediaOptionsEx(options1, connection);
+
+            SecondPublishButton.gameObject.SetActive(true);
+            SecondUnpublishButton.gameObject.SetActive(false);
+        }
+
 
         private void GetVideoDeviceManager()
         {
