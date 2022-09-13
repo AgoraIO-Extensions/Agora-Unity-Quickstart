@@ -122,7 +122,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
         {
             Debug.Log("Playing with " + (_urlToggle.isOn ? "URL" : "local file"));
 
-            var ret = RtcEngine.StartAudioMixing(_urlToggle.isOn ? Sound_URL : _localPath, !_loopbackToggle.isOn, 1);
+            var ret = RtcEngine.StartAudioMixing(_urlToggle.isOn ? Sound_URL : _localPath, _loopbackToggle.isOn, 1);
             Debug.Log("StartAudioMixing returns: " + ret);
         }
 
@@ -130,7 +130,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
         private void PlayEffectTest()
         {
             Debug.Log("Playing with " + (_urlToggle.isOn ? "URL" : "local file"));
-            RtcEngine.PlayEffect(1, _urlToggle.isOn ? Sound_URL : _localPath, 1, 1.0, 0, 100, _loopbackToggle.isOn, 0);
+            RtcEngine.PlayEffect(1, _urlToggle.isOn ? Sound_URL : _localPath, 1, 1.0, 0, 100, !_loopbackToggle.isOn, 0);
         }
 
         private void StopEffectTest()
