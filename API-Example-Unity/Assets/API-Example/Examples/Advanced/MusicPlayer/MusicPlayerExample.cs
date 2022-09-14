@@ -41,7 +41,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
         internal Button GetLyricButton;
         internal Button SearchMusicButton;
 
-        internal MusicChartCollection musicChartCollection = null;
+        internal MusicChartInfo[] musicChartInfo = null;
         internal MusicCollection musicCollection = null;
 
         private void Start()
@@ -105,8 +105,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
 
-            var appId = "695752b975654e44bea00137d084c71c";
-            var rtmToken = "006695752b975654e44bea00137d084c71cIADqGZpTqyvZwyHMS5qzNIYAODnhqoCUU1CFDEdzFLIDLtJjSIgAAAAAEACfaxpBG1IhYwEA6AMbUiFj";
+            var appId = "";
+            var rtmToken = "";
             uint mccUid = 123;
             MusicContentCenter = RtcEngine.GetMusicContentCenter();
             var config = new MusicContentCenterConfiguration(appId, rtmToken, mccUid);
@@ -174,13 +174,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
 
         void OnMusicCollectionButtonClick()
         {
-            if (this.musicChartCollection == null || this.musicChartCollection.count <= 0)
+            if (this.musicChartInfo == null || this.musicChartInfo.Length <= 0)
             {
                 Debug.Log("musicChartsResult is empty list");
                 return;
             }
 
-            var chartType = this.musicChartCollection.musicChartInfo[0];
+            var chartType = this.musicChartInfo[0];
             string requestId = "";
             var ret = MusicContentCenter.GetMusicCollectionByMusicChartId(ref requestId, chartType.id, 0, 5, "");
             this.Log.UpdateLog("GetMusicCollectionByMusicChartId: " + ret);
@@ -459,15 +459,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             this._sample.Log.UpdateLog(string.Format("OnLyricResult requestId:{0} lyricUrl:{1}", requestId, lyricUrl));
         }
 
-        public override void OnMusicChartsResult(string requestId, MusicContentCenterStatusCode status, MusicChartCollection result)
+        public override void OnMusicChartsResult(string requestId, MusicContentCenterStatusCode status, MusicChartInfo[] result)
         {
-            this._sample.Log.UpdateLog(string.Format("OnMusicChartsResult requestId:{0} CopyRightMusicStatusCode:{1} result.count:{2}", requestId, status, result.count));
-            var str = AgoraJson.ToJson<MusicChartCollection>(result);
-            Debug.Log(str);
+            this._sample.Log.UpdateLog(string.Format("OnMusicChartsResult requestId:{0} CopyRightMusicStatusCode:{1} result.count:{2}", requestId, status, result.Length));
+            Debug.Log(result.ToString());
 
             this._sample.GetMusicCollectionButton.gameObject.SetActive(true);
             this._sample.SearchMusicButton.gameObject.SetActive(true);
-            this._sample.musicChartCollection = result;
+            this._sample.musicChartInfo = result;
         }
 
         public override void OnMusicCollectionResult(string requestId, MusicContentCenterStatusCode status, MusicCollection result)
