@@ -51,7 +51,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             {
                 SetUpUI();
                 InitEngine();
-                EnableExtension();
                 JoinChannelWithMPK();
             }
         }
@@ -249,34 +248,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             Music music = this.musicCollection.music[0];
             var ret = MusicContentCenter.IsPreloaded(music.songCode);
             this.Log.UpdateLog("IsPreloaded:" + ret);
-        }
-
-        private void EnableExtension()
-        {
-#if UNITY_EDITOR_WIN && UNITY_64
-            string libPath = Application.dataPath + "/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/x86_64/agora_drm_loader.dll";
-             libPath = libPath.Replace('/', '\\');
-            var nRet = RtcEngine.LoadExtensionProvider(libPath);
-            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
-#elif UNITY_STANDALONE_WIN && UNITY_64
-            string libPath = Application.dataPath + "/Plugins/x86_64/agora_drm_loader.dll";
-             libPath = libPath.Replace('/', '\\');
-            var nRet = RtcEngine.LoadExtensionProvider(libPath);
-            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
-#elif UNITY_EDITOR_WIN
-            string libPath = Application.dataPath + "/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/x86/agora_drm_loader.dll";
-             libPath = libPath.Replace('/', '\\');
-            var nRet = RtcEngine.LoadExtensionProvider(libPath);
-            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
-#elif UNITY_STANDALONE_WIN
-            string libPath = Application.dataPath + "/Plugins/x86/agora_drm_loader.dll";
-             libPath = libPath.Replace('/', '\\');
-            var nRet = RtcEngine.LoadExtensionProvider(libPath);
-            this.Log.UpdateLog("LoadExtensionProvider:" + nRet + " path:" + libPath);
-#elif UNITY_ANDROID
-            var nRet = RtcEngine.LoadExtensionProvider("agora_drm_loader");
-            this.Log.UpdateLog("LoadExtensionProvider:" + nRet);
-#endif
         }
 
         private void OnDestroy()
