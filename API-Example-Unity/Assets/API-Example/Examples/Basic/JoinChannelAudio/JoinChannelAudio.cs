@@ -1,10 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Linq;
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
 using Agora.Util;
 using Logger = Agora.Util.Logger;
-
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
 {
@@ -31,9 +32,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
 
-        private Button _stopPublishButton;
-        public Button _startPublishButton;
-
+        private IAudioDeviceManager _audioDeviceManager;
+        private DeviceInfo[] _audioPlaybackDeviceInfos;
+        public Dropdown _audioDeviceSelect;
 
         // Start is called before the first frame update
         private void Start()
@@ -42,8 +43,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
             if (CheckAppId())
             {
                 InitRtcEngine();
-                JoinChannel();
-                SetupUI();
+                SetBasicConfiguration();
             }
         }
 
@@ -79,50 +79,82 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
             RtcEngine.InitEventHandler(handler);
         }
 
-        private void JoinChannel()
+        private void SetBasicConfiguration()
         {
             RtcEngine.EnableAudio();
+            RtcEngine.SetChannelProfile(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_COMMUNICATION);
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+        }
+
+        #region -- Button Events ---
+
+        public void StartEchoTest()
+        {
+            RtcEngine.StartEchoTest(10);
+            Log.UpdateLog("StartEchoTest, speak now. You cannot conduct another echo test or join a channel before StopEchoTest");
+        }
+
+        public void StopEchoTest()
+        {
+            RtcEngine.StopEchoTest();
+        }
+
+        public void JoinChannel()
+        {
             RtcEngine.JoinChannel(_token, _channelName);
         }
 
-        private void SetupUI()
+        public void LeaveChannel()
         {
-            _stopPublishButton = GameObject.Find("StopButton").GetComponent<Button>();
-            _stopPublishButton.onClick.AddListener(StopPublishAudio);
-
-            _startPublishButton = GameObject.Find("StartButton").GetComponent<Button>();
-            _startPublishButton.onClick.AddListener(StartPublishAudio);
-            _startPublishButton.gameObject.SetActive(false);
+            RtcEngine.LeaveChannel();
         }
 
-        private void StopPublishAudio()
+        public void StopPublishAudio()
         {
             var options = new ChannelMediaOptions();
             options.publishMicrophoneTrack.SetValue(false);
             var nRet =  RtcEngine.UpdateChannelMediaOptions(options);
             this.Log.UpdateLog("UpdateChannelMediaOptions: " + nRet);
-
-            _stopPublishButton.gameObject.SetActive(false);
-            _startPublishButton.gameObject.SetActive(true);
         }
 
-        private void StartPublishAudio()
+        public void StartPublishAudio()
         {
             var options = new ChannelMediaOptions();
             options.publishMicrophoneTrack.SetValue(true);
             var nRet = RtcEngine.UpdateChannelMediaOptions(options);
             this.Log.UpdateLog("UpdateChannelMediaOptions: " + nRet);
-
-            _stopPublishButton.gameObject.SetActive(true);
-            _startPublishButton.gameObject.SetActive(false);
         }
 
-        private void OnLeaveBtnClick()
+        public void GetAudioPlaybackDevice()
         {
-            RtcEngine.InitEventHandler(null);
-            RtcEngine.LeaveChannel();
+            _audioDeviceSelect.ClearOptions();
+            _audioDeviceManager = RtcEngine.GetAudioDeviceManager();
+            _audioPlaybackDeviceInfos = _audioDeviceManager.EnumeratePlaybackDevices();
+            Log.UpdateLog(string.Format("AudioPlaybackDevice count: {0}", _audioPlaybackDeviceInfos.Length));
+            for (var i = 0; i < _audioPlaybackDeviceInfos.Length; i++)
+            {
+                Log.UpdateLog(string.Format("AudioPlaybackDevice device index: {0}, name: {1}, id: {2}", i,
+                    _audioPlaybackDeviceInfos[i].deviceName, _audioPlaybackDeviceInfos[i].deviceId));
+            }
+
+            _audioDeviceSelect.AddOptions(_audioPlaybackDeviceInfos.Select(w =>
+                    new Dropdown.OptionData(
+                        string.Format("{0} :{1}", w.deviceName, w.deviceId)))
+                .ToList());
         }
+
+        public void SelectAudioPlaybackDevice()
+        {
+            if (_audioDeviceSelect == null) return;
+            var option = _audioDeviceSelect.options[_audioDeviceSelect.value].text;
+            if (string.IsNullOrEmpty(option)) return;
+
+            var deviceId = option.Split(":".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
+            var ret = _audioDeviceManager.SetPlaybackDevice(deviceId);
+            Log.UpdateLog("SelectAudioPlaybackDevice ret:" + ret + " , DeviceId: " + deviceId);
+        }
+
+        #endregion
 
         private void OnDestroy()
         {
@@ -144,7 +176,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
         {
             _audioSample = audioSample;
         }
-
 
         public override void OnError(int err, string msg)
         {
