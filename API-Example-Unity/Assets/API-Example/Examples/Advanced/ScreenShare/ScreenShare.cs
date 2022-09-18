@@ -34,11 +34,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
         private ScreenCaptureSourceInfo[] _screenCaptureSourceInfos;
 
         public Dropdown WinIdSelect;
+        public Button GetSourceBtn;
         public Button StartShareBtn;
         public Button StopShareBtn;
         public Button UpdateShareBtn;
         public Button PublishBtn;
         public Button UnpublishBtn;
+        public Button ShowThumbBtn;
+        public Button ShowIconBtn;
         public RawImage IconImage;
         public RawImage ThumbImage;
 
@@ -51,8 +54,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
                 InitEngine();
                 SetBasicConfiguration();
 #if UNITY_ANDROID || UNITY_IPHONE
-                GameObject.Find("winIdSelect").SetActive(false);
+                GetSourceBtn.gameObject.SetActive(false);
+                WinIdSelect.gameObject.SetActive(false);
                 UpdateShareBtn.gameObject.SetActive(true);
+                IconImage.gameObject.SetActive(false);
+                ThumbImage.gameObject.SetActive(false);
+                ShowThumbBtn.gameObject.SetActive(false);
+                ShowIconBtn.gameObject.SetActive(false);
 #else
                 UpdateShareBtn.gameObject.SetActive(false);
 #endif
@@ -237,10 +245,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             }
             ThumbImageBuffer thumbImageBuffer = _screenCaptureSourceInfos[WinIdSelect.value].thumbImage;
             if (thumbImageBuffer.buffer.Length == 0) return;
+            Texture2D texture = null;
 #if UNITY_STANDALONE_OSX
-            Texture2D texture = new Texture2D((int)thumbImageBuffer.width, (int)thumbImageBuffer.height, TextureFormat.RGBA32, false);
+            texture = new Texture2D((int)thumbImageBuffer.width, (int)thumbImageBuffer.height, TextureFormat.RGBA32, false);
 #elif UNITY_STANDALONE_WIN
-            Texture2D texture = new Texture2D((int)thumbImageBuffer.width, (int)thumbImageBuffer.height, TextureFormat.ARGB32, false);
+            texture = new Texture2D((int)thumbImageBuffer.width, (int)thumbImageBuffer.height, TextureFormat.ARGB32, false);
 #endif
             texture.LoadRawTextureData(thumbImageBuffer.buffer);
             texture.Apply();
@@ -256,10 +265,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             }
             ThumbImageBuffer iconImageBuffer = _screenCaptureSourceInfos[WinIdSelect.value].iconImage;
             if (iconImageBuffer.buffer.Length == 0) return;
+            Texture2D texture = null;
 #if UNITY_STANDALONE_OSX
-            Texture2D texture = new Texture2D((int)iconImageBuffer.width, (int)iconImageBuffer.height, TextureFormat.RGBA32, false);
+            texture = new Texture2D((int)iconImageBuffer.width, (int)iconImageBuffer.height, TextureFormat.RGBA32, false);
 #elif UNITY_STANDALONE_WIN
-            Texture2D texture = new Texture2D((int)iconImageBuffer.width, (int)iconImageBuffer.height, TextureFormat.ARGB32, false);
+            texture = new Texture2D((int)iconImageBuffer.width, (int)iconImageBuffer.height, TextureFormat.ARGB32, false);
 #endif
             texture.LoadRawTextureData(iconImageBuffer.buffer);
             texture.Apply();

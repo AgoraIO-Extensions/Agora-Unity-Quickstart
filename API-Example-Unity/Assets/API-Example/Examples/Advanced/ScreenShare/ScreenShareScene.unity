@@ -2950,11 +2950,14 @@ MonoBehaviour:
   _channelName: 
   LogText: {fileID: 424067497}
   WinIdSelect: {fileID: 1429482570}
+  GetSourceBtn: {fileID: 1251590885}
   StartShareBtn: {fileID: 941466700}
   StopShareBtn: {fileID: 521743713}
   UpdateShareBtn: {fileID: 880787791}
   PublishBtn: {fileID: 1198887982}
   UnpublishBtn: {fileID: 473599126}
+  ShowThumbBtn: {fileID: 1200647153}
+  ShowIconBtn: {fileID: 713936988}
   IconImage: {fileID: 150881006}
   ThumbImage: {fileID: 2027887730}
 --- !u!1 &1349632690
@@ -3535,7 +3538,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1060007686}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.2954
+  m_Size: 0.29540002
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
