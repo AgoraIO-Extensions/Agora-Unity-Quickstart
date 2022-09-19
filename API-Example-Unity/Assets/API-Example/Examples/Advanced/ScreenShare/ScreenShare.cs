@@ -31,13 +31,19 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
         public Text LogText;
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
+        private ScreenCaptureSourceInfo[] _screenCaptureSourceInfos;
 
-        private Dropdown _winIdSelect;
-        private Button _startShareBtn;
-        private Button _stopShareBtn;
-        private Button _updateShareBtn;
-        private Button _publishBtn;
-        private Button _unpublishBtn;
+        public Dropdown WinIdSelect;
+        public Button GetSourceBtn;
+        public Button StartShareBtn;
+        public Button StopShareBtn;
+        public Button UpdateShareBtn;
+        public Button PublishBtn;
+        public Button UnpublishBtn;
+        public Button ShowThumbBtn;
+        public Button ShowIconBtn;
+        public RawImage IconImage;
+        public RawImage ThumbImage;
 
         // Use this for initialization
         private void Start()
@@ -45,16 +51,19 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             LoadAssetData();
             if (CheckAppId())
             {
-                EnableUI();
                 InitEngine();
+                SetBasicConfiguration();
 #if UNITY_ANDROID || UNITY_IPHONE
-                GameObject.Find("winIdSelect").SetActive(false);
-                _updateShareBtn.gameObject.SetActive(true);
+                GetSourceBtn.gameObject.SetActive(false);
+                WinIdSelect.gameObject.SetActive(false);
+                UpdateShareBtn.gameObject.SetActive(true);
+                IconImage.gameObject.SetActive(false);
+                ThumbImage.gameObject.SetActive(false);
+                ShowThumbBtn.gameObject.SetActive(false);
+                ShowIconBtn.gameObject.SetActive(false);
 #else
-                _updateShareBtn.gameObject.SetActive(false);
-                PrepareScreenCapture();
+                UpdateShareBtn.gameObject.SetActive(false);
 #endif
-                JoinChannel();
             }
         }
 
@@ -74,17 +83,38 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             _channelName = _appIdInput.channelName;
         }
 
-        private void JoinChannel()
+        private void InitEngine()
+        {
+            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
+            UserEventHandler handler = new UserEventHandler(this);
+            RtcEngineContext context = new RtcEngineContext(_appID, 0,
+                                        CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
+                                        AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
+            RtcEngine.Initialize(context);
+            RtcEngine.InitEventHandler(new UserEventHandler(this));
+        }
+
+        private void SetBasicConfiguration()
         {
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+        }
 
+        #region -- Button Events ---
+
+        public void JoinChannel()
+        {
             var ret = RtcEngine.JoinChannel(_token, _channelName);
             Debug.Log("JoinChannel returns: " + ret);
         }
 
-        private void OnPublishButtonClick()
+        public void LeaveChannel()
+        {
+            RtcEngine.LeaveChannel();
+        }
+
+        public void OnPublishButtonClick()
         {
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.publishCameraTrack.SetValue(false);
@@ -97,11 +127,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             var ret = RtcEngine.UpdateChannelMediaOptions(options);
             Debug.Log("UpdateChannelMediaOptions returns: " + ret);
 
-            _publishBtn.gameObject.SetActive(false);
-            _unpublishBtn.gameObject.SetActive(true);
+            PublishBtn.gameObject.SetActive(false);
+            UnpublishBtn.gameObject.SetActive(true);
         }
 
-        private void OnUnplishButtonClick()
+        public void OnUnplishButtonClick()
         {
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.publishCameraTrack.SetValue(true);
@@ -114,28 +144,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             var ret = RtcEngine.UpdateChannelMediaOptions(options);
             Debug.Log("UpdateChannelMediaOptions returns: " + ret);
 
-            _publishBtn.gameObject.SetActive(true);
-            _unpublishBtn.gameObject.SetActive(false);
+            PublishBtn.gameObject.SetActive(true);
+            UnpublishBtn.gameObject.SetActive(false);
         }
 
-        private void InitEngine()
+        public void PrepareScreenCapture()
         {
-            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
-            UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(_appID, 0,
-                                        CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
-                                        AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            RtcEngine.Initialize(context);
-            RtcEngine.InitEventHandler(new UserEventHandler(this));
-        }
+            if (WinIdSelect == null || RtcEngine == null) return;
 
-        private void PrepareScreenCapture()
-        {
-            _winIdSelect = GameObject.Find("winIdSelect").GetComponent<Dropdown>();
-
-            if (_winIdSelect == null || RtcEngine == null) return;
-
-            _winIdSelect.ClearOptions();
+            WinIdSelect.ClearOptions();
 
             SIZE t = new SIZE();
             t.width = 360;
@@ -143,48 +160,20 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             SIZE s = new SIZE();
             s.width = 360;
             s.height = 240;
-            var info = RtcEngine.GetScreenCaptureSources(t, s, true);
+            _screenCaptureSourceInfos = RtcEngine.GetScreenCaptureSources(t, s, true);
 
-            _winIdSelect.AddOptions(info.Select(w =>
+            WinIdSelect.AddOptions(_screenCaptureSourceInfos.Select(w =>
                     new Dropdown.OptionData(
                         string.Format("{0}: {1}-{2} | {3}", w.type, w.sourceName, w.sourceTitle, w.sourceId)))
                 .ToList());
         }
 
-
-        private void EnableUI()
-        {
-            _startShareBtn = GameObject.Find("startShareBtn").GetComponent<Button>();
-            _stopShareBtn = GameObject.Find("stopShareBtn").GetComponent<Button>();
-            if (_startShareBtn != null) _startShareBtn.onClick.AddListener(OnStartShareBtnClick);
-            if (_stopShareBtn != null)
-            {
-                _stopShareBtn.onClick.AddListener(OnStopShareBtnClick);
-                _stopShareBtn.gameObject.SetActive(false);
-            }
-
-            var gameObject = GameObject.Find("updateShareBtn");
-            if (gameObject != null)
-            {
-                _updateShareBtn = gameObject.GetComponent<Button>();
-                _updateShareBtn.onClick.AddListener(OnUpdateShareBtnClick);
-            }
-
-            _publishBtn = GameObject.Find("publishBtn").GetComponent<Button>();
-            _publishBtn.onClick.AddListener(OnPublishButtonClick);
-            _publishBtn.gameObject.SetActive(false);
-
-            _unpublishBtn = GameObject.Find("unpublishBtn").GetComponent<Button>();
-            _unpublishBtn.onClick.AddListener(OnUnplishButtonClick);
-            _unpublishBtn.gameObject.SetActive(false);
-        }
-
-        private void OnStartShareBtnClick()
+        public void OnStartShareBtnClick()
         {
             if (RtcEngine == null) return;
 
-            if (_startShareBtn != null) _startShareBtn.gameObject.SetActive(false);
-            if (_stopShareBtn != null) _stopShareBtn.gameObject.SetActive(true);
+            if (StartShareBtn != null) StartShareBtn.gameObject.SetActive(false);
+            if (StopShareBtn != null) StopShareBtn.gameObject.SetActive(true);
 
 #if UNITY_ANDROID || UNITY_IPHONE
             var parameters2 = new ScreenCaptureParameters2();
@@ -194,8 +183,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             this.Log.UpdateLog("StartScreenCapture :" + nRet);
 #else
             RtcEngine.StopScreenCapture();
-            if (_winIdSelect == null) return;
-            var option = _winIdSelect.options[_winIdSelect.value].text;
+            if (WinIdSelect == null) return;
+            var option = WinIdSelect.options[WinIdSelect.value].text;
             if (string.IsNullOrEmpty(option)) return;
 
             if (option.Contains("ScreenCaptureSourceType_Window"))
@@ -217,23 +206,25 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 
 #endif
 
-            OnPublishButtonClick();
+            //OnPublishButtonClick();
+            ScreenShare.MakeVideoView(0, "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_SCREEN);
 
         }
 
-        private void OnStopShareBtnClick()
+        public void OnStopShareBtnClick()
         {
-            if (_startShareBtn != null) _startShareBtn.gameObject.SetActive(true);
-            if (_stopShareBtn != null) _stopShareBtn.gameObject.SetActive(false);
+            if (StartShareBtn != null) StartShareBtn.gameObject.SetActive(true);
+            if (StopShareBtn != null) StopShareBtn.gameObject.SetActive(false);
 
 
-            _publishBtn.gameObject.SetActive(false);
-            _unpublishBtn.gameObject.SetActive(false);
+            PublishBtn.gameObject.SetActive(false);
+            UnpublishBtn.gameObject.SetActive(false);
 
+            DestroyVideoView(0);
             RtcEngine.StopScreenCapture();
         }
 
-        private void OnUpdateShareBtnClick()
+        public void OnUpdateShareBtnClick()
         {
             //only work in ios or android
             var config = new ScreenCaptureParameters2();
@@ -244,6 +235,48 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             var nRet = RtcEngine.UpdateScreenCapture(config);
             this.Log.UpdateLog("UpdateScreenCapture: " + nRet);
         }
+
+        public void OnShowThumbButtonClick()
+        {
+            if (ThumbImage.texture)
+            {
+                GameObject.Destroy(ThumbImage.texture);
+                ThumbImage.texture = null;
+            }
+            ThumbImageBuffer thumbImageBuffer = _screenCaptureSourceInfos[WinIdSelect.value].thumbImage;
+            if (thumbImageBuffer.buffer.Length == 0) return;
+            Texture2D texture = null;
+#if UNITY_STANDALONE_OSX
+            texture = new Texture2D((int)thumbImageBuffer.width, (int)thumbImageBuffer.height, TextureFormat.RGBA32, false);
+#elif UNITY_STANDALONE_WIN
+            texture = new Texture2D((int)thumbImageBuffer.width, (int)thumbImageBuffer.height, TextureFormat.ARGB32, false);
+#endif
+            texture.LoadRawTextureData(thumbImageBuffer.buffer);
+            texture.Apply();
+            ThumbImage.texture = texture;
+        }
+
+        public void OnShowIconButtonClick()
+        {
+            if (IconImage.texture)
+            {
+                GameObject.Destroy(IconImage.texture);
+                IconImage.texture = null;
+            }
+            ThumbImageBuffer iconImageBuffer = _screenCaptureSourceInfos[WinIdSelect.value].iconImage;
+            if (iconImageBuffer.buffer.Length == 0) return;
+            Texture2D texture = null;
+#if UNITY_STANDALONE_OSX
+            texture = new Texture2D((int)iconImageBuffer.width, (int)iconImageBuffer.height, TextureFormat.RGBA32, false);
+#elif UNITY_STANDALONE_WIN
+            texture = new Texture2D((int)iconImageBuffer.width, (int)iconImageBuffer.height, TextureFormat.ARGB32, false);
+#endif
+            texture.LoadRawTextureData(iconImageBuffer.buffer);
+            texture.Apply();
+            IconImage.texture = texture;
+        }
+
+        #endregion
 
         private void OnDestroy()
         {
@@ -259,7 +292,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             return _channelName;
         }
 
-        #region -- Video Render UI Logic ---
+#region -- Video Render UI Logic ---
 
         internal static void MakeVideoView(uint uid, string channelId = "", VIDEO_SOURCE_TYPE videoSourceType = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA)
         {
@@ -350,10 +383,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             }
         }
 
-        #endregion
+#endregion
     }
 
-    #region -- Agora Event ---
+#region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -377,7 +410,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             _desktopScreenShare.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));
-            ScreenShare.MakeVideoView(0, "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_SCREEN);
         }
 
         public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
@@ -389,7 +421,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
         {
             _desktopScreenShare.Log.UpdateLog("OnLeaveChannel");
             ScreenShare.DestroyVideoView(connection.localUid);
-            ScreenShare.DestroyVideoView(0);
         }
 
         public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
@@ -411,5 +442,5 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
         }
     }
 
-    #endregion
+#endregion
 }
