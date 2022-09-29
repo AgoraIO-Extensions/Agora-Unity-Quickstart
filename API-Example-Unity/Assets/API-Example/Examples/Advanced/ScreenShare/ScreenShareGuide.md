@@ -49,7 +49,7 @@ Screen sharing on the iOS side is achieved by recording the screen using the iOS
 
    - If you only need to use the functions in `AgoraReplayKitExtension.framework` provided by Agora, the modification method is: select `Target` as the newly created Extension, and in **Info**, set **NSExtension > NSExtensionPrincipalClass** corresponding* *Value** changed from **SampleHandler** to **AgoraReplayKitHandler**.
 
-     ![img](https://web-cdn.agora.io/docs-files/1649660342845)
+     ![img](https://web-cdn.agora.io/docs-files/1648112619203)
 
    - If you also need to customize some business logic, the modification method is: replace the following code in the `SampleHandler.h` file:
 
