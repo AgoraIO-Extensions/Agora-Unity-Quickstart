@@ -86,7 +86,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.JoinChannelWithUserAcco
             RtcEngine.JoinChannelWithUserAccount(_token, _channelName, USER_ACCOUNT);
         }
 
-        private void GetUserInfoByUserAccount()
+        public void GetUserInfoByUserAccount()
         {
             UserInfo info = new UserInfo();
             RtcEngine.GetUserInfoByUserAccount(USER_ACCOUNT, ref info);

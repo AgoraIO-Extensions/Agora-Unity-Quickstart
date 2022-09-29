@@ -194,9 +194,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
             string file;
 #if UNITY_ANDROID && !UNITY_EDITOR
         // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
-            file = "/assets/img/MPK.mov";
+            file = "/assets/img/MPK.mp4";
 #else
-            file = Application.streamingAssetsPath + "/img/" + "MPK.mov";
+            file = Application.streamingAssetsPath + "/img/" + "MPK.mp4";
 #endif
             this.customDataProvider.Open(file);
 
@@ -205,6 +205,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
 
 
             var source = new MediaSource();
+            source.url = null;
+            source.uri = null;
             source.provider = this.customDataProvider;
             source.autoPlay = false;
             var ret = MediaPlayer.OpenWithMediaSource(source);
