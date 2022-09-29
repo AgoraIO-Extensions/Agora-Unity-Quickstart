@@ -34,7 +34,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
 
 
         private const string MPK_URL =
-            "https://agora-adc-artifacts.oss-cn-beijing.aliyuncs.com/video/meta_live_mpk.mov";
+            "https://agoracdn.s3.us-west-1.amazonaws.com/videos/Agora.io-Interactions.mp4";
 
         private Button _button1;
         private Button _button2;
@@ -130,8 +130,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.autoSubscribeAudio.SetValue(true);
             options.autoSubscribeVideo.SetValue(true);
-            //options.publishAudioTrack.SetValue(true);
-            options.publishCameraTrack.SetValue(false);
+            options.publishCameraTrack.SetValue(true);
+            options.publishMicrophoneTrack.SetValue(false);
             options.enableAudioRecordingOrPlayout.SetValue(true);
             options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             var ret = RtcEngine.JoinChannelEx("", connection, options);
@@ -145,7 +145,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
             connection.localUid = uid;
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.autoSubscribeAudio.SetValue(false);
-            options.autoSubscribeVideo.SetValue(false);
+            options.autoSubscribeVideo.SetValue(true);
             //options.publishAudioTrack.SetValue(false);
             options.publishCameraTrack.SetValue(false);
             options.publishMediaPlayerAudioTrack.SetValue(true);
@@ -206,7 +206,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
 
         #region -- Video Render UI Logic ---
 
-        internal static void MakeVideoView(uint uid, string channelId = "")
+        internal static void MakeVideoView(uint uid, string channelId = "", VIDEO_SOURCE_TYPE source = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE)
         {
             var go = GameObject.Find(uid.ToString());
             if (!ReferenceEquals(go, null))
@@ -218,7 +218,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
             var videoSurface = MakeImageSurface(uid.ToString());
             if (ReferenceEquals(videoSurface, null)) return;
             // configure videoSurface
-            videoSurface.SetForUser(uid, channelId, VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE);
+            videoSurface.SetForUser(uid, channelId, source);
             videoSurface.SetEnable(true);
             videoSurface.OnTextureSizeModify += (int width, int height) =>
             {

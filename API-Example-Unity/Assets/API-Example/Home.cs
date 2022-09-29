@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Agora.Util;
+using Agora.Rtc;
+using System;
 
 public class Home : MonoBehaviour
 {
@@ -52,7 +54,7 @@ public class Home : MonoBehaviour
         "SpatialAudioWithMediaPlayerScene",
         "StartDirectCdnStreamingScene",
         "StartRhythmPlayerScene",
-        "StartRtmpStreamWithTranscodingScene",
+        //"StartRtmpStreamWithTranscodingScene",
         "StreamMessageScene",
         "TakeSnapshotScene",
         "VirtualBackgroundScene",
@@ -100,6 +102,7 @@ public class Home : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
+      
 
     }
 
