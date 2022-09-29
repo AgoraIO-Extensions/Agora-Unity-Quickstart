@@ -27,6 +27,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRtmpStreamWithTran
         private string _channelName = "";
 
         public Text LogText;
+        public InputField rtmpUrl;
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
         public uint Uid = 0;
@@ -121,15 +122,22 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRtmpStreamWithTran
                 audioChannel = 0
             };
 
-            var nRet = RtcEngine.StartRtmpStreamWithTranscoding("rtmp://push.alexmk.name/live/agora_rtc_unity_" + this._channelName, liveTranscoding);
+            var url = this.rtmpUrl.text;
+            if (url == "")
+            {
+                this.Log.UpdateLog("your must input your rtmpUrl in Inspector of VideoCanvas");
+                return;
+            }
+
+            var nRet = RtcEngine.StartRtmpStreamWithTranscoding(url, liveTranscoding);
             this.Log.UpdateLog("StartRtmpStreamWithTranscoding:" + nRet);
             if (nRet == 0)
             {
-                this.Log.UpdateLog("pushing stream to rtmp://push.alexmk.name/live/agora_rtc_unity_" + this._channelName);
+                this.Log.UpdateLog(url);
                 /* 
                     Verify remote
                     1.install ffmpeg(brew install ffmpeg)
-                    2.ffplay rtmp://play.alexmk.name/live/agora_rtc_unity_+this.channelName
+                    2.ffplay rtmp://play.xxxxx.xxx.xxxx
                  */
             }
         }
@@ -160,7 +168,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRtmpStreamWithTran
 
         private void OnStopButtonPress()
         {
-            var nRet = RtcEngine.StopRtmpStream("rtmp://push.alexmk.name/live/agora_rtc_unity_" + this._channelName);
+            var url = this.rtmpUrl.text;
+            if (url == "")
+            {
+                this.Log.UpdateLog("your must input your rtmpUrl in Inspector of VideoCanvas");
+                return;
+            }
+            var nRet = RtcEngine.StopRtmpStream(url);
             this.Log.UpdateLog("StopRtmpStream:" + nRet);
         }
 

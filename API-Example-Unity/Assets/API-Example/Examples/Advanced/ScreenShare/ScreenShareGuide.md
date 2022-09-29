@@ -26,7 +26,7 @@ When use screen sharing on the Android platform, you only need to call `startScr
 
 Screen sharing on the iOS side is achieved by recording the screen using the iOS native ReplayKit framework in the Extension, and then adding the screen sharing stream as a user to the channel. Since Apple does not support capturing the screen in the main app process, you need to create a separate Extension for the screen sharing flow.
 
-![img](https://web-cdn.agora.io/docs-files/1606368135907)
+![img](https://web-cdn.agora.io/docs-files/1649660342845)
 
 ### Implementation Steps
 
