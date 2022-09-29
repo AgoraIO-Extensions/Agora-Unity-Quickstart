@@ -37,7 +37,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
         internal IMediaPlayer MediaPlayer = null;
 
         private const string MPK_URL =
-            "https://agora-adc-artifacts.oss-cn-beijing.aliyuncs.com/video/meta_live_mpk.mov";
+            "https://agoracdn.s3.us-west-1.amazonaws.com/videos/Agora.io-Interactions.mp4";
 
         private Button _button1;
         private Button _button2;
@@ -212,9 +212,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
             {
 #if UNITY_ANDROID && !UNITY_EDITOR
                 // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
-                path = "/assets/img/MPK.mov";
+                path = "/assets/img/MPK.mp4";
 #else
-                path = Path.Combine(Application.streamingAssetsPath, "img/MPK.mov");
+                path = Path.Combine(Application.streamingAssetsPath, "img/MPK.mp4");
 #endif
             }
             this.Log.UpdateLog("Is opening : " + path);
@@ -499,6 +499,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
 
         public override bool OnRemoteAudioSpectrum(UserAudioSpectrumInfo[] spectrums, uint spectrumNumber)
         {
+            Debug.Log("OnRemoteAudioSpectrum");
             return true;
         }
     }

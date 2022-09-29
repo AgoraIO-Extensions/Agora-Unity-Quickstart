@@ -433,7 +433,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             _videoSample.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
             if (uid != _videoSample.UID1 && uid != _videoSample.UID2)
             {
-                DualCamera.MakeVideoView(uid, _videoSample.GetChannelName());
+                DualCamera.MakeVideoView(uid, _videoSample.GetChannelName(),VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE);
             }
         }
 

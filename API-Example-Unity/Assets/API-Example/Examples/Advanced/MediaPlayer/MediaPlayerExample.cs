@@ -33,8 +33,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
         internal IRtcEngine RtcEngine = null;
         internal IMediaPlayer MediaPlayer = null;
 
-        private const string MPK_URL ="https://agora-adc-artifacts.oss-cn-beijing.aliyuncs.com/video/meta_live_mpk.mov";
-        private const string PRELOAD_URL = "https://web-cdn.agora.io/website-files/images/meta.mp4";
+        private const string MPK_URL = "https://agoracdn.s3.us-west-1.amazonaws.com/videos/Agora.io-Interactions.mp4";
+        private const string PRELOAD_URL = "https://agoracdn.s3.us-west-1.amazonaws.com/videos/Agora+Quality+Comparison+Jellyfish.mp4";
 
         public Button PlayButton;
         public Button StopButton;
@@ -211,9 +211,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
             {
 #if UNITY_ANDROID && !UNITY_EDITOR
                 // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
-                path = "/assets/img/MPK.mov";
+                path = "/assets/img/MPK.mp4";
 #else
-                path = Path.Combine(Application.streamingAssetsPath, "img/MPK.mov");
+                path = Path.Combine(Application.streamingAssetsPath, "img/MPK.mp4");
 #endif
             }
             this.Log.UpdateLog("Is opening : " + path);
