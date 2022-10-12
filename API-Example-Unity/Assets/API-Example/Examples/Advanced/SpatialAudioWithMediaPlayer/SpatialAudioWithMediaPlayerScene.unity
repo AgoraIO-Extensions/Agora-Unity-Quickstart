@@ -206,7 +206,7 @@ GameObject:
   - component: {fileID: 313166926}
   - component: {fileID: 313166925}
   m_Layer: 5
-  m_Name: Button2
+  m_Name: Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -852,6 +852,8 @@ MonoBehaviour:
   _token: 
   _channelName: 
   LogText: {fileID: 1444145488}
+  UidUseInEx: 123
+  UidUseInMPK: 67890
   x: 0
 --- !u!1 &1849429302
 GameObject:
@@ -865,7 +867,7 @@ GameObject:
   - component: {fileID: 1849429305}
   - component: {fileID: 1849429304}
   m_Layer: 5
-  m_Name: Button1
+  m_Name: Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1041,7 +1043,7 @@ GameObject:
   - component: {fileID: 2048567113}
   - component: {fileID: 2048567112}
   m_Layer: 5
-  m_Name: Button3
+  m_Name: Play
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
