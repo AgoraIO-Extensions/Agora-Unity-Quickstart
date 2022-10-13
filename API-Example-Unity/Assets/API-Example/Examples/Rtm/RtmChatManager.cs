@@ -246,6 +246,11 @@ namespace io.agora.rtm.demo
                 int ret = StreamChannel.GetSubscribedUserList(subtopic, ref userList);
 
                 messageDisplay.AddMessage("StreamChannel.GetSubscribedTopic ret:" + ret + " userListCount : " + userList.userCount, Message.MessageType.Info);
+
+                for (int i = 0; i < userList.userCount; i++)
+                {
+                    messageDisplay.AddMessage("StreamChannel.GetSubscribedTopic userIndex : " + i + " userListName : " + userList.users[i], Message.MessageType.Info);
+                }
             }
 
         }
