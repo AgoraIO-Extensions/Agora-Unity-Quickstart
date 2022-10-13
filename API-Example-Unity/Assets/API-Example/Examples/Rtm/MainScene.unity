@@ -1100,7 +1100,7 @@ MonoBehaviour:
   m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 1920, y: 800}
+  m_ReferenceResolution: {x: 2340, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -1711,8 +1711,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fada1dae731e4492a83d78e079c3324b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  appId: 
-  token: 
+  appId: aab8b8f5a8cd4469a63042fcfafe7063
+  token: aab8b8f5a8cd4469a63042fcfafe7063
   userNameInput: {fileID: 985826887}
   channelNameInput: {fileID: 896113091}
   TopicMsgInputBox: {fileID: 166708667}
@@ -2521,7 +2521,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.000030517578}
+  m_AnchoredPosition: {x: 0, y: 0.000030517578}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &690512206
@@ -4014,7 +4014,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 436596858}
-        m_MethodName: Leave
+        m_MethodName: ChannelLeave
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

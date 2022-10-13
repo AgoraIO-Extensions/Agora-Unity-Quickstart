@@ -156,7 +156,7 @@ namespace io.agora.rtm.demo
 
         public void ChannelDispose()
         {
-            if (StreamChannel != null)
+            if (rtmClient!=null &&StreamChannel != null)
             {
                 StreamChannel.Dispose();
             }
@@ -167,8 +167,10 @@ namespace io.agora.rtm.demo
         {
             if (rtmClient != null)
             {
+                ChannelDispose();
                 rtmClient.Dispose();
                 rtmClient = null;
+
             }
 
         }
@@ -237,13 +239,13 @@ namespace io.agora.rtm.demo
 
         public void GetSubscribedUserList()
         {
-            UserList[] userList = new UserList[0];
+            UserList userList = new UserList();
 
             if(StreamChannel!=null)
             {
                 int ret = StreamChannel.GetSubscribedUserList(subtopic, ref userList);
 
-                messageDisplay.AddMessage("StreamChannel.GetSubscribedTopic ret:" + ret + " userListCount" + userList.Length, Message.MessageType.Info);
+                messageDisplay.AddMessage("StreamChannel.GetSubscribedTopic ret:" + ret + " userListCount : " + userList.userCount, Message.MessageType.Info);
             }
 
         }
