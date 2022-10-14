@@ -34,7 +34,7 @@ namespace io.agora.rtm.demo
 
         private IRtcEngine rtcEngine;
         private IRtmClient rtmClient;
-        private IStreamChannel StreamChannel;
+        private IStreamChannel streamChannel;
 
         private List<string> userList = new List<string>();
 
@@ -69,7 +69,7 @@ namespace io.agora.rtm.demo
             channelNameInput.text = PlayerPrefs.GetString("RTM_CHANNEL", "");
 
             rtcEngine = RtcEngine.CreateAgoraRtcEngine();
-            if(rtcEngine!=null)
+            if (rtcEngine != null)
             {
                 int init = rtcEngine.Initialize(new RtcEngineContext(appId, 0,
                                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
@@ -86,10 +86,10 @@ namespace io.agora.rtm.demo
         }
         private void OnDestroy()
         {
-            if (StreamChannel != null)
+            if (streamChannel != null)
             {
-                var ret = StreamChannel.Leave();
-                StreamChannel.Dispose();
+                var ret = streamChannel.Leave();
+                streamChannel.Dispose();
                 messageDisplay.AddMessage("StreamChannel.Leave + ret:" + ret, Message.MessageType.Info);
             }
             if (rtmClient != null)
@@ -122,7 +122,7 @@ namespace io.agora.rtm.demo
             config.eventHandler = rtmEventHandler;
 
             config.userId = UserName;
-            if(rtmClient!=null)
+            if (rtmClient != null)
             {
                 var ret = rtmClient.Initialize(config);
                 messageDisplay.AddMessage("rtmClient.Initialize + ret:" + ret, Message.MessageType.Info);
@@ -137,18 +137,18 @@ namespace io.agora.rtm.demo
             ChannelName = channelNameInput.text;
             if (rtmClient != null)
             {
-                StreamChannel = rtmClient.CreateStreamChannel(ChannelName);
+                streamChannel = rtmClient.CreateStreamChannel(ChannelName);
                 JoinChannelOptions options = new JoinChannelOptions();
                 options.token = token;
-                int ret = StreamChannel.Join(options);
+                int ret = streamChannel.Join(options);
                 messageDisplay.AddMessage("StreamChannel.Join + ret:" + ret, Message.MessageType.Info);
             }
         }
         public void ChannelLeave()
         {
-            if (StreamChannel != null)
+            if (streamChannel != null)
             {
-                int ret = StreamChannel.Leave();
+                int ret = streamChannel.Leave();
 
                 messageDisplay.AddMessage("StreamChannel.ChannelLeave ret:" + ret, Message.MessageType.Info);
             }
@@ -156,9 +156,9 @@ namespace io.agora.rtm.demo
 
         public void ChannelDispose()
         {
-            if (rtmClient!=null &&StreamChannel != null)
+            if (rtmClient != null && streamChannel != null)
             {
-                StreamChannel.Dispose();
+                streamChannel.Dispose();
             }
 
         }
@@ -170,9 +170,7 @@ namespace io.agora.rtm.demo
                 ChannelDispose();
                 rtmClient.Dispose();
                 rtmClient = null;
-
             }
-
         }
 
         public void JoinTopic()
@@ -181,22 +179,22 @@ namespace io.agora.rtm.demo
 
             JoinTopicOptions joinTopicOptions = new JoinTopicOptions();
 
-            if(StreamChannel !=null)
+            if (streamChannel != null)
             {
-                int ret = StreamChannel.JoinTopic(topic, joinTopicOptions);
+                int ret = streamChannel.JoinTopic(topic, joinTopicOptions);
 
-                messageDisplay.AddMessage("StreamChannel.GetChannelName ret:" + StreamChannel.GetChannelName(), Message.MessageType.Info);
+                messageDisplay.AddMessage("StreamChannel.GetChannelName ret:" + streamChannel.GetChannelName(), Message.MessageType.Info);
 
                 messageDisplay.AddMessage("StreamChannel.JoinTopic ret:" + ret, Message.MessageType.Info);
             }
-          
+
         }
 
         public void LeaveTopic()
         {
-            if(StreamChannel!=null)
+            if (streamChannel != null)
             {
-                int ret = StreamChannel.LeaveTopic(topic);
+                int ret = streamChannel.LeaveTopic(topic);
 
                 messageDisplay.AddMessage("StreamChannel.LeaveTopic ret:" + ret, Message.MessageType.Info);
             }
@@ -215,7 +213,7 @@ namespace io.agora.rtm.demo
                 topicOptions.userCount = (uint)userList.Count;
             }
 
-            int ret = StreamChannel.SubscribeTopic(subtopic, topicOptions);
+            int ret = streamChannel.SubscribeTopic(subtopic, topicOptions);
 
             messageDisplay.AddMessage("StreamChannel.SubscribeTopic ret:" + ret, Message.MessageType.Info);
 
@@ -232,7 +230,7 @@ namespace io.agora.rtm.demo
                 topicOptions.userCount = (uint)userList.Count;
             }
 
-            int ret = StreamChannel.UnsubscribeTopic(subtopic, topicOptions);
+            int ret = streamChannel.UnsubscribeTopic(subtopic, topicOptions);
 
             messageDisplay.AddMessage("StreamChannel.UnsubscribeTopic ret:" + ret, Message.MessageType.Info);
         }
@@ -241,9 +239,9 @@ namespace io.agora.rtm.demo
         {
             UserList userList = new UserList();
 
-            if(StreamChannel!=null)
+            if (streamChannel != null)
             {
-                int ret = StreamChannel.GetSubscribedUserList(subtopic, ref userList);
+                int ret = streamChannel.GetSubscribedUserList(subtopic, ref userList);
 
                 messageDisplay.AddMessage("StreamChannel.GetSubscribedTopic ret:" + ret + " userListCount : " + userList.userCount, Message.MessageType.Info);
 
@@ -258,13 +256,13 @@ namespace io.agora.rtm.demo
         public void SendTopicMessage()
         {
             byte[] message = System.Text.Encoding.Default.GetBytes(TopicMessageBox.text);
-            if(StreamChannel!=null)
+            if (streamChannel != null)
             {
-                int ret = StreamChannel.PublishTopicMessage(topic, message, (uint)TopicMessageBox.text.Length);
+                int ret = streamChannel.PublishTopicMessage(topic, message, (uint)TopicMessageBox.text.Length);
 
                 messageDisplay.AddMessage("StreamChannel.PublishTopicMessage  ret:" + ret, Message.MessageType.Info);
             }
-           
+
         }
 
         public void AddUser()
