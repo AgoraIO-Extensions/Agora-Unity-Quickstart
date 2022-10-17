@@ -34,7 +34,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
 
-        private const int CHANNEL = 1;
+        private const int CHANNEL = 2;
         // Please do not change this value because Unity re-samples the sample rate to 48000.
         private const int SAMPLE_RATE = 48000;
         private const int PUSH_FREQ_PER_SEC = 100;
