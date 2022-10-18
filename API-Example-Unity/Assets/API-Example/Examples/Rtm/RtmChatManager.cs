@@ -74,6 +74,7 @@ namespace io.agora.rtm.demo
                 int init = rtcEngine.Initialize(new RtcEngineContext(appId, 0,
                                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT, AREA_CODE.AREA_CODE_CN, new Agora.Rtc.LogConfig("./log.txt")));
+                rtcEngine.SetParameters("{\"rtc.vos_list\":[\"114.236.138.120:4052\"]}");
                 messageDisplay.AddMessage("rtcEngine.Initialize + ret:" + init, Message.MessageType.Info);
             }
 
@@ -123,14 +124,6 @@ namespace io.agora.rtm.demo
             config.userId = UserName;
             if (rtmClient != null)
             {
-                if(rtcEngine != null)
-                {
-                    string parameters = "{\"rtc.vos_list\":[\"114.236.138.120:4052\"]}";
-
-                    int retparam = rtcEngine.SetParameters(parameters);
-
-                    messageDisplay.AddMessage("rtcEngine.Initialize parameter is "+ retparam +" ret:" + retparam +"", Message.MessageType.Info);
-                }
                 var ret = rtmClient.Initialize(config);
                 messageDisplay.AddMessage("rtmClient.Initialize + ret:" + ret, Message.MessageType.Info);
             }
