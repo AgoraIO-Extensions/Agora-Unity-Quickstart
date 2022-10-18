@@ -137,7 +137,11 @@ namespace io.agora.rtm.demo
             ChannelName = channelNameInput.text;
             if (rtmClient != null)
             {
-                streamChannel = rtmClient.CreateStreamChannel(ChannelName);
+                if(streamChannel ==null)
+                {
+                    streamChannel = rtmClient.CreateStreamChannel(ChannelName);
+                }
+
                 JoinChannelOptions options = new JoinChannelOptions();
                 options.token = token;
                 int ret = streamChannel.Join(options);
