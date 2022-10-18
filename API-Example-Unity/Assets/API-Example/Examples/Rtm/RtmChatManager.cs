@@ -89,12 +89,12 @@ namespace io.agora.rtm.demo
             if (streamChannel != null)
             {
                 var ret = streamChannel.Leave();
-                streamChannel.Dispose();
+                streamChannel.Release();
                 messageDisplay.AddMessage("StreamChannel.Leave + ret:" + ret, Message.MessageType.Info);
             }
             if (rtmClient != null)
             {
-                rtmClient.Dispose();
+                rtmClient.Release();
                 rtmClient = null;
             }
             if (rtcEngine != null)
@@ -162,7 +162,7 @@ namespace io.agora.rtm.demo
         {
             if (rtmClient != null && streamChannel != null)
             {
-                streamChannel.Dispose();
+                streamChannel.Release();
             }
 
         }
@@ -172,7 +172,7 @@ namespace io.agora.rtm.demo
             if (rtmClient != null)
             {
                 ChannelDispose();
-                rtmClient.Dispose();
+                rtmClient.Release();
                 rtmClient = null;
             }
         }
