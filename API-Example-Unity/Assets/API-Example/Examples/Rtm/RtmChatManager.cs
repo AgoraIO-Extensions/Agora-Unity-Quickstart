@@ -265,11 +265,20 @@ namespace io.agora.rtm.demo
             byte[] message = System.Text.Encoding.Default.GetBytes(TopicMessageBox.text);
             if (streamChannel != null)
             {
-                int ret = streamChannel.PublishTopicMessage(topic, message, (uint)message.Length);
+                int ret = streamChannel.PublishTopicMessage(topic, message);
 
                 messageDisplay.AddMessage("StreamChannel.PublishTopicMessage  ret:" + ret, Message.MessageType.Info);
             }
+        }
 
+        public void SendTopicMessageStr()
+        {
+            if (streamChannel != null)
+            {
+                int ret = streamChannel.PublishTopicMessage(topic, TopicMessageBox.text);
+
+                messageDisplay.AddMessage("StreamChannel.PublishTopicMessage  ret:" + ret, Message.MessageType.Info);
+            }
         }
 
         public void AddUser()
