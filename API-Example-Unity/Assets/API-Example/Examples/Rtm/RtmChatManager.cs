@@ -265,7 +265,7 @@ namespace io.agora.rtm.demo
             byte[] message = System.Text.Encoding.Default.GetBytes(TopicMessageBox.text);
             if (streamChannel != null)
             {
-                int ret = streamChannel.PublishTopicMessage(topic, message, (uint)TopicMessageBox.text.Length);
+                int ret = streamChannel.PublishTopicMessage(topic, message, (uint)message.Length);
 
                 messageDisplay.AddMessage("StreamChannel.PublishTopicMessage  ret:" + ret, Message.MessageType.Info);
             }
