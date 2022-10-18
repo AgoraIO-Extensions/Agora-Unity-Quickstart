@@ -22,6 +22,9 @@ namespace io.agora.rtm.demo
         [Header("Application Properties")]
 
         [SerializeField] InputField userNameInput, channelNameInput;
+
+        [SerializeField] InputField AppIdInputBox, TokenInputBox;
+
         [SerializeField] InputField TopicMsgInputBox;
         [SerializeField] InputField TopicNameBox;
         [SerializeField] InputField TopicMessageBox;
@@ -63,10 +66,16 @@ namespace io.agora.rtm.demo
             }
         }
 
-        private void Awake()
+        public void Awake()
         {
             userNameInput.text = PlayerPrefs.GetString("RTM_USER", "");
             channelNameInput.text = PlayerPrefs.GetString("RTM_CHANNEL", "");
+        }
+
+        public void InitRtcEngine()
+        {
+            appId = appId == "" ? AppIdInputBox.text : appId;
+            token = token == "" ? TokenInputBox.text : token;
 
             rtcEngine = RtcEngine.CreateAgoraRtcEngine();
             if (rtcEngine != null)
@@ -77,13 +86,9 @@ namespace io.agora.rtm.demo
                 rtcEngine.SetParameters("{\"rtc.vos_list\":[\"114.236.138.120:4052\"]}");
                 messageDisplay.AddMessage("rtcEngine.Initialize + ret:" + init, Message.MessageType.Info);
             }
-
-        }
-
-        private void Start()
-        {
             ShowDisplayTexts();
         }
+
         private void OnDestroy()
         {
             if (streamChannel != null)
