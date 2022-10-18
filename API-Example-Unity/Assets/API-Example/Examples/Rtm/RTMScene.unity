@@ -1711,8 +1711,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fada1dae731e4492a83d78e079c3324b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  appId: aab8b8f5a8cd4469a63042fcfafe7063
-  token: aab8b8f5a8cd4469a63042fcfafe7063
+  appId: 
+  token: 
   userNameInput: {fileID: 985826887}
   channelNameInput: {fileID: 896113091}
   TopicMsgInputBox: {fileID: 166708667}
