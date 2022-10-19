@@ -41,7 +41,7 @@ public class CommandRTMBuild : MonoBehaviour
         if (summary.result == BuildResult.Failed)
         {
             Debug.Log("Build Android failed");
-        }`
+        }
 #else
         string message = BuildPipeline.BuildPlayer(buildPlayerOptions);
         Debug.Log("Build Android: " + message);
