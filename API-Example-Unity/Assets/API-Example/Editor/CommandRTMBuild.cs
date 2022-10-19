@@ -25,7 +25,7 @@ public class CommandRTMBuild : MonoBehaviour
 
         BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
         buildPlayerOptions.scenes = GetAllScenes();
-        buildPlayerOptions.locationPathName = "../Build/Android.apk";
+        buildPlayerOptions.locationPathName = "../RTMBuild/Android.apk";
         buildPlayerOptions.target = BuildTarget.Android;
         buildPlayerOptions.options = BuildOptions.None;
 
@@ -41,7 +41,7 @@ public class CommandRTMBuild : MonoBehaviour
         if (summary.result == BuildResult.Failed)
         {
             Debug.Log("Build Android failed");
-        }
+        }`
 #else
         string message = BuildPipeline.BuildPlayer(buildPlayerOptions);
         Debug.Log("Build Android: " + message);
@@ -54,7 +54,7 @@ public class CommandRTMBuild : MonoBehaviour
     {
         BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
         buildPlayerOptions.scenes = GetAllScenes();
-        buildPlayerOptions.locationPathName = "../Build/IPhone";
+        buildPlayerOptions.locationPathName = "../RTMBuild/IPhone";
         buildPlayerOptions.target = BuildTarget.iOS;
         buildPlayerOptions.options = BuildOptions.None;
 
@@ -82,7 +82,7 @@ public class CommandRTMBuild : MonoBehaviour
     {
         BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
         buildPlayerOptions.scenes = GetAllScenes();
-        buildPlayerOptions.locationPathName = "../Build/Mac.app";
+        buildPlayerOptions.locationPathName = "../RTMBuild/Mac.app";
         buildPlayerOptions.target = BuildTarget.StandaloneOSX;
         buildPlayerOptions.options = BuildOptions.None;
 
@@ -112,7 +112,7 @@ public class CommandRTMBuild : MonoBehaviour
 
         BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
         buildPlayerOptions.scenes = GetAllScenes();
-        buildPlayerOptions.locationPathName = "../Build/x86/x86.exe";
+        buildPlayerOptions.locationPathName = "../RTMBuild/x86/x86.exe";
         buildPlayerOptions.target = BuildTarget.StandaloneWindows;
         buildPlayerOptions.options = BuildOptions.None;
     
@@ -141,7 +141,7 @@ public class CommandRTMBuild : MonoBehaviour
     {
         BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
         buildPlayerOptions.scenes = GetAllScenes();
-        buildPlayerOptions.locationPathName = "../Build/x86_64/x86_64.exe";
+        buildPlayerOptions.locationPathName = "../RTMBuild/x86_64/x86_64.exe";
         buildPlayerOptions.target = BuildTarget.StandaloneWindows64;
         buildPlayerOptions.options = BuildOptions.None;
 
