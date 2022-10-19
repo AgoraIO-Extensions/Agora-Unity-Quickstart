@@ -120,9 +120,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
 
-            var appId = "695752b975654e44bea00137d084c71c";
-            var rtmToken = "006695752b975654e44bea00137d084c71cIADhu7/LqSFzOTQ0YDlrW30RbpvpaqGvdRvR4Wucy3sONqPg45sAAAAAEACQ3CaJRmFPYwEA6ANGYU9j695752b975654e44bea00137d084c71c";
-            uint mccUid = 123;
+            var appId = "";
+            var rtmToken = "";
+            uint mccUid = 0;
             MusicContentCenter = RtcEngine.GetMusicContentCenter();
             var config = new MusicContentCenterConfiguration(appId, rtmToken, mccUid);
             var Ret = MusicContentCenter.Initialize(config);
@@ -200,6 +200,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
         void OnMusicCollectSelectValueChanged(int value)
         {
             this.CurSongCode = this.CurMusicCollection.music[value].songCode;
+            this.SelectedMusic.gameObject.SetActive(true);
             this.SelectedMusic.text = "Selected: " + this.CurMusicCollection.music[value].name;
             this.PreloadButton.gameObject.SetActive(true);
             this.OpenButton.gameObject.SetActive(true);
@@ -477,8 +478,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             this._sample.SelectedMusic.gameObject.SetActive(false);
             this._sample.OpenButton.gameObject.SetActive(false);
             this._sample.GetLyricButton.gameObject.SetActive(false);
-            this._sample.SearchMusicButton.gameObject.SetActive(false);
             this._sample.IsPreloadButton.gameObject.SetActive(false);
+            this._sample.PreloadButton.gameObject.SetActive(false);
             this._sample.Log.UpdateLog("Select your musicChat item please");
         }
 
@@ -495,9 +496,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             foreach (var info in result.music) {
                 optionDatas.Add(new Dropdown.OptionData( info.name));
             }
-                
+            this._sample.MusicCollectionSelect.ClearOptions();
+            this._sample.MusicCollectionSelect.AddOptions(optionDatas);
 
-    
+            this._sample.OpenButton.gameObject.SetActive(false);
+            this._sample.GetLyricButton.gameObject.SetActive(false);
+            this._sample.IsPreloadButton.gameObject.SetActive(false);
+            this._sample.PreloadButton.gameObject.SetActive(false);
+            this._sample.SelectedMusic.gameObject.SetActive(false);
+
             this._sample.Log.UpdateLog("Select your music item please");
             
         }
