@@ -42,6 +42,7 @@ public class Home : MonoBehaviour
         "MediaPlayerWithCustomDataProviderScene",
         "MediaRecorderScene",
         "MetadataScene",
+        "MusicPlayerScene",
         "ProcessAudioRawDataScene",
         "ProcessVideoRawDataScene",
         "PushEncodedVideoImageScene",

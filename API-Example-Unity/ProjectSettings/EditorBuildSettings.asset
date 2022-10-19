@@ -110,3 +110,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/API-Example/Examples/Advanced/VoiceChanger/VoiceChangerScene.unity
     guid: 5e00dd36388ca4686be1bdf82e52b79d
+  - enabled: 1
+    path: Assets/API-Example/Examples/Advanced/MusicPlayer/MusicPlayerScene.unity
+    guid: f8537af61000347599a419361f0a9e98
