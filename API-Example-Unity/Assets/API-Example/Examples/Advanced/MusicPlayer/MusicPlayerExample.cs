@@ -34,6 +34,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
         internal IMusicContentCenter MusicContentCenter = null;
         internal IMusicPlayer MusicPlayer = null;
 
+
+        internal InputField RtmAppidInputField;
+        internal InputField RtmTokenInputField;
+        internal InputField RtmUidInputField;
+        internal Button JoinChannelButton;
+
+
         internal Button GetMusicChartsButton;
         internal Dropdown MusicChartsSelect;
         internal Dropdown MusicCollectionSelect;
@@ -56,7 +63,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             {
                 SetUpUI();
                 InitEngine();
-                JoinChannelWithMPK();
+               
             }
         }
         // Update is called once per frame
@@ -68,6 +75,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
 
         private void SetUpUI()
         {
+
+            RtmAppidInputField = GameObject.Find("RtmAppidInputField").GetComponent<InputField>();
+            RtmTokenInputField = GameObject.Find("RtmTokenInputField").GetComponent<InputField>();
+            RtmUidInputField = GameObject.Find("RtmUidInputField").GetComponent<InputField>();
+
+            JoinChannelButton = GameObject.Find("JoinChannelButton").GetComponent<Button>();
+            JoinChannelButton.onClick.AddListener(JoinChannelAndInitMusicContentCenter);
+            
             GetMusicChartsButton = GameObject.Find("GetMusicCharts").GetComponent<Button>();
             GetMusicChartsButton.onClick.AddListener(OnGetMusicChartsButtonClick);
             GetMusicChartsButton.gameObject.SetActive(false);
@@ -114,19 +129,51 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
-        private void JoinChannelWithMPK()
+
+
+
+        private void JoinChannelAndInitMusicContentCenter()
         {
+            if (RtmAppidInputField.text == "") {
+                 this.Log.UpdateLog("Please enter you rtm appid first");
+                return;
+            }
+
+            if (RtmTokenInputField.text == "") {
+                this.Log.UpdateLog("Please enter you rtm token first");
+                return;
+            }
+
+            if (RtmUidInputField.text == "")
+            {
+                this.Log.UpdateLog("Please enter you rtm uid(uint) first");
+                return;
+            }
+
+
+            UInt64 mccUid = 0;
+            UInt64.TryParse(RtmUidInputField.text, out mccUid);
+            if (mccUid == 0) {
+                this.Log.UpdateLog("rtm uid must be UInt64");
+                return;
+            }
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
 
-            var appId = "";
-            var rtmToken = "";
-            uint mccUid = 0;
+            var appId = RtmAppidInputField.text;
+            var rtmToken = RtmTokenInputField.text;
             MusicContentCenter = RtcEngine.GetMusicContentCenter();
             var config = new MusicContentCenterConfiguration(appId, rtmToken, mccUid);
             var Ret = MusicContentCenter.Initialize(config);
             this.Log.UpdateLog("MusicContentCenter.Initialize: " + Ret);
+
+            if (Ret != 0) {
+                this.Log.UpdateLog("MusicContentCenter Initialize failed. Please check you appid, token or uid");
+                return;
+            }
+
+
             MusicContentCenter.RegisterEventHandler(new UserMusicContentCenterEventHandler(this));
             MusicPlayer = MusicContentCenter.CreateMusicPlayer();
 
@@ -153,6 +200,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             var ret = RtcEngine.JoinChannel(_token, _channelName, 0, options);
             this.Log.UpdateLog("RtcEngineController JoinChannel_MPK returns: " + ret);
+
+            this.GetMusicChartsButton.gameObject.SetActive(true);
+
+            RtmAppidInputField.gameObject.SetActive(false);
+            RtmTokenInputField.gameObject.SetActive(false);
+            RtmUidInputField.gameObject.SetActive(false);
+            JoinChannelButton.gameObject.SetActive(false);
         }
 
         //Show data in AgoraBasicProfile
