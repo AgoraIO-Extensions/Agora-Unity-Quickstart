@@ -45,7 +45,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
 
 
         private Thread _pullAudioFrameThread;
-        private System.Object _pullAudioFrameThreadSignal = new System.Object();
+        private System.Object _rtcLock = new System.Object();
 
         private int _writeCount;
         private int _readCount;
@@ -85,23 +85,30 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
 
         private void InitRtcEngine()
         {
-            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
-            UserEventHandler handler = new UserEventHandler(this);
-            //be care, enableAudioDevice need be false
-            RtcEngineContext context = new RtcEngineContext(_appID, 0,
-                                        CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING, null,
-                                        AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            var ret = RtcEngine.Initialize(context);
-            RtcEngine.InitEventHandler(handler);
+            lock (_rtcLock)
+            {
+
+                RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
+                UserEventHandler handler = new UserEventHandler(this);
+                //be care, enableAudioDevice need be false
+                RtcEngineContext context = new RtcEngineContext(_appID, 0,
+                                            CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING, null,
+                                            AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
+                var ret = RtcEngine.Initialize(context);
+                RtcEngine.InitEventHandler(handler);
+            }
         }
 
         private void JoinChannel()
         {
-            RtcEngine.EnableAudio();
-            //no enableAudioDevice to set false？ how this methond work?
-            var nRet = RtcEngine.SetExternalAudioSink(true,SAMPLE_RATE, CHANNEL);
-            this.Log.UpdateLog("SetExternalAudioSink ret:" + nRet);
-            RtcEngine.JoinChannel(_token, _channelName);
+            lock (_rtcLock)
+            {
+                RtcEngine.EnableAudio();
+                //no enableAudioDevice to set false？ how this methond work?
+                var nRet = RtcEngine.SetExternalAudioSink(true, SAMPLE_RATE, CHANNEL);
+                this.Log.UpdateLog("SetExternalAudioSink ret:" + nRet);
+                RtcEngine.JoinChannel(_token, _channelName);
+            }
         }
 
         private AudioSource InitAudioSource()
@@ -130,12 +137,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
             aud.clip = _audioClip;
             aud.loop = true;
             aud.Play();
+
+            this.Log.UpdateLog("Because the api of rtcEngine is called in different threads, it is necessary to use locks to ensure that different threads do not call the api of rtcEngine at the same time");
+
         }
 
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
-            lock (_pullAudioFrameThreadSignal)
+            lock (_rtcLock)
             {
                 if (RtcEngine == null) return;
                 RtcEngine.InitEventHandler(null);
@@ -143,6 +153,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
                 RtcEngine.Dispose();
                 RtcEngine = null;
             }
+            //need wait pullAudioFrameThread stop 
+            _pullAudioFrameThread.Join();
         }
 
         private void PullAudioFrameThread()
@@ -165,7 +177,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
 
             while (true)
             {
-                lock (_pullAudioFrameThreadSignal)
+                lock (_rtcLock)
                 {
                     if (RtcEngine == null)
                     {
