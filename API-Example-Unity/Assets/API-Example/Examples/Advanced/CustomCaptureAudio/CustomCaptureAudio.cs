@@ -43,9 +43,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
         private bool _startConvertSignal = false;
 
         private Thread _pushAudioFrameThread;
-        private System.Object _pushAudioFrameThreadSignal = new System.Object();
-        private int _count;
-        private bool _startSignal = false;
+        private System.Object _rtcLock = new System.Object();
+     
 
 
         // Use this for initialization
@@ -85,19 +84,26 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 
         private void InitRtcEngine()
         {
-            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
+            lock (_rtcLock)
+            {
 
-            RtcEngineContext context = new RtcEngineContext(_appID, 0,
-                CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING, null,
-                AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            RtcEngine.Initialize(context);
-            RtcEngine.InitEventHandler(new UserEventHandler(this));
+                RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
+
+                RtcEngineContext context = new RtcEngineContext(_appID, 0,
+                    CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING, null,
+                    AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
+                RtcEngine.Initialize(context);
+                RtcEngine.InitEventHandler(new UserEventHandler(this));
+            }
         }
 
         private void SetExternalAudioSource()
         {
-            var nRet = RtcEngine.SetExternalAudioSource(true, SAMPLE_RATE, CHANNEL, 1);
-            this.Log.UpdateLog("SetExternalAudioSource nRet:" + nRet);
+            lock (_rtcLock)
+            {
+                var nRet = RtcEngine.SetExternalAudioSource(true, SAMPLE_RATE, CHANNEL, 1);
+                this.Log.UpdateLog("SetExternalAudioSource nRet:" + nRet);
+            }
         }
 
         private void StartPushAudioFrame()
@@ -109,15 +115,20 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 
             _pushAudioFrameThread = new Thread(PushAudioFrameThread);
             _pushAudioFrameThread.Start();
+
+            this.Log.UpdateLog("Because the api of rtcEngine is called in different threads, it is necessary to use locks to ensure that different threads do not call the api of rtcEngine at the same time");
         }
 
         private void JoinChannel()
         {
-            RtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY,
+            lock (_rtcLock)
+            {
+                RtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            RtcEngine.EnableAudio();
-            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            RtcEngine.JoinChannel(_token, _channelName, "");
+                RtcEngine.EnableAudio();
+                RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+                RtcEngine.JoinChannel(_token, _channelName, "");
+            }
         }
 
         private void OnLeaveBtnClick()
@@ -128,14 +139,18 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
-            if (RtcEngine == null) return;
-            lock (_pushAudioFrameThreadSignal)
+         
+            lock (_rtcLock)
             {
+                if (RtcEngine == null) return;
                 RtcEngine.InitEventHandler(null);
                 RtcEngine.LeaveChannel();
                 RtcEngine.Dispose();
                 RtcEngine = null;
             }
+            //need wait pullAudioFrameThread stop 
+            _pushAudioFrameThread.Join();
+
         }
 
         private void PushAudioFrameThread()
@@ -167,7 +182,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 
             while (true)
             {
-                lock (_pushAudioFrameThreadSignal)
+                lock (_rtcLock)
                 {
                     if (RtcEngine == null)
                     {
