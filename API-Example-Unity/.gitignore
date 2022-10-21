@@ -5,7 +5,6 @@
 /[Bb]uilds/
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
-/ProjectSettings/
 *.log
 
 # MemoryCaptures can get excessive in size.
