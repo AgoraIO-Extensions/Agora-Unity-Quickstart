@@ -171,14 +171,18 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
         private void onLeftLocationPress()
         {
             float[] f1 = { 0.0f, 1.0f, 0.0f };
-            var ret = SpatialAudioEngine.UpdateRemotePositionEx(UidUseInMPK, f1, new float[] { 0, 0, 0 }, new RtcConnection(_channelName, UidUseInEx));
+            float[] f2 = { 0, 0, 0 };
+            RemoteVoicePositionInfo remoteVoicePositionInfo = new RemoteVoicePositionInfo(f1, f2);
+            var ret = SpatialAudioEngine.UpdateRemotePositionEx(UidUseInMPK, remoteVoicePositionInfo, new RtcConnection(_channelName, UidUseInEx));
             Debug.Log("_spatialAudio.UpdateRemotePosition returns: " + ret);
         }
 
         private void onRightLocationPress()
         {
             float[] f1 = { 0.0f, -1.0f, 0.0f };
-            var ret = SpatialAudioEngine.UpdateRemotePositionEx(UidUseInMPK, f1, new float[] { 0, 0, 0 }, new RtcConnection(_channelName, UidUseInEx));
+            float[] f2 = { 0, 0, 0 };
+            RemoteVoicePositionInfo remoteVoicePositionInfo = new RemoteVoicePositionInfo(f1, f2);
+            var ret = SpatialAudioEngine.UpdateRemotePositionEx(UidUseInMPK, remoteVoicePositionInfo, new RtcConnection(_channelName, UidUseInEx));
             Debug.Log("_spatialAudio.UpdateRemotePosition returns: " + ret);
         }
 
