@@ -92,7 +92,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
 
             //If you use a Bluetooth headset, you need to set AUDIO_SCENARIO_TYPE to AUDIO_SCENARIO_GAME_STREAMING.
             RtcEngineContext context = new RtcEngineContext(_appID, 0,
-                                        CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
+                                        CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING, null,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
             var ret = RtcEngine.Initialize(context);
             Debug.Log("Agora: Initialize " + ret);
@@ -174,21 +174,25 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
         //If you trigger this button event, the remote user's audio source will appear in your right left direction.
         private void onLeftLocationPress()
         {
+
             //If remote user is moving, position and trandform could be:
             //var position = remoteUserTransform.position;
             //var forward = remoteUserTransform.forward;
             //float[] positionRemote = { position.x, position.y, position.z };
             //float[] forwardRemote = { forward.x, forward.y, forward.z };
 
-            float[] remoteUserPosition = { 0.0f, -1.0f, 0.0f };
-            float[] remoteUserForward = { 0.0f, 0.0f, 0.0f };
-            var ret = SpatialAudioEngine.UpdateRemotePositionEx(UidUseInMPK, remoteUserPosition, remoteUserForward, new RtcConnection(_channelName, UidUseInEx));
+
+            float[] positionRemote = { 0.0f, -1.0f, 0.0f };
+            float[] forwardRemote = { 0, 0, 0 };
+            RemoteVoicePositionInfo remoteVoicePositionInfo = new RemoteVoicePositionInfo(positionRemote, forwardRemote);
+            var ret = SpatialAudioEngine.UpdateRemotePositionEx(UidUseInMPK, remoteVoicePositionInfo, new RtcConnection(_channelName, UidUseInEx));
             Debug.Log("_spatialAudio.UpdateRemotePosition returns: " + ret);
         }
 
         //If you trigger this button event, the remote user's audio source will appear in your right right direction.
         private void onRightLocationPress()
         {
+
             //If remote user is moving, position and trandform could be:
             //
             //var position = remoteUserTransform.position;
@@ -196,9 +200,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
             //float[] positionRemote = { position.x, position.y, position.z };
             //float[] forwardRemote = { forward.x, forward.y, forward.z };
 
-            float[] remoteUserPosition = { 0.0f, 1.0f, 0.0f };
-            float[] remoteUserForward = { 0.0f, 0.0f, 0.0f };
-            var ret = SpatialAudioEngine.UpdateRemotePositionEx(UidUseInMPK, remoteUserPosition, remoteUserForward, new RtcConnection(_channelName, UidUseInEx));
+  
+            float[] positionRemote = { 0.0f, 1.0f, 0.0f };
+            float[] forwardRemote = { 0, 0, 0 };
+            RemoteVoicePositionInfo remoteVoicePositionInfo = new RemoteVoicePositionInfo(positionRemote, forwardRemote);
+            var ret = SpatialAudioEngine.UpdateRemotePositionEx(UidUseInMPK, remoteVoicePositionInfo, new RtcConnection(_channelName, UidUseInEx));
+
             Debug.Log("_spatialAudio.UpdateRemotePosition returns: " + ret);
         }
 
@@ -392,7 +399,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
             SpatialAudioWithMediaPlayer.DestroyVideoView(0);
         }
 
-        public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
+        public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole, ClientRoleOptions newRoleOptions)
         {
             _spatialAudio.Log.UpdateLog("OnClientRoleChanged");
         }
