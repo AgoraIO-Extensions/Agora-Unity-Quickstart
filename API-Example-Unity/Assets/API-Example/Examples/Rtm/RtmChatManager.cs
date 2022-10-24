@@ -25,7 +25,6 @@ namespace io.agora.rtm.demo
 
         [SerializeField] InputField AppIdInputBox, TokenInputBox;
 
-        [SerializeField] InputField TopicMsgInputBox;
         [SerializeField] InputField TopicNameBox;
         [SerializeField] InputField TopicMessageBox;
         [SerializeField] InputField TopicSubscribedBox;
@@ -137,7 +136,7 @@ namespace io.agora.rtm.demo
 
         }
 
-        public void Join()
+        public void JoinChannel()
         {
             ChannelName = channelNameInput.text;
             if (rtmClient != null)
@@ -149,8 +148,15 @@ namespace io.agora.rtm.demo
 
                 JoinChannelOptions options = new JoinChannelOptions();
                 options.token = token;
-                int ret = streamChannel.Join(options);
-                messageDisplay.AddMessage("StreamChannel.Join + ret:" + ret, Message.MessageType.Info);
+                if (streamChannel != null)
+                {
+                    int ret = streamChannel.Join(options);
+                    messageDisplay.AddMessage("StreamChannel.JoinChannel  ret:" + ret, Message.MessageType.Info);
+                }
+                else
+                {
+                    messageDisplay.AddMessage("StreamChannel is invalid: ChannelName is invalid", Message.MessageType.Error);
+                }
             }
         }
         public void ChannelLeave()
@@ -298,7 +304,7 @@ namespace io.agora.rtm.demo
         }
         #endregion
 
-        bool ShowDisplayTexts()
+        private bool ShowDisplayTexts()
         {
             int showLength = 6;
             if (string.IsNullOrEmpty(appId) || appId.Length < showLength)

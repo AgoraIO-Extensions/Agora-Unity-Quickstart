@@ -1925,7 +1925,6 @@ MonoBehaviour:
   channelNameInput: {fileID: 896113091}
   AppIdInputBox: {fileID: 628692810}
   TokenInputBox: {fileID: 396807538}
-  TopicMsgInputBox: {fileID: 166708667}
   TopicNameBox: {fileID: 26697875}
   TopicMessageBox: {fileID: 166708667}
   TopicSubscribedBox: {fileID: 577453204}
@@ -5538,7 +5537,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 436596858}
-        m_MethodName: Join
+        m_MethodName: JoinChannel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
