@@ -17,13 +17,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PluginSceneSample
         #region DllImport
 
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-        private const string PluginLibName = "AgoraRtcWrapper";
+        private const string PluginLibName = "VideoObserverPlugin";
 #elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
         private const string PluginLibName = "VideoObserverPluginUnity";
 #elif UNITY_IPHONE
 		private const string PluginLibName = "__Internal";
 #else
-        private const string PluginLibName = "AgoraRtcWrapper";
+        private const string PluginLibName = "VideoObserverPlugin";
 #endif
 
         [System.Runtime.InteropServices.DllImport(PluginLibName, CharSet = System.Runtime.InteropServices.CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -112,9 +112,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PluginSceneSample
 
         public void JoinChannel()
         {
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
-            RtcEngine.JoinChannel(_token, _channelName,"",0);
+            RtcEngine.JoinChannel(_token, _channelName, "", 0);
         }
 
 
@@ -247,6 +248,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PluginSceneSample
 
             bool result = EnablePlugin(this.pluginSamplePtr);
             this.Log.UpdateLog("Enable Plugin :" + result);
+
+            int nRet = RtcEngine.SetRecordingAudioFrameParameters(48000, 2, RAW_AUDIO_FRAME_OP_MODE_TYPE.RAW_AUDIO_FRAME_OP_MODE_READ_WRITE, 960);
+            this.Log.UpdateLog("SetRecordingAudioFrameParameters: " + nRet);
         }
 
         public void onDisablePluginButtonClick()
@@ -257,10 +261,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PluginSceneSample
                 return;
             }
 
-            bool result= DisablePlugin(this.pluginSamplePtr);
+            bool result = DisablePlugin(this.pluginSamplePtr);
             this.Log.UpdateLog("Disable Plugin :" + result);
             DestroySamplePlugin(this.pluginSamplePtr);
             this.pluginSamplePtr = IntPtr.Zero;
+
+            int nRet = RtcEngine.SetRecordingAudioFrameParameters(48000, 2, RAW_AUDIO_FRAME_OP_MODE_TYPE.RAW_AUDIO_FRAME_OP_MODE_READ_ONLY, 960);
+            this.Log.UpdateLog("SetRecordingAudioFrameParameters: " + nRet);
         }
     }
 
