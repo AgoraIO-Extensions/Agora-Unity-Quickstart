@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define USE_PLUGIN
+
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
@@ -15,6 +17,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PluginSceneSample
     {
 
         #region DllImport
+
+#if USE_PLUGIN
 
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
         private const string PluginLibName = "VideoObserverPlugin";
@@ -37,8 +41,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PluginSceneSample
 
         [System.Runtime.InteropServices.DllImport(PluginLibName, CharSet = System.Runtime.InteropServices.CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern bool DisablePlugin(PluginSamplePtr engine);
-
-        #endregion
+#endif
+#endregion
 
 
         [FormerlySerializedAs("appIdInput")]
@@ -236,6 +240,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PluginSceneSample
 
         public void OnEnablePluginButtonClick()
         {
+#if USE_PLUGIN
             if (this.pluginSamplePtr != IntPtr.Zero)
             {
                 this.Log.UpdateLog("plugine already enabled");
@@ -251,10 +256,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PluginSceneSample
 
             int nRet = RtcEngine.SetRecordingAudioFrameParameters(48000, 2, RAW_AUDIO_FRAME_OP_MODE_TYPE.RAW_AUDIO_FRAME_OP_MODE_READ_WRITE, 960);
             this.Log.UpdateLog("SetRecordingAudioFrameParameters: " + nRet);
+#else
+            this.Log.UpdateLog("if you want use plugin, you need uncomment the first line in PluginSceneSample.cs and import VideoObserverPlugin into this project");
+#endif
         }
 
         public void onDisablePluginButtonClick()
         {
+#if USE_PLUGIN
             if (this.pluginSamplePtr == IntPtr.Zero)
             {
                 this.Log.UpdateLog("plugin not actived");
@@ -268,6 +277,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PluginSceneSample
 
             int nRet = RtcEngine.SetRecordingAudioFrameParameters(48000, 2, RAW_AUDIO_FRAME_OP_MODE_TYPE.RAW_AUDIO_FRAME_OP_MODE_READ_ONLY, 960);
             this.Log.UpdateLog("SetRecordingAudioFrameParameters: " + nRet);
+#else
+            this.Log.UpdateLog("if you want use plugin, you need uncomment the first line in PluginSceneSample.cs and import VideoObserverPlugin into this project");
+#endif
         }
     }
 
