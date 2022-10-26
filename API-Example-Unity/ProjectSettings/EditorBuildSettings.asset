@@ -113,3 +113,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/API-Example/Examples/Advanced/MusicPlayer/MusicPlayerScene.unity
     guid: f8537af61000347599a419361f0a9e98
+  - enabled: 1
+    path: Assets/API-Example/Examples/Advanced/Plugin/PluginScene.unity
+    guid: 451211adb15b3487c90afa3af6d7040d
