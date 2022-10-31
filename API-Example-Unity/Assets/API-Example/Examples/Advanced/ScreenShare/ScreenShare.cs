@@ -45,6 +45,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
         public RawImage IconImage;
         public RawImage ThumbImage;
 
+        public InputField WidthField;
+        public InputField HeightField;
+        public InputField BitrateField;
+        public InputField FPSField;
+
         // Use this for initialization
         private void Start()
         {
@@ -92,6 +97,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(new UserEventHandler(this));
+
+            RtcEngine.SetParameters("{\"rtc.video.degradation_preference\":100}");
+            RtcEngine.SetParameters("{\"che.video.render.d3d9_texture\":true}");
         }
 
         private void SetBasicConfiguration()
@@ -187,12 +195,37 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             var option = WinIdSelect.options[WinIdSelect.value].text;
             if (string.IsNullOrEmpty(option)) return;
 
+
+            int width = int.Parse(WidthField.text);
+            int height = int.Parse(HeightField.text);
+            int bitrate = int.Parse(BitrateField.text);
+            int fps = int.Parse(FPSField.text);
+
+            this.Log.UpdateLog(width + " " + height + " " + bitrate + " " + fps);
+
+            VideoEncoderConfiguration videoEncoderConfiguration = new VideoEncoderConfiguration();
+            videoEncoderConfiguration.dimensions = new VideoDimensions(width, height);
+            videoEncoderConfiguration.bitrate = bitrate;
+            videoEncoderConfiguration.frameRate = fps;
+            RtcEngine.SetVideoEncoderConfiguration(videoEncoderConfiguration);
+
+
+            ScreenCaptureParameters screenCaptureParameters = new ScreenCaptureParameters();
+            screenCaptureParameters.dimensions = new VideoDimensions(width, height);
+            screenCaptureParameters.bitrate = bitrate;
+            screenCaptureParameters.frameRate = fps;
+
+            screenCaptureParameters.enableHighLight = false;
+            screenCaptureParameters.windowFocus = false;
+            screenCaptureParameters.captureMouseCursor = false;
+
+
             if (option.Contains("ScreenCaptureSourceType_Window"))
             {
                 var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
                 Log.UpdateLog(string.Format(">>>>> Start sharing {0}", windowId));
                 var nRet = RtcEngine.StartScreenCaptureByWindowId(ulong.Parse(windowId), default(Rectangle),
-                        default(ScreenCaptureParameters));
+                        screenCaptureParameters);
                 this.Log.UpdateLog("StartScreenCaptureByWindowId:" + nRet);
             }
             else
@@ -200,14 +233,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
                 var dispId = uint.Parse(option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1]);
                 Log.UpdateLog(string.Format(">>>>> Start sharing display {0}", dispId));
                 var nRet = RtcEngine.StartScreenCaptureByDisplayId(dispId, default(Rectangle),
-                    new ScreenCaptureParameters { captureMouseCursor = true, frameRate = 30 });
+                   screenCaptureParameters);
                 this.Log.UpdateLog("StartScreenCaptureByDisplayId:" + nRet);
             }
 
 #endif
 
             //OnPublishButtonClick();
-            ScreenShare.MakeVideoView(0, "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_SCREEN);
+            //ScreenShare.MakeVideoView(0, "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_SCREEN);
 
         }
 
@@ -431,7 +464,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
             _desktopScreenShare.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-            ScreenShare.MakeVideoView(uid, _desktopScreenShare.GetChannelName(), VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE);
+            //ScreenShare.MakeVideoView(uid, _desktopScreenShare.GetChannelName(), VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE);
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)

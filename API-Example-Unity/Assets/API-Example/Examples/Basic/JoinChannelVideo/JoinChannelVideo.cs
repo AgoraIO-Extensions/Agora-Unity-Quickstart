@@ -79,6 +79,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT, AREA_CODE.AREA_CODE_CN, new LogConfig("./log.txt"));
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
+            RtcEngine.SetParameters("{\"rtc.video.degradation_preference\":100}");
+            RtcEngine.SetParameters("{\"che.video.render.d3d9_texture\":true}");
         }
 
         private void SetBasicConfiguration()
@@ -352,7 +354,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
             _videoSample.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-            JoinChannelVideo.MakeVideoView(uid, _videoSample.GetChannelName());
+            //JoinChannelVideo.MakeVideoView(uid, _videoSample.GetChannelName());
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
