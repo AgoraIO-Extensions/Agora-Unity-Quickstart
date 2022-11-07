@@ -31,7 +31,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PluginSceneSample
 #endif
 
         [System.Runtime.InteropServices.DllImport(PluginLibName, CharSet = System.Runtime.InteropServices.CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern PluginSamplePtr CreateSampePlugin(RtcEnginePtr engine);
+        internal static extern PluginSamplePtr CreateSamplePlugin(RtcEnginePtr engine);
 
         [System.Runtime.InteropServices.DllImport(PluginLibName, CharSet = System.Runtime.InteropServices.CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void DestroySamplePlugin(PluginSamplePtr engine);
@@ -249,7 +249,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PluginSceneSample
 
             RtcEnginePtr rtcEnginePtr = IntPtr.Zero;
             this.RtcEngine.GetNativeHandler(ref rtcEnginePtr);
-            this.pluginSamplePtr = CreateSampePlugin(rtcEnginePtr);
+            this.pluginSamplePtr = CreateSamplePlugin(rtcEnginePtr);
 
             bool result = EnablePlugin(this.pluginSamplePtr);
             this.Log.UpdateLog("Enable Plugin :" + result);
