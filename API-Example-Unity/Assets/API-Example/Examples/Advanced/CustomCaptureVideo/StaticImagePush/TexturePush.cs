@@ -80,12 +80,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.TexturePush
                     var timetick = System.DateTime.Now.Ticks / 10000;
                     ExternalVideoFrame externalVideoFrame = new ExternalVideoFrame();
                     externalVideoFrame.type = VIDEO_BUFFER_TYPE.VIDEO_BUFFER_RAW_DATA;
-                    //externalVideoFrame.type = VIDEO_BUFFER_TYPE.VIDEO_BUFFER_TEXTURE;
                     externalVideoFrame.format = VIDEO_PIXEL_FORMAT.VIDEO_PIXEL_RGBA;
                     externalVideoFrame.buffer = _shareData;
                     externalVideoFrame.stride = (int)_rect.width;
                     externalVideoFrame.height = (int)_rect.height;
-                    //externalVideoFrame.rotation = 180;
+                    externalVideoFrame.rotation = 180;
                     externalVideoFrame.timestamp = timetick;
                     var ret = rtc.PushVideoFrame(externalVideoFrame);
                     //Debug.Log("PushVideoFrame ret = " + ret + " time: " + timetick);
@@ -94,22 +93,24 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.TexturePush
         }
 
 
-        private byte[] convertColor32(Color32[] colors) {
+        private byte[] convertColor32(Color32[] colors)
+        {
             byte[] ret = new byte[colors.Length * 4];
             int i = 0;
-            foreach (var color in colors) {
+            foreach (var color in colors)
+            {
                 ret[i++] = color.r;
                 ret[i++] = color.g;
                 ret[i++] = color.b;
                 ret[i++] = color.a;
             }
-            return ret; 
+            return ret;
         }
 
 
         private void InitEngine()
         {
-            
+
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0,
@@ -121,7 +122,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.TexturePush
 
         private void SetExternalVideoSource()
         {
-           
+
             var ret = RtcEngine.SetExternalVideoSource(true, false, EXTERNAL_VIDEO_SOURCE_TYPE.VIDEO_FRAME, new SenderOptions());
             this.Log.UpdateLog("SetExternalVideoSource returns:" + ret);
         }
@@ -143,25 +144,23 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.TexturePush
         private void InitTexture()
         {
             _texture = ShareTexture;
-     
 
-            //如果只是一张固定的图片的话。那么获取_shareData只需要计算一次，然后每帧都推送可以了
+            //If it's just a fixed image. Then you only need to calculate once to get _shareData, and then push it every frame.
+            //The reason why you can't use _texture.GetRawTextureData() to get byte data is because this _texture.format is not RGBA8888,
+            //On different platforms this _texture.foramt may be some other format. So you need to get Color32 first, and then replace it with RGBA8888 byte data
             Color32[] color32s = _texture.GetPixels32(0);
             _shareData = convertColor32(color32s);
+
             Debug.Log("_shareData length: " + _shareData.Length);
 
-            //这里之所以不能用 _texture.GetRawTextureData()来获取byte数据，是因为这个 _texture.format 并不是 RGBA8888 的，
-            //在不同的平台上这个_texture.foramt可能是其他的什么之类的格式。所以需要先得到Color32，然后再装换成 RGBA8888的byte数据
-
             _rect = new UnityEngine.Rect(0, 0, _texture.width, _texture.height);
-            Debug.Log("InitTexture rect = " + _rect.width +  "  " + _rect.height);
+            Debug.Log("InitTexture rect = " + _rect.width + "  " + _rect.height);
 
             VideoEncoderConfiguration videoEncoderConfiguration = new VideoEncoderConfiguration();
             videoEncoderConfiguration.dimensions = new VideoDimensions((int)_rect.width, (int)_rect.height);
             RtcEngine.SetVideoEncoderConfiguration(videoEncoderConfiguration);
 
             SampleaImage.texture = _texture;
-
         }
 
 
