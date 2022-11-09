@@ -44,7 +44,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 
         private Thread _pushAudioFrameThread;
         private System.Object _rtcLock = new System.Object();
-     
+
 
 
         // Use this for initialization
@@ -139,7 +139,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
-         
+
             lock (_rtcLock)
             {
                 if (RtcEngine == null) return;
@@ -160,13 +160,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
             var channels = CHANNEL;
             var samples = SAMPLE_RATE / PUSH_FREQ_PER_SEC;
             var samplesPerSec = SAMPLE_RATE;
-            var buffer = new byte[samples * bytesPerSample * CHANNEL];
+
             var freq = 1000 / PUSH_FREQ_PER_SEC;
 
             var tic = DateTime.Now;
 
-
-            IntPtr audioFrameBuffer = Marshal.AllocHGlobal(buffer.Length);
             var audioFrame = new AudioFrame
             {
                 bytesPerSample = BYTES_PER_SAMPLE.TWO_BYTES_PER_SAMPLE,
@@ -174,53 +172,44 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
                 samplesPerChannel = samples,
                 samplesPerSec = samplesPerSec,
                 channels = channels,
-                buffer = (UInt64)audioFrameBuffer,
-                bufferPtr = audioFrameBuffer,
-                RawBuffer = buffer,
+                RawBuffer = new byte[samples * bytesPerSample * CHANNEL],
                 renderTimeMs = freq
             };
 
             while (true)
             {
+                double tickBeforePull = GetTimestamp();
                 lock (_rtcLock)
                 {
                     if (RtcEngine == null)
                     {
                         break;
                     }
-                    var toc = DateTime.Now;
 
-                    if ((toc - tic).Milliseconds >= freq)
+                    int nRet = -1;
+                    lock (_audioBuffer)
                     {
-                        lock (_audioBuffer)
+                        if (_audioBuffer.Size > samples * bytesPerSample * CHANNEL)
                         {
-                            if (_audioBuffer.Size > samples * bytesPerSample * CHANNEL)
+                            for (var j = 0; j < samples * bytesPerSample * CHANNEL; j++)
                             {
-                                for (var j = 0; j < samples * bytesPerSample * CHANNEL; j++)
-                                {
-                                    buffer[j] = _audioBuffer.Get();
-                                }
-
-                                Marshal.Copy(buffer, 0, audioFrame.bufferPtr, buffer.Length);
-
-                                var ret = RtcEngine.PushAudioFrame(MEDIA_SOURCE_TYPE.AUDIO_PLAYOUT_SOURCE, audioFrame);
-                                Debug.Log("PushAudioFrame returns: " + ret);
-
-                                tic = toc;
+                                audioFrame.RawBuffer[j] = _audioBuffer.Get();
                             }
-                            else
-                            {
-                                tic = tic.AddMilliseconds(1);
-                            }
+                            nRet = RtcEngine.PushAudioFrame(MEDIA_SOURCE_TYPE.AUDIO_PLAYOUT_SOURCE, audioFrame);
+                            Debug.Log("PushAudioFrame returns: " + nRet);
+                          
                         }
-
                     }
+
+                    if (nRet == 0)
+                    {
+                        double tickAfterPull = GetTimestamp();
+                        Thread.Sleep(freq - (int)(tickAfterPull - tickBeforePull) - 1);
+                    }
+
                 }
-                Thread.Sleep(1);
+
             }
-
-
-            Marshal.FreeHGlobal(audioFrameBuffer);
         }
 
         private void OnAudioFilterRead(float[] data, int channels)
@@ -242,9 +231,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
                     _audioBuffer.Put(byteArr[1]);
                 }
             }
+        }
 
-            //_count += 1;
-            //if (_count == 20) _startSignal = true;
+        //get timestamp millisecond
+        private double GetTimestamp()
+        {
+            TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            return ts.TotalMilliseconds;
         }
     }
 
