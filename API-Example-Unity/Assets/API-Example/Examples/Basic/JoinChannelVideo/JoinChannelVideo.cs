@@ -214,7 +214,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             }
 
             // create a GameObject and assign to this new user
-            var videoSurface = MakeImageSurface(uid.ToString());
+            var videoSurface = MakePlaneSurface(uid.ToString());
             if (ReferenceEquals(videoSurface, null)) return;
             // configure videoSurface
             if (uid == 0)
@@ -229,7 +229,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             videoSurface.OnTextureSizeModify += (int width, int height) =>
             {
                 float scale = (float)height / (float)width;
-                videoSurface.transform.localScale = new Vector3(-5, 5 * scale, 1);
+                //videoSurface.transform.localScale = new Vector3(-5, 5 * scale, 1); // image view
+                videoSurface.transform.localScale = new Vector3(-1, 1, 1 * scale); // plane view
                 Debug.Log("OnTextureSizeModify: " + width + "  " + height);
             };
 
@@ -354,7 +355,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
             _videoSample.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-            //JoinChannelVideo.MakeVideoView(uid, _videoSample.GetChannelName());
+            JoinChannelVideo.MakeVideoView(uid, _videoSample.GetChannelName());
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
