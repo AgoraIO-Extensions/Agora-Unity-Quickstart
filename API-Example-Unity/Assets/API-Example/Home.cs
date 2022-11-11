@@ -60,7 +60,8 @@ public class Home : MonoBehaviour
         "StreamMessageScene",
         "TakeSnapshotScene",
         "VirtualBackgroundScene",
-        "VoiceChangerScene"
+        "VoiceChangerScene",
+        "WriteBackVideoRawDataScene"
     };
 
     private void Awake()
