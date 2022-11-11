@@ -37,7 +37,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
         private const int CHANNEL = 2;
         // Please do not change this value because Unity re-samples the sample rate to 48000.
         private const int SAMPLE_RATE = 48000;
-        private const int PUSH_FREQ_PER_SEC = 100;
+        private const int PUSH_FREQ_PER_SEC = 10;
 
         private RingBuffer<byte> _audioBuffer;
         private bool _startConvertSignal = false;
@@ -163,8 +163,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 
             var freq = 1000 / PUSH_FREQ_PER_SEC;
 
-            var tic = DateTime.Now;
-
             var audioFrame = new AudioFrame
             {
                 bytesPerSample = BYTES_PER_SAMPLE.TWO_BYTES_PER_SAMPLE,
@@ -176,9 +174,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
                 renderTimeMs = freq
             };
 
+
+            double startMillisecond = GetTimestamp();
+            long tick = 0;
+
             while (true)
             {
-                double tickBeforePull = GetTimestamp();
                 lock (_rtcLock)
                 {
                     if (RtcEngine == null)
@@ -196,15 +197,22 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
                                 audioFrame.RawBuffer[j] = _audioBuffer.Get();
                             }
                             nRet = RtcEngine.PushAudioFrame(MEDIA_SOURCE_TYPE.AUDIO_PLAYOUT_SOURCE, audioFrame);
-                            Debug.Log("PushAudioFrame returns: " + nRet);
-                          
+                            //Debug.Log("PushAudioFrame returns: " + nRet);
+
                         }
                     }
 
                     if (nRet == 0)
                     {
-                        double tickAfterPull = GetTimestamp();
-                        Thread.Sleep(freq - (int)(tickAfterPull - tickBeforePull) - 1);
+                        tick++;
+                        double nextMillisecond = startMillisecond + tick * freq;
+                        double curMillisecond = GetTimestamp();
+                        int sleepMillisecond = (int)Math.Ceiling(nextMillisecond - curMillisecond);
+                        //Debug.Log("sleepMillisecond : " + sleepMillisecond);
+                        if (sleepMillisecond > 0)
+                        {
+                            Thread.Sleep(sleepMillisecond);
+                        }
                     }
 
                 }
@@ -216,17 +224,18 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
         {
             if (!_startConvertSignal) return;
             var rescaleFactor = 32767;
-            foreach (var t in data)
+            lock (_audioBuffer)
             {
-                var sample = t;
-                if (sample > 1) sample = 1;
-                else if (sample < -1) sample = -1;
-
-                var shortData = (short)(sample * rescaleFactor);
-                var byteArr = new byte[2];
-                byteArr = BitConverter.GetBytes(shortData);
-                lock (_audioBuffer)
+                foreach (var t in data)
                 {
+                    var sample = t;
+                    if (sample > 1) sample = 1;
+                    else if (sample < -1) sample = -1;
+
+                    var shortData = (short)(sample * rescaleFactor);
+                    var byteArr = new byte[2];
+                    byteArr = BitConverter.GetBytes(shortData);
+
                     _audioBuffer.Put(byteArr[0]);
                     _audioBuffer.Put(byteArr[1]);
                 }

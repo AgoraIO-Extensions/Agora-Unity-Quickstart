@@ -172,18 +172,20 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
             AudioFrame audioFrame = new AudioFrame(type, samples, BYTES_PER_SAMPLE.TWO_BYTES_PER_SAMPLE, channels, samplesPerSec, null, 0, avsync_type);
             audioFrame.buffer = Marshal.AllocHGlobal(samples * bytesPerSample * channels);
 
+            double startMillisecond = GetTimestamp();
+            long tick = 0;
 
             while (true)
             {
-                double tickBeforePull = GetTimestamp();
-                int nRet = -1;
+
+                int nRet;
                 lock (_rtcLock)
                 {
                     if (RtcEngine == null)
                     {
                         break;
                     }
-
+                    nRet = -1;
                     nRet = RtcEngine.PullAudioFrame(audioFrame);
                     Debug.Log("PullAudioFrame returns: " + nRet);
 
@@ -196,14 +198,21 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
                             _audioBuffer.Put(floatArray);
                         }
                         _writeCount += floatArray.Length;
-                 
+
                     }
                 }
 
                 if (nRet == 0)
                 {
-                    double tickAfterPull = GetTimestamp();
-                    Thread.Sleep(freq - (int)(tickAfterPull - tickBeforePull));
+                    tick++;
+                    double nextMillisecond = startMillisecond + tick * freq;
+                    double curMillisecond = GetTimestamp();
+                    int sleepMillisecond = (int)Math.Ceiling(nextMillisecond - curMillisecond);
+                    //Debug.Log("sleepMillisecond : " + sleepMillisecond);
+                    if (sleepMillisecond > 0)
+                    {
+                        Thread.Sleep(sleepMillisecond);
+                    }
                 }
 
             }
@@ -225,10 +234,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
         private void OnAudioRead(float[] data)
         {
             //if (!_startSignal) return;
-            for (var i = 0; i < data.Length; i++)
+            lock (_audioBuffer)
             {
-                lock (_audioBuffer)
+                for (var i = 0; i < data.Length; i++)
                 {
+
                     if (_audioBuffer.Count > 0)
                     {
                         data[i] = _audioBuffer.Get();
