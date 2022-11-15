@@ -21,13 +21,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PluginSceneSample
 #if USE_PLUGIN
 
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-        private const string PluginLibName = "VideoObserverPlugin";
+        private const string PluginLibName = "AgoraRawDataPlugin";
 #elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
-        private const string PluginLibName = "VideoObserverPluginUnity";
+        private const string PluginLibName = "AgoraRawDataPluginUnity";
 #elif UNITY_IPHONE
 		private const string PluginLibName = "__Internal";
 #else
-        private const string PluginLibName = "VideoObserverPlugin";
+        private const string PluginLibName = "AgoraRawDataPlugin";
 #endif
 
         [System.Runtime.InteropServices.DllImport(PluginLibName, CharSet = System.Runtime.InteropServices.CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -42,7 +42,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PluginSceneSample
         [System.Runtime.InteropServices.DllImport(PluginLibName, CharSet = System.Runtime.InteropServices.CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern bool DisablePlugin(PluginSamplePtr engine);
 #endif
-#endregion
+        #endregion
 
 
         [FormerlySerializedAs("appIdInput")]
