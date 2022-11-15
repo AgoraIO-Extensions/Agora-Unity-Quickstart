@@ -40,11 +40,18 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
         // Use this for initialization
         private void Start()
         {
+
             LoadAssetData();
             if (CheckAppId())
             {
                 InitEngine();
                 SetBasicConfiguration();
+
+                var shader = Shader.Find("Unlit/RendererShader601");
+                if (shader == null)
+                {
+                    this.Log.UpdateLog("Unlit/RendererShader601 is not in this Project!!! Please make sure put this shader in AlwaysIncludedShaders");
+                }
             }
         }
 
@@ -107,6 +114,24 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
             RtcEngine.LeaveChannel();
         }
 
+        public void AdjustVideoEncodedConfiguration640()
+        {
+            VideoEncoderConfiguration config = new VideoEncoderConfiguration();
+            config.dimensions = new VideoDimensions(640, 360);
+            config.frameRate = 15;
+            config.bitrate = 0;
+            RtcEngine.SetVideoEncoderConfiguration(config);
+        }
+
+        public void AdjustVideoEncodedConfiguration480()
+        {
+            VideoEncoderConfiguration config = new VideoEncoderConfiguration();
+            config.dimensions = new VideoDimensions(480, 480);
+            config.frameRate = 15;
+            config.bitrate = 0;
+            RtcEngine.SetVideoEncoderConfiguration(config);
+        }
+
         #endregion
 
         private void OnDestroy()
@@ -128,10 +153,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
         internal static void MakeVideoView(uint uid, string channelId = "", bool useYUV = false, bool usePlane = false)
         {
             var go = GameObject.Find(uid.ToString());
-            if (!ReferenceEquals(go, null))
-            {
-                return; // reuse
-            }
+            //if (!ReferenceEquals(go, null))
+            //{
+            //    return; // reuse
+            //}
 
             VideoSurface videoSurface = null;
 
@@ -276,7 +301,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
             _sample.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));
-
+          
             RenderWithYUVSample.MakeVideoView(0, "", _sample.YUVToggle.isOn, _sample.PlaneToggle.isOn);
         }
 
