@@ -153,10 +153,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
         internal static void MakeVideoView(uint uid, string channelId = "", bool useYUV = false, bool usePlane = false)
         {
             var go = GameObject.Find(uid.ToString());
-            //if (!ReferenceEquals(go, null))
-            //{
-            //    return; // reuse
-            //}
+            if (!ReferenceEquals(go, null))
+            {
+                return; // reuse
+            }
 
             VideoSurface videoSurface = null;
 
