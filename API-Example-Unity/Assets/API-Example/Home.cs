@@ -47,6 +47,7 @@ public class Home : MonoBehaviour
         "ProcessAudioRawDataScene",
         "ProcessVideoRawDataScene",
         "PushEncodedVideoImageScene",
+        "RenderWithYUV",
         "ScreenShareScene",
         "ScreenShareWhileVideoCallScene",
         "SetBeautyEffectOptionsScene",

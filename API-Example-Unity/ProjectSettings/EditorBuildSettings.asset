@@ -119,3 +119,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/API-Example/Examples/Advanced/WriteBackVideoRawData/WriteBackVideoRawDataScene.unity
     guid: cf65ed82301fd4f84bbe12244bd56f1e
+  - enabled: 1
+    path: Assets/API-Example/Examples/Advanced/RenderWithYUV/RenderWithYUV.unity
+    guid: e4761610ddd74415ba995470c22e2a76
