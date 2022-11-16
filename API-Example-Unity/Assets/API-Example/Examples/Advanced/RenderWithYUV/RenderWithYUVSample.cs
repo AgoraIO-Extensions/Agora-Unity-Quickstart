@@ -47,10 +47,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
                 InitEngine();
                 SetBasicConfiguration();
 
-                var shader = Shader.Find("Unlit/RendererShader601");
+                var shader = Shader.Find("Unlit/Texture");
                 if (shader == null)
                 {
-                    this.Log.UpdateLog("Unlit/RendererShader601 is not in this Project!!! Please make sure put this shader in AlwaysIncludedShaders");
+                    Debug.Log("It looks like Unlit/Texture shader not be packaged in this project. May be some videosurface will look like pink");
                 }
             }
         }
@@ -209,6 +209,17 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
             go.transform.position = Vector3.zero;
             go.transform.localScale = new Vector3(0.25f, 0.5f, 0.5f);
 
+            var meshRenderer = go.GetComponent<MeshRenderer>();
+            var shader = Shader.Find("Unlit/Texture");
+            if (shader != null)
+            {
+                meshRenderer.material = new Material(shader);
+            }
+            else
+            {
+                Debug.Log("It looks like Unlit/Texture shader not include Always Includes Shaders. May be some videosurface will be pink");
+            }
+
             // configure videoSurface
             VideoSurface videoSurface = null;
             if (useYUV)
@@ -301,7 +312,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
             _sample.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));
-          
+
             RenderWithYUVSample.MakeVideoView(0, "", _sample.YUVToggle.isOn, _sample.PlaneToggle.isOn);
         }
 
