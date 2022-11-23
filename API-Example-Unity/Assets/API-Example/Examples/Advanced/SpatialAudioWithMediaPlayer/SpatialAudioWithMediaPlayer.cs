@@ -92,7 +92,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
 
             //If you use a Bluetooth headset, you need to set AUDIO_SCENARIO_TYPE to AUDIO_SCENARIO_GAME_STREAMING.
             RtcEngineContext context = new RtcEngineContext(_appID, 0,
-                                        CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING, null,
+                                        CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
             var ret = RtcEngine.Initialize(context);
             Debug.Log("Agora: Initialize " + ret);
