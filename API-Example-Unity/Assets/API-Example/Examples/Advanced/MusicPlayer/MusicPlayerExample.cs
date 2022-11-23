@@ -88,7 +88,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             GetMusicChartsButton.gameObject.SetActive(false);
 
             MusicChartsSelect = GameObject.Find("MusicChartsSelect").GetComponent<Dropdown>();
-            MusicChartsSelect.onValueChanged.AddListener(this.OnMusicChatsSelectValueChanged);
+            MusicChartsSelect.onValueChanged.AddListener(this.OnMusicChartsSelectValueChanged);
             MusicChartsSelect.gameObject.SetActive(false);
 
 
@@ -224,7 +224,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0,
-                CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING, null,
+                CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
@@ -241,7 +241,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             this.Log.UpdateLog("requestId: " + requestId);
         }
 
-        void OnMusicChatsSelectValueChanged(int value)
+        void OnMusicChartsSelectValueChanged(int value)
         {
             var info = this.CurMusicChartInfo[value];
 
@@ -534,7 +534,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             this._sample.GetLyricButton.gameObject.SetActive(false);
             this._sample.IsPreloadButton.gameObject.SetActive(false);
             this._sample.PreloadButton.gameObject.SetActive(false);
-            this._sample.Log.UpdateLog("Select your musicChat item please");
+            this._sample.Log.UpdateLog("Select your Music Chart item please");
         }
 
         public override void OnMusicCollectionResult(string requestId, MusicContentCenterStatusCode status, MusicCollection result)

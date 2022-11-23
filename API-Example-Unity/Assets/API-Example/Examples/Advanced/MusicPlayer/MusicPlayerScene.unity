@@ -1095,7 +1095,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Enter rtm appid here
+  m_Text: Enter rtm appid here ( required )
 --- !u!222 &278527517
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2248,7 +2248,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Enter rtm token here
+  m_Text: Enter rtm token here ( required )
 --- !u!222 &822257732
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3034,7 +3034,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Enter rtm uid here
+  m_Text: Enter rtm uid here ( required )
 --- !u!222 &1186748529
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4431,7 +4431,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1957415164}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.687403
+  m_Size: 0.6874031
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
