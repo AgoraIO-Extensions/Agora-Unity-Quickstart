@@ -106,7 +106,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0,
-                                        CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING, null,
+                                        CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             var ret = RtcEngine.Initialize(context);
             Debug.Log("Agora: Initialize " + ret);
@@ -182,7 +182,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
                     var configuration = new CameraCapturerConfiguration()
                     {
                         format = new VideoFormat(640, 320, 30),
-                        deviceId = devices[0].deviceId
+                        deviceId = devices[1].deviceId
                     };
                     this.RtcEngine.StartSecondaryCameraCapture(configuration);
 
@@ -269,11 +269,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
 
             var conf = new LocalTranscoderConfiguration();
             conf.streamCount = Convert.ToUInt32(list.Count);
-            conf.VideoInputStreams = new TranscodingVideoStream[list.Count];
-            for (int i = 0; i < list.Count; i++)
-            {
-                conf.VideoInputStreams[i] = list[i];
-            }
+            conf.VideoInputStreams = list.ToArray();
             conf.videoOutputConfiguration.dimensions.width = 1080;
             conf.videoOutputConfiguration.dimensions.height = 960;
 

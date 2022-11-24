@@ -57,7 +57,7 @@ public class Home : MonoBehaviour
         "SpatialAudioWithMediaPlayerScene",
         "StartDirectCdnStreamingScene",
         "StartRhythmPlayerScene",
-        //"StartRtmpStreamWithTranscodingScene",
+        "StartRtmpStreamWithTranscodingScene",
         "StreamMessageScene",
         "TakeSnapshotScene",
         "VirtualBackgroundScene",

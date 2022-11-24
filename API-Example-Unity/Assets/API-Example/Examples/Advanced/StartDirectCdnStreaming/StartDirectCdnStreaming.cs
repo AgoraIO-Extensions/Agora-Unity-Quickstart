@@ -26,8 +26,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
         [SerializeField]
         private string _channelName = "";
 
-
-        private const string PUBLISH_URL = "rtmp://push.alexmk.name/live/agora_rtc_unity";
+        public InputField InputField;
         public Text LogText;
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
@@ -39,8 +38,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
             if (CheckAppId())
             {
                 InitEngine();
+                SetUpUI();
                 SetProfile();
-                StartDirectCdnStreamingCamera();
             }
         }
 
@@ -72,10 +71,66 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0,
-                CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,null,
+                CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(new UserEventHandler(this));
+        }
+
+        private void SetUpUI()
+        {
+            var btn = this.transform.Find("StartButton").GetComponent<Button>();
+            btn.onClick.AddListener(this.OnStartButtonPress);
+
+            btn = this.transform.Find("UpdateButton").GetComponent<Button>();
+            btn.onClick.AddListener(this.OnUpdateButtonPress);
+
+            btn = this.transform.Find("StopButton").GetComponent<Button>();
+            btn.onClick.AddListener(this.OnStopButtonPress);
+        }
+
+        private void OnStartButtonPress()
+        {
+            var url = this.InputField.text;
+            if (url == "")
+            {
+                this.Log.UpdateLog("you must input your url first");
+                return;
+            }
+
+            DirectCdnStreamingMediaOptions options = new DirectCdnStreamingMediaOptions();
+            options.publishMicrophoneTrack.SetValue(true);
+            options.publishCameraTrack.SetValue(true);
+
+            RtcEngine.SetDirectCdnStreamingVideoConfiguration(new VideoEncoderConfiguration
+            {
+                dimensions = new VideoDimensions { width = 1280, height = 720 },
+                frameRate = 15,
+                bitrate = 2260,
+                minBitrate = -1,
+                degradationPreference = DEGRADATION_PREFERENCE.MAINTAIN_QUALITY,
+                codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_H264,
+                mirrorMode = VIDEO_MIRROR_MODE_TYPE.VIDEO_MIRROR_MODE_DISABLED
+            });
+            RtcEngine.StartDirectCdnStreaming(url, options);
+            RtcEngine.StartPreview();
+            MakeVideoView(0);
+        }
+
+        private void OnUpdateButtonPress()
+        {
+            DirectCdnStreamingMediaOptions options = new DirectCdnStreamingMediaOptions();
+            options.publishMicrophoneTrack.SetValue(true);
+            options.publishCameraTrack.SetValue(false);
+
+            var nRet = RtcEngine.UpdateDirectCdnStreamingMediaOptions(options);
+            this.Log.UpdateLog("UpdateDirectCdnStreamingMediaOptions:" + nRet);
+        }
+
+        private void OnStopButtonPress()
+        {
+            var nRet = RtcEngine.StopDirectCdnStreaming();
+            this.Log.UpdateLog("StopDirectCdnStreaming:" + nRet);
         }
 
         private void SetProfile()
@@ -88,23 +143,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
 
         private void StartDirectCdnStreamingCamera()
         {
-            DirectCdnStreamingMediaOptions options = new DirectCdnStreamingMediaOptions();
-            options.publishMicrophoneTrack.SetValue(true);
-            options.publishCameraTrack.SetValue(true);
            
-            RtcEngine.SetDirectCdnStreamingVideoConfiguration(new VideoEncoderConfiguration
-            {
-                dimensions = new VideoDimensions { width = 1280, height = 720 },
-                frameRate = 15,
-                bitrate = 2260,
-                minBitrate = -1,
-                degradationPreference = DEGRADATION_PREFERENCE.MAINTAIN_QUALITY,
-                codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_H264,
-                mirrorMode = VIDEO_MIRROR_MODE_TYPE.VIDEO_MIRROR_MODE_DISABLED
-            });
-            RtcEngine.StartDirectCdnStreaming(PUBLISH_URL, options);
-            RtcEngine.StartPreview();
-            MakeVideoView(0);
         }
 
         private void OnDestroy()
