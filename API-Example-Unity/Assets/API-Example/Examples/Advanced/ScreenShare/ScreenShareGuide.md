@@ -47,7 +47,7 @@ Screen sharing on the iOS side is achieved by recording the screen using the iOS
 
    d. Modify the `SampleHandler.h` file to modify the code logic that implements screen sharing:
 
-   - If you only need to use the functions in `AgoraReplayKitExtension.framework` provided by Agora, the modification method is: select `Target` as the newly created Extension, and in **Info**, set **NSExtension > NSExtensionPrincipalClass** corresponding* *Value** changed from **SampleHandler** to **AgoraReplayKitHandler**.
+   - If you only need to use the functions in `AgoraReplayKitExtension.framework` provided by Agora, the modification method is: select `Target` as the newly created Extension, and in **Info**, set **NSExtension > NSExtensionPrincipalClass** to **AgoraReplayKitHandler**.
 
      ![img](https://web-cdn.agora.io/docs-files/1648112619203)
 
