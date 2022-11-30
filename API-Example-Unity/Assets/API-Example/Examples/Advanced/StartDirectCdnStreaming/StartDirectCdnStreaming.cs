@@ -96,7 +96,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
             {
                 dimensions = new VideoDimensions { width = 1280, height = 720 },
                 frameRate = 15,
-                bitrate = 2260,
+                kBitrate = 2260,
                 minBitrate = -1,
                 degradationPreference = DEGRADATION_PREFERENCE.MAINTAIN_QUALITY,
                 codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_H264,

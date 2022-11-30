@@ -147,7 +147,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
 
             if (this.ToggleRecord.isOn)
             {
-                list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.AUDIO_RECORDING_SOURCE, 0, "", 0, 0, 0, 0, 1, 1, false));
+                list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.AUDIO_RECORDING_SOURCE, 0, "", 0, 0, 0, 0, 0, 1, 1, false));
             }
 
             if (this.TogglePrimartCamera.isOn)
@@ -164,7 +164,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
                     };
                     var nRet = this.RtcEngine.StartPrimaryCameraCapture(configuration);
                     this.Log.UpdateLog("StartPrimaryCameraCapture :" + nRet);
-                    list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE, 0, "", 0, 0, 640, 320, 1, 1, false));
+                    list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE, 0, "", 0, 0, 0, 640, 320, 1, 1, false));
                 }
                 else
                 {
@@ -186,7 +186,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
                     };
                     this.RtcEngine.StartSecondaryCameraCapture(configuration);
 
-                    list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.SECONDARY_CAMERA_SOURCE, 0, "", 0, 0, 360, 240, 1, 1, false));
+                    list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.SECONDARY_CAMERA_SOURCE, 0, "", 0, 0, 0, 360, 240, 1, 1, false));
                 }
                 else
                 {
@@ -202,7 +202,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
 #else
                 var filePath = Path.Combine(Application.streamingAssetsPath, "img/png.png");
 #endif
-                list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.RTC_IMAGE_PNG_SOURCE, 0, filePath, 320, 180, 640, 360, 1, 1, false));
+                list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.RTC_IMAGE_PNG_SOURCE, 0, filePath, 0, 320, 180, 640, 360, 1, 1, false));
             }
 
             if (this.ToggleJpg.isOn)
@@ -214,7 +214,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
 #else
                 var filePath = Path.Combine(Application.streamingAssetsPath, "img/jpg.jpg");
 #endif
-                list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.RTC_IMAGE_JPEG_SOURCE, 0, filePath, 360, 240, 360, 240, 1, 1, false));
+                list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.RTC_IMAGE_JPEG_SOURCE, 0, filePath, 0, 360, 240, 360, 240, 1, 1, false));
             }
 
 
@@ -226,7 +226,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
 #else
                 var filePath = Path.Combine(Application.streamingAssetsPath, "img/gif.gif");
 #endif
-                list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.RTC_IMAGE_GIF_SOURCE, 0, filePath, 0, 0, 476, 280, 1, 1, false));
+                list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.RTC_IMAGE_GIF_SOURCE, 0, filePath, 0, 0, 0, 476, 280, 1, 1, false));
             }
 
             if (this.ToggleRemote.isOn)
@@ -234,7 +234,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
                 if (this.RemoteUserUids.Count >= 1)
                 {
                     var remoteUserUid = this.RemoteUserUids[0];
-                    list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.REMOTE_VIDEO_SOURCE, remoteUserUid, "", 200, 200, 100, 100, 1, 1, false));
+                    list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.REMOTE_VIDEO_SOURCE, remoteUserUid, "", 0, 200, 200, 100, 100, 1, 1, false));
                 }
                 else
                 {
@@ -246,7 +246,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
             {
                 if (this.StartScreenShare())
                 {
-                    list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.PRIMARY_SCREEN_SOURCE, 0, "", 480, 640, 640, 320, 1, 1, false));
+                    list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.PRIMARY_SCREEN_SOURCE, 0, "", 0, 480, 640, 640, 320, 1, 1, false));
                 }
             }
             else
@@ -260,7 +260,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
                 this.Log.UpdateLog("Media palyer ret:" + ret);
                 var sourceId = this.MediaPlayer.GetId();
                 this.Log.UpdateLog("Media palyer ret:" + ret);
-                list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.MEDIA_PLAYER_SOURCE, 0, sourceId.ToString(), 0, 0, 1080, 960, 1, 1, false));
+                list.Add(new TranscodingVideoStream(MEDIA_SOURCE_TYPE.MEDIA_PLAYER_SOURCE, 0, sourceId.ToString(), 0, 0, 0, 1080, 960, 1, 1, false));
             }
             else
             {
@@ -269,10 +269,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
 
             var conf = new LocalTranscoderConfiguration();
             conf.streamCount = Convert.ToUInt32(list.Count);
-            conf.VideoInputStreams = new TranscodingVideoStream[list.Count];
+            conf.videoInputStreams = new TranscodingVideoStream[list.Count];
             for (int i = 0; i < list.Count; i++)
             {
-                conf.VideoInputStreams[i] = list[i];
+                conf.videoInputStreams[i] = list[i];
             }
             conf.videoOutputConfiguration.dimensions.width = 1080;
             conf.videoOutputConfiguration.dimensions.height = 960;
@@ -285,7 +285,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
         {
 #if UNITY_IPHONE || UNITY_ANDROID
             this.Log.UpdateLog("Not Support Screen Share in this platform!");
-             return false;
+            return false;
 #else
             SIZE t = new SIZE();
             t.width = 360;
