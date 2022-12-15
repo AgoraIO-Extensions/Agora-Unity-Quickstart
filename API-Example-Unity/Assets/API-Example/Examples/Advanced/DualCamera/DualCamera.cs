@@ -48,10 +48,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
         // Use this for initialization
         private void Start()
         {
-#if UNITY_IPHONE || UNITY_ANDROID
+#if  UNITY_ANDROID
             this.LogText.text = "iOS/Android is not supported, but you could see how it works on the Editor for Windows/MacOS";
 
 #else
+
+#if UNITY_IPHONE
+            this.LogText.text = "iPhone is only support in iPhone XR or better. iOS version is support in 13.0 or better";
+
+#endif
             LoadAssetData();
             if (CheckAppId())
             {
@@ -93,6 +98,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
+
+
         }
 
         public void MainCameraJoinChannel()
@@ -156,6 +163,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
 
         public void SecondCameraJoinChannel()
         {
+
+#if UNITY_IPHONE
+            CameraCapturerConfiguration cameraCapturerConfiguration = new CameraCapturerConfiguration();
+            cameraCapturerConfiguration.cameraDirection = CAMERA_DIRECTION.CAMERA_REAR;
+            int nRet = RtcEngine.EnableMultiCamera(true, cameraCapturerConfiguration);
+            this.Log.UpdateLog("EnableMultiCamera :" + nRet);
+
+            _config2.cameraDirection = CAMERA_DIRECTION.CAMERA_REAR;
+#endif
+
             var ret = RtcEngine.StartSecondaryCameraCapture(_config2);
             Log.UpdateLog(
                 string.Format("StartSecondaryCameraCapture returns: {0}", ret));
@@ -220,17 +237,24 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             }
 
             _config1 = new CameraCapturerConfiguration();
-            _config1.deviceId = _videoDeviceInfos[0].deviceId;
-            Debug.Log("PrimaryCamera: " + _config1.deviceId);
-            _config1.format = new VideoFormat();
-
-            if (_videoDeviceInfos.Length > 1)
+            if (_videoDeviceInfos.Length >= 1)
             {
-                _config2 = new CameraCapturerConfiguration();
+        
+                _config1.deviceId = _videoDeviceInfos[0].deviceId;
+                Debug.Log("PrimaryCamera: " + _config1.deviceId);
+                _config1.format = new VideoFormat();
+            }
+           
+
+            _config2 = new CameraCapturerConfiguration();
+            if (_videoDeviceInfos.Length >= 2)
+            {
+               
                 _config2.deviceId = _videoDeviceInfos[1].deviceId;
                 Debug.Log("SecondaryCamera: " + _config2.deviceId);
                 _config2.format = new VideoFormat();
             }
+       
         }
 
         private void OnDestroy()
@@ -250,7 +274,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             return _channelName;
         }
 
-        #region -- Video Render UI Logic ---
+#region -- Video Render UI Logic ---
 
         internal static void MakeVideoView(uint uid, string channelId = "", VIDEO_SOURCE_TYPE videoSourceType = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA)
         {
@@ -362,10 +386,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             }
         }
 
-        #endregion
+#endregion
     }
 
-    #region -- Agora Event ---
+#region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -433,7 +457,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             _videoSample.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
             if (uid != _videoSample.UID1 && uid != _videoSample.UID2)
             {
-                DualCamera.MakeVideoView(uid, _videoSample.GetChannelName(),VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE);
+                DualCamera.MakeVideoView(uid, _videoSample.GetChannelName(), VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE);
             }
         }
 
@@ -448,5 +472,5 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
         }
     }
 
-    #endregion
+#endregion
 }
