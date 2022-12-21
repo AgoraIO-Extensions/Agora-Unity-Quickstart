@@ -191,7 +191,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRhythmPlayer
 
         }
 
-        public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
+        public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole, ClientRoleOptions newRoleOptions)
         {
             _startRhythmPlayer.Log.UpdateLog("OnClientRoleChanged");
         }

@@ -34,18 +34,17 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
 
-        private const int CHANNEL = 1;
+        private const int CHANNEL = 2;
         // Please do not change this value because Unity re-samples the sample rate to 48000.
         private const int SAMPLE_RATE = 48000;
-        private const int PUSH_FREQ_PER_SEC = 100;
+        private const int PUSH_FREQ_PER_SEC = 10;
 
         private RingBuffer<byte> _audioBuffer;
         private bool _startConvertSignal = false;
 
         private Thread _pushAudioFrameThread;
-        private System.Object _pushAudioFrameThreadSignal = new System.Object();
-        private int _count;
-        private bool _startSignal = false;
+        private System.Object _rtcLock = new System.Object();
+
 
 
         // Use this for initialization
@@ -85,19 +84,26 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 
         private void InitRtcEngine()
         {
-            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
+            lock (_rtcLock)
+            {
 
-            RtcEngineContext context = new RtcEngineContext(_appID, 0,
-                CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
-                AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            RtcEngine.Initialize(context);
-            RtcEngine.InitEventHandler(new UserEventHandler(this));
+                RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
+
+                RtcEngineContext context = new RtcEngineContext(_appID, 0,
+                    CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
+                    AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
+                RtcEngine.Initialize(context);
+                RtcEngine.InitEventHandler(new UserEventHandler(this));
+            }
         }
 
         private void SetExternalAudioSource()
         {
-            var nRet = RtcEngine.SetExternalAudioSource(true, SAMPLE_RATE, CHANNEL, 1);
-            this.Log.UpdateLog("SetExternalAudioSource nRet:" + nRet);
+            lock (_rtcLock)
+            {
+                var nRet = RtcEngine.SetExternalAudioSource(true, SAMPLE_RATE, CHANNEL, 1);
+                this.Log.UpdateLog("SetExternalAudioSource nRet:" + nRet);
+            }
         }
 
         private void StartPushAudioFrame()
@@ -109,15 +115,20 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 
             _pushAudioFrameThread = new Thread(PushAudioFrameThread);
             _pushAudioFrameThread.Start();
+
+            this.Log.UpdateLog("Because the api of rtcEngine is called in different threads, it is necessary to use locks to ensure that different threads do not call the api of rtcEngine at the same time");
         }
 
         private void JoinChannel()
         {
-            RtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY,
+            lock (_rtcLock)
+            {
+                RtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-            RtcEngine.EnableAudio();
-            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            RtcEngine.JoinChannel(_token, _channelName, "");
+                RtcEngine.EnableAudio();
+                RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+                RtcEngine.JoinChannel(_token, _channelName, "");
+            }
         }
 
         private void OnLeaveBtnClick()
@@ -128,14 +139,18 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
-            if (RtcEngine == null) return;
-            lock (_pushAudioFrameThreadSignal)
+
+            lock (_rtcLock)
             {
+                if (RtcEngine == null) return;
                 RtcEngine.InitEventHandler(null);
                 RtcEngine.LeaveChannel();
                 RtcEngine.Dispose();
                 RtcEngine = null;
             }
+            //need wait pullAudioFrameThread stop 
+            _pushAudioFrameThread.Join();
+
         }
 
         private void PushAudioFrameThread()
@@ -145,13 +160,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
             var channels = CHANNEL;
             var samples = SAMPLE_RATE / PUSH_FREQ_PER_SEC;
             var samplesPerSec = SAMPLE_RATE;
-            var buffer = new byte[samples * bytesPerSample * CHANNEL];
+
             var freq = 1000 / PUSH_FREQ_PER_SEC;
 
-            var tic = DateTime.Now;
-
-
-            IntPtr audioFrameBuffer = Marshal.AllocHGlobal(buffer.Length);
             var audioFrame = new AudioFrame
             {
                 bytesPerSample = BYTES_PER_SAMPLE.TWO_BYTES_PER_SAMPLE,
@@ -159,77 +170,83 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
                 samplesPerChannel = samples,
                 samplesPerSec = samplesPerSec,
                 channels = channels,
-                buffer = (UInt64)audioFrameBuffer,
-                bufferPtr = audioFrameBuffer,
-                RawBuffer = buffer,
+                RawBuffer = new byte[samples * bytesPerSample * CHANNEL],
                 renderTimeMs = freq
             };
 
+
+            double startMillisecond = GetTimestamp();
+            long tick = 0;
+
             while (true)
             {
-                lock (_pushAudioFrameThreadSignal)
+                lock (_rtcLock)
                 {
                     if (RtcEngine == null)
                     {
                         break;
                     }
-                    var toc = DateTime.Now;
 
-                    if ((toc - tic).Milliseconds >= freq)
+                    int nRet = -1;
+                    lock (_audioBuffer)
                     {
-                        lock (_audioBuffer)
+                        if (_audioBuffer.Size > samples * bytesPerSample * CHANNEL)
                         {
-                            if (_audioBuffer.Size > samples * bytesPerSample * CHANNEL)
+                            for (var j = 0; j < samples * bytesPerSample * CHANNEL; j++)
                             {
-                                for (var j = 0; j < samples * bytesPerSample * CHANNEL; j++)
-                                {
-                                    buffer[j] = _audioBuffer.Get();
-                                }
-
-                                Marshal.Copy(buffer, 0, audioFrame.bufferPtr, buffer.Length);
-
-                                var ret = RtcEngine.PushAudioFrame(MEDIA_SOURCE_TYPE.AUDIO_PLAYOUT_SOURCE, audioFrame);
-                                Debug.Log("PushAudioFrame returns: " + ret);
-
-                                tic = toc;
+                                audioFrame.RawBuffer[j] = _audioBuffer.Get();
                             }
-                            else
-                            {
-                                tic = tic.AddMilliseconds(1);
-                            }
+                            nRet = RtcEngine.PushAudioFrame(MEDIA_SOURCE_TYPE.AUDIO_PLAYOUT_SOURCE, audioFrame);
+                            //Debug.Log("PushAudioFrame returns: " + nRet);
+
                         }
-
                     }
+
+                    if (nRet == 0)
+                    {
+                        tick++;
+                        double nextMillisecond = startMillisecond + tick * freq;
+                        double curMillisecond = GetTimestamp();
+                        int sleepMillisecond = (int)Math.Ceiling(nextMillisecond - curMillisecond);
+                        //Debug.Log("sleepMillisecond : " + sleepMillisecond);
+                        if (sleepMillisecond > 0)
+                        {
+                            Thread.Sleep(sleepMillisecond);
+                        }
+                    }
+
                 }
-                Thread.Sleep(1);
+
             }
-
-
-            Marshal.FreeHGlobal(audioFrameBuffer);
         }
 
         private void OnAudioFilterRead(float[] data, int channels)
         {
             if (!_startConvertSignal) return;
             var rescaleFactor = 32767;
-            foreach (var t in data)
+            lock (_audioBuffer)
             {
-                var sample = t;
-                if (sample > 1) sample = 1;
-                else if (sample < -1) sample = -1;
-
-                var shortData = (short)(sample * rescaleFactor);
-                var byteArr = new byte[2];
-                byteArr = BitConverter.GetBytes(shortData);
-                lock (_audioBuffer)
+                foreach (var t in data)
                 {
+                    var sample = t;
+                    if (sample > 1) sample = 1;
+                    else if (sample < -1) sample = -1;
+
+                    var shortData = (short)(sample * rescaleFactor);
+                    var byteArr = new byte[2];
+                    byteArr = BitConverter.GetBytes(shortData);
+
                     _audioBuffer.Put(byteArr[0]);
                     _audioBuffer.Put(byteArr[1]);
                 }
             }
+        }
 
-            //_count += 1;
-            //if (_count == 20) _startSignal = true;
+        //get timestamp millisecond
+        private double GetTimestamp()
+        {
+            TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            return ts.TotalMilliseconds;
         }
     }
 

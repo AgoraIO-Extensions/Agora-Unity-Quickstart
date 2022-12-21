@@ -182,7 +182,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
                     var configuration = new CameraCapturerConfiguration()
                     {
                         format = new VideoFormat(640, 320, 30),
-                        deviceId = devices[0].deviceId
+                        deviceId = devices[1].deviceId
                     };
                     this.RtcEngine.StartSecondaryCameraCapture(configuration);
 
@@ -269,11 +269,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
 
             var conf = new LocalTranscoderConfiguration();
             conf.streamCount = Convert.ToUInt32(list.Count);
-            conf.VideoInputStreams = new TranscodingVideoStream[list.Count];
-            for (int i = 0; i < list.Count; i++)
-            {
-                conf.VideoInputStreams[i] = list[i];
-            }
+            conf.VideoInputStreams = list.ToArray();
             conf.videoOutputConfiguration.dimensions.width = 1080;
             conf.videoOutputConfiguration.dimensions.height = 960;
 
@@ -510,7 +506,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
             StartLocalVideoTranscoder.DestroyVideoView(0);
         }
 
-        public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
+        public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole, ClientRoleOptions newRoleOptions)
         {
             _sample.Log.UpdateLog("OnClientRoleChanged");
         }

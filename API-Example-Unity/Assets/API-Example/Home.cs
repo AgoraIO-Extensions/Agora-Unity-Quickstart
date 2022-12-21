@@ -42,9 +42,12 @@ public class Home : MonoBehaviour
         "MediaPlayerWithCustomDataProviderScene",
         "MediaRecorderScene",
         "MetadataScene",
+        "MusicPlayerScene",
+        "PluginScene",
         "ProcessAudioRawDataScene",
         "ProcessVideoRawDataScene",
         "PushEncodedVideoImageScene",
+        "RenderWithYUV",
         "ScreenShareScene",
         "ScreenShareWhileVideoCallScene",
         "SetBeautyEffectOptionsScene",
@@ -54,11 +57,12 @@ public class Home : MonoBehaviour
         "SpatialAudioWithMediaPlayerScene",
         "StartDirectCdnStreamingScene",
         "StartRhythmPlayerScene",
-        //"StartRtmpStreamWithTranscodingScene",
+        "StartRtmpStreamWithTranscodingScene",
         "StreamMessageScene",
         "TakeSnapshotScene",
         "VirtualBackgroundScene",
-        "VoiceChangerScene"
+        "VoiceChangerScene",
+        "WriteBackVideoRawDataScene"
     };
 
     private void Awake()

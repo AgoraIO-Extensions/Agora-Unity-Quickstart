@@ -56,6 +56,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
                 InitMediaPlayer();
                 InitSpatialAudioEngine();
                 JoinChannelEx(_channelName, UidUseInEx);
+
+                //We use the mpk to simulate the voice of remote users.
                 JoinChannelExWithMPK(_channelName, UidUseInMPK, MediaPlayer.GetId());
             }
         }
@@ -87,6 +89,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngineEx();
             UserEventHandler handler = new UserEventHandler(this);
+
+            //If you use a Bluetooth headset, you need to set AUDIO_SCENARIO_TYPE to AUDIO_SCENARIO_GAME_STREAMING.
             RtcEngineContext context = new RtcEngineContext(_appID, 0,
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
@@ -146,7 +150,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.autoSubscribeAudio.SetValue(false);
             options.autoSubscribeVideo.SetValue(true);
-            //options.publishAudioTrack.SetValue(false);
             options.publishCameraTrack.SetValue(false);
             options.publishMediaPlayerAudioTrack.SetValue(true);
             options.publishMediaPlayerVideoTrack.SetValue(true);
@@ -160,25 +163,49 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
 
         private void SetUpUI()
         {
-            _button1 = GameObject.Find("Button1").GetComponent<Button>();
+            _button1 = GameObject.Find("Left").GetComponent<Button>();
             _button1.onClick.AddListener(onLeftLocationPress);
-            _button2 = GameObject.Find("Button2").GetComponent<Button>();
+            _button2 = GameObject.Find("Right").GetComponent<Button>();
             _button2.onClick.AddListener(onRightLocationPress);
-            _button3 = GameObject.Find("Button3").GetComponent<Button>();
+            _button3 = GameObject.Find("Play").GetComponent<Button>();
             _button3.onClick.AddListener(onOpenButtonPress);
         }
 
+        //If you trigger this button event, the remote user's audio source will appear in your right left direction.
         private void onLeftLocationPress()
         {
-            float[] f1 = { 0.0f, 1.0f, 0.0f };
-            var ret = SpatialAudioEngine.UpdateRemotePositionEx(UidUseInMPK, f1, new float[] { 0, 0, 0 }, new RtcConnection(_channelName, UidUseInEx));
+
+            //If remote user is moving, position and trandform could be:
+            //var position = remoteUserTransform.position;
+            //var forward = remoteUserTransform.forward;
+            //float[] positionRemote = { position.x, position.y, position.z };
+            //float[] forwardRemote = { forward.x, forward.y, forward.z };
+
+
+            float[] positionRemote = { 0.0f, -1.0f, 0.0f };
+            float[] forwardRemote = { 0, 0, 0 };
+            RemoteVoicePositionInfo remoteVoicePositionInfo = new RemoteVoicePositionInfo(positionRemote, forwardRemote);
+            var ret = SpatialAudioEngine.UpdateRemotePositionEx(UidUseInMPK, remoteVoicePositionInfo, new RtcConnection(_channelName, UidUseInEx));
             Debug.Log("_spatialAudio.UpdateRemotePosition returns: " + ret);
         }
 
+        //If you trigger this button event, the remote user's audio source will appear in your right right direction.
         private void onRightLocationPress()
         {
-            float[] f1 = { 0.0f, -1.0f, 0.0f };
-            var ret = SpatialAudioEngine.UpdateRemotePositionEx(UidUseInMPK, f1, new float[] { 0, 0, 0 }, new RtcConnection(_channelName, UidUseInEx));
+
+            //If remote user is moving, position and trandform could be:
+            //
+            //var position = remoteUserTransform.position;
+            //var forward = remoteUserTransform.forward;
+            //float[] positionRemote = { position.x, position.y, position.z };
+            //float[] forwardRemote = { forward.x, forward.y, forward.z };
+
+  
+            float[] positionRemote = { 0.0f, 1.0f, 0.0f };
+            float[] forwardRemote = { 0, 0, 0 };
+            RemoteVoicePositionInfo remoteVoicePositionInfo = new RemoteVoicePositionInfo(positionRemote, forwardRemote);
+            var ret = SpatialAudioEngine.UpdateRemotePositionEx(UidUseInMPK, remoteVoicePositionInfo, new RtcConnection(_channelName, UidUseInEx));
+
             Debug.Log("_spatialAudio.UpdateRemotePosition returns: " + ret);
         }
 
@@ -343,11 +370,21 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
             _spatialAudio.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));
-            float[] f1 = new float[] { 0.0f, 0.0f, 0.0f };
-            float[] f2 = new float[] { 1.0f, 0.0f, 0.0f };
-            float[] f3 = new float[] { 0.0f, 1.0f, 0.0f };
-            float[] f4 = new float[] { 0.0f, 0.0f, 1.0f };
-            var ret = _spatialAudio.SpatialAudioEngine.UpdateSelfPositionEx(f1, f2, f3, f4, connection);
+
+            //If local user is moving, position and trandform could be:
+            //Transform transform = this.GetComponent<Transform>();
+            //var position = transform.position;
+
+            //float[] positionLocal = { position.x, position.y, position.z };
+            //float[] right = { transform.right.x, transform.right.y, transform.right.z };
+            //float[] up = { transform.up.x, transform.up.y, transform.up.z };
+            //float[] forward = { transform.forward.x, transform.forward.y, transform.forward.z };
+
+            float[] localUserPosition = new float[] { 0.0f, 0.0f, 0.0f };
+            float[] forward = new float[] { 1.0f, 0.0f, 0.0f };
+            float[] right = new float[] { 0.0f, 1.0f, 0.0f };
+            float[] up = new float[] { 0.0f, 0.0f, 1.0f };
+            var ret = _spatialAudio.SpatialAudioEngine.UpdateSelfPositionEx(localUserPosition, forward, right, up, connection);
             Debug.Log("UpdateSelfPosition return: " + ret);
         }
 
@@ -362,7 +399,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
             SpatialAudioWithMediaPlayer.DestroyVideoView(0);
         }
 
-        public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole)
+        public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole, ClientRoleOptions newRoleOptions)
         {
             _spatialAudio.Log.UpdateLog("OnClientRoleChanged");
         }
