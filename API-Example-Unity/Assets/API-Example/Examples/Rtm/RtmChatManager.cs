@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using Agora.Rtm;
 using Agora.Rtc;
 using io.agora.rtm.demo;
+using System;
 
 namespace io.agora.rtm.demo
 {
@@ -81,7 +82,7 @@ namespace io.agora.rtm.demo
             {
                 int init = rtcEngine.Initialize(new RtcEngineContext(appId, 0,
                                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
-                                AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT, AREA_CODE.AREA_CODE_CN));
+                                AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT, Agora.Rtc.AREA_CODE.AREA_CODE_CN));
                 rtcEngine.SetParameters("{\"rtc.vos_list\":[\"114.236.138.120:4052\"]}");
                 messageDisplay.AddMessage("rtcEngine.Initialize + ret:" + init, Message.MessageType.Info);
             }
@@ -92,13 +93,14 @@ namespace io.agora.rtm.demo
         {
             if (streamChannel != null)
             {
-                var ret = streamChannel.Leave();
-                streamChannel.Release();
+                UInt64 requestId = 0;
+                var ret = streamChannel.Leave(ref requestId);
+                streamChannel.Dispose();
                 messageDisplay.AddMessage("StreamChannel.Leave + ret:" + ret, Message.MessageType.Info);
             }
             if (rtmClient != null)
             {
-                rtmClient.Release();
+                rtmClient.Dispose();
                 rtmClient = null;
             }
             if (rtcEngine != null)
@@ -141,7 +143,7 @@ namespace io.agora.rtm.demo
             ChannelName = channelNameInput.text;
             if (rtmClient != null)
             {
-                if(streamChannel ==null)
+                if (streamChannel == null)
                 {
                     streamChannel = rtmClient.CreateStreamChannel(ChannelName);
                 }
@@ -150,8 +152,9 @@ namespace io.agora.rtm.demo
                 options.token = token;
                 if (streamChannel != null)
                 {
-                    int ret = streamChannel.Join(options);
-                    messageDisplay.AddMessage("StreamChannel.JoinChannel  ret:" + ret, Message.MessageType.Info);
+                    UInt64 requestId = 0;
+                    int ret = streamChannel.Join(options, ref requestId);
+                    messageDisplay.AddMessage(string.Format("StreamChannel.JoinChannel ret:{0} requestId:{1}", ret, requestId), Message.MessageType.Info);
                 }
                 else
                 {
@@ -163,9 +166,10 @@ namespace io.agora.rtm.demo
         {
             if (streamChannel != null)
             {
-                int ret = streamChannel.Leave();
+                UInt64 requestId = 0;
+                int ret = streamChannel.Leave(ref requestId);
 
-                messageDisplay.AddMessage("StreamChannel.ChannelLeave ret:" + ret, Message.MessageType.Info);
+                messageDisplay.AddMessage(string.Format("StreamChannel.ChannelLeave ret:{0} requestId:{1}", ret, requestId), Message.MessageType.Info);
             }
         }
 
@@ -173,7 +177,7 @@ namespace io.agora.rtm.demo
         {
             if (rtmClient != null && streamChannel != null)
             {
-                streamChannel.Release();
+                streamChannel.Dispose();
             }
 
         }
@@ -183,7 +187,7 @@ namespace io.agora.rtm.demo
             if (rtmClient != null)
             {
                 ChannelDispose();
-                rtmClient.Release();
+                rtmClient.Dispose();
                 rtmClient = null;
             }
         }
@@ -196,11 +200,12 @@ namespace io.agora.rtm.demo
 
             if (streamChannel != null)
             {
-                int ret = streamChannel.JoinTopic(topic, joinTopicOptions);
+                UInt64 requestId = 0;
+                int ret = streamChannel.JoinTopic(topic, joinTopicOptions, ref requestId);
 
                 messageDisplay.AddMessage("StreamChannel.GetChannelName ret:" + streamChannel.GetChannelName(), Message.MessageType.Info);
 
-                messageDisplay.AddMessage("StreamChannel.JoinTopic ret:" + ret, Message.MessageType.Info);
+                messageDisplay.AddMessage(string.Format("StreamChannel.JoinTopic ret:{0} requestId:{1}", ret, requestId), Message.MessageType.Info);
             }
 
         }
@@ -209,9 +214,10 @@ namespace io.agora.rtm.demo
         {
             if (streamChannel != null)
             {
-                int ret = streamChannel.LeaveTopic(topic);
+                UInt64 requestId = 0;
+                int ret = streamChannel.LeaveTopic(topic, ref requestId);
 
-                messageDisplay.AddMessage("StreamChannel.LeaveTopic ret:" + ret, Message.MessageType.Info);
+                messageDisplay.AddMessage(string.Format("StreamChannel.LeaveTopic ret:{0} requestId:{1}", ret, requestId), Message.MessageType.Info);
             }
         }
 
@@ -227,10 +233,10 @@ namespace io.agora.rtm.demo
                 topicOptions.users = userList.ToArray();
                 topicOptions.userCount = (uint)userList.Count;
             }
+            UInt64 requestId = 0;
+            int ret = streamChannel.SubscribeTopic(subtopic, topicOptions, ref requestId);
 
-            int ret = streamChannel.SubscribeTopic(subtopic, topicOptions);
-
-            messageDisplay.AddMessage("StreamChannel.SubscribeTopic ret:" + ret, Message.MessageType.Info);
+            messageDisplay.AddMessage(string.Format("StreamChannel.SubscribeTopic ret:{0} requestId:{1}", ret, requestId), Message.MessageType.Info);
 
             userList.Clear();
         }
@@ -252,10 +258,10 @@ namespace io.agora.rtm.demo
 
         public void GetSubscribedUserList()
         {
-            UserList userList = new UserList();
-
             if (streamChannel != null)
             {
+                UserList userList = new UserList();
+
                 int ret = streamChannel.GetSubscribedUserList(subtopic, ref userList);
 
                 messageDisplay.AddMessage("StreamChannel.GetSubscribedTopic ret:" + ret + " userListCount : " + userList.userCount, Message.MessageType.Info);
@@ -273,21 +279,25 @@ namespace io.agora.rtm.demo
             byte[] message = System.Text.Encoding.Default.GetBytes(TopicMessageBox.text);
             if (streamChannel != null)
             {
-                int ret = streamChannel.PublishTopicMessage(topic, message);
+                PublishOptions publishOptions = new PublishOptions();
+                publishOptions.type = RTM_MESSAGE_TYPE.RTM_MESSAGE_TYPE_STRING;
+                publishOptions.sendTs = 0;
+
+                int ret = streamChannel.PublishTopicMessage(topic, message, (ulong)message.Length, publishOptions);
 
                 messageDisplay.AddMessage("StreamChannel.PublishTopicMessage  ret:" + ret, Message.MessageType.Info);
             }
         }
 
-        public void SendTopicMessageStr()
-        {
-            if (streamChannel != null)
-            {
-                int ret = streamChannel.PublishTopicMessage(topic, TopicMessageBox.text);
+        //public void SendTopicMessageStr()
+        //{
+        //    if (streamChannel != null)
+        //    {
+        //        int ret = streamChannel.PublishTopicMessage(topic, TopicMessageBox.text);
 
-                messageDisplay.AddMessage("StreamChannel.PublishTopicMessage  ret:" + ret, Message.MessageType.Info);
-            }
-        }
+        //        messageDisplay.AddMessage("StreamChannel.PublishTopicMessage  ret:" + ret, Message.MessageType.Info);
+        //    }
+        //}
 
         public void AddUser()
         {
@@ -346,22 +356,29 @@ internal class RtmEventHandler : IRtmEventHandler
 
     public override void OnPresenceEvent(PresenceEvent @event)
     {
-        messageDisplay.AddMessage("OnPresenceEvent " + @event.channelName + " userId : " + @event.userId + " topicInfoNumber : " + @event.topicInfoNumber + " type : " + @event.type.ToString() + " channelType : " + @event.channelType.ToString(), Message.MessageType.Info);
+        string str = string.Format("OnPresenceEvent: type:{0} channelType:{1} channelName:{2} publisher:{3}", @event.type, @event.channelType, @event.channelName, @event.publisher);
+
+        messageDisplay.AddMessage(str, Message.MessageType.Info);
     }
 
-    public override void OnJoinResult(string channelName, string userId, STREAM_CHANNEL_ERROR_CODE errorCode)
+    public override void OnJoinResult(UInt64 requestId, string channelName, string userId, RTM_CHANNEL_ERROR_CODE errorCode)
     {
-        messageDisplay.AddMessage("OnJoinResult " + channelName + " uid :" + userId + " STREAM_CHANNEL_ERROR_CODE : " + errorCode, Message.MessageType.Info);
+        string str = string.Format("OnJoinResult: requestId:{0} channelName:{1} userId:{2} errorCode:{3}", requestId, channelName, userId, errorCode);
+
+        messageDisplay.AddMessage(str, Message.MessageType.Info);
     }
 
-    public override void OnLeaveResult(string channelName, string userId, STREAM_CHANNEL_ERROR_CODE errorCode)
+    public override void OnLeaveResult(UInt64 requestId, string channelName, string userId, RTM_CHANNEL_ERROR_CODE errorCode)
     {
-        messageDisplay.AddMessage("OnLeaveResult " + channelName + " uid :" + userId + " STREAM_CHANNEL_ERROR_CODE : " + errorCode, Message.MessageType.Info);
+        string str = string.Format("OnJoinResult: requestId:{0} channelName:{1} userId:{2} errorCode:{3}", requestId, channelName, userId, errorCode);
+
+        messageDisplay.AddMessage(str, Message.MessageType.Info);
     }
 
-    public override void OnTopicSubscribed(string channelName, string userId, string topic, UserList succeedUsers, UserList failedUsers, STREAM_CHANNEL_ERROR_CODE errorCode)
+    public override void OnTopicSubscribed(UInt64 requestId, string channelName, string userId, string topic,
+                                              UserList succeedUsers, UserList failedUsers, RTM_CHANNEL_ERROR_CODE errorCode)
     {
-        messageDisplay.AddMessage("OnTopicSubscribed " + channelName + " userId :" + userId + " topic :" + topic + " succeedUsersCount :" + succeedUsers.userCount + " failedUsers :" + failedUsers.userCount, Message.MessageType.Info);
+        messageDisplay.AddMessage("OnTopicSubscribed" + " requestId:" + requestId + " channelName:" + channelName + " userId :" + userId + " topic :" + topic + " succeedUsersCount :" + succeedUsers.userCount + " failedUsers :" + failedUsers.userCount, Message.MessageType.Info);
 
         for (int i = 0; i < succeedUsers.userCount; i++)
         {
@@ -374,34 +391,18 @@ internal class RtmEventHandler : IRtmEventHandler
         }
 
     }
-
-    public override void OnTopicUnsubscribed(string channelName, string userId, string topic, UserList succeedUsers, UserList failedUsers, STREAM_CHANNEL_ERROR_CODE errorCode)
-    {
-        messageDisplay.AddMessage("OnTopicUnsubscribed " + channelName + " userId :" + userId + " topic :" + topic + " succeedUsersCount :" + succeedUsers.userCount + " failedUsers :" + failedUsers.userCount, Message.MessageType.Info);
-
-        for (int i = 0; i < succeedUsers.userCount; i++)
-        {
-            messageDisplay.AddMessage("OnTopicSubscribed succeedUsers index " + i + " UserName is " + succeedUsers.users[i], Message.MessageType.Info);
-        }
-
-        for (int i = 0; i < failedUsers.userCount; i++)
-        {
-            messageDisplay.AddMessage("OnTopicSubscribed failedUsers index " + i + " UserName is " + succeedUsers.users[i], Message.MessageType.Info);
-        }
-    }
-
     public override void OnConnectionStateChange(string channelName, RTM_CONNECTION_STATE state, RTM_CONNECTION_CHANGE_REASON reason)
     {
         messageDisplay.AddMessage("OnConnectionStateChange : " + channelName + " CONNECTION_STATE : " + state.ToString() + " RTM_CONNECTION_CHANGE_REASON : " + reason.ToString(), Message.MessageType.Info);
     }
 
-    public override void OnJoinTopicResult(string channelName, string userId, string topic, string meta, STREAM_CHANNEL_ERROR_CODE errorCode)
+    public override void OnJoinTopicResult(UInt64 requestId, string channelName, string userId, string topic, string meta, RTM_CHANNEL_ERROR_CODE errorCode)
     {
-        messageDisplay.AddMessage("OnJoinTopicResult " + channelName + " userId :" + userId + " topic : " + topic + " meta : " + meta + " STREAM_CHANNEL_ERROR_CODE : " + errorCode.ToString(), Message.MessageType.Info);
+        messageDisplay.AddMessage("OnJoinTopicResult " + " requestId:" + requestId + " channelName:" + channelName + " userId :" + userId + " topic : " + topic + " meta : " + meta + " STREAM_CHANNEL_ERROR_CODE : " + errorCode.ToString(), Message.MessageType.Info);
     }
 
-    public override void OnLeaveTopicResult(string channelName, string userId, string topic, string meta, STREAM_CHANNEL_ERROR_CODE errorCode)
+    public override void OnLeaveTopicResult(UInt64 requestId, string channelName, string userId, string topic, string meta, RTM_CHANNEL_ERROR_CODE errorCode)
     {
-        messageDisplay.AddMessage("OnLeaveTopicResult " + channelName + " userId:" + userId + " topic" + topic + " meta" + meta + " STREAM_CHANNEL_ERROR_CODE" + errorCode.ToString(), Message.MessageType.Info);
+        messageDisplay.AddMessage("OnLeaveTopicResult " + " requestId:" + requestId + " channelName:" + channelName + " userId:" + userId + " topic" + topic + " meta" + meta + " STREAM_CHANNEL_ERROR_CODE" + errorCode.ToString(), Message.MessageType.Info);
     }
 }
