@@ -92,7 +92,6 @@ namespace io.agora.rtm.demo
                 int init = rtcEngine.Initialize(new RtcEngineContext(appId, 0,
                                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT, Agora.Rtc.AREA_CODE.AREA_CODE_CN));
-                rtcEngine.SetParameters("{\"rtc.vos_list\":[\"114.236.138.120:4052\"]}");
                 messageDisplay.AddMessage("rtcEngine.Initialize + ret:" + init, Message.MessageType.Info);
             }
             ShowDisplayTexts();
@@ -134,7 +133,7 @@ namespace io.agora.rtm.demo
             config.appId = appId;
             RtmEventHandler rtmEventHandler = new RtmEventHandler();
 
-            config.eventHandler = rtmEventHandler;
+            config.setEventHandler(rtmEventHandler);
 
             config.userId = UserName;
             if (rtmClient != null)
@@ -292,7 +291,7 @@ namespace io.agora.rtm.demo
                 publishOptions.type = RTM_MESSAGE_TYPE.RTM_MESSAGE_TYPE_STRING;
                 publishOptions.sendTs = 0;
 
-                int ret = streamChannel.PublishTopicMessage(topic, message, (ulong)message.Length, publishOptions);
+                int ret = streamChannel.PublishTopicMessage(topic, message, message.Length, publishOptions);
 
                 messageDisplay.AddMessage("StreamChannel.PublishTopicMessage  ret:" + ret, Message.MessageType.Info);
             }
@@ -341,7 +340,7 @@ namespace io.agora.rtm.demo
                 string message = messageChannelMessageInput.text;
                 string channelName = this.messageChannelNameInput.text;
                 UInt64 requestId = 0;
-                int ret = rtmClient.Publish(channelName, message, (ulong)message.Length, new PublishOptions(), ref requestId);
+                int ret = rtmClient.Publish(channelName, message, message.Length, new PublishOptions(), ref requestId);
 
                 messageDisplay.AddMessage("rtmClient.Publish  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
             }
