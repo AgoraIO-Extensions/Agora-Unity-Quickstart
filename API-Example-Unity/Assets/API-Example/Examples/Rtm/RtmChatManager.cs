@@ -140,6 +140,18 @@ namespace io.agora.rtm.demo
             {
                 var ret = rtmClient.Initialize(config);
                 messageDisplay.AddMessage("rtmClient.Initialize + ret:" + ret, Message.MessageType.Info);
+
+                ret = rtmClient.SetParameters("{\"rtm.link_address0\":[\"183.131.160.141\", 9130]}");
+                messageDisplay.AddMessage("rtmClient.SetParameters + ret:" + ret, Message.MessageType.Info);
+                ret = rtmClient.SetParameters("{\"rtm.link_address1\":[\"183.131.160.142\", 9131]}");
+                messageDisplay.AddMessage("rtmClient.SetParameters + ret:" + ret, Message.MessageType.Info);
+                ret = rtmClient.SetParameters("{\"rtm.link_encryption\": false}");
+                messageDisplay.AddMessage("rtmClient.SetParameters + ret:" + ret, Message.MessageType.Info);
+                //ret = rtmClient.SetParameters("{\"rtm.ap_address\":[\"114.236.137.40\", 8443]}");
+                //messageDisplay.AddMessage("rtmClient.SetParameters + ret:" + ret, Message.MessageType.Info);
+
+                ret = rtmClient.Login(token);
+                messageDisplay.AddMessage("rtmClient.Login + ret:" + ret, Message.MessageType.Info);
             }
             rtmEventHandler.messageDisplay = messageDisplay;
 
@@ -157,7 +169,12 @@ namespace io.agora.rtm.demo
                 }
 
                 JoinChannelOptions options = new JoinChannelOptions();
-                options.token = token;
+                options.withLock = true;
+                options.withMetadata = true;
+                options.withPresence = true;
+
+                options.token = TokenInputBox.text;
+                if (options.token == "") options.token = AppIdInputBox.text;
                 if (streamChannel != null)
                 {
                     UInt64 requestId = 0;
@@ -276,7 +293,7 @@ namespace io.agora.rtm.demo
 
                 for (int i = 0; i < userList.userCount; i++)
                 {
-                    messageDisplay.AddMessage("StreamChannel.GetSubscribedTopic userIndex : " + i + " userListName : " + userList.users[i], Message.MessageType.Info);
+                    messageDisplay.AddMessage("userIndex : " + i + " userListName : " + userList.users[i], Message.MessageType.Info);
                 }
             }
 
@@ -415,7 +432,7 @@ namespace io.agora.rtm.demo
                 UInt64 requestId = 0;
                 int ret = rtmLock.ReleaseLock(channelName, RTM_CHANNEL_TYPE.RTM_CHANNEL_TYPE_MESSAGE, lockName, ref requestId);
 
-                messageDisplay.AddMessage("IRtmLock.RemoveLock  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
+                messageDisplay.AddMessage("IRtmLock.ReleaseLock  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
             }
         }
 
@@ -430,7 +447,7 @@ namespace io.agora.rtm.demo
                 UInt64 requestId = 0;
                 int ret = rtmLock.RevokeLock(channelName, RTM_CHANNEL_TYPE.RTM_CHANNEL_TYPE_MESSAGE, lockName, owner, ref requestId);
 
-                messageDisplay.AddMessage("IRtmLock.RemoveLock  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
+                messageDisplay.AddMessage("IRtmLock.RevokeLock  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
             }
         }
 
@@ -816,6 +833,11 @@ internal class RtmEventHandler : IRtmEventHandler
 {
     public io.agora.rtm.demo.MessageDisplay messageDisplay;
 
+    public override void OnLoginResult(RTM_LOGIN_ERROR_CODE errorCode)
+    {
+        messageDisplay.AddMessage("OnLoginResult errorCode : " + errorCode, Message.MessageType.TopicMessage);
+    }
+
     public override void OnMessageEvent(MessageEvent @event)
     {
         messageDisplay.AddMessage("OnMessageEvent channelName : " + @event.channelName + " channelTopic :" + @event.channelTopic + " channelType : " + @event.channelType + " publisher : " + @event.publisher + " message : " + @event.message, Message.MessageType.TopicMessage);
@@ -824,7 +846,22 @@ internal class RtmEventHandler : IRtmEventHandler
     public override void OnPresenceEvent(PresenceEvent @event)
     {
         string str = string.Format("OnPresenceEvent: type:{0} channelType:{1} channelName:{2} publisher:{3}", @event.type, @event.channelType, @event.channelName, @event.publisher);
+        messageDisplay.AddMessage(str, Message.MessageType.Info);
+    }
 
+    public override void OnStorageEvent(StorageEvent @event)
+    {
+        string str = string.Format("OnStorageEvent: channelType:{0} eventType:{1} target:{2}", @event.channelType, @event.eventType, @event.target);
+        messageDisplay.AddMessage(str, Message.MessageType.Info);
+        if (@event.data != null)
+        {
+            DisplayRtmMetadata(ref @event.data);
+        }
+    }
+
+    public override void OnPublishResult(ulong requestId, RTM_CHANNEL_ERROR_CODE errorCode)
+    {
+        string str = string.Format("OnStorageEvent: requestId:{0} errorCode:{1}", requestId, errorCode);
         messageDisplay.AddMessage(str, Message.MessageType.Info);
     }
 
@@ -861,6 +898,12 @@ internal class RtmEventHandler : IRtmEventHandler
     public override void OnConnectionStateChange(string channelName, RTM_CONNECTION_STATE state, RTM_CONNECTION_CHANGE_REASON reason)
     {
         messageDisplay.AddMessage("OnConnectionStateChange : " + channelName + " CONNECTION_STATE : " + state.ToString() + " RTM_CONNECTION_CHANGE_REASON : " + reason.ToString(), Message.MessageType.Info);
+    }
+
+    public override void OnSubscribeResult(UInt64 requestId, string channelName, RTM_CHANNEL_ERROR_CODE errorCode)
+    {
+        string info = string.Format("OnSubscribeResult requestId:{0}, channelName:{1}, errorCode:{2}", requestId, channelName, errorCode);
+        messageDisplay.AddMessage(info, Message.MessageType.Info);
     }
 
     public override void OnJoinTopicResult(UInt64 requestId, string channelName, string userId, string topic, string meta, RTM_CHANNEL_ERROR_CODE errorCode)
@@ -1029,32 +1072,32 @@ internal class RtmEventHandler : IRtmEventHandler
 
     public override void OnSetUserMetadataResult(UInt64 requestId, string userId, OPERATION_ERROR_CODE errorCode)
     {
-        string info = string.Format("OnGetChannelMetadataResult requestId:{0},userId:{1},errorCode:{2}", requestId, userId, errorCode);
+        string info = string.Format("OnSetUserMetadataResult requestId:{0},userId:{1},errorCode:{2}", requestId, userId, errorCode);
         messageDisplay.AddMessage(info, Message.MessageType.Info);
     }
 
     public override void OnUpdateUserMetadataResult(UInt64 requestId, string userId, OPERATION_ERROR_CODE errorCode)
     {
-        string info = string.Format("OnGetChannelMetadataResult requestId:{0},userId:{1},errorCode:{2}", requestId, userId, errorCode);
+        string info = string.Format("OnUpdateUserMetadataResult requestId:{0},userId:{1},errorCode:{2}", requestId, userId, errorCode);
         messageDisplay.AddMessage(info, Message.MessageType.Info);
     }
 
     public override void OnRemoveUserMetadataResult(UInt64 requestId, string userId, OPERATION_ERROR_CODE errorCode)
     {
-        string info = string.Format("OnGetChannelMetadataResult requestId:{0},userId:{1},errorCode:{2}", requestId, userId, errorCode);
+        string info = string.Format("OnRemoveUserMetadataResult requestId:{0},userId:{1},errorCode:{2}", requestId, userId, errorCode);
         messageDisplay.AddMessage(info, Message.MessageType.Info);
     }
 
     public override void OnGetUserMetadataResult(UInt64 requestId, string userId, RtmMetadata data, OPERATION_ERROR_CODE errorCode)
     {
-        string info = string.Format("OnGetChannelMetadataResult requestId:{0},userId:{1},errorCode:{2}", requestId, userId, errorCode);
+        string info = string.Format("OnGetUserMetadataResult requestId:{0},userId:{1},errorCode:{2}", requestId, userId, errorCode);
         messageDisplay.AddMessage(info, Message.MessageType.Info);
         DisplayRtmMetadata(ref data);
     }
 
     public override void OnSubscribeUserMetadataResult(string userId, OPERATION_ERROR_CODE errorCode)
     {
-        string info = string.Format("OnGetChannelMetadataResult userId:{0},errorCode:{1}", userId, errorCode);
+        string info = string.Format("OnSubscribeUserMetadataResult userId:{0},errorCode:{1}", userId, errorCode);
         messageDisplay.AddMessage(info, Message.MessageType.Info);
     }
 
