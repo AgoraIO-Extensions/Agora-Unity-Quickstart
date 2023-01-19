@@ -202,9 +202,10 @@ namespace io.agora.rtm.demo
         {
             if (rtmClient != null && streamChannel != null)
             {
-                streamChannel.Dispose();
+                var ret = streamChannel.Dispose();
+                messageDisplay.AddMessage(string.Format("StreamChannel.Dispose ret:{0}", ret), Message.MessageType.Info);
+                streamChannel = null;
             }
-
         }
 
         public void RtmDispose()
@@ -212,6 +213,9 @@ namespace io.agora.rtm.demo
             if (rtmClient != null)
             {
                 ChannelDispose();
+                var ret = rtmClient.Logout();
+                messageDisplay.AddMessage(string.Format("RtmClient.Logout ret:{0} ", ret), Message.MessageType.Info);
+
                 rtmClient.Dispose();
                 rtmClient = null;
             }
@@ -222,7 +226,7 @@ namespace io.agora.rtm.demo
             topic = TopicNameBox.text;
 
             JoinTopicOptions joinTopicOptions = new JoinTopicOptions();
-
+            joinTopicOptions.syncWithMedia = false;
             if (streamChannel != null)
             {
                 UInt64 requestId = 0;
@@ -268,6 +272,7 @@ namespace io.agora.rtm.demo
 
         public void TopicUnSubscribed()
         {
+            subtopic = TopicSubscribedBox.text;
             TopicOptions topicOptions = new TopicOptions();
 
             if (userList != null && userList.Count > 0)
@@ -285,6 +290,8 @@ namespace io.agora.rtm.demo
         {
             if (streamChannel != null)
             {
+                subtopic = TopicSubscribedBox.text;
+
                 UserList userList = new UserList();
 
                 int ret = streamChannel.GetSubscribedUserList(subtopic, ref userList);
@@ -301,6 +308,7 @@ namespace io.agora.rtm.demo
 
         public void SendTopicMessage()
         {
+            topic = TopicNameBox.text;
             byte[] message = System.Text.Encoding.Default.GetBytes(TopicMessageBox.text);
             if (streamChannel != null)
             {
@@ -863,6 +871,30 @@ internal class RtmEventHandler : IRtmEventHandler
     {
         string str = string.Format("OnStorageEvent: requestId:{0} errorCode:{1}", requestId, errorCode);
         messageDisplay.AddMessage(str, Message.MessageType.Info);
+    }
+
+    public override void OnTopicEvent(TopicEvent @event)
+    {
+        string str = string.Format("OnTopicEvent: channelName:{0} userId:{1}", @event.channelName, @event.userId);
+        messageDisplay.AddMessage(str, Message.MessageType.Info);
+
+        if (@event.topicInfoCount > 0)
+        {
+            for (ulong i = 0; i < @event.topicInfoCount; i++)
+            {
+                var topicInfo = @event.topicInfos[i];
+                string str1 = string.Format("topicInfo {0}: topic:{1} publisherCount:{2}", i, topicInfo.topic, topicInfo.publisherCount);
+                messageDisplay.AddMessage(str, Message.MessageType.Info);
+                if (topicInfo.publisherCount > 0)
+                {
+                    for (ulong j = 0; j < topicInfo.publisherCount; j++)
+                    {
+                        var publisher = topicInfo.publishers[j];
+                        string str2 = string.Format("publisher {0}: userId:{1} meta:{2}", j, publisher.publisherUserId, publisher.publisherMeta);
+                    }
+                }
+            }
+        }
     }
 
     public override void OnJoinResult(UInt64 requestId, string channelName, string userId, RTM_CHANNEL_ERROR_CODE errorCode)
