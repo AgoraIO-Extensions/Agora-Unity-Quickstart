@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using Agora.Rtm;
 using Agora.Rtc;
 using io.agora.rtm.demo;
+using System;
 
 namespace io.agora.rtm.demo
 {
@@ -31,6 +32,15 @@ namespace io.agora.rtm.demo
         [SerializeField] InputField UserAddBox;
         [SerializeField] Text appIdDisplayText;
         [SerializeField] Text tokenDisplayText;
+
+        //Send MessageChannel Message
+        [SerializeField] InputField messageChannelNameInput, messageChannelMessageInput;
+        //Lock
+        [SerializeField] InputField LockChannelNameInput, LockNameInput, LockOwnerInput;
+        //Presence
+        [SerializeField] InputField PresenceChannelNameInput, PresenceKeyInput, PresenceValueInput, PresenceUserIdInput;
+        //Storage
+        [SerializeField] InputField MetadataMajorReversionInput, MetadataItemKeyInput, MetadataItemValueInput, MetadataItemAuthorUserIdInput, MetadataItemReversionIdInput, MetadataItemUpdateTsIdInput, MetadataChannelInput, MetadataUserIdInput, MetadataLockNameInput;
 
         [SerializeField] MessageDisplay messageDisplay;
 
@@ -81,8 +91,7 @@ namespace io.agora.rtm.demo
             {
                 int init = rtcEngine.Initialize(new RtcEngineContext(appId, 0,
                                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
-                                AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT, AREA_CODE.AREA_CODE_CN));
-                rtcEngine.SetParameters("{\"rtc.vos_list\":[\"114.236.138.120:4052\"]}");
+                                AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT, Agora.Rtc.AREA_CODE.AREA_CODE_CN));
                 messageDisplay.AddMessage("rtcEngine.Initialize + ret:" + init, Message.MessageType.Info);
             }
             ShowDisplayTexts();
@@ -92,13 +101,14 @@ namespace io.agora.rtm.demo
         {
             if (streamChannel != null)
             {
-                var ret = streamChannel.Leave();
-                streamChannel.Release();
+                UInt64 requestId = 0;
+                var ret = streamChannel.Leave(ref requestId);
+                streamChannel.Dispose();
                 messageDisplay.AddMessage("StreamChannel.Leave + ret:" + ret, Message.MessageType.Info);
             }
             if (rtmClient != null)
             {
-                rtmClient.Release();
+                rtmClient.Dispose();
                 rtmClient = null;
             }
             if (rtcEngine != null)
@@ -123,13 +133,25 @@ namespace io.agora.rtm.demo
             config.appId = appId;
             RtmEventHandler rtmEventHandler = new RtmEventHandler();
 
-            config.eventHandler = rtmEventHandler;
+            config.setEventHandler(rtmEventHandler);
 
             config.userId = UserName;
             if (rtmClient != null)
             {
                 var ret = rtmClient.Initialize(config);
                 messageDisplay.AddMessage("rtmClient.Initialize + ret:" + ret, Message.MessageType.Info);
+
+                ret = rtmClient.SetParameters("{\"rtm.link_address0\":[\"183.131.160.141\", 9130]}");
+                messageDisplay.AddMessage("rtmClient.SetParameters + ret:" + ret, Message.MessageType.Info);
+                ret = rtmClient.SetParameters("{\"rtm.link_address1\":[\"183.131.160.142\", 9131]}");
+                messageDisplay.AddMessage("rtmClient.SetParameters + ret:" + ret, Message.MessageType.Info);
+                ret = rtmClient.SetParameters("{\"rtm.link_encryption\": false}");
+                messageDisplay.AddMessage("rtmClient.SetParameters + ret:" + ret, Message.MessageType.Info);
+                //ret = rtmClient.SetParameters("{\"rtm.ap_address\":[\"114.236.137.40\", 8443]}");
+                //messageDisplay.AddMessage("rtmClient.SetParameters + ret:" + ret, Message.MessageType.Info);
+
+                ret = rtmClient.Login(token);
+                messageDisplay.AddMessage("rtmClient.Login + ret:" + ret, Message.MessageType.Info);
             }
             rtmEventHandler.messageDisplay = messageDisplay;
 
@@ -141,17 +163,23 @@ namespace io.agora.rtm.demo
             ChannelName = channelNameInput.text;
             if (rtmClient != null)
             {
-                if(streamChannel ==null)
+                if (streamChannel == null)
                 {
                     streamChannel = rtmClient.CreateStreamChannel(ChannelName);
                 }
 
                 JoinChannelOptions options = new JoinChannelOptions();
-                options.token = token;
+                options.withLock = true;
+                options.withMetadata = true;
+                options.withPresence = true;
+
+                options.token = TokenInputBox.text;
+                if (options.token == "") options.token = AppIdInputBox.text;
                 if (streamChannel != null)
                 {
-                    int ret = streamChannel.Join(options);
-                    messageDisplay.AddMessage("StreamChannel.JoinChannel  ret:" + ret, Message.MessageType.Info);
+                    UInt64 requestId = 0;
+                    int ret = streamChannel.Join(options, ref requestId);
+                    messageDisplay.AddMessage(string.Format("StreamChannel.JoinChannel ret:{0} requestId:{1}", ret, requestId), Message.MessageType.Info);
                 }
                 else
                 {
@@ -163,9 +191,10 @@ namespace io.agora.rtm.demo
         {
             if (streamChannel != null)
             {
-                int ret = streamChannel.Leave();
+                UInt64 requestId = 0;
+                int ret = streamChannel.Leave(ref requestId);
 
-                messageDisplay.AddMessage("StreamChannel.ChannelLeave ret:" + ret, Message.MessageType.Info);
+                messageDisplay.AddMessage(string.Format("StreamChannel.ChannelLeave ret:{0} requestId:{1}", ret, requestId), Message.MessageType.Info);
             }
         }
 
@@ -173,9 +202,10 @@ namespace io.agora.rtm.demo
         {
             if (rtmClient != null && streamChannel != null)
             {
-                streamChannel.Release();
+                var ret = streamChannel.Dispose();
+                messageDisplay.AddMessage(string.Format("StreamChannel.Dispose ret:{0}", ret), Message.MessageType.Info);
+                streamChannel = null;
             }
-
         }
 
         public void RtmDispose()
@@ -183,7 +213,10 @@ namespace io.agora.rtm.demo
             if (rtmClient != null)
             {
                 ChannelDispose();
-                rtmClient.Release();
+                var ret = rtmClient.Logout();
+                messageDisplay.AddMessage(string.Format("RtmClient.Logout ret:{0} ", ret), Message.MessageType.Info);
+
+                rtmClient.Dispose();
                 rtmClient = null;
             }
         }
@@ -193,14 +226,15 @@ namespace io.agora.rtm.demo
             topic = TopicNameBox.text;
 
             JoinTopicOptions joinTopicOptions = new JoinTopicOptions();
-
+            joinTopicOptions.syncWithMedia = false;
             if (streamChannel != null)
             {
-                int ret = streamChannel.JoinTopic(topic, joinTopicOptions);
+                UInt64 requestId = 0;
+                int ret = streamChannel.JoinTopic(topic, joinTopicOptions, ref requestId);
 
                 messageDisplay.AddMessage("StreamChannel.GetChannelName ret:" + streamChannel.GetChannelName(), Message.MessageType.Info);
 
-                messageDisplay.AddMessage("StreamChannel.JoinTopic ret:" + ret, Message.MessageType.Info);
+                messageDisplay.AddMessage(string.Format("StreamChannel.JoinTopic ret:{0} requestId:{1}", ret, requestId), Message.MessageType.Info);
             }
 
         }
@@ -209,9 +243,10 @@ namespace io.agora.rtm.demo
         {
             if (streamChannel != null)
             {
-                int ret = streamChannel.LeaveTopic(topic);
+                UInt64 requestId = 0;
+                int ret = streamChannel.LeaveTopic(topic, ref requestId);
 
-                messageDisplay.AddMessage("StreamChannel.LeaveTopic ret:" + ret, Message.MessageType.Info);
+                messageDisplay.AddMessage(string.Format("StreamChannel.LeaveTopic ret:{0} requestId:{1}", ret, requestId), Message.MessageType.Info);
             }
         }
 
@@ -227,16 +262,17 @@ namespace io.agora.rtm.demo
                 topicOptions.users = userList.ToArray();
                 topicOptions.userCount = (uint)userList.Count;
             }
+            UInt64 requestId = 0;
+            int ret = streamChannel.SubscribeTopic(subtopic, topicOptions, ref requestId);
 
-            int ret = streamChannel.SubscribeTopic(subtopic, topicOptions);
-
-            messageDisplay.AddMessage("StreamChannel.SubscribeTopic ret:" + ret, Message.MessageType.Info);
+            messageDisplay.AddMessage(string.Format("StreamChannel.SubscribeTopic ret:{0} requestId:{1}", ret, requestId), Message.MessageType.Info);
 
             userList.Clear();
         }
 
         public void TopicUnSubscribed()
         {
+            subtopic = TopicSubscribedBox.text;
             TopicOptions topicOptions = new TopicOptions();
 
             if (userList != null && userList.Count > 0)
@@ -252,17 +288,19 @@ namespace io.agora.rtm.demo
 
         public void GetSubscribedUserList()
         {
-            UserList userList = new UserList();
-
             if (streamChannel != null)
             {
+                subtopic = TopicSubscribedBox.text;
+
+                UserList userList = new UserList();
+
                 int ret = streamChannel.GetSubscribedUserList(subtopic, ref userList);
 
                 messageDisplay.AddMessage("StreamChannel.GetSubscribedTopic ret:" + ret + " userListCount : " + userList.userCount, Message.MessageType.Info);
 
                 for (int i = 0; i < userList.userCount; i++)
                 {
-                    messageDisplay.AddMessage("StreamChannel.GetSubscribedTopic userIndex : " + i + " userListName : " + userList.users[i], Message.MessageType.Info);
+                    messageDisplay.AddMessage("userIndex : " + i + " userListName : " + userList.users[i], Message.MessageType.Info);
                 }
             }
 
@@ -270,24 +308,488 @@ namespace io.agora.rtm.demo
 
         public void SendTopicMessage()
         {
+            topic = TopicNameBox.text;
             byte[] message = System.Text.Encoding.Default.GetBytes(TopicMessageBox.text);
             if (streamChannel != null)
             {
-                int ret = streamChannel.PublishTopicMessage(topic, message);
+                PublishOptions publishOptions = new PublishOptions();
+                publishOptions.type = RTM_MESSAGE_TYPE.RTM_MESSAGE_TYPE_STRING;
+                publishOptions.sendTs = 0;
+
+                int ret = streamChannel.PublishTopicMessage(topic, message, message.Length, publishOptions);
 
                 messageDisplay.AddMessage("StreamChannel.PublishTopicMessage  ret:" + ret, Message.MessageType.Info);
             }
         }
 
-        public void SendTopicMessageStr()
+
+        #region messageChannel
+
+        public void SubscribeMessageChannel()
         {
-            if (streamChannel != null)
+            if (rtmClient != null)
             {
-                int ret = streamChannel.PublishTopicMessage(topic, TopicMessageBox.text);
 
-                messageDisplay.AddMessage("StreamChannel.PublishTopicMessage  ret:" + ret, Message.MessageType.Info);
+                string channelName = this.messageChannelNameInput.text;
+                UInt64 requestId = 0;
+                SubscribeOptions subscribeOptions = new SubscribeOptions()
+                {
+                    withMessage = true,
+                    withMetadata = true,
+                    withPresence = true,
+                    withLock = true
+                };
+
+                int ret = rtmClient.Subscribe(channelName, subscribeOptions, ref requestId);
+
+                messageDisplay.AddMessage("rtmClient.Subscribe  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
             }
         }
+
+        public void UnsubscribeMessageChannel()
+        {
+            if (rtmClient != null)
+            {
+                string channelName = this.messageChannelNameInput.text;
+
+                int ret = rtmClient.Unsubscribe(channelName);
+
+                messageDisplay.AddMessage("rtmClient.Unsubscribe  ret:" + ret, Message.MessageType.Info);
+            }
+        }
+
+        public void SendMessageChannelMessage()
+        {
+            if (rtmClient != null)
+            {
+                string message = messageChannelMessageInput.text;
+                string channelName = this.messageChannelNameInput.text;
+                UInt64 requestId = 0;
+                int ret = rtmClient.Publish(channelName, message, message.Length, new PublishOptions(), ref requestId);
+
+                messageDisplay.AddMessage("rtmClient.Publish  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
+            }
+        }
+
+        #endregion
+
+        #region Lock
+        public void SetLock()
+        {
+            if (rtmClient != null)
+            {
+                IRtmLock rtmLock = rtmClient.GetLock();
+                string channelName = this.LockChannelNameInput.text;
+                string lockName = this.LockNameInput.text;
+                UInt64 requestId = 0;
+                int ret = rtmLock.SetLock(channelName, RTM_CHANNEL_TYPE.RTM_CHANNEL_TYPE_MESSAGE, lockName, 30, ref requestId);
+
+                messageDisplay.AddMessage("IRtmLock.SetLock  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
+            }
+        }
+
+        public void GetLock()
+        {
+            if (rtmClient != null)
+            {
+                IRtmLock rtmLock = rtmClient.GetLock();
+                string channelName = this.LockChannelNameInput.text;
+                string lockName = this.LockNameInput.text;
+                UInt64 requestId = 0;
+                int ret = rtmLock.GetLocks(channelName, RTM_CHANNEL_TYPE.RTM_CHANNEL_TYPE_MESSAGE, ref requestId);
+
+                messageDisplay.AddMessage("IRtmLock.GetLocks  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
+            }
+        }
+
+        public void RemoveLock()
+        {
+            if (rtmClient != null)
+            {
+                IRtmLock rtmLock = rtmClient.GetLock();
+                string channelName = this.LockChannelNameInput.text;
+                string lockName = this.LockNameInput.text;
+                UInt64 requestId = 0;
+                int ret = rtmLock.RemoveLock(channelName, RTM_CHANNEL_TYPE.RTM_CHANNEL_TYPE_MESSAGE, lockName, ref requestId);
+
+                messageDisplay.AddMessage("IRtmLock.RemoveLock  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
+            }
+        }
+
+        public void AcquireLock()
+        {
+            if (rtmClient != null)
+            {
+                IRtmLock rtmLock = rtmClient.GetLock();
+                string channelName = this.LockChannelNameInput.text;
+                string lockName = this.LockNameInput.text;
+                UInt64 requestId = 0;
+                int ret = rtmLock.AcquireLock(channelName, RTM_CHANNEL_TYPE.RTM_CHANNEL_TYPE_MESSAGE, lockName, true, ref requestId);
+
+                messageDisplay.AddMessage("IRtmLock.AcquireLock  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
+            }
+        }
+
+        public void ReleaseLock()
+        {
+            if (rtmClient != null)
+            {
+                IRtmLock rtmLock = rtmClient.GetLock();
+                string channelName = this.LockChannelNameInput.text;
+                string lockName = this.LockNameInput.text;
+                UInt64 requestId = 0;
+                int ret = rtmLock.ReleaseLock(channelName, RTM_CHANNEL_TYPE.RTM_CHANNEL_TYPE_MESSAGE, lockName, ref requestId);
+
+                messageDisplay.AddMessage("IRtmLock.ReleaseLock  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
+            }
+        }
+
+        public void RevokeLock()
+        {
+            if (rtmClient != null)
+            {
+                IRtmLock rtmLock = rtmClient.GetLock();
+                string channelName = this.LockChannelNameInput.text;
+                string lockName = this.LockNameInput.text;
+                string owner = this.LockOwnerInput.text;
+                UInt64 requestId = 0;
+                int ret = rtmLock.RevokeLock(channelName, RTM_CHANNEL_TYPE.RTM_CHANNEL_TYPE_MESSAGE, lockName, owner, ref requestId);
+
+                messageDisplay.AddMessage("IRtmLock.RevokeLock  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
+            }
+        }
+
+        #endregion
+
+        #region Presence
+        public void WhoNow()
+        {
+            if (rtmClient != null)
+            {
+                IRtmPresence rtmPresence = rtmClient.GetPresence();
+                string channelName = this.PresenceChannelNameInput.text;
+                string key = this.PresenceKeyInput.text;
+                string value = this.PresenceValueInput.text;
+                string userId = this.PresenceUserIdInput.text;
+                PresenceOptions presenceOptions = new PresenceOptions()
+                {
+                    withState = true,
+                    withUserId = true
+                };
+                UInt64 requestId = 0;
+
+                int ret = rtmPresence.WhoNow(channelName, RTM_CHANNEL_TYPE.RTM_CHANNEL_TYPE_MESSAGE, presenceOptions, ref requestId);
+                messageDisplay.AddMessage("IRtmPresence.WhoNow  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
+            }
+        }
+
+        public void WhereNow()
+        {
+            if (rtmClient != null)
+            {
+                IRtmPresence rtmPresence = rtmClient.GetPresence();
+                string channelName = this.PresenceChannelNameInput.text;
+                string key = this.PresenceKeyInput.text;
+                string value = this.PresenceValueInput.text;
+                string userId = this.PresenceUserIdInput.text;
+                PresenceOptions presenceOptions = new PresenceOptions()
+                {
+                    withState = true,
+                    withUserId = true
+                };
+                UInt64 requestId = 0;
+
+                int ret = rtmPresence.WhereNow(userId, ref requestId);
+                messageDisplay.AddMessage("IRtmPresence.WhereNow  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
+            }
+        }
+
+        public void SetState()
+        {
+            if (rtmClient != null)
+            {
+                IRtmPresence rtmPresence = rtmClient.GetPresence();
+                string channelName = this.PresenceChannelNameInput.text;
+                string key = this.PresenceKeyInput.text;
+                string value = this.PresenceValueInput.text;
+                string userId = this.PresenceUserIdInput.text;
+                StateItem[] stateItems = new StateItem[1];
+                stateItems[0] = new StateItem(key, value);
+                UInt64 requestId = 0;
+
+                int ret = rtmPresence.SetState(channelName, RTM_CHANNEL_TYPE.RTM_CHANNEL_TYPE_MESSAGE, stateItems, 1, ref requestId);
+                messageDisplay.AddMessage("IRtmPresence.SetState  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
+            }
+        }
+
+        public void RemoveState()
+        {
+            if (rtmClient != null)
+            {
+                IRtmPresence rtmPresence = rtmClient.GetPresence();
+                string channelName = this.PresenceChannelNameInput.text;
+                string key = this.PresenceKeyInput.text;
+                string value = this.PresenceValueInput.text;
+                string userId = this.PresenceUserIdInput.text;
+                string[] keys = new string[] { key };
+
+                UInt64 requestId = 0;
+
+                int ret = rtmPresence.RemoveState(channelName, RTM_CHANNEL_TYPE.RTM_CHANNEL_TYPE_MESSAGE, keys, 1, ref requestId);
+                messageDisplay.AddMessage("IRtmPresence.RemoveState  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
+            }
+        }
+
+        public void GetState()
+        {
+            if (rtmClient != null)
+            {
+                IRtmPresence rtmPresence = rtmClient.GetPresence();
+                string channelName = this.PresenceChannelNameInput.text;
+                string key = this.PresenceKeyInput.text;
+                string value = this.PresenceValueInput.text;
+                string userId = this.PresenceUserIdInput.text;
+
+                UInt64 requestId = 0;
+
+                int ret = rtmPresence.GetState(channelName, RTM_CHANNEL_TYPE.RTM_CHANNEL_TYPE_MESSAGE, userId, ref requestId);
+                messageDisplay.AddMessage("IRtmPresence.GetState  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
+            }
+        }
+
+        #endregion
+
+        #region Storage
+
+        public void SetChannelMetadata()
+        {
+            if (rtmClient != null)
+            {
+                IRtmStorage rtmStorage = rtmClient.GetStorage();
+                string channelName = this.MetadataChannelInput.text;
+                string userId = this.MetadataUserIdInput.text;
+                MetadataOptions metadataOptions = new MetadataOptions()
+                {
+                    recordUserId = true,
+                    recordTs = true
+                };
+                string lockName = this.MetadataLockNameInput.text;
+                UInt64 requestId = 0;
+
+                int ret = rtmStorage.SetChannelMetadata(channelName, RTM_CHANNEL_TYPE.RTM_CHANNEL_TYPE_MESSAGE, GetRtmMetadata(), metadataOptions, lockName, ref requestId);
+                messageDisplay.AddMessage("IRtmStorage.SetChannelMetadata  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
+            }
+        }
+
+        public void UpdateChannelMetadata()
+        {
+            if (rtmClient != null)
+            {
+                IRtmStorage rtmStorage = rtmClient.GetStorage();
+                string channelName = this.MetadataChannelInput.text;
+                string userId = this.MetadataUserIdInput.text;
+                MetadataOptions metadataOptions = new MetadataOptions()
+                {
+                    recordUserId = true,
+                    recordTs = true
+                };
+                string lockName = this.MetadataLockNameInput.text;
+                UInt64 requestId = 0;
+
+                int ret = rtmStorage.UpdateChannelMetadata(channelName, RTM_CHANNEL_TYPE.RTM_CHANNEL_TYPE_MESSAGE, GetRtmMetadata(), metadataOptions, lockName, ref requestId);
+                messageDisplay.AddMessage("IRtmStorage.UpdateChannelMetadata  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
+            }
+        }
+
+        public void RemoveChannelMetadata()
+        {
+            if (rtmClient != null)
+            {
+                IRtmStorage rtmStorage = rtmClient.GetStorage();
+                string channelName = this.MetadataChannelInput.text;
+                string userId = this.MetadataUserIdInput.text;
+                MetadataOptions metadataOptions = new MetadataOptions()
+                {
+                    recordUserId = true,
+                    recordTs = true
+                };
+                string lockName = this.MetadataLockNameInput.text;
+                UInt64 requestId = 0;
+
+                int ret = rtmStorage.RemoveChannelMetadata(channelName, RTM_CHANNEL_TYPE.RTM_CHANNEL_TYPE_MESSAGE, GetRtmMetadata(), metadataOptions, lockName, ref requestId);
+                messageDisplay.AddMessage("IRtmStorage.RemoveChannelMetadata  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
+            }
+        }
+
+        public void GetChannelMetadata()
+        {
+            if (rtmClient != null)
+            {
+                IRtmStorage rtmStorage = rtmClient.GetStorage();
+                string channelName = this.MetadataChannelInput.text;
+                string userId = this.MetadataUserIdInput.text;
+                MetadataOptions metadataOptions = new MetadataOptions()
+                {
+                    recordUserId = true,
+                    recordTs = true
+                };
+                string lockName = this.MetadataLockNameInput.text;
+                UInt64 requestId = 0;
+
+                int ret = rtmStorage.GetChannelMetadata(channelName, RTM_CHANNEL_TYPE.RTM_CHANNEL_TYPE_MESSAGE, ref requestId);
+                messageDisplay.AddMessage("IRtmStorage.GetChannelMetadata  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
+            }
+        }
+
+        public void SetUserMetadata()
+        {
+            if (rtmClient != null)
+            {
+                IRtmStorage rtmStorage = rtmClient.GetStorage();
+                string channelName = this.MetadataChannelInput.text;
+                string userId = this.MetadataUserIdInput.text;
+                MetadataOptions metadataOptions = new MetadataOptions()
+                {
+                    recordUserId = true,
+                    recordTs = true
+                };
+                string lockName = this.MetadataLockNameInput.text;
+                UInt64 requestId = 0;
+
+                int ret = rtmStorage.SetUserMetadata(userId, GetRtmMetadata(), metadataOptions, ref requestId);
+                messageDisplay.AddMessage("IRtmStorage.SetUserMetadata  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
+            }
+        }
+
+        public void UpdateUserMetadata()
+        {
+            if (rtmClient != null)
+            {
+                IRtmStorage rtmStorage = rtmClient.GetStorage();
+                string channelName = this.MetadataChannelInput.text;
+                string userId = this.MetadataUserIdInput.text;
+                MetadataOptions metadataOptions = new MetadataOptions()
+                {
+                    recordUserId = true,
+                    recordTs = true
+                };
+                string lockName = this.MetadataLockNameInput.text;
+                UInt64 requestId = 0;
+
+                int ret = rtmStorage.UpdateUserMetadata(userId, GetRtmMetadata(), metadataOptions, ref requestId);
+                messageDisplay.AddMessage("IRtmStorage.UpdateUserMetadata  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
+            }
+        }
+
+        public void RemoveUserMetadata()
+        {
+            if (rtmClient != null)
+            {
+                IRtmStorage rtmStorage = rtmClient.GetStorage();
+                string channelName = this.MetadataChannelInput.text;
+                string userId = this.MetadataUserIdInput.text;
+                MetadataOptions metadataOptions = new MetadataOptions()
+                {
+                    recordUserId = true,
+                    recordTs = true
+                };
+                string lockName = this.MetadataLockNameInput.text;
+                UInt64 requestId = 0;
+
+                int ret = rtmStorage.RemoveUserMetadata(userId, GetRtmMetadata(), metadataOptions, ref requestId);
+                messageDisplay.AddMessage("IRtmStorage.RemoveUserMetadata  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
+            }
+        }
+
+        public void GetUserMetadata()
+        {
+            if (rtmClient != null)
+            {
+                IRtmStorage rtmStorage = rtmClient.GetStorage();
+                string channelName = this.MetadataChannelInput.text;
+                string userId = this.MetadataUserIdInput.text;
+                MetadataOptions metadataOptions = new MetadataOptions()
+                {
+                    recordUserId = true,
+                    recordTs = true
+                };
+                string lockName = this.MetadataLockNameInput.text;
+                UInt64 requestId = 0;
+
+                int ret = rtmStorage.GetUserMetadata(userId, ref requestId);
+                messageDisplay.AddMessage("IRtmStorage.GetUserMetadata  ret:" + ret + " requestId:" + requestId, Message.MessageType.Info);
+            }
+        }
+
+        public void SubscribeUserMetadata()
+        {
+            if (rtmClient != null)
+            {
+                IRtmStorage rtmStorage = rtmClient.GetStorage();
+                string channelName = this.MetadataChannelInput.text;
+                string userId = this.MetadataUserIdInput.text;
+                MetadataOptions metadataOptions = new MetadataOptions()
+                {
+                    recordUserId = true,
+                    recordTs = true
+                };
+                string lockName = this.MetadataLockNameInput.text;
+                UInt64 requestId = 0;
+
+                int ret = rtmStorage.SubscribeUserMetadata(userId);
+                messageDisplay.AddMessage("IRtmStorage.SubscribeUserMetadata  ret:" + ret, Message.MessageType.Info);
+            }
+        }
+
+        public void UnsubscribeUserMetadata()
+        {
+            if (rtmClient != null)
+            {
+                IRtmStorage rtmStorage = rtmClient.GetStorage();
+                string channelName = this.MetadataChannelInput.text;
+                string userId = this.MetadataUserIdInput.text;
+                MetadataOptions metadataOptions = new MetadataOptions()
+                {
+                    recordUserId = true,
+                    recordTs = true
+                };
+                string lockName = this.MetadataLockNameInput.text;
+                UInt64 requestId = 0;
+
+                int ret = rtmStorage.UnsubscribeUserMetadata(userId);
+                messageDisplay.AddMessage("IRtmStorage.UnsubscribeUserMetadata  ret:" + ret, Message.MessageType.Info);
+            }
+        }
+
+        private RtmMetadata GetRtmMetadata()
+        {
+            RtmMetadata rtmMetadata = new RtmMetadata();
+            rtmMetadata.majorRevision = long.Parse(this.MetadataMajorReversionInput.text);
+            MetadataItem metadataItem = new MetadataItem()
+            {
+                key = this.MetadataItemKeyInput.text,
+                value = this.MetadataItemValueInput.text,
+                authorUserId = this.MetadataItemAuthorUserIdInput.text,
+                revision = long.Parse(this.MetadataItemReversionIdInput.text),
+                updateTs = long.Parse(this.MetadataItemUpdateTsIdInput.text)
+            };
+            rtmMetadata.metadataItems = new MetadataItem[] { metadataItem };
+            rtmMetadata.metadataItemsSize = 1;
+            return rtmMetadata;
+        }
+
+        #endregion
+
+
+        //public void SendTopicMessageStr()
+        //{
+        //    if (streamChannel != null)
+        //    {
+        //        int ret = streamChannel.PublishTopicMessage(topic, TopicMessageBox.text);
+
+        //        messageDisplay.AddMessage("StreamChannel.PublishTopicMessage  ret:" + ret, Message.MessageType.Info);
+        //    }
+        //}
 
         public void AddUser()
         {
@@ -339,6 +841,11 @@ internal class RtmEventHandler : IRtmEventHandler
 {
     public io.agora.rtm.demo.MessageDisplay messageDisplay;
 
+    public override void OnLoginResult(RTM_LOGIN_ERROR_CODE errorCode)
+    {
+        messageDisplay.AddMessage("OnLoginResult errorCode : " + errorCode, Message.MessageType.TopicMessage);
+    }
+
     public override void OnMessageEvent(MessageEvent @event)
     {
         messageDisplay.AddMessage("OnMessageEvent channelName : " + @event.channelName + " channelTopic :" + @event.channelTopic + " channelType : " + @event.channelType + " publisher : " + @event.publisher + " message : " + @event.message, Message.MessageType.TopicMessage);
@@ -346,22 +853,68 @@ internal class RtmEventHandler : IRtmEventHandler
 
     public override void OnPresenceEvent(PresenceEvent @event)
     {
-        messageDisplay.AddMessage("OnPresenceEvent " + @event.channelName + " userId : " + @event.userId + " topicInfoNumber : " + @event.topicInfoNumber + " type : " + @event.type.ToString() + " channelType : " + @event.channelType.ToString(), Message.MessageType.Info);
+        string str = string.Format("OnPresenceEvent: type:{0} channelType:{1} channelName:{2} publisher:{3}", @event.type, @event.channelType, @event.channelName, @event.publisher);
+        messageDisplay.AddMessage(str, Message.MessageType.Info);
     }
 
-    public override void OnJoinResult(string channelName, string userId, STREAM_CHANNEL_ERROR_CODE errorCode)
+    public override void OnStorageEvent(StorageEvent @event)
     {
-        messageDisplay.AddMessage("OnJoinResult " + channelName + " uid :" + userId + " STREAM_CHANNEL_ERROR_CODE : " + errorCode, Message.MessageType.Info);
+        string str = string.Format("OnStorageEvent: channelType:{0} eventType:{1} target:{2}", @event.channelType, @event.eventType, @event.target);
+        messageDisplay.AddMessage(str, Message.MessageType.Info);
+        if (@event.data != null)
+        {
+            DisplayRtmMetadata(ref @event.data);
+        }
     }
 
-    public override void OnLeaveResult(string channelName, string userId, STREAM_CHANNEL_ERROR_CODE errorCode)
+    public override void OnPublishResult(ulong requestId, RTM_CHANNEL_ERROR_CODE errorCode)
     {
-        messageDisplay.AddMessage("OnLeaveResult " + channelName + " uid :" + userId + " STREAM_CHANNEL_ERROR_CODE : " + errorCode, Message.MessageType.Info);
+        string str = string.Format("OnStorageEvent: requestId:{0} errorCode:{1}", requestId, errorCode);
+        messageDisplay.AddMessage(str, Message.MessageType.Info);
     }
 
-    public override void OnTopicSubscribed(string channelName, string userId, string topic, UserList succeedUsers, UserList failedUsers, STREAM_CHANNEL_ERROR_CODE errorCode)
+    public override void OnTopicEvent(TopicEvent @event)
     {
-        messageDisplay.AddMessage("OnTopicSubscribed " + channelName + " userId :" + userId + " topic :" + topic + " succeedUsersCount :" + succeedUsers.userCount + " failedUsers :" + failedUsers.userCount, Message.MessageType.Info);
+        string str = string.Format("OnTopicEvent: channelName:{0} userId:{1}", @event.channelName, @event.userId);
+        messageDisplay.AddMessage(str, Message.MessageType.Info);
+
+        if (@event.topicInfoCount > 0)
+        {
+            for (ulong i = 0; i < @event.topicInfoCount; i++)
+            {
+                var topicInfo = @event.topicInfos[i];
+                string str1 = string.Format("topicInfo {0}: topic:{1} publisherCount:{2}", i, topicInfo.topic, topicInfo.publisherCount);
+                messageDisplay.AddMessage(str, Message.MessageType.Info);
+                if (topicInfo.publisherCount > 0)
+                {
+                    for (ulong j = 0; j < topicInfo.publisherCount; j++)
+                    {
+                        var publisher = topicInfo.publishers[j];
+                        string str2 = string.Format("publisher {0}: userId:{1} meta:{2}", j, publisher.publisherUserId, publisher.publisherMeta);
+                    }
+                }
+            }
+        }
+    }
+
+    public override void OnJoinResult(UInt64 requestId, string channelName, string userId, RTM_CHANNEL_ERROR_CODE errorCode)
+    {
+        string str = string.Format("OnJoinResult: requestId:{0} channelName:{1} userId:{2} errorCode:{3}", requestId, channelName, userId, errorCode);
+
+        messageDisplay.AddMessage(str, Message.MessageType.Info);
+    }
+
+    public override void OnLeaveResult(UInt64 requestId, string channelName, string userId, RTM_CHANNEL_ERROR_CODE errorCode)
+    {
+        string str = string.Format("OnJoinResult: requestId:{0} channelName:{1} userId:{2} errorCode:{3}", requestId, channelName, userId, errorCode);
+
+        messageDisplay.AddMessage(str, Message.MessageType.Info);
+    }
+
+    public override void OnTopicSubscribed(UInt64 requestId, string channelName, string userId, string topic,
+                                              UserList succeedUsers, UserList failedUsers, RTM_CHANNEL_ERROR_CODE errorCode)
+    {
+        messageDisplay.AddMessage("OnTopicSubscribed" + " requestId:" + requestId + " channelName:" + channelName + " userId :" + userId + " topic :" + topic + " succeedUsersCount :" + succeedUsers.userCount + " failedUsers :" + failedUsers.userCount, Message.MessageType.Info);
 
         for (int i = 0; i < succeedUsers.userCount; i++)
         {
@@ -374,34 +927,222 @@ internal class RtmEventHandler : IRtmEventHandler
         }
 
     }
-
-    public override void OnTopicUnsubscribed(string channelName, string userId, string topic, UserList succeedUsers, UserList failedUsers, STREAM_CHANNEL_ERROR_CODE errorCode)
-    {
-        messageDisplay.AddMessage("OnTopicUnsubscribed " + channelName + " userId :" + userId + " topic :" + topic + " succeedUsersCount :" + succeedUsers.userCount + " failedUsers :" + failedUsers.userCount, Message.MessageType.Info);
-
-        for (int i = 0; i < succeedUsers.userCount; i++)
-        {
-            messageDisplay.AddMessage("OnTopicSubscribed succeedUsers index " + i + " UserName is " + succeedUsers.users[i], Message.MessageType.Info);
-        }
-
-        for (int i = 0; i < failedUsers.userCount; i++)
-        {
-            messageDisplay.AddMessage("OnTopicSubscribed failedUsers index " + i + " UserName is " + succeedUsers.users[i], Message.MessageType.Info);
-        }
-    }
-
     public override void OnConnectionStateChange(string channelName, RTM_CONNECTION_STATE state, RTM_CONNECTION_CHANGE_REASON reason)
     {
         messageDisplay.AddMessage("OnConnectionStateChange : " + channelName + " CONNECTION_STATE : " + state.ToString() + " RTM_CONNECTION_CHANGE_REASON : " + reason.ToString(), Message.MessageType.Info);
     }
 
-    public override void OnJoinTopicResult(string channelName, string userId, string topic, string meta, STREAM_CHANNEL_ERROR_CODE errorCode)
+    public override void OnSubscribeResult(UInt64 requestId, string channelName, RTM_CHANNEL_ERROR_CODE errorCode)
     {
-        messageDisplay.AddMessage("OnJoinTopicResult " + channelName + " userId :" + userId + " topic : " + topic + " meta : " + meta + " STREAM_CHANNEL_ERROR_CODE : " + errorCode.ToString(), Message.MessageType.Info);
+        string info = string.Format("OnSubscribeResult requestId:{0}, channelName:{1}, errorCode:{2}", requestId, channelName, errorCode);
+        messageDisplay.AddMessage(info, Message.MessageType.Info);
     }
 
-    public override void OnLeaveTopicResult(string channelName, string userId, string topic, string meta, STREAM_CHANNEL_ERROR_CODE errorCode)
+    public override void OnJoinTopicResult(UInt64 requestId, string channelName, string userId, string topic, string meta, RTM_CHANNEL_ERROR_CODE errorCode)
     {
-        messageDisplay.AddMessage("OnLeaveTopicResult " + channelName + " userId:" + userId + " topic" + topic + " meta" + meta + " STREAM_CHANNEL_ERROR_CODE" + errorCode.ToString(), Message.MessageType.Info);
+        messageDisplay.AddMessage("OnJoinTopicResult " + " requestId:" + requestId + " channelName:" + channelName + " userId :" + userId + " topic : " + topic + " meta : " + meta + " STREAM_CHANNEL_ERROR_CODE : " + errorCode.ToString(), Message.MessageType.Info);
     }
+
+    public override void OnLeaveTopicResult(UInt64 requestId, string channelName, string userId, string topic, string meta, RTM_CHANNEL_ERROR_CODE errorCode)
+    {
+        messageDisplay.AddMessage("OnLeaveTopicResult " + " requestId:" + requestId + " channelName:" + channelName + " userId:" + userId + " topic" + topic + " meta" + meta + " STREAM_CHANNEL_ERROR_CODE" + errorCode.ToString(), Message.MessageType.Info);
+    }
+
+    #region Lock
+
+    public override void OnLockEvent(LockEvent @event)
+    {
+        string info = string.Format("OnLockEvent channelType:{0}, eventType:{1}, channelName:{2}, count:{3}", @event.channelType, @event.eventType, @event.channelName, @event.count);
+        messageDisplay.AddMessage(info, Message.MessageType.Info);
+        if (@event.count > 0)
+        {
+            for (int i = 0; i < @event.lockDetailList.Length; i++)
+            {
+                var detail = @event.lockDetailList[i];
+                string info2 = string.Format("lockDetailList lockName:{0}, owner:{1}, ttl:{2}", detail.lockName, detail.owner, detail.ttl);
+                messageDisplay.AddMessage(info2, Message.MessageType.Info);
+            }
+        }
+
+    }
+
+    public override void OnSetLockResult(UInt64 requestId, string channelName, RTM_CHANNEL_TYPE channelType,
+                                            string lockName, OPERATION_ERROR_CODE errorCode)
+    {
+        string info = string.Format("OnSetLockResult requestId:{0},channelName:{1},channelType:{2},lockName:{3},errorCode:{4}", requestId, channelName, channelType, lockName, errorCode);
+        messageDisplay.AddMessage(info, Message.MessageType.Info);
+    }
+
+    public override void OnRemoveLockResult(UInt64 requestId, string channelName, RTM_CHANNEL_TYPE channelType,
+                                            string lockName, OPERATION_ERROR_CODE errorCode)
+    {
+        string info = string.Format("OnRemoveLockResult requestId:{0},channelName:{1},channelType:{2},lockName:{3},errorCode:{4}", requestId, channelName, channelType, lockName, errorCode);
+        messageDisplay.AddMessage(info, Message.MessageType.Info);
+    }
+
+    public override void OnReleaseLockResult(UInt64 requestId, string channelName, RTM_CHANNEL_TYPE channelType,
+                                            string lockName, OPERATION_ERROR_CODE errorCode)
+    {
+        string info = string.Format("OnReleaseLockResult requestId:{0},channelName:{1},channelType:{2},lockName:{3},errorCode:{4}", requestId, channelName, channelType, lockName, errorCode);
+        messageDisplay.AddMessage(info, Message.MessageType.Info);
+    }
+
+    public override void OnAcquireLockResult(UInt64 requestId, string channelName, RTM_CHANNEL_TYPE channelType,
+                                            string lockName, OPERATION_ERROR_CODE errorCode, string errorDetails)
+    {
+        string info = string.Format("OnAcquireLockResult requestId:{0},channelName:{1},channelType:{2},lockName:{3},errorCode:{4}", requestId, channelName, channelType, lockName, errorCode);
+        messageDisplay.AddMessage(info, Message.MessageType.Info);
+    }
+
+    public override void OnRevokeLockResult(UInt64 requestId, string channelName, RTM_CHANNEL_TYPE channelType,
+                                            string lockName, OPERATION_ERROR_CODE errorCode)
+    {
+        string info = string.Format("OnRevokeLockResult requestId:{0},channelName:{1},channelType:{2},lockName:{3},errorCode:{4}", requestId, channelName, channelType, lockName, errorCode);
+        messageDisplay.AddMessage(info, Message.MessageType.Info);
+    }
+
+    public override void OnGetLocksResult(UInt64 requestId, string channelName, RTM_CHANNEL_TYPE channelType,
+                                            LockDetail[] lockDetailList, UInt64 count, OPERATION_ERROR_CODE errorCode)
+    {
+        string info = string.Format("OnGetLocksResult requestId:{0},channelName:{1},channelType:{2},count:{3},errorCode:{4},", requestId, channelName, channelType, count, errorCode);
+        messageDisplay.AddMessage(info, Message.MessageType.Info);
+        if (count > 0)
+        {
+            for (int i = 0; i < lockDetailList.Length; i++)
+            {
+                var detail = lockDetailList[i];
+                string info2 = string.Format("lockDetailList lockName:{0}, owner:{1}, ttl:{2}", detail.lockName, detail.owner, detail.ttl);
+                messageDisplay.AddMessage(info2, Message.MessageType.Info);
+            }
+        }
+
+    }
+    #endregion
+
+    #region Presence
+    public override void WhoNowResult(UInt64 requestId, UserState[] userStateList, UInt64 count, OPERATION_ERROR_CODE errorCode)
+    {
+
+        string info = string.Format("WhoNowResult requestId:{0},count:{1},errorCode:{2},", requestId, count, errorCode);
+        messageDisplay.AddMessage(info, Message.MessageType.Info);
+        if (count > 0)
+        {
+            for (int i = 0; i < userStateList.Length; i++)
+            {
+                var userState = userStateList[i];
+                string info2 = string.Format("userStateList userId:{0}, stateCount:{1}", userState.userId, userState.statesCount);
+                messageDisplay.AddMessage(info2, Message.MessageType.Info);
+            }
+        }
+    }
+
+    public override void WhereNowResult(UInt64 requestId, ChannelInfo[] channels, UInt64 count, OPERATION_ERROR_CODE errorCode)
+    {
+
+        string info = string.Format("WhereNowResult requestId:{0},count:{1},errorCode:{2},", requestId, count, errorCode);
+        messageDisplay.AddMessage(info, Message.MessageType.Info);
+        if (count > 0)
+        {
+            for (int i = 0; i < channels.Length; i++)
+            {
+                var channelInfo = channels[i];
+                string info2 = string.Format("userStateList channelName:{0}, channelType:{1}", channelInfo.channelName, channelInfo.channelType);
+                messageDisplay.AddMessage(info2, Message.MessageType.Info);
+            }
+        }
+    }
+
+    public override void OnPresenceSetStateResult(UInt64 requestId, OPERATION_ERROR_CODE errorCode)
+    {
+        string info = string.Format("OnPresenceSetStateResult requestId:{0},errorCode:{1},", requestId, errorCode);
+        messageDisplay.AddMessage(info, Message.MessageType.Info);
+    }
+
+    public override void OnPresenceRemoveStateResult(UInt64 requestId, OPERATION_ERROR_CODE errorCode)
+    {
+        string info = string.Format("OnPresenceRemoveStateResult requestId:{0},errorCode:{1},", requestId, errorCode);
+        messageDisplay.AddMessage(info, Message.MessageType.Info);
+    }
+
+    public override void OnPresenceGetStateResult(UInt64 requestId, UserState state, OPERATION_ERROR_CODE errorCode)
+    {
+        string info = string.Format("OnPresenceGetStateResult requestId:{0},errorCode:{1},", requestId, errorCode);
+        messageDisplay.AddMessage(info, Message.MessageType.Info);
+
+        string info2 = string.Format("userStateList userId:{0}, stateCount:{1}", state.userId, state.statesCount);
+        messageDisplay.AddMessage(info2, Message.MessageType.Info);
+    }
+    #endregion
+
+
+    #region IRtmStorage
+    public override void OnSetChannelMetadataResult(UInt64 requestId, string channelName, RTM_CHANNEL_TYPE channelType, OPERATION_ERROR_CODE errorCode)
+    {
+        string info = string.Format("OnSetChannelMetadataResult requestId:{0},channelName:{1},channelType:{2},errorCode:{3}", requestId, channelName, channelType, errorCode);
+        messageDisplay.AddMessage(info, Message.MessageType.Info);
+    }
+
+    public override void OnUpdateChannelMetadataResult(UInt64 requestId, string channelName, RTM_CHANNEL_TYPE channelType, OPERATION_ERROR_CODE errorCode)
+    {
+        string info = string.Format("OnUpdateChannelMetadataResult requestId:{0},channelName:{1},channelType:{2},errorCode:{3}", requestId, channelName, channelType, errorCode);
+        messageDisplay.AddMessage(info, Message.MessageType.Info);
+    }
+
+    public override void OnRemoveChannelMetadataResult(UInt64 requestId, string channelName, RTM_CHANNEL_TYPE channelType, OPERATION_ERROR_CODE errorCode)
+    {
+        string info = string.Format("OnRemoveChannelMetadataResult requestId:{0},channelName:{1},channelType:{2},errorCode:{3}", requestId, channelName, channelType, errorCode);
+        messageDisplay.AddMessage(info, Message.MessageType.Info);
+    }
+
+    public override void OnGetChannelMetadataResult(UInt64 requestId, string channelName, RTM_CHANNEL_TYPE channelType, RtmMetadata data,
+                                                      OPERATION_ERROR_CODE errorCode)
+    {
+        string info = string.Format("OnGetChannelMetadataResult requestId:{0},channelName:{1},channelType:{2},errorCode:{3}", requestId, channelName, channelType, errorCode);
+        messageDisplay.AddMessage(info, Message.MessageType.Info);
+        DisplayRtmMetadata(ref data);
+    }
+
+    public override void OnSetUserMetadataResult(UInt64 requestId, string userId, OPERATION_ERROR_CODE errorCode)
+    {
+        string info = string.Format("OnSetUserMetadataResult requestId:{0},userId:{1},errorCode:{2}", requestId, userId, errorCode);
+        messageDisplay.AddMessage(info, Message.MessageType.Info);
+    }
+
+    public override void OnUpdateUserMetadataResult(UInt64 requestId, string userId, OPERATION_ERROR_CODE errorCode)
+    {
+        string info = string.Format("OnUpdateUserMetadataResult requestId:{0},userId:{1},errorCode:{2}", requestId, userId, errorCode);
+        messageDisplay.AddMessage(info, Message.MessageType.Info);
+    }
+
+    public override void OnRemoveUserMetadataResult(UInt64 requestId, string userId, OPERATION_ERROR_CODE errorCode)
+    {
+        string info = string.Format("OnRemoveUserMetadataResult requestId:{0},userId:{1},errorCode:{2}", requestId, userId, errorCode);
+        messageDisplay.AddMessage(info, Message.MessageType.Info);
+    }
+
+    public override void OnGetUserMetadataResult(UInt64 requestId, string userId, RtmMetadata data, OPERATION_ERROR_CODE errorCode)
+    {
+        string info = string.Format("OnGetUserMetadataResult requestId:{0},userId:{1},errorCode:{2}", requestId, userId, errorCode);
+        messageDisplay.AddMessage(info, Message.MessageType.Info);
+        DisplayRtmMetadata(ref data);
+    }
+
+    public override void OnSubscribeUserMetadataResult(string userId, OPERATION_ERROR_CODE errorCode)
+    {
+        string info = string.Format("OnSubscribeUserMetadataResult userId:{0},errorCode:{1}", userId, errorCode);
+        messageDisplay.AddMessage(info, Message.MessageType.Info);
+    }
+
+    private void DisplayRtmMetadata(ref RtmMetadata data)
+    {
+        messageDisplay.AddMessage("RtmMetadata.majorRevision:" + data.majorRevision, Message.MessageType.Info);
+        if (data.metadataItemsSize > 0)
+        {
+            foreach (var item in data.metadataItems)
+            {
+                messageDisplay.AddMessage(string.Format("key:{0},value:{1},authorUserId:{2},revision:{3},updateTs:{4}", item.key, item.value, item.authorUserId, item.revision, item.updateTs), Message.MessageType.Info);
+            }
+        }
+    }
+    #endregion
 }
