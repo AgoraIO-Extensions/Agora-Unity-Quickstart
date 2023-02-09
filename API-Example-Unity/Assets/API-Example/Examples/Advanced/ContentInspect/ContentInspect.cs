@@ -214,6 +214,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
                 return null;
             }
 
+            go.name = goName;
             // to be renderered onto
             go.AddComponent<RawImage>();
             // make the object draggable
