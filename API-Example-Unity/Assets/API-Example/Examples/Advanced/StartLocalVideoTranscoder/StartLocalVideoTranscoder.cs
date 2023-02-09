@@ -409,6 +409,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
             }
 
             go.name = goName;
+            var mesh = go.GetComponent<MeshRenderer>();
+            if (mesh != null)
+            {
+                Debug.LogWarning("VideoSureface update shader");
+                mesh.material = new Material(Shader.Find("Unlit/Texture"));
+            }
             // set up transform
             go.transform.position = Vector3.zero;
             go.transform.localScale = new Vector3(0.25f, 0.5f, 0.5f);

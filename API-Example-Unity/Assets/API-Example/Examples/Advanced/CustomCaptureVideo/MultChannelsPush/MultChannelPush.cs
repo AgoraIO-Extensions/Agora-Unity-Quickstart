@@ -260,6 +260,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MultChannelPush
             }
 
             go.name = goName;
+            var mesh = go.GetComponent<MeshRenderer>();
+            if (mesh != null)
+            {
+
+                Debug.LogWarning("VideoSureface update shader");
+                mesh.material = new Material(Shader.Find("Unlit/Texture"));
+
+            }
             // to be renderered onto
             go.AddComponent<RawImage>();
             // make the object draggable
