@@ -97,7 +97,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WriteBackVideoRawData
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
         }
 
-       
+
 
         public void JoinChannel()
         {
@@ -162,6 +162,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WriteBackVideoRawData
             }
 
             go.name = goName;
+            var mesh = go.GetComponent<MeshRenderer>();
+            if (mesh != null)
+            {
+                Debug.LogWarning("VideoSureface update shader");
+                mesh.material = new Material(Shader.Find("Unlit/Texture"));
+            }
             // set up transform
             go.transform.Rotate(-90.0f, 0.0f, 0.0f);
             var yPos = UnityEngine.Random.Range(3.0f, 5.0f);
@@ -294,11 +300,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WriteBackVideoRawData
     # endregion
 
 
-    internal class VideoFrameObserver : IVideoFrameObserver {
+    internal class VideoFrameObserver : IVideoFrameObserver
+    {
 
         public override bool OnCaptureVideoFrame(VideoFrame videoFrame, VideoFrameBufferConfig config)
         {
-            int length = videoFrame.uStride * videoFrame.height /2;
+            int length = videoFrame.uStride * videoFrame.height / 2;
             byte[] bytes = new byte[length];
             for (int i = 0; i < length; i++) bytes[i] = 128;
 
@@ -308,7 +315,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WriteBackVideoRawData
             return true;
         }
 
-         
+
         public override bool OnRenderVideoFrame(string channelId, uint uid, VideoFrame videoFrame)
         {
             int length = videoFrame.uStride * videoFrame.height / 2;
@@ -326,7 +333,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WriteBackVideoRawData
             return VIDEO_OBSERVER_FRAME_TYPE.FRAME_TYPE_YUV420;
         }
 
-      
-       
+
+
     }
 }

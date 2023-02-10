@@ -245,6 +245,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             }
 
             go.name = goName;
+            var mesh = go.GetComponent<MeshRenderer>();
+            if (mesh != null)
+            {
+                Debug.LogWarning("VideoSureface update shader");
+                mesh.material = new Material(Shader.Find("Unlit/Texture"));
+            }
             // set up transform
             go.transform.Rotate(-90.0f, 0.0f, 0.0f);
             var yPos = UnityEngine.Random.Range(3.0f, 5.0f);

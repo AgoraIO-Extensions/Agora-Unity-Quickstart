@@ -69,7 +69,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
             lock (data)
             {
                 if (data.Count > 0)
-                { 
+                {
                     for (var i = 0; i < this.data.Count; i++)
                     {
                         var height = (-data[i] + 1);
@@ -300,6 +300,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
             }
 
             go.name = goName;
+            var mesh = go.GetComponent<MeshRenderer>();
+            if (mesh != null)
+            {
+                Debug.LogWarning("VideoSureface update shader");
+                mesh.material = new Material(Shader.Find("Unlit/Texture"));
+            }
+
             // set up transform
             go.transform.Rotate(-90.0f, 0.0f, 0.0f);
             go.transform.position = Vector3.zero;
