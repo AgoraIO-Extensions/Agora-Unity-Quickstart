@@ -23,7 +23,7 @@ namespace io.agora.rtm.demo
 
         [Header("Application Properties")]
 
-        [SerializeField] InputField userNameInput, channelNameInput;
+        [SerializeField] InputField userNameInput, presenceTimeoutInput, channelNameInput;
 
         [SerializeField] InputField AppIdInputBox, TokenInputBox;
 
@@ -124,6 +124,7 @@ namespace io.agora.rtm.demo
         {
             appId = appId == "" ? AppIdInputBox.text : appId;
             token = token == "" ? TokenInputBox.text : token;
+            uint presenceTimeout = uint.Parse(presenceTimeoutInput.text); 
             UserName = userNameInput.text;
             if (string.IsNullOrEmpty(UserName) || string.IsNullOrEmpty(appId))
             {
@@ -135,6 +136,7 @@ namespace io.agora.rtm.demo
             RtmConfig config = new RtmConfig();
             config.appId = appId;
             config.userId = UserName;
+            config.presenceTimeout = presenceTimeout;
             try
             {
                 rtmClient = RtmClient.CreateAgoraRtmClient(config);

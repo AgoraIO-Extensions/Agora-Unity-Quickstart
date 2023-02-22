@@ -11,7 +11,6 @@ using UnityEngine;
 public class CommandRTMBuild : MonoBehaviour
 {
 
-
     private static string[] GetAllScenes()
     {
         List<string> scenesList = new List<string>();
@@ -19,7 +18,7 @@ public class CommandRTMBuild : MonoBehaviour
         return scenesList.ToArray();
     }
 
-    [MenuItem("Build/Android")]
+    [MenuItem("BuildRtm/Android")]
     public static void BuildAndrod()
     {
 
@@ -49,7 +48,7 @@ public class CommandRTMBuild : MonoBehaviour
     }
 
 
-    [MenuItem("Build/IPhone")]
+    [MenuItem("BuildRtm/IPhone")]
     public static void BuildIPhone()
     {
         BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
@@ -77,7 +76,7 @@ public class CommandRTMBuild : MonoBehaviour
 #endif
     }
 
-    [MenuItem("Build/Mac")]
+    [MenuItem("BuildRtm/Mac")]
     public static void BuildMac()
     {
         BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
@@ -106,7 +105,7 @@ public class CommandRTMBuild : MonoBehaviour
     }
 
 
-    [MenuItem("Build/x86")]
+    [MenuItem("BuildRtm/x86")]
     public static void BuildWin32()
     {
 
@@ -136,7 +135,7 @@ public class CommandRTMBuild : MonoBehaviour
 
     }
 
-    [MenuItem("Build/x86_64")]
+    [MenuItem("BuildRtm/x86_64")]
     public static void BuildWin64()
     {
         BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
@@ -165,7 +164,7 @@ public class CommandRTMBuild : MonoBehaviour
 
     }
 
-    [MenuItem("Build/All")]
+    [MenuItem("BuildRtm/All")]
     public static void BuildAll()
     {
         BuildAndrod();
