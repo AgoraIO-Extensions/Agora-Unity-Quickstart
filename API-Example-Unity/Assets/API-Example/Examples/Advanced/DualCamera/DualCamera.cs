@@ -109,7 +109,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
 
-            var ret = RtcEngine.StartPrimaryCameraCapture(_config1);
+            var ret = RtcEngine.StartCameraCapture(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA, _config1);
             Log.UpdateLog(
                 string.Format("StartPrimaryCameraCapture returns: {0}", ret));
             ChannelMediaOptions options1 = new ChannelMediaOptions();
@@ -119,14 +119,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             options1.publishScreenTrack.SetValue(false);
             options1.enableAudioRecordingOrPlayout.SetValue(true);
             options1.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            ret = RtcEngine.JoinChannel(_token, _channelName, UID1, options1);
+            ret = RtcEngine.JoinChannelEx(_token, new RtcConnection(_channelName, UID1), options1);
             Debug.Log("MainCameraJoinChannel returns: " + ret);
         }
 
         public void MainCameraLeaveChannel()
         {
-            RtcEngine.StopPrimaryCameraCapture();
-            var ret = RtcEngine.LeaveChannel();
+            RtcEngine.StopCameraCapture(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA);
+            var ret = RtcEngine.LeaveChannelEx(new RtcConnection(_channelName, UID1));
             Debug.Log("MainCameraLeaveChannel returns: " + ret);
         }
 
@@ -154,7 +154,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             var connection = new RtcConnection();
             connection.channelId = _channelName;
             connection.localUid = UID1;
-            RtcEngine.UpdateChannelMediaOptions(options1);
+            RtcEngine.UpdateChannelMediaOptionsEx(options1, connection);
 
             MainPublishButton.gameObject.SetActive(true);
             MainUnpublishButton.gameObject.SetActive(false);
@@ -173,7 +173,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             _config2.cameraDirection = CAMERA_DIRECTION.CAMERA_REAR;
 #endif
 
-            var ret = RtcEngine.StartSecondaryCameraCapture(_config2);
+            var ret = RtcEngine.StartCameraCapture(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_SECONDARY, _config2);
             Log.UpdateLog(
                 string.Format("StartSecondaryCameraCapture returns: {0}", ret));
             ChannelMediaOptions options2 = new ChannelMediaOptions();
@@ -190,8 +190,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
 
         public void SecondCameraLeaveChannel()
         {
-            RtcEngine.StopSecondaryCameraCapture();
-            var ret = RtcEngine.LeaveChannelEx(new RtcConnection(_channelName, 456));
+            RtcEngine.StopCameraCapture(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_SECONDARY);
+            var ret = RtcEngine.LeaveChannelEx(new RtcConnection(_channelName, UID2));
             Debug.Log("SecondCameraLeaveChannel returns: " + ret);
         }
 
@@ -239,22 +239,26 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             _config1 = new CameraCapturerConfiguration();
             if (_videoDeviceInfos.Length >= 1)
             {
-        
+
                 _config1.deviceId = _videoDeviceInfos[0].deviceId;
                 Debug.Log("PrimaryCamera: " + _config1.deviceId);
                 _config1.format = new VideoFormat();
             }
-           
+
 
             _config2 = new CameraCapturerConfiguration();
             if (_videoDeviceInfos.Length >= 2)
             {
-               
+
                 _config2.deviceId = _videoDeviceInfos[1].deviceId;
                 Debug.Log("SecondaryCamera: " + _config2.deviceId);
                 _config2.format = new VideoFormat();
             }
-       
+
+            if (_videoDeviceInfos.Length < 2)
+            {
+                Log.UpdateLog("You do not have mult camera, this case cant work!!!!");
+            }
         }
 
         private void OnDestroy()
@@ -262,8 +266,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             Debug.Log("OnDestroy");
             if (RtcEngine == null) return;
             RtcEngine.InitEventHandler(null);
-            RtcEngine.StopSecondaryCameraCapture();
-            RtcEngine.StopPrimaryCameraCapture();
+            RtcEngine.StopCameraCapture(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA);
+            RtcEngine.StopCameraCapture(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_SECONDARY);
             RtcEngine.LeaveChannelEx(new RtcConnection(_channelName, 456));
             RtcEngine.LeaveChannel();
             RtcEngine.Dispose();
@@ -274,7 +278,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             return _channelName;
         }
 
-#region -- Video Render UI Logic ---
+        #region -- Video Render UI Logic ---
 
         internal static void MakeVideoView(uint uid, string channelId = "", VIDEO_SOURCE_TYPE videoSourceType = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA)
         {
@@ -392,10 +396,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             }
         }
 
-#endregion
+        #endregion
     }
 
-#region -- Agora Event ---
+    #region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -478,5 +482,5 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
         }
     }
 
-#endregion
+    #endregion
 }

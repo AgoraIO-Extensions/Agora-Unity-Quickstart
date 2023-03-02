@@ -7,8 +7,8 @@ using Logger = Agora.Util.Logger;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
 {
-	public class MediaRecorder : MonoBehaviour
-	{
+    public class MediaRecorder : MonoBehaviour
+    {
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
         private AppIdInput _appIdInput;
@@ -30,12 +30,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
         internal IMediaPlayer MediaPlayer = null;
-        internal RtcConnection SelfConnection = null;
-        internal IMediaRecorder Recorder = null;
+        internal IMediaRecorder LocalRecorder = null;
 
         private Button _button1;
         private Button _button2;
-   
+
 
         // Use this for initialization
         private void Start()
@@ -63,7 +62,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
             _button1.onClick.AddListener(OnStartButtonPress);
             _button2 = GameObject.Find("Button2").GetComponent<Button>();
             _button2.onClick.AddListener(OnStopButtonPress);
-            
+
         }
 
         public void EnableUI(bool val)
@@ -97,17 +96,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
-                AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
+                AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING,AREA_CODE.AREA_CODE_GLOB, new LogConfig("./log.txt"));
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
         }
 
-        internal void InitMediaRecorder()
-        {
-            Recorder = RtcEngine.GetMediaRecorder();
-            var nRet = Recorder.SetMediaRecorderObserver(SelfConnection, new MediaRecorderObserver(this));
-            this.Log.UpdateLog("SetMediaRecorderObserver:" + nRet);
-        }
 
         private void JoinChannel()
         {
@@ -132,18 +125,18 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
             var config = new MediaRecorderConfiguration();
             config.storagePath = Application.persistentDataPath + "/record.mp4";
             config.recorderInfoUpdateInterval = 5;
-            var nRet = Recorder.StartRecording(this.SelfConnection, config);
+            var nRet = LocalRecorder.StartRecording(config);
             this.Log.UpdateLog("StartRecording:" + nRet);
             this.Log.UpdateLog("storagePath: " + config.storagePath);
         }
 
         private void OnStopButtonPress()
         {
-            var nRet = Recorder.StopRecording(this.SelfConnection);
+            var nRet = LocalRecorder.StopRecording();
             this.Log.UpdateLog("StopRecording:" + nRet);
         }
 
-    
+
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
@@ -284,10 +277,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
             _sample.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                     connection.channelId, connection.localUid, elapsed));
-            _sample.SelfConnection = connection;
+
+            _sample.LocalRecorder = _sample.RtcEngine.CreateLocalMediaRecorder(connection);
+            _sample.LocalRecorder.SetMediaRecorderObserver(new MediaRecorderObserver(_sample));
             _sample.EnableUI(true);
             MediaRecorder.MakeVideoView(0);
-            _sample.InitMediaRecorder();
+
         }
 
         public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
@@ -329,12 +324,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
             _sample = sample;
         }
 
-        public override void OnRecorderInfoUpdated(RecorderInfo info)
+        public override void OnRecorderInfoUpdated(string channelId, uint uid, RecorderInfo info)
         {
             _sample.Log.UpdateLog(string.Format("OnRecorderInfoUpdated fileName: {0}, durationMs: {1} fileSize：{2}", info.fileName, info.durationMs, info.fileSize));
         }
 
-        public override void OnRecorderStateChanged(RecorderState state, RecorderErrorCode error)
+        public override void OnRecorderStateChanged(string channelId, uint uid, RecorderState state, RecorderErrorCode error)
         {
             _sample.Log.UpdateLog(string.Format("OnRecorderStateChanged state: {0}, error: {1}", state, error));
 
