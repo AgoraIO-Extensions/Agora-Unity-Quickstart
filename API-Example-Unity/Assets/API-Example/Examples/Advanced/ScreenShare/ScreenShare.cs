@@ -249,7 +249,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 #if UNITY_STANDALONE_OSX
             texture = new Texture2D((int)thumbImageBuffer.width, (int)thumbImageBuffer.height, TextureFormat.RGBA32, false);
 #elif UNITY_STANDALONE_WIN
-            texture = new Texture2D((int)thumbImageBuffer.width, (int)thumbImageBuffer.height, TextureFormat.ARGB32, false);
+            texture = new Texture2D((int)thumbImageBuffer.width, (int)thumbImageBuffer.height, TextureFormat.BGRA32, false);
 #endif
             texture.LoadRawTextureData(thumbImageBuffer.buffer);
             texture.Apply();
@@ -269,7 +269,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 #if UNITY_STANDALONE_OSX
             texture = new Texture2D((int)iconImageBuffer.width, (int)iconImageBuffer.height, TextureFormat.RGBA32, false);
 #elif UNITY_STANDALONE_WIN
-            texture = new Texture2D((int)iconImageBuffer.width, (int)iconImageBuffer.height, TextureFormat.ARGB32, false);
+            texture = new Texture2D((int)iconImageBuffer.width, (int)iconImageBuffer.height, TextureFormat.BGRA32, false);
 #endif
             texture.LoadRawTextureData(iconImageBuffer.buffer);
             texture.Apply();
