@@ -160,7 +160,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
                     };
                     var nRet = this.RtcEngine.StartCameraCapture(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA, configuration);
                     this.Log.UpdateLog("StartCameraCapture :" + nRet);
-                    list.Add(new TranscodingVideoStream(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA, 0, "", 0, 0, 640, 320, 1, 1, false));
+                    list.Add(new TranscodingVideoStream(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA, 0, "", 0,0, 0, 640, 320, 1, 1, false));
                 }
                 else
                 {
@@ -182,7 +182,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
                     };
                     this.RtcEngine.StartCameraCapture(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_SECONDARY, configuration);
 
-                    list.Add(new TranscodingVideoStream(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_SECONDARY, 0, "", 0, 0, 360, 240, 1, 1, false));
+                    list.Add(new TranscodingVideoStream(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_SECONDARY, 0, "",0, 0, 0, 360, 240, 1, 1, false));
                 }
                 else
                 {
@@ -198,7 +198,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
 #else
                 var filePath = Path.Combine(Application.streamingAssetsPath, "img/png.png");
 #endif
-                list.Add(new TranscodingVideoStream(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_RTC_IMAGE_PNG, 0, filePath, 320, 180, 640, 360, 1, 1, false));
+                list.Add(new TranscodingVideoStream(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_RTC_IMAGE_PNG, 0, filePath,0, 320, 180, 640, 360, 1, 1, false));
             }
 
             if (this.ToggleJpg.isOn)
@@ -210,7 +210,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
 #else
                 var filePath = Path.Combine(Application.streamingAssetsPath, "img/jpg.jpg");
 #endif
-                list.Add(new TranscodingVideoStream(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_RTC_IMAGE_JPEG, 0, filePath, 360, 240, 360, 240, 1, 1, false));
+                list.Add(new TranscodingVideoStream(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_RTC_IMAGE_JPEG, 0, filePath,0, 360, 240, 360, 240, 1, 1, false));
             }
 
 
@@ -222,7 +222,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
 #else
                 var filePath = Path.Combine(Application.streamingAssetsPath, "img/gif.gif");
 #endif
-                list.Add(new TranscodingVideoStream(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_RTC_IMAGE_GIF, 0, filePath, 0, 0, 476, 280, 1, 1, false));
+                list.Add(new TranscodingVideoStream(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_RTC_IMAGE_GIF, 0, filePath, 0,0, 0, 476, 280, 1, 1, false));
             }
 
             if (this.ToggleRemote.isOn)
@@ -230,7 +230,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
                 if (this.RemoteUserUids.Count >= 1)
                 {
                     var remoteUserUid = this.RemoteUserUids[0];
-                    list.Add(new TranscodingVideoStream(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE, remoteUserUid, "", 200, 200, 100, 100, 1, 1, false));
+                    list.Add(new TranscodingVideoStream(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE, remoteUserUid, "",0, 200, 200, 100, 100, 1, 1, false));
                 }
                 else
                 {
@@ -242,7 +242,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
             {
                 if (this.StartScreenShare())
                 {
-                    list.Add(new TranscodingVideoStream(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_SCREEN, 0, "", 480, 640, 640, 320, 1, 1, false));
+                    list.Add(new TranscodingVideoStream(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_SCREEN, 0, "", 0,480, 640, 640, 320, 1, 1, false));
                 }
             }
             else
@@ -254,9 +254,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
             {
                 var ret = this.MediaPlayer.Open("https://big-class-test.oss-cn-hangzhou.aliyuncs.com/61102.1592987815092.mp4", 0);
                 this.Log.UpdateLog("Media palyer ret:" + ret);
-                var sourceId = this.MediaPlayer.GetId();
-                this.Log.UpdateLog("Media palyer ret:" + ret);
-                list.Add(new TranscodingVideoStream(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_MEDIA_PLAYER, 0, sourceId.ToString(), 0, 0, 1080, 960, 1, 1, false));
+              
+                list.Add(new TranscodingVideoStream(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_MEDIA_PLAYER, 0, "", MediaPlayer.GetId(), 0, 0, 1080, 960, 1, 1, false));
             }
             else
             {
