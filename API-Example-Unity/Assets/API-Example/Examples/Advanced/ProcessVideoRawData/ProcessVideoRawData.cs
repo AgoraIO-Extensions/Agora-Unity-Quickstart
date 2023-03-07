@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
 using Agora.Util;
+using System.Collections.Generic;
 using Logger = Agora.Util.Logger;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
@@ -49,7 +50,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
                 }
 
             }
-        
+
             get
             {
                 return _videoFrameWidth;
@@ -113,7 +114,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
                     _texture.Apply();
                 }
             }
-            else if(_needResize)
+            else if (_needResize)
             {
                 _texture.Resize(_videoFrameWidth, _videoFrameHeight);
                 _texture.Apply();
@@ -154,6 +155,32 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
             RtcEngine.RegisterVideoFrameObserver(new VideoFrameObserver(this), OBSERVER_MODE.RAW_DATA);
+
+            int nRet = -1;
+#if UNITY_ANDROID
+            //only need load Extension in android platform
+            nRet = RtcEngine.LoadExtensionProvider("agora_face_capture_extension");
+            this.Log.UpdateLog("LoadExtensionProvider: " + nRet);
+#endif
+            nRet = RtcEngine.EnableExtension("agora_video_filters_face_capture", "face_capture");
+            this.Log.UpdateLog("EnableExtension: " + nRet);
+
+            //activation
+            Dictionary<string, object> activationInfo = new Dictionary<string, object>();
+            //put your appid and other id here
+            activationInfo.Add("faceCapAppId", "");
+            activationInfo.Add("faceCapAppKey", "");
+            activationInfo.Add("agoraAppId", "");
+            activationInfo.Add("agoraUid", "");
+            activationInfo.Add("agoraRtmToken", "");
+
+            Dictionary<string, object> valueDic = new Dictionary<string, object>();
+            valueDic.Add("activationInfo", activationInfo);
+
+            string value = AgoraJson.ToJson(valueDic);
+            this.Log.UpdateLog("value :" + value);
+            RtcEngine.SetExtensionProperty("agora_video_filters_face_capture", "face_capture", "face_capture_options", value, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
+
         }
 
         void JoinChannel()
@@ -251,6 +278,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
             _agoraVideoRawData.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                 (int)reason));
         }
+
+        public override void OnExtensionEvent(string provider, string extension, string key, string value)
+        {
+            _agoraVideoRawData.Log.UpdateLog(string.Format("OnExtensionEvent provider: {0}, extension: {1}, key: {2}, value: {3}", provider, extension, key, value));
+        }
     }
 
     internal class VideoFrameObserver : IVideoFrameObserver
@@ -272,6 +304,21 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
             {
                 _agoraVideoRawData.VideoBuffer = videoFrame.yBuffer;
             }
+
+
+            //only work in android/ios and metaInfo is only valid in this function.
+            IVideoFrameMetaInfo metaInfo = videoFrame.metaInfo;
+            if (metaInfo != null)
+            {
+                string value = metaInfo.GetMetaInfoStr(META_INFO_KEY.KEY_FACE_CAPTURE);
+                Debug.Log("GetMetaInfoStr: " + value);
+            }
+            else
+            {
+                Debug.Log("metaInfo is null");
+            }
+
+
             return true;
         }
 
