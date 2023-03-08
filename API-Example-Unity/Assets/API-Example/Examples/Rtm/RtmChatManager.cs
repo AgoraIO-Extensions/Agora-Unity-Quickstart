@@ -1148,14 +1148,15 @@ namespace io.agora.rtm.demo
                 for (ulong i = 0; i < @event.topicInfoCount; i++)
                 {
                     var topicInfo = @event.topicInfos[i];
-                    string str1 = string.Format("topicInfo {0}: topic:{1} publisherCount:{2}", i, topicInfo.topic, topicInfo.publisherCount);
-                    messageDisplay.AddMessage(str, Message.MessageType.Info);
+                    string str1 = string.Format("|--topicInfo {0}: topic:{1} publisherCount:{2}", i, topicInfo.topic, topicInfo.publisherCount);
+                    messageDisplay.AddMessage(str1, Message.MessageType.Info);
                     if (topicInfo.publisherCount > 0)
                     {
                         for (ulong j = 0; j < topicInfo.publisherCount; j++)
                         {
                             var publisher = topicInfo.publishers[j];
-                            string str2 = string.Format("publisher {0}: userId:{1} meta:{2}", j, publisher.publisherUserId, publisher.publisherMeta);
+                            string str2 = string.Format("  |--publisher {0}: userId:{1} meta:{2}", j, publisher.publisherUserId, publisher.publisherMeta);
+                            messageDisplay.AddMessage(str2, Message.MessageType.Info);
                         }
                     }
                 }
