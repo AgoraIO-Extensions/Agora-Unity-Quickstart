@@ -176,6 +176,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
 
             Dictionary<string, object> valueDic = new Dictionary<string, object>();
             valueDic.Add("activationInfo", activationInfo);
+            valueDic.Add("enable", 1);
 
             string value = AgoraJson.ToJson(valueDic);
             this.Log.UpdateLog("value :" + value);
@@ -312,6 +313,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
             {
                 string value = metaInfo.GetMetaInfoStr(META_INFO_KEY.KEY_FACE_CAPTURE);
                 Debug.Log("GetMetaInfoStr: " + value);
+                Debug.Log("GetMetaInfoStr in unity: " + value);
             }
             else
             {
