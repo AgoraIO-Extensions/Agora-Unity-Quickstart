@@ -44,6 +44,7 @@ Any scene of this project can run successfully alone.
 | [SetEncryption](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/release/4.0.0/API-Example-Unity/Assets/API-Example/Examples/Advanced/SetEncryption) | sending video with encryption                                | EnableEncryption                                             |
 | [SetVideoEncoderConfiguration](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/release/4.0.0/API-Example-Unity/Assets/API-Example/Examples/Advanced/SetVideoEncoderConfiguration) | video demo with multiple encoding dimension choice           | SetVideoEncoderConfiguration                                 |
 | [SpatialAudioWithMediaPlayer](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/release/4.0.0/API-Example-Unity/Assets/API-Example/Examples/Advanced/SpatialAudioWithMediaPlayer) | play media with spatial audio                                | GetLocalSpatialAudioEngine, UpdateRemotePositionEx           |
+| [SpatialAudioWithUsers](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/release/4.0.0/API-Example-Unity/Assets/API-Example/Examples/Advanced/SpatialAudioWithUsers) | experience remote user spatial audio based on position change                                | GetLocalSpatialAudioEngine, UpdateSelfPosition, UpdateRemotePosition           |
 | [StartLocalVideoTranscoder](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/release/4.0.0/API-Example-Unity/Assets/API-Example/Examples/Advanced/StartLocalVideoTranscoder) | Merging of multiple video sources, options are jpg,png,gif,medai,etc | StartLocalVideoTranscoder                                    |
 | [StartDirectCdnStreaming](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/release/4.0.0/API-Example-Unity/Assets/API-Example/Examples/Advanced/StartDirectCdnStreaming) | stream video by RTMP Push to a CDN          | StartDirectCdnStreaming, SetDirectCdnStreamingVideoConfiguration, StopDirectCdnStreaming                               |
 | [StartRhythmPlayer](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/release/4.0.0/API-Example-Unity/Assets/API-Example/Examples/Advanced/StartRhythmPlayer) | use phythm player in rtc engine                              | StartRhythmPlayer                                            |
@@ -104,3 +105,4 @@ If you have any problems or suggestions regarding the sample projects, feel free
 
 ## License
 The sample projects are under the MIT license.
+
