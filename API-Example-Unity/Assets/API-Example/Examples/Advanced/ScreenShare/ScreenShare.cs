@@ -91,7 +91,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
-            RtcEngine.InitEventHandler(new UserEventHandler(this));
+            RtcEngine.InitEventHandler(handler);
         }
 
         private void SetBasicConfiguration()

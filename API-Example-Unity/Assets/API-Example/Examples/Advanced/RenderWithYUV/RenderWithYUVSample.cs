@@ -204,8 +204,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
             go.name = goName;
             // set up transform
             go.transform.Rotate(-90.0f, 0.0f, 0.0f);
-            var yPos = UnityEngine.Random.Range(3.0f, 5.0f);
-            var xPos = UnityEngine.Random.Range(-2.0f, 2.0f);
             go.transform.position = Vector3.zero;
             go.transform.localScale = new Vector3(0.25f, 0.5f, 0.5f);
 
@@ -248,7 +246,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
             var canvas = GameObject.Find("VideoCanvas");
             if (canvas != null)
             {
-                go.transform.parent = canvas.transform;
+                go.transform.SetParent(canvas.transform);
                 Debug.Log("add video view");
             }
             else

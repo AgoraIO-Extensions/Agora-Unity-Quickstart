@@ -139,7 +139,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
 
         void SetUpUI()
         {
-            var bufferLength = _videoFrameHeight * _videoFrameWidth * 4;
             _texture = new Texture2D(_videoFrameWidth, _videoFrameHeight, TextureFormat.RGBA32, false);
             _texture.Apply();
         }

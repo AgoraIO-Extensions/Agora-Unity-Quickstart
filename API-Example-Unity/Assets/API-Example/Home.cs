@@ -71,8 +71,7 @@ public class Home : MonoBehaviour
         PermissionHelper.RequestCameraPermission();
 
         GameObject content = GameObject.Find("Content");
-        var contentRectTrans = content.GetComponent<RectTransform>();
-
+       
         for (int i = 0; i < _baseSceneNameList.Length; i++)
         {
             var go = Instantiate(CasePanel, content.transform);
