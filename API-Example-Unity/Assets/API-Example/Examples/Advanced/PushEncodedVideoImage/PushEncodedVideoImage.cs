@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Agora.Rtc;
-using Agora.Util;
+ 
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
-using Logger = Agora.Util.Logger;
+ 
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
 {

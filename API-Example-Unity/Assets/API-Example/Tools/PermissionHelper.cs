@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Android;
 #endif
 
-namespace Agora.Util
+namespace Agora_RTC_Plugin.API_Example
 {
     public class PermissionHelper
     {

@@ -4,8 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
-using Agora.Util;
-using Logger = Agora.Util.Logger;
+ 
+ 
 using System.Collections.Generic;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
