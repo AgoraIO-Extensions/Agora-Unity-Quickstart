@@ -5,8 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.Serialization;
 using System.Runtime.InteropServices;
 using Agora.Rtc;
-using Agora.Util;
-using Logger = Agora.Util.Logger;
+
 using RingBuffer;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio

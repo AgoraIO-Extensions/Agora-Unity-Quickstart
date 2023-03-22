@@ -2,11 +2,11 @@
 using System.IO;
 using System.Collections.Generic;
 using Agora.Rtc;
-using Agora.Util;
+ 
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
-using Logger = Agora.Util.Logger;
+ 
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscoder
 {

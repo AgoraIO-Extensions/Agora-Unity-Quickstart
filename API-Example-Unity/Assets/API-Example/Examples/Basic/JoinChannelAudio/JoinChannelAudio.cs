@@ -4,8 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
-using Agora.Util;
-using Logger = Agora.Util.Logger;
+
+
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
 {
@@ -113,7 +113,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
         {
             var options = new ChannelMediaOptions();
             options.publishMicrophoneTrack.SetValue(false);
-            var nRet =  RtcEngine.UpdateChannelMediaOptions(options);
+            var nRet = RtcEngine.UpdateChannelMediaOptions(options);
             this.Log.UpdateLog("UpdateChannelMediaOptions: " + nRet);
         }
 

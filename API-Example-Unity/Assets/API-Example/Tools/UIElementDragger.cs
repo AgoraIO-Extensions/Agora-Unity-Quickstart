@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Agora.Util
+namespace Agora_RTC_Plugin.API_Example
 {
     public class UIElementDrag : EventTrigger
     {

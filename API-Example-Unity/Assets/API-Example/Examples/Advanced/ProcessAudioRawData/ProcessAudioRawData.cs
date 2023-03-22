@@ -3,8 +3,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
-using Agora.Util;
-using Logger = Agora.Util.Logger;
 using RingBuffer;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
@@ -95,7 +93,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
 
             //You can hear two layers of sound, one is played by Rtc SDK,
             //and the other is played by Unity.audioClip
-             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext(_appID, 0,
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
@@ -246,7 +244,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
         public override bool OnPlaybackAudioFrame(string channelId, AudioFrame audioFrame)
         {
             Debug.Log("OnPlaybackAudioFrame-----------");
-           
+
             var floatArray = ProcessAudioRawData.ConvertByteToFloat16(audioFrame.RawBuffer);
 
             lock (_agoraAudioRawData._audioBuffer)
