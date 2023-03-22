@@ -296,7 +296,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
                 return;
             }
 
-            Music music = this.CurMusicCollection.music[0];
             var ret = MusicContentCenter.IsPreloaded(this.CurSongCode);
             this.Log.UpdateLog("IsPreloaded:" + ret);
         }

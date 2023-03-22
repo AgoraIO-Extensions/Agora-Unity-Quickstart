@@ -87,7 +87,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.TexturePush
                     externalVideoFrame.rotation = 180;
                     externalVideoFrame.timestamp = timetick;
                     var ret = rtc.PushVideoFrame(externalVideoFrame);
-                    //Debug.Log("PushVideoFrame ret = " + ret + " time: " + timetick);
+                    Debug.Log("PushVideoFrame ret = " + ret + " time: " + timetick);
                 }
             }
         }

@@ -30,8 +30,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
         public string _channelName = "";
 
         public GameObject RolePrefab;
-        private GameObject _roleLocal;
-
+      
         public Text LogText;
         internal Logger Log;
         internal IRtcEngineEx RtcEngine = null;
@@ -71,7 +70,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
-            RtcEngine.RegisterVideoEncodedFrameObserver(new VideoEncodedImageReceiver(this), OBSERVER_MODE.INTPTR);
+            RtcEngine.RegisterVideoEncodedFrameObserver(new VideoEncodedImageReceiver(), OBSERVER_MODE.INTPTR);
         }
 
         private void JoinChannel()
@@ -173,8 +172,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
             }
             // set up transform
             go.transform.Rotate(-90.0f, 0.0f, 0.0f);
-            var yPos = UnityEngine.Random.Range(3.0f, 5.0f);
-            var xPos = UnityEngine.Random.Range(-2.0f, 2.0f);
             go.transform.position = Vector3.zero;
             go.transform.localScale = new Vector3(0.25f, 0.5f, 0.5f);
 
@@ -292,11 +289,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
 
     internal class VideoEncodedImageReceiver : IVideoEncodedFrameObserver
     {
-        private readonly PushEncodedVideoImage _pushEncodedVideoImage;
-
-        internal VideoEncodedImageReceiver(PushEncodedVideoImage videoSample)
+        internal VideoEncodedImageReceiver()
         {
-            _pushEncodedVideoImage = videoSample;
+           
         }
 
         public override bool OnEncodedVideoFrameReceived(uint uid, IntPtr imageBufferPtr, UInt64 length, EncodedVideoFrameInfo videoEncodedFrameInfo)

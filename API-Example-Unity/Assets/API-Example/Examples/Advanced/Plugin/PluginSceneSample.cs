@@ -66,7 +66,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PluginSceneSample
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
 
+#if USE_PLUGIN
         PluginSamplePtr pluginSamplePtr = IntPtr.Zero;
+#endif
 
         // Use this for initialization
         void Start()
@@ -189,8 +191,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PluginSceneSample
             }
             // set up transform
             go.transform.Rotate(-90.0f, 0.0f, 0.0f);
-            var yPos = UnityEngine.Random.Range(3.0f, 5.0f);
-            var xPos = UnityEngine.Random.Range(-2.0f, 2.0f);
             go.transform.position = Vector3.zero;
             go.transform.localScale = new Vector3(0.25f, 0.5f, 0.5f);
 

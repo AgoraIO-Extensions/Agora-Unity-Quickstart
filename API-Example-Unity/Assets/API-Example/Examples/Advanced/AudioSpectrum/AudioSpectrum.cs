@@ -456,11 +456,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
 
     internal class UserPlayerCustomDataProvider : IMediaPlayerCustomDataProvider
     {
-        AudioSpectrum _sample;
-
-        internal UserPlayerCustomDataProvider(AudioSpectrum sample)
+        internal UserPlayerCustomDataProvider()
         {
-            _sample = sample;
+           
         }
 
         public override Int64 OnSeek(Int64 offset, int whence)
@@ -479,8 +477,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
     internal class UserAudioSpectrumObserver : IAudioSpectrumObserver
     {
         AudioSpectrum _sample;
-        bool s = true;
-
+     
         internal UserAudioSpectrumObserver(AudioSpectrum sample)
         {
             this._sample = sample;
