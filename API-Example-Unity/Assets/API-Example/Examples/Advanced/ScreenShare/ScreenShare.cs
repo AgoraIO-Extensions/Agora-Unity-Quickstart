@@ -45,6 +45,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
         public RawImage IconImage;
         public RawImage ThumbImage;
 
+        private Rect _originThumRect = new Rect(0,0,500,260);
+        private Rect _originIconRect = new Rect(0,0,289,280);
+
         // Use this for initialization
         private void Start()
         {
@@ -155,11 +158,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             WinIdSelect.ClearOptions();
 
             SIZE t = new SIZE();
-            t.width = 360;
-            t.height = 240;
+            t.width = 1280;
+            t.height = 720;
             SIZE s = new SIZE();
-            s.width = 360;
-            s.height = 240;
+            s.width = 640;
+            s.height = 640;
             _screenCaptureSourceInfos = RtcEngine.GetScreenCaptureSources(t, s, true);
 
             WinIdSelect.AddOptions(_screenCaptureSourceInfos.Select(w =>
@@ -254,6 +257,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             texture.LoadRawTextureData(thumbImageBuffer.buffer);
             texture.Apply();
             ThumbImage.texture = texture;
+
+            float scale = Math.Min((float)_originThumRect.width / (float)thumbImageBuffer.width, (float)_originThumRect.height / (float)thumbImageBuffer.height);
+            ThumbImage.rectTransform.sizeDelta = new Vector2(thumbImageBuffer.width * scale, thumbImageBuffer.height * scale);
         }
 
         public void OnShowIconButtonClick()
@@ -274,6 +280,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             texture.LoadRawTextureData(iconImageBuffer.buffer);
             texture.Apply();
             IconImage.texture = texture;
+
+
+            float scale = Math.Min((float)_originIconRect.width / (float)iconImageBuffer.width, (float)_originIconRect.height / (float)iconImageBuffer.height);
+            IconImage.rectTransform.sizeDelta = new Vector2(iconImageBuffer.width * scale, iconImageBuffer.height * scale);
+
         }
 
         #endregion
