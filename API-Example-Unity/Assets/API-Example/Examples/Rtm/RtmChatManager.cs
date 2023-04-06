@@ -124,7 +124,7 @@ namespace io.agora.rtm.demo
         {
             appId = appId == "" ? AppIdInputBox.text : appId;
             token = token == "" ? TokenInputBox.text : token;
-            uint presenceTimeout = uint.Parse(presenceTimeoutInput.text); 
+            uint presenceTimeout = uint.Parse(presenceTimeoutInput.text);
             UserName = userNameInput.text;
             if (string.IsNullOrEmpty(UserName) || string.IsNullOrEmpty(appId))
             {
@@ -132,7 +132,7 @@ namespace io.agora.rtm.demo
                 return;
             }
 
-           
+
             RtmConfig config = new RtmConfig();
             config.appId = appId;
             config.userId = UserName;
@@ -178,8 +178,26 @@ namespace io.agora.rtm.demo
                 {
                     messageDisplay.AddMessage("rtmClient.Login + respones:" + result.Response.ErrorCode, Message.MessageType.Info);
                 }
+            }
+        }
 
+        public void ClientRenewToken()
+        {
+            if (rtmClient != null)
+            {
+                string token = this.TokenInputBox.text;
+                RtmStatus rtmStatus = rtmClient.RenewToken(token);
+                messageDisplay.AddMessage("rtmClient RenewToken: " + rtmStatus.ErrorCode, Message.MessageType.Info);
+            }
+        }
 
+        public  void StreamChannelRenewToken()
+        {
+            if (rtmClient != null && streamChannel != null)
+            {
+                string token = this.TokenInputBox.text;
+                RtmStatus rtmStatus = streamChannel.RenewToken(token);
+                messageDisplay.AddMessage("streamChannel RenewToken: " + rtmStatus.ErrorCode, Message.MessageType.Info);
             }
         }
 
