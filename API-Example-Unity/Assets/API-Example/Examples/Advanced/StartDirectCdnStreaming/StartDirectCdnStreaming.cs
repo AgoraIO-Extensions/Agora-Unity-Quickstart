@@ -112,6 +112,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
                 degradationPreference = DEGRADATION_PREFERENCE.MAINTAIN_QUALITY,
                 codecType = VIDEO_CODEC_TYPE.VIDEO_CODEC_H264,
                 mirrorMode = VIDEO_MIRROR_MODE_TYPE.VIDEO_MIRROR_MODE_DISABLED,
+                //do not set orientationMode = ORIENTATION_MODE.ORIENTATION_MODE_ADAPTIVE,
+                //otherwise will return -8 when you call StartDirectCdnStreaming
                 orientationMode = ORIENTATION_MODE.ORIENTATION_MODE_FIXED_LANDSCAPE
             });
             int nRet = RtcEngine.StartDirectCdnStreaming(url, options);
