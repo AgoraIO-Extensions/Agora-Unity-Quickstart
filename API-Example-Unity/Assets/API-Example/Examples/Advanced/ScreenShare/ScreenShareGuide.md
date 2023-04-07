@@ -132,7 +132,7 @@ Screen sharing on the iOS side is achieved by recording the screen using the iOS
        @end
      ```
 
-4. Select the Extension you created in **TARGETS**, add **Frameworks/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/iOS/** path in **General/Frameworks and Libraries** Download all frameworks.
+4. Select the Extension you created in **TARGETS**, and add all frameworks under the **Frameworks/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/iOS/** path in **General/Frameworks and Libraries**.
 
 5. Call `startScreenCapture`, combined with the user's manual action, to enable the app to start screen sharing.
 
