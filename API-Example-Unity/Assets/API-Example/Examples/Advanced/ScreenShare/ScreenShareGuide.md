@@ -134,11 +134,18 @@ Screen sharing on the iOS side is achieved by recording the screen using the iOS
      ```
 
 4. Select the Extension you created in **TARGETS**, and add all frameworks under the **Frameworks/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/iOS/** path in **General/Frameworks and Libraries**.
+![Unity-iPhone_—_Unity-iPhone_xcodeproj](https://user-images.githubusercontent.com/1261195/231263461-9ef70e04-798e-47f2-95ce-003b91bcf3ce.jpg)
+5. Call `startScreenCapture` in Unity C#, combined with the user's [manual action](#manual-actions), to enable the app to start screen sharing.
 
-5. Call `startScreenCapture`, combined with the user's manual action, to enable the app to start screen sharing.
+#### Development Considerations
+
+- Make sure the app and extension have the same TARGETS/Deployment/iOS version.
+
+- The Broadcast Upload Extension's memory usage is limited to 50 MB, please make sure that the extension's memory usage for screen sharing does not exceed 50 MB.
+- In the process of screen sharing, you need to call the `muteAllRemoteVideoStreams` and `muteAllRemoteAudioStreams` methods to cancel receiving streams from remote users to avoid repeated subscriptions.
 
 ## Manual Actions
-Taking [the ShareScreen demo](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Advanced/ScreenShare) as example, the steps to properly share the screen on iOS must follow the steps:
+Taking [the ShareScreen demo](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Advanced/ScreenShare) as example, the steps to properly share the screen on iOS should follow the steps:
 1. The order of buttons press should be: Join Channel -> Start Sharing -> Start Publish
 ![ss_step1](https://user-images.githubusercontent.com/1261195/231244602-0609459e-aa40-4d0a-a816-7607a15b449f.jpg)
 2. You should see StartScreenCapture call return 0.  Here you may see a white box, since ScreenRecording has not started.
@@ -155,19 +162,11 @@ Taking [the ShareScreen demo](https://github.com/AgoraIO-Extensions/Agora-Unity-
  
 
 
-### Development Considerations
-
-- Make sure the app and extension have the same TARGETS/Deployment/iOS version.
-
-- The Broadcast Upload Extension's memory usage is limited to 50 MB, please make sure that the extension's memory usage for screen sharing does not exceed 50 MB.
-- In the process of screen sharing, you need to call the `muteAllRemoteVideoStreams` and `muteAllRemoteAudioStreams` methods to cancel receiving streams from remote users to avoid repeated subscriptions.
 
 ## API Reference
 
-There are currently some usage restrictions and precautions for the screen sharing function, and there will be charges. Agora recommends that you read the following API reference before calling the API:
+There are currently some usage restrictions and precautions for the screen sharing function, and there could be future changes. Agora recommends that you read the following API reference before calling the API:
 
-- [`startScreenCapture`]()
-- [`stopScreenCapture`]()
-- [`updateScreenCaptureParameters`]()
-
-
+- [`startScreenCapture`](https://docs-preprod.agora.io/en/live-streaming-standard-4.x/API%20Reference/unity_ng/API/class_irtcengine.html#api_irtcengine_startscreencapture)
+- [`stopScreenCapture`](https://docs-preprod.agora.io/en/live-streaming-standard-4.x/API%20Reference/unity_ng/API/class_irtcengine.html#api_irtcengine_stopscreencapture)
+- [`updateScreenCaptureParameters`](https://docs-preprod.agora.io/en/live-streaming-standard-4.x/API%20Reference/unity_ng/API/class_irtcengine.html#api_irtcengine_updatescreencaptureparameters)
