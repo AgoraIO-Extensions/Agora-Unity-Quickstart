@@ -58,13 +58,15 @@ namespace io.agora.rtm.demo
             newMessage.text = text;
 
             GameObject newText = Instantiate(textPrefab, chatPanel.transform);
+            RectTransform tran = (RectTransform)newText.transform;
+            tran.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, ((RectTransform)chatPanel.transform).rect.width);
             newMessage.textObj = newText.GetComponent<Text>();
-            newMessage.textObj.text = newMessage.text;
+            newMessage.textObj.text = "\n" + newMessage.text;
             newMessage.textObj.color = MessageTypeColor(messageType);
             messageList.Add(newMessage);
         }
 
-        public void AddImageToDisplay(byte [] bytes)
+        public void AddImageToDisplay(byte[] bytes)
         {
             // Create a texture. Texture size does not matter, since
             // LoadImage will replace with with incoming image size.
@@ -72,18 +74,19 @@ namespace io.agora.rtm.demo
             texture.LoadImage(bytes);
             //ImageDisplay.texture = texture;
             //ImageDisplay.gameObject.SetActive(true);
-	    }
+        }
 
         public void Clear()
         {
             //ImageDisplay.texture = null;
             //ImageDisplay.gameObject.SetActive(false);
-            foreach (Message msg in messageList) {
+            foreach (Message msg in messageList)
+            {
                 Destroy(msg.textObj.gameObject);
-	        }
+            }
             messageList.Clear();
             messageDatas.Clear();
-	    }
+        }
 
         Color MessageTypeColor(Message.MessageType messageType)
         {
