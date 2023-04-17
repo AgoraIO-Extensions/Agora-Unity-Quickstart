@@ -327,7 +327,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
             var options = new ChannelMediaOptions();
             options.publishCameraTrack.SetValue(false);
             options.publishSecondaryCameraTrack.SetValue(false);
-            options.publishTrancodedVideoTrack.SetValue(true);
+            options.publishTranscodedVideoTrack.SetValue(true);
             RtcEngine.UpdateChannelMediaOptions(options);
         }
 
