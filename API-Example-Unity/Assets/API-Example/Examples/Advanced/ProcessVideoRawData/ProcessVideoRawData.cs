@@ -162,7 +162,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
             nRet = RtcEngine.LoadExtensionProvider("agora_face_capture_extension");
             this.Log.UpdateLog("LoadExtensionProvider: " + nRet);
 #endif
-            nRet = RtcEngine.EnableExtension("agora_video_filters_face_capture", "face_capture");
+            nRet = RtcEngine.EnableExtension("agora_video_filters_face_capture", "face_capture",true, MEDIA_SOURCE_TYPE.PRIMARY_CAMERA_SOURCE);
             this.Log.UpdateLog("EnableExtension: " + nRet);
 
             //activation
