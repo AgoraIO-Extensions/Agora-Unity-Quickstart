@@ -2,8 +2,8 @@
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
- 
- 
+
+
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetBeautyEffectOptions
 {
@@ -84,6 +84,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetBeautyEffectOptions
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
+            int nRet = RtcEngine.EnableExtension("agora_video_filters_clear_vision", "clear_vision");
+            this.Log.UpdateLog(string.Format("EnableExtension:{0}", nRet));
         }
 
         private void JoinChannel()
