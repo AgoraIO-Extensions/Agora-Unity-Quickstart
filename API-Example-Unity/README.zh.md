@@ -80,7 +80,7 @@
 
 ## 参考文档
 
-- 您可以在 [文档中心](https://docs.agora.io/cn/All/api-ref?platform=Unity)找到完整的API文档
+- 您可以在 [文档中心](https://docs.agora.io/cn/All/API%20Reference/unity_ng/API/rtc_api_overview_ng.html)找到完整的API文档
 - 您可以在 [发版说明](https://docs.agora.io/cn/video-call-4.x/release_unity_ng?platform=Unity)找到完整的发版说明
 - 您可以在 [github issue](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/issues)提交你的issue
 
