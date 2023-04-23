@@ -75,7 +75,7 @@ namespace io.agora.rtm.demo
 
         public void OnMark()
         {
-            string show = "alread subscribe channl name:\n";
+            string show = "alread subscribe channl. size:" + ChannelNameList.Count + "\n";
             foreach (string channelName in ChannelNameList)
             {
                 show += ("    " + channelName + "\n");

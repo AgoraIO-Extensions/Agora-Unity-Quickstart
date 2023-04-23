@@ -7,7 +7,6 @@ namespace io.agora.rtm.demo
 {
     public class RtmClientParametersComponent : IRtmComponet
     {
-
         public InputField ParametersInput;
         public List<string> ParametersList = new List<string>();
 
@@ -43,7 +42,7 @@ namespace io.agora.rtm.demo
         public void OnMark()
         {
 
-            string show = "already set parameters:\n";
+            string show = "already set parameters size:" + ParametersList.Count + "\n";
             foreach (var parameter in ParametersList)
             {
                 show += ("    " + parameter + "\n");
