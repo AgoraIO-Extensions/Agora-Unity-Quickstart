@@ -33,10 +33,10 @@ namespace Agora_RTC_Plugin.API_Example
         [MenuItem("Build/Android")]
         public static void BuildAndrod()
         {
-
+            EditorUserBuildSettings.exportAsGoogleAndroidProject = true;
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
             buildPlayerOptions.scenes = GetAllScenes();
-            buildPlayerOptions.locationPathName = "../Build/Android.apk";
+            buildPlayerOptions.locationPathName = "../Build/android_studio";
             buildPlayerOptions.target = BuildTarget.Android;
             buildPlayerOptions.options = BuildOptions.None;
 
