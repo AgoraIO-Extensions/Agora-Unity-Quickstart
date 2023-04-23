@@ -90,8 +90,8 @@ If you have any problems or suggestions regarding the sample projects, feel free
 
 ## Reference
 
-- You can find full API document at [Document Center](https://docs.agora.io/en/video-call-4.x/api-ref)
-- You can find full release note at [Release Note](https://docs.agora.io/en/video-call-4.x/release_unity_ng?platform=Unity)
+- You can find full API document at [Document Center](https://api-ref.agora.io/en/video-sdk/unity/4.x/API/rtc_api_overview_ng.html)
+- You can find full release note at [Release Note](https://docs.agora.io/en/video-calling/reference/release-notes?platform=unity)
 - You can file issues about this demo at [issue](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/issues)
 
 ## Related resources
