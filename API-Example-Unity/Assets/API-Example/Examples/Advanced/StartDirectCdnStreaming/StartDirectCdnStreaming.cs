@@ -82,9 +82,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
             var btn = this.transform.Find("StartButton").GetComponent<Button>();
             btn.onClick.AddListener(this.OnStartButtonPress);
 
-            btn = this.transform.Find("UpdateButton").GetComponent<Button>();
-            btn.onClick.AddListener(this.OnUpdateButtonPress);
-
             btn = this.transform.Find("StopButton").GetComponent<Button>();
             btn.onClick.AddListener(this.OnStopButtonPress);
         }
@@ -122,16 +119,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
             MakeVideoView(0);
         }
 
-        private void OnUpdateButtonPress()
-        {
-            DirectCdnStreamingMediaOptions options = new DirectCdnStreamingMediaOptions();
-            options.publishMicrophoneTrack.SetValue(true);
-            options.publishCameraTrack.SetValue(false);
-
-            var nRet = RtcEngine.UpdateDirectCdnStreamingMediaOptions(options);
-            this.Log.UpdateLog("UpdateDirectCdnStreamingMediaOptions:" + nRet);
-        }
-
         private void OnStopButtonPress()
         {
             var nRet = RtcEngine.StopDirectCdnStreaming();
@@ -144,11 +131,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
             RtcEngine.EnableVideo();
             RtcEngine.SetChannelProfile(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING);
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-        }
-
-        private void StartDirectCdnStreamingCamera()
-        {
-           
         }
 
         private void OnDestroy()
