@@ -92,9 +92,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRtmpStreamWithTran
             var btn = this.transform.Find("StartButton").GetComponent<Button>();
             btn.onClick.AddListener(this.OnStartButtonPress);
 
-            btn = this.transform.Find("UpdateButton").GetComponent<Button>();
-            btn.onClick.AddListener(this.OnUpdateButtonPress);
-
             btn = this.transform.Find("StopButton").GetComponent<Button>();
             btn.onClick.AddListener(this.OnStopButtonPress);
         }
@@ -138,30 +135,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRtmpStreamWithTran
                     2.ffplay rtmp://play.xxxxxxxxxx
                  */
             }
-        }
-
-        private void OnUpdateButtonPress()
-        {
-            var liveTranscoding = new LiveTranscoding();
-            liveTranscoding.width = 640;
-            liveTranscoding.height = 960;
-            liveTranscoding.userCount = 1;
-            liveTranscoding.transcodingUsers = new TranscodingUser[1];
-            liveTranscoding.transcodingUsers[0] = new TranscodingUser()
-            {
-                uid = this.Uid,
-                x = 100,
-                y = 100,
-                width = 360,
-                height = 640,
-                alpha = 1,
-                zOrder = 1,
-                audioChannel = 0
-            };
-
-
-            var nRet = RtcEngine.UpdateRtmpTranscoding(liveTranscoding);
-            this.Log.UpdateLog("UpdateRtmpTranscoding:" + nRet);
         }
 
         private void OnStopButtonPress()
