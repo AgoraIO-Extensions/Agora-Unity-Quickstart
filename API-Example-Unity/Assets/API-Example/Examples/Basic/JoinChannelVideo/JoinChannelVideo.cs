@@ -45,6 +45,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
                 InitEngine();
                 SetBasicConfiguration();
             }
+
+#if UNITY_IOS || UNITY_ANDROID
+            var text = GameObject.Find("VideoCanvas/Scroll View/Viewport/Content/VideoDeviceManager").GetComponent<Text>();
+            text.text = "Video device manager not support in this platform";
+
+            GameObject.Find("VideoCanvas/Scroll View/Viewport/Content/VideoDeviceButton").SetActive(false);
+            GameObject.Find("VideoCanvas/Scroll View/Viewport/Content/deviceIdSelect").SetActive(false);
+            GameObject.Find("VideoCanvas/Scroll View/Viewport/Content/VideoSelectButton").SetActive(false);
+#endif
         }
 
         // Update is called once per frame
@@ -94,7 +103,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
         }
 
-        #region -- Button Events ---
+#region -- Button Events ---
 
         public void JoinChannel()
         {
@@ -185,7 +194,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             Log.UpdateLog("SelectVideoCaptureDevice ret:" + ret + " , DeviceId: " + deviceId);
         }
 
-        #endregion
+#endregion
 
         private void OnDestroy()
         {
@@ -201,7 +210,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             return _channelName;
         }
 
-        #region -- Video Render UI Logic ---
+#region -- Video Render UI Logic ---
 
         internal static void MakeVideoView(uint uid, string channelId = "")
         {
@@ -306,10 +315,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             }
         }
 
-        # endregion
+#endregion
     }
 
-    #region -- Agora Event ---
+#region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -377,5 +386,5 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
         }
     }
 
-    # endregion
+#endregion
 }
