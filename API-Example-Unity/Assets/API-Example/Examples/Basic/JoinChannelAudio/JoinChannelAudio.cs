@@ -45,6 +45,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
                 InitRtcEngine();
                 SetBasicConfiguration();
             }
+
+#if UNITY_IOS || UNITY_ANDROID
+            var text = GameObject.Find("Canvas/Scroll View/Viewport/Content/AudioDeviceManager").GetComponent<Text>();
+            text.text = "Audio device manager not support in this platform";
+
+            GameObject.Find("Canvas/Scroll View/Viewport/Content/AudioDeviceButton").SetActive(false);
+            GameObject.Find("Canvas/Scroll View/Viewport/Content/deviceIdSelect").SetActive(false);
+            GameObject.Find("Canvas/Scroll View/Viewport/Content/AudioSelectButton").SetActive(false);
+#endif
+
         }
 
         private void Update()
@@ -86,7 +96,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
         }
 
-        #region -- Button Events ---
+#region -- Button Events ---
 
         public void StartEchoTest()
         {
@@ -154,7 +164,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
             Log.UpdateLog("SelectAudioPlaybackDevice ret:" + ret + " , DeviceId: " + deviceId);
         }
 
-        #endregion
+#endregion
 
         private void OnDestroy()
         {
@@ -166,7 +176,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
         }
     }
 
-    #region -- Agora Event ---
+#region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -219,5 +229,5 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
         }
     }
 
-    #endregion
+#endregion
 }
