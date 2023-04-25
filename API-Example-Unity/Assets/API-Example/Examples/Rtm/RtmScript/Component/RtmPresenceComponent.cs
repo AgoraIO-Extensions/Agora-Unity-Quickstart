@@ -99,7 +99,7 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string info = string.Format("WhereNow Response: count:{1},errorCode:{2},"
+                string info = string.Format("WhereNow Response: count:{0},errorCode:{1},"
                     , result.Response.Count, result.Response.ErrorCode);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
                 if (result.Response.Count > 0)
@@ -134,7 +134,7 @@ namespace io.agora.rtm.demo
             RTM_CHANNEL_TYPE channelType = (RTM_CHANNEL_TYPE)this.ChannelTypeDropDown.GetSelectValue();
             StateItem[] stateItems = this.ContanierStateItem.GetDataSource();
 
-            RtmScene.AddMessage("stateItem List: " + this.ContanierStateItem.ToString(), Message.MessageType.Info);
+            RtmScene.AddMessage("stateItem List: \n" + this.ContanierStateItem.ToString(), Message.MessageType.Info);
 
             IRtmPresence rtmPresence = this.RtmScene.RtmClient.GetPresence();
             var result = await rtmPresence.SetStateAsync(channelName, channelType, stateItems);
@@ -167,7 +167,7 @@ namespace io.agora.rtm.demo
             RTM_CHANNEL_TYPE channelType = (RTM_CHANNEL_TYPE)this.ChannelTypeDropDown.GetSelectValue();
             string[] keys = this.ContainerKey.GetDataSource();
 
-            RtmScene.AddMessage("key List: " + this.ContainerKey.ToString(), Message.MessageType.Info);
+            RtmScene.AddMessage("key List: \n" + this.ContainerKey.ToString(), Message.MessageType.Info);
 
             IRtmPresence rtmPresence = this.RtmScene.RtmClient.GetPresence();
 

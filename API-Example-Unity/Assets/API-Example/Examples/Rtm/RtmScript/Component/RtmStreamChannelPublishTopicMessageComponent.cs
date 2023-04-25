@@ -17,6 +17,7 @@ namespace io.agora.rtm.demo
         public void Start()
         {
             this.SendTsInput.text = "0";
+            this.TypeDropDown.Init<RTM_MESSAGE_TYPE>();
         }
 
         public async void OnPublishTopicMessage()

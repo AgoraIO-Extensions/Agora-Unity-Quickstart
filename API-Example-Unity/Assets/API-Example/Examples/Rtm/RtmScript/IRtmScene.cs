@@ -42,14 +42,8 @@ namespace io.agora.rtm.demo
             }
         }
 
-        public async void OnDestroy()
+        public void OnDestroy()
         {
-            if (this.StreamChannel != null)
-            {
-                RtmResult<LeaveResult> rtmResult = await StreamChannel.LeaveAsync();
-                StreamChannel.Dispose();
-                AddMessage("StreamChannel.Leave + ret:" + rtmResult.Status.ErrorCode, Message.MessageType.Info);
-            }
             if (RtmClient != null)
             {
                 RtmClient.Dispose();

@@ -58,10 +58,10 @@ namespace io.agora.rtm.demo
         {
             string str = "";
 
-            T[] comps = this.GetComponentsInChildren<T>();
+            ListItem<T>[] comps = this.GetComponentsInChildren<ListItem<T>>();
             foreach (var com in comps)
             {
-                str += (com.ToString() + "-------\n");
+                str += ("------" + com.ToString() + "\n");
             }
             return str;
         }

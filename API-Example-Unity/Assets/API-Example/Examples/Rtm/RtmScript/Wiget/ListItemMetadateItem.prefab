@@ -556,7 +556,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 3785940556877276306}
+      - m_Target: {fileID: 1086954942095090141}
         m_MethodName: DestroySelf
         m_Mode: 1
         m_Arguments:
@@ -659,7 +659,7 @@ GameObject:
   - component: {fileID: 700889641088981778}
   - component: {fileID: 700889641088981776}
   - component: {fileID: 700889641088981779}
-  - component: {fileID: 3785940556877276306}
+  - component: {fileID: 1086954942095090141}
   m_Layer: 5
   m_Name: ListItemMetadateItem
   m_TagString: Untagged
@@ -729,7 +729,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
---- !u!114 &3785940556877276306
+--- !u!114 &1086954942095090141
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -738,10 +738,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 700889641088981781}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ed52eb87ffd4840fbb54711d6d2602e9, type: 3}
+  m_Script: {fileID: 11500000, guid: f34ddef3ec01f42be986d5de7c892df3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  UserInput: {fileID: 700889640345459340}
+  KeyInput: {fileID: 700889640345459340}
+  ValueInput: {fileID: 2029819925578058090}
+  AuthorUserIdInput: {fileID: 8790883296348049604}
+  RevisionInput: {fileID: 7722396686949384078}
+  UpdateTsInput: {fileID: 3127832242850691464}
 --- !u!1 &700889641916772623
 GameObject:
   m_ObjectHideFlags: 0

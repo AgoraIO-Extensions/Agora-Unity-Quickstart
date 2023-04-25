@@ -43,7 +43,7 @@ namespace io.agora.rtm.demo
             RtmMetadata rtmMetadata = new RtmMetadata();
             rtmMetadata.majorRevision = long.Parse(this.MajorRevisionInput.text);
             rtmMetadata.metadataItems = this.ContainerMetadataItem.GetDataSource();
-            RtmScene.AddMessage("metadataItem List: " + this.ContainerMetadataItem.ToString(), Message.MessageType.Info);
+            RtmScene.AddMessage("metadataItem List: \n" + this.ContainerMetadataItem.ToString(), Message.MessageType.Info);
 
             IRtmStorage rtmStorage = RtmScene.RtmClient.GetStorage();
 
@@ -90,7 +90,7 @@ namespace io.agora.rtm.demo
             RtmMetadata rtmMetadata = new RtmMetadata();
             rtmMetadata.majorRevision = long.Parse(this.MajorRevisionInput.text);
             rtmMetadata.metadataItems = this.ContainerMetadataItem.GetDataSource();
-            RtmScene.AddMessage("metadataItem List: " + this.ContainerMetadataItem.ToString(), Message.MessageType.Info);
+            RtmScene.AddMessage("metadataItem List: \n" + this.ContainerMetadataItem.ToString(), Message.MessageType.Info);
 
             IRtmStorage rtmStorage = RtmScene.RtmClient.GetStorage();
             var result = await rtmStorage.UpdateUserMetadataAsync(userId, rtmMetadata, metadataOptions);
@@ -136,7 +136,7 @@ namespace io.agora.rtm.demo
             RtmMetadata rtmMetadata = new RtmMetadata();
             rtmMetadata.majorRevision = long.Parse(this.MajorRevisionInput.text);
             rtmMetadata.metadataItems = this.ContainerMetadataItem.GetDataSource();
-            RtmScene.AddMessage("metadataItem List: " + this.ContainerMetadataItem.ToString(), Message.MessageType.Info);
+            RtmScene.AddMessage("metadataItem List: \n" + this.ContainerMetadataItem.ToString(), Message.MessageType.Info);
 
             IRtmStorage rtmStorage = RtmScene.RtmClient.GetStorage();
             var result = await rtmStorage.RemoveUserMetadataAsync(userId, rtmMetadata, metadataOptions);

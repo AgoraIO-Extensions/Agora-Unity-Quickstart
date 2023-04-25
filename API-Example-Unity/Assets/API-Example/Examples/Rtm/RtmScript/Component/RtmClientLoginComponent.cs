@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
+using Agora.Rtm;
 namespace io.agora.rtm.demo
 {
     public class RtmClientLoginComponent : IRtmComponet
@@ -72,6 +72,10 @@ namespace io.agora.rtm.demo
                 RtmScene.AddMessage("RtmClient not init!!!", Message.MessageType.Error);
                 return;
             }
+
+            string token = this.TokenInput.text;
+            RtmStatus rtmStatus = RtmScene.RtmClient.RenewToken(token);
+            RtmScene.AddMessage("rtmClient RenewToken: " + rtmStatus.ErrorCode, Message.MessageType.Info);
 
         }
 

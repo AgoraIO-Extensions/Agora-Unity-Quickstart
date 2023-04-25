@@ -107,7 +107,10 @@ namespace io.agora.rtm.demo
                 else
                 {
                     this.RtmScene.AddMessage("GetSubscribedTopic return size is " + userList.userCount, Message.MessageType.Error);
-                    this.ContainerUser.SetDataSource(userList.users);
+                    foreach(var user in userList.users)
+                    {
+                        this.RtmScene.AddMessage("--- " + user, Message.MessageType.Info);
+                    }
                 }
             }
         }
