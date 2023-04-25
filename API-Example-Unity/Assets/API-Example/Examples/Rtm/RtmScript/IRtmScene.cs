@@ -14,6 +14,8 @@ namespace io.agora.rtm.demo
         public IRtmLock RtmLock = null;
         public IRtmPresence RtmPresence = null;
         public IRtmStorage RtmStorage = null;
+        public string JoinedChannelName = null;
+        public uint JoinedUid = 0;
         public AppIdInput InfoInput;
         public MessageDisplay Display;
 
@@ -37,6 +39,25 @@ namespace io.agora.rtm.demo
             foreach (var rtmCom in comps)
             {
                 rtmCom.UpdateUI();
+            }
+        }
+
+        public async void OnDestroy()
+        {
+            if (this.StreamChannel != null)
+            {
+                RtmResult<LeaveResult> rtmResult = await StreamChannel.LeaveAsync();
+                StreamChannel.Dispose();
+                AddMessage("StreamChannel.Leave + ret:" + rtmResult.Status.ErrorCode, Message.MessageType.Info);
+            }
+            if (RtmClient != null)
+            {
+                RtmClient.Dispose();
+                RtmClient = null;
+            }
+            if (RtcEngine != null)
+            {
+                RtcEngine.Dispose();
             }
         }
     }

@@ -30,7 +30,7 @@ namespace io.agora.rtm.demo
 
             if (result.Status.Error)
             {
-                RtmScene.AddMessage("rtmClient.Login + ret:" + result.Status.ErrorCode, Message.MessageType.Info);
+                RtmScene.AddMessage("rtmClient.Login + ret:" + result.Status.ErrorCode, Message.MessageType.Error);
                 this.TitleText.text = "RtmClient login failed";
                 this.TitleText.color = Color.red;
             }

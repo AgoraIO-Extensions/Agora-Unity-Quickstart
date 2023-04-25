@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace io.agora.rtm.demo
 {
-    public class RtmStreamChannelTopicComponent : IRtmComponet
+    public class RtmStreamChannelJoinTopicComponent : IRtmComponet
     {
         public InputField TopicInput;
         public EnumDropDown QosDropDown;
@@ -16,6 +16,12 @@ namespace io.agora.rtm.demo
         public Toggle SyncWithMediaToggle;
         public List<string> TopicList = new List<string>();
 
+
+        public void Start()
+        {
+            this.QosDropDown.Init<RTM_MESSAGE_QOS>();
+            this.PriorityDropDown.Init<RTM_MESSAGE_PRIORITY>();
+        }
 
         public async void OnJoinTopic()
         {
@@ -30,8 +36,6 @@ namespace io.agora.rtm.demo
                 return;
             }
 
-
-
             JoinTopicOptions options = new JoinTopicOptions()
             {
                 qos = (RTM_MESSAGE_QOS)this.QosDropDown.GetSelectValue(),
@@ -43,7 +47,7 @@ namespace io.agora.rtm.demo
             var result = await this.RtmScene.StreamChannel.JoinTopicAsync(this.TopicInput.text, options);
             if (result.Status.Error)
             {
-                this.RtmScene.AddMessage(string.Format("StreamChannel.JoinTopic Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Info);
+                this.RtmScene.AddMessage(string.Format("StreamChannel.JoinTopic Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Error);
             }
             else
             {

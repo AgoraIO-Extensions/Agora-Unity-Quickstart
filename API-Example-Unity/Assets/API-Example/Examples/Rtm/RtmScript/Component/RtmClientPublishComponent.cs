@@ -52,7 +52,7 @@ namespace io.agora.rtm.demo
 
             if (result.Status.Error)
             {
-                RtmScene.AddMessage(string.Format("rtmClient.Publish Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Info);
+                RtmScene.AddMessage(string.Format("rtmClient.Publish Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Error);
             }
             else
             {

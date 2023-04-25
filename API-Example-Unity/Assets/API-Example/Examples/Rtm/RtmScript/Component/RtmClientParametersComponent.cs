@@ -41,7 +41,6 @@ namespace io.agora.rtm.demo
 
         public void OnMark()
         {
-
             string show = "already set parameters size:" + ParametersList.Count + "\n";
             foreach (var parameter in ParametersList)
             {
@@ -49,9 +48,5 @@ namespace io.agora.rtm.demo
             }
             RtmScene.AddMessage(show, Message.MessageType.Info);
         }
-
-
-
-
     }
 }

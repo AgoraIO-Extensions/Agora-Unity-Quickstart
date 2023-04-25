@@ -39,7 +39,7 @@ namespace io.agora.rtm.demo
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
             int nRet = rtcEngine.Initialize(context);
-            RtmScene.AddMessage("RtcEngine Init :" + nRet, Message.MessageType.Info);
+            RtmScene.AddMessage("RtcEngine Init :" + nRet, nRet == 0? Message.MessageType.Info: Message.MessageType.Error);
             rtcEngine.InitEventHandler(handler);
 
             RtmScene.RtcEngine = rtcEngine;
@@ -55,6 +55,28 @@ namespace io.agora.rtm.demo
         public UserEventHandler(RtcEngineComponent engineComponent)
         {
             this.EngineComponent = engineComponent;
+        }
+
+        public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
+        {
+            this.EngineComponent.RtmScene.AddMessage("RtcEngine join channel Sucess", Message.MessageType.Info);
+            this.EngineComponent.RtmScene.JoinedChannelName = connection.channelId;
+            this.EngineComponent.RtmScene.JoinedUid = connection.localUid;
+            this.EngineComponent.RtmScene.PostSatusNotify();
+        }
+
+        public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
+        {
+            this.EngineComponent.RtmScene.AddMessage("RtcEngine leave channel Sucess", Message.MessageType.Info);
+            this.EngineComponent.RtmScene.JoinedChannelName = null;
+            this.EngineComponent.RtmScene.JoinedUid = 0;
+            this.EngineComponent.RtmScene.PostSatusNotify();
+        }
+
+        public override void OnError(int err, string msg)
+        {
+            string show = string.Format("RtcEngine OnError err:{0} msg:{1}", err, msg);
+            this.EngineComponent.RtmScene.AddMessage(show, Message.MessageType.Error);
         }
     }
 
