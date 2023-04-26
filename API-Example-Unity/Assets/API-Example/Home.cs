@@ -61,6 +61,14 @@ public class Home : MonoBehaviour
         "VoiceChangerScene"
     };
 
+    private string[] _rtmNameList = {
+        "RtmClientScene",
+        "RtmStreamChannelScene",
+        "RtmLockScene",
+        "RtmPresenceScene",
+        "RtmStorageScene"
+    };
+
     private void Awake()
     {
         PermissionHelper.RequestMicrophontPermission();
@@ -84,6 +92,16 @@ public class Home : MonoBehaviour
             var go = Instantiate(CasePanel, content.transform);
             var name = go.transform.Find("Text").gameObject.GetComponent<Text>();
             name.text = _advancedNameList[i];
+            var button = go.transform.Find("Button").gameObject.GetComponent<Button>();
+            button.onClick.AddListener(OnJoinSceneClicked);
+            button.onClick.AddListener(SetScolllerActive);
+        }
+
+        for (int i = 0; i < _rtmNameList.Length; i++)
+        {
+            var go = Instantiate(CasePanel, content.transform);
+            var name = go.transform.Find("Text").gameObject.GetComponent<Text>();
+            name.text = _rtmNameList[i];
             var button = go.transform.Find("Button").gameObject.GetComponent<Button>();
             button.onClick.AddListener(OnJoinSceneClicked);
             button.onClick.AddListener(SetScolllerActive);

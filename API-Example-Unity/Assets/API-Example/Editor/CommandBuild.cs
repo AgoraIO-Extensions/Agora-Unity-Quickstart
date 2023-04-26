@@ -10,12 +10,22 @@ using UnityEngine;
 
 public class CommandBuild : MonoBehaviour
 {
-
-
     private static string[] GetAllScenes()
     {
         List<string> scenesList = new List<string>();
-        scenesList.Add("Assets/API-Example/Examples/Rtm/RTMScene.unity");
+        scenesList.Add("Assets/API-Example/HomeScene.unity");
+
+        string[] resFiles = AssetDatabase.FindAssets("t:Scene", new string[] { "Assets" });
+        for (int i = 0; i < resFiles.Length; i++)
+        {
+            resFiles[i] = AssetDatabase.GUIDToAssetPath(resFiles[i]);
+            Debug.Log(resFiles[i]);
+            if (resFiles[i] != "Assets/API-Example/HomeScene.unity")
+            {
+                scenesList.Add(resFiles[i]);
+            }
+        }
+
         return scenesList.ToArray();
     }
 
