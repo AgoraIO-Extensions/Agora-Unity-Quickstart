@@ -63,8 +63,8 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string info = string.Format("SetChannelMetadata Response : channelName:{0}, channelType:{1}, errorCode:{2}",
-                    result.Response.ChannelName, result.Response.ChannelType, result.Response.ErrorCode);
+                string info = string.Format("SetChannelMetadata Response : channelName:{0}, channelType:{1}",
+                    result.Response.ChannelName, result.Response.ChannelType);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
             }
         }
@@ -113,8 +113,8 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string info = string.Format("UpdateChannelMetadata Response: channelName:{0}, channelType:{1}, errorCode:{2}",
-                    result.Response.ChannelName, result.Response.ChannelType, result.Response.ErrorCode);
+                string info = string.Format("UpdateChannelMetadata Response: channelName:{0}, channelType:{1}",
+                    result.Response.ChannelName, result.Response.ChannelType);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
             }
         }
@@ -163,8 +163,8 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string info = string.Format("rtmStorage.RemoveChannelMetadata Response : channelName:{0}, channelType:{1}, errorCode:{2}",
-                    result.Response.ChannelName, result.Response.ChannelType, result.Response.ErrorCode);
+                string info = string.Format("rtmStorage.RemoveChannelMetadata Response : channelName:{0}, channelType:{1}",
+                    result.Response.ChannelName, result.Response.ChannelType);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
             }
 
@@ -196,8 +196,8 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string info = string.Format("rtmStorage.GetChannelMetadata Response ,channelName:{0},channelType:{1},errorCode:{2}",
-                    result.Response.ChannelName, result.Response.ChannelType, result.Response.ErrorCode);
+                string info = string.Format("rtmStorage.GetChannelMetadata Response ,channelName:{0},channelType:{1}",
+                    result.Response.ChannelName, result.Response.ChannelType);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
                 DisplayRtmMetadata(ref result.Response.Data);
             }

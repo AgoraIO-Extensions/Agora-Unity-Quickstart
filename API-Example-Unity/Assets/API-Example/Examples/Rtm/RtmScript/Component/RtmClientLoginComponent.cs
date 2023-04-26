@@ -36,7 +36,7 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                RtmScene.AddMessage("rtmClient.Login + respones:" + result.Response.ErrorCode, Message.MessageType.Info);
+                RtmScene.AddMessage("rtmClient.Login + respones:", Message.MessageType.Info);
                 this.TitleText.text = "RtmClient already login";
                 this.TitleText.color = Color.green;
             }

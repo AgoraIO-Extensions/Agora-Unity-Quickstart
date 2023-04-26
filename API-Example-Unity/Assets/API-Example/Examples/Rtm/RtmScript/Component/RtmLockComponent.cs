@@ -49,8 +49,8 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string info = string.Format("GetLocks Response: channelName:{0},channelType:{1},count:{2},errorCode:{3},",
-                    result.Response.ChannelName, result.Response.ChannelType, result.Response.Count, result.Response.ErrorCode);
+                string info = string.Format("GetLocks Response: channelName:{0},channelType:{1},count:{2}",
+                    result.Response.ChannelName, result.Response.ChannelType, result.Response.Count);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
                 if (result.Response.Count > 0)
                 {
@@ -98,8 +98,8 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string info = string.Format("RemoveLock Response channelName:{0},channelType:{1},lockName:{2},errorCode:{3}",
-                    result.Response.ChannelName, result.Response.ChannelType, result.Response.LockName, result.Response.ErrorCode);
+                string info = string.Format("RemoveLock Response channelName:{0},channelType:{1},lockName:{2}",
+                    result.Response.ChannelName, result.Response.ChannelType, result.Response.LockName);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
             }
         }
@@ -138,8 +138,8 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string info = string.Format("ReleaseLock Response:channelName:{0},channelType:{1},lockName:{2},errorCode:{3}",
-                   result.Response.ChannelName, result.Response.ChannelType, result.Response.LockName, result.Response.ErrorCode);
+                string info = string.Format("ReleaseLock Response:channelName:{0},channelType:{1},lockName:{2}",
+                   result.Response.ChannelName, result.Response.ChannelType, result.Response.LockName);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
             }
 
@@ -187,8 +187,8 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string info = string.Format("SetLock Response :channelName:{0}, channelType:{1}, lockName:{2} errorCode:{3}",
-                    result.Response.ChannelName, result.Response.ChannelType, result.Response.LockName, result.Response.ErrorCode);
+                string info = string.Format("SetLock Response :channelName:{0}, channelType:{1}, lockName:{2}",
+                    result.Response.ChannelName, result.Response.ChannelType, result.Response.LockName);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
             }
         }
@@ -228,8 +228,8 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string info = string.Format("AcquireLock Response : channelName:{0},channelType:{1},lockName:{2},errorCode:{3}",
-                    result.Response.ChannelName, result.Response.ChannelType, result.Response.LockName, result.Response.ErrorCode);
+                string info = string.Format("AcquireLock Response : channelName:{0},channelType:{1},lockName:{2}",
+                    result.Response.ChannelName, result.Response.ChannelType, result.Response.LockName);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
             }
         }
@@ -275,8 +275,8 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string info = string.Format("RevokeLock Response : channelName:{0},channelType:{1},lockName:{2},errorCode:{3}",
-                    result.Response.ChannelName, result.Response.ChannelType, result.Response.LockName, result.Response.ErrorCode);
+                string info = string.Format("RevokeLock Response : channelName:{0},channelType:{1},lockName:{2}",
+                    result.Response.ChannelName, result.Response.ChannelType, result.Response.LockName);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
             }
         }

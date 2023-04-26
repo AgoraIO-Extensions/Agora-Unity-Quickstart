@@ -54,8 +54,8 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string info = string.Format("SetUserMetadata Response : userId:{0}, errorCode:{1}",
-                    result.Response.UserId, result.Response.ErrorCode);
+                string info = string.Format("SetUserMetadata Response : userId:{0}",
+                    result.Response.UserId);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
             }
 
@@ -100,8 +100,8 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string info = string.Format("UpdateUserMetadata Response ,userId:{0}, errorCode:{1}",
-                    result.Response.UserId, result.Response.ErrorCode);
+                string info = string.Format("UpdateUserMetadata Response ,userId:{0}",
+                    result.Response.UserId);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
             }
 
@@ -146,8 +146,8 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string info = string.Format("RemoveUserMetadata Response ,userId:{0},errorCode:{1}",
-                    result.Response.UserId, result.Response.ErrorCode);
+                string info = string.Format("RemoveUserMetadata Response ,userId:{0}",
+                    result.Response.UserId);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
             }
         }
@@ -175,8 +175,8 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string info = string.Format("GetUserMetadata Response ,userId:{0}, errorCode:{1}",
-                    result.Response.UserId, result.Response.ErrorCode);
+                string info = string.Format("GetUserMetadata Response ,userId:{0}",
+                    result.Response.UserId);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
                 DisplayRtmMetadata(ref result.Response.Data);
             }
@@ -206,8 +206,8 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string info = string.Format("SubscribeUserMetadata Response userId:{0}, errorCode:{1}",
-                    result.Response.UserId, result.Response.ErrorCode);
+                string info = string.Format("SubscribeUserMetadata Response userId:{0}",
+                    result.Response.UserId);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
             }
 

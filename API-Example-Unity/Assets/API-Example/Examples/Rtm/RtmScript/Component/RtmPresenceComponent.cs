@@ -56,8 +56,8 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string info = string.Format("WhoNow Response : count:{0},errorCode:{1},nextPage:{2}",
-                    result.Response.Count, result.Response.ErrorCode, result.Response.NextPage);
+                string info = string.Format("WhoNow Response : count:{0},nextPage:{1}",
+                    result.Response.Count, result.Response.NextPage);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
                 if (result.Response.Count > 0)
                 {
@@ -99,8 +99,8 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string info = string.Format("WhereNow Response: count:{0},errorCode:{1},"
-                    , result.Response.Count, result.Response.ErrorCode);
+                string info = string.Format("WhereNow Response: count:{0}"
+                    , result.Response.Count);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
                 if (result.Response.Count > 0)
                 {
@@ -144,7 +144,7 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string info = string.Format("SetState Response : errorCode:{0}", result.Response.ErrorCode);
+                string info = string.Format("SetState Response");
                 RtmScene.AddMessage(info, Message.MessageType.Info);
             }
         }
@@ -178,7 +178,7 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string info = string.Format("RemoveState Response : ErrorCode:{0},", result.Response.ErrorCode);
+                string info = string.Format("RemoveState Response");
                 RtmScene.AddMessage(info, Message.MessageType.Info);
             }
 
@@ -217,7 +217,7 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string info = string.Format("rtmPresence.GetState Response ,errorCode:{0},", result.Response.ErrorCode);
+                string info = string.Format("rtmPresence.GetState Response");
                 RtmScene.AddMessage(info, Message.MessageType.Info);
 
                 string info2 = string.Format("userStateList userId:{0}, stateCount:{1}",

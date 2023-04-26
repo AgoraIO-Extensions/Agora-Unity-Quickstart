@@ -56,7 +56,7 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string info = string.Format("rtmClient.Publish Response , errorCode:{0}", result.Response.ErrorCode);
+                string info = string.Format("rtmClient.Publish Response");
                 RtmScene.AddMessage(info, Message.MessageType.Info);
             }
 

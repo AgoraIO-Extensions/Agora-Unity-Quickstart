@@ -101,8 +101,8 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string str = string.Format("Join Response: channelName:{0} userId:{1} errorCode:{2}",
-                    result.Response.ChannelName, result.Response.UserId, result.Response.ErrorCode);
+                string str = string.Format("Join Response: channelName:{0} userId:{1}",
+                    result.Response.ChannelName, result.Response.UserId);
                 this.RtmScene.AddMessage(str, Message.MessageType.Info);
                 this.TitleText.text = "Steam channel already joined";
                 this.TitleText.color = Color.green;
@@ -125,8 +125,8 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string str = string.Format("StreamChannel.Leave Response: channelName:{0} userId:{1} errorCode:{2}",
-                    result.Response.ChannelName, result.Response.UserId, result.Response.ErrorCode);
+                string str = string.Format("StreamChannel.Leave Response: channelName:{0} userId:{1}",
+                    result.Response.ChannelName, result.Response.UserId);
                 this.RtmScene.AddMessage(str, Message.MessageType.Info);
                 this.TitleText.text = "Steam channel already leave";
                 this.TitleText.color = Color.red;

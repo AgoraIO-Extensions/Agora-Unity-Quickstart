@@ -51,8 +51,8 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string str = string.Format("StreamChannel.JoinTopic Response: channelName:{0} userId:{1} topic:{2} meta:{3} errorCode:{4}",
-                  result.Response.ChannelName, result.Response.UserId, result.Response.Topic, result.Response.Meta, result.Response.ErrorCode);
+                string str = string.Format("StreamChannel.JoinTopic Response: channelName:{0} userId:{1} topic:{2} meta:{3}",
+                  result.Response.ChannelName, result.Response.UserId, result.Response.Topic, result.Response.Meta);
                 this.RtmScene.AddMessage(str, Message.MessageType.Info);
                 this.TopicList.Add(this.TopicInput.text);
             }
@@ -80,8 +80,8 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string str = string.Format("StreamChannel.LeaveTopic Response: channelName:{0} userId:{1} topic:{2} meta:{3} errorCode:{4}",
-                  result.Response.ChannelName, result.Response.UserId, result.Response.Topic, result.Response.Meta, result.Response.ErrorCode);
+                string str = string.Format("StreamChannel.LeaveTopic Response: channelName:{0} userId:{1} topic:{2} meta:{3}",
+                  result.Response.ChannelName, result.Response.UserId, result.Response.Topic, result.Response.Meta);
                 this.RtmScene.AddMessage(str, Message.MessageType.Info);
                 this.TopicList.Remove(this.TopicInput.text);
             }

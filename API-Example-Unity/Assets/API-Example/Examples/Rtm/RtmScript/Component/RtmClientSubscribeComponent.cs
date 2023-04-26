@@ -48,7 +48,7 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                string info = string.Format("rtmClient.Subscribe Response , channelName:{0}, errorCode:{1}", result.Response.ChannelName, result.Response.ErrorCode);
+                string info = string.Format("rtmClient.Subscribe Response , channelName:{0}", result.Response.ChannelName);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
                 ChannelNameList.Add(channelName);
             }
