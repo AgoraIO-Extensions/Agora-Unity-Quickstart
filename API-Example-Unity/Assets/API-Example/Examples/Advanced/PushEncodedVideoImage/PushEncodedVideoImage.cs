@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Agora.Rtc;
- 
+
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
- 
+
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
 {
@@ -30,7 +30,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
         public string _channelName = "";
 
         public GameObject RolePrefab;
-      
+
         public Text LogText;
         internal Logger Log;
         internal IRtcEngineEx RtcEngine = null;
@@ -278,6 +278,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
         {
             _pushEncodedVideoImage.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
             PushEncodedVideoImage.MakeVideoView(uid, _pushEncodedVideoImage.GetChannelName());
+            VideoSubscriptionOptions options = new VideoSubscriptionOptions();
+            options.encodedFrameOnly.SetValue(false);
+            options.type.SetValue(VIDEO_STREAM_TYPE.VIDEO_STREAM_HIGH);
+            _pushEncodedVideoImage.RtcEngine.SetRemoteVideoSubscriptionOptions(uid, options);
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
@@ -291,7 +295,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
     {
         internal VideoEncodedImageReceiver()
         {
-           
+
         }
 
         public override bool OnEncodedVideoFrameReceived(uint uid, IntPtr imageBufferPtr, UInt64 length, EncodedVideoFrameInfo videoEncodedFrameInfo)
