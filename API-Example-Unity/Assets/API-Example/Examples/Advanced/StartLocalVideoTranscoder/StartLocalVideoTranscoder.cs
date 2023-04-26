@@ -37,8 +37,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
 
         internal List<uint> RemoteUserUids = new List<uint>();
 
-
-        public Toggle ToggleRecord;
         public Toggle TogglePrimartCamera;
         public Toggle ToggleSecondaryCamera;
         public Toggle TogglePng;
@@ -240,6 +238,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
 
             if (this.ToggleScreenShare.isOn)
             {
+                this.StopScreenShare();
                 if (this.StartScreenShare())
                 {
                     list.Add(new TranscodingVideoStream(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_SCREEN, 0, "", 0,480, 640, 640, 320, 1, 1, false));
@@ -252,6 +251,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
 
             if (this.ToggleMediaPlay.isOn)
             {
+                this.MediaPlayer.Stop();
                 var ret = this.MediaPlayer.Open("https://big-class-test.oss-cn-hangzhou.aliyuncs.com/61102.1592987815092.mp4", 0);
                 this.Log.UpdateLog("Media palyer ret:" + ret);
               
