@@ -49,7 +49,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
         private void Start()
         {
 #if  UNITY_ANDROID
-            this.LogText.text = "iOS/Android is not supported, but you could see how it works on the Editor for Windows/MacOS";
+            this.LogText.text = "Android is not supported, but you could see how it works on the Editor for Windows/MacOS";
 
 #else
 
