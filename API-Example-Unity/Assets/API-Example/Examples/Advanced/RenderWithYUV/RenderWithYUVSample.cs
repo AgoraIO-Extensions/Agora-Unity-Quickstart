@@ -4,8 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
- 
- 
+
+
 using System.Collections.Generic;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
@@ -150,7 +150,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
 
         #region -- Video Render UI Logic ---
 
-        internal static void MakeVideoView(uint uid, string channelId = "", bool useYUV = false, bool usePlane = false)
+        internal void MakeVideoView(uint uid, string channelId = "", bool useYUV = false, bool usePlane = false)
         {
             var go = GameObject.Find(uid.ToString());
             if (!ReferenceEquals(go, null))
@@ -181,7 +181,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
                 float scale = (float)height / (float)width;
 
                 if (usePlane)
-                    videoSurface.transform.localScale = new Vector3(-1, 1, 1 * scale);
+                    videoSurface.transform.localScale = new Vector3(-30, 30, 30 * scale);
                 else
                     videoSurface.transform.localScale = new Vector3(-5, 5 * scale, 1);
 
@@ -192,7 +192,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
         }
 
         // VIDEO TYPE 1: 3D Object
-        private static VideoSurface MakePlaneSurface(string goName, bool useYUV = false)
+        private VideoSurface MakePlaneSurface(string goName, bool useYUV = false)
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
@@ -203,9 +203,17 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
 
             go.name = goName;
             // set up transform
-            go.transform.Rotate(-90.0f, 0.0f, 0.0f);
-            go.transform.position = Vector3.zero;
-            go.transform.localScale = new Vector3(0.25f, 0.5f, 0.5f);
+            go.AddComponent<UIElementDrag>();
+
+            var father = GameObject.Find("3DParent");
+            if (father != null)
+            {
+                go.transform.SetParent(father.transform);
+                go.transform.Rotate(-90.0f, 0.0f, 0.0f);
+                var random = new System.Random();
+                go.transform.position = new Vector3(random.Next(-100, 100), random.Next(-100, 100), 0);
+                go.transform.localScale = new Vector3(10, 10, 10);
+            }
 
             var meshRenderer = go.GetComponent<MeshRenderer>();
             var shader = Shader.Find("Unlit/Texture");
@@ -215,7 +223,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
             }
             else
             {
-                Debug.Log("It looks like Unlit/Texture shader not include Always Includes Shaders. May be some videosurface will be pink");
+                Log.UpdateLog("It looks like Unlit/Texture shader not include Always Includes Shaders. May be some videosurface will be pink");
             }
 
             // configure videoSurface
@@ -229,7 +237,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
         }
 
         // Video TYPE 2: RawImage
-        private static VideoSurface MakeImageSurface(string goName, bool useYUV = false)
+        private VideoSurface MakeImageSurface(string goName, bool useYUV = false)
         {
             GameObject go = new GameObject();
 
@@ -311,7 +319,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));
 
-            RenderWithYUVSample.MakeVideoView(0, "", _sample.YUVToggle.isOn, _sample.PlaneToggle.isOn);
+            _sample.MakeVideoView(0, "", _sample.YUVToggle.isOn, _sample.PlaneToggle.isOn);
         }
 
         public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
@@ -339,7 +347,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
             _sample.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-            RenderWithYUVSample.MakeVideoView(uid, _sample.GetChannelName(), _sample.YUVToggle.isOn, _sample.PlaneToggle.isOn);
+            _sample.MakeVideoView(uid, _sample.GetChannelName(), _sample.YUVToggle.isOn, _sample.PlaneToggle.isOn);
             this.usersInChannel.Add(uid);
         }
 
