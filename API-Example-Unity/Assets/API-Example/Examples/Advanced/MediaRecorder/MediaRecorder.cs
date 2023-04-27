@@ -278,7 +278,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                     connection.channelId, connection.localUid, elapsed));
 
-            _sample.LocalRecorder = _sample.RtcEngine.CreateLocalMediaRecorder(connection);
+            _sample.LocalRecorder = _sample.RtcEngine.CreateMediaRecorder(new RecorderStreamInfo(connection.channelId, connection.localUid));
             _sample.LocalRecorder.SetMediaRecorderObserver(new MediaRecorderObserver(_sample));
             _sample.EnableUI(true);
             MediaRecorder.MakeVideoView(0);
