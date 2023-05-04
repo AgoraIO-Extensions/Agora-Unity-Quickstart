@@ -68,6 +68,18 @@
 #
 # ========== Guidelines End=============
 # --------------------------------------------------------------------------------------------------------------------------
+echo unitydemo_branch: $unitydemo_branch
+echo Unity_Version: $Unity_Version
+echo SDK_Version: $SDK_Version
+echo SDK_Url: $SDK_Url
+echo Build_Mac: $Build_Mac
+echo Build_Win: $Build_Win
+echo Build_IOS: $Build_IOS
+echo Build_IOS_SIGN: $Build_IOS_SIGN
+echo Build_Android: $Build_Android
+echo Plugin_Url: $Plugin_Url
+echo "yangqunshuage"
+
 
 echo Package_Publish: $Package_Publish
 echo is_tag_fetch: $is_tag_fetch
