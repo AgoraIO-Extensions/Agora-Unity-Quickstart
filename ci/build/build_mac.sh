@@ -150,7 +150,7 @@ done
 
 #upload all file
 demo_zips=`ls ./Demo_zip`
-for zip_file in ${Demo_zip}
+for zip_file in ${demo_zips}
 do
    python3 ${WORKSPACE}/artifactory_utils.py --action=upload_file --file=./Demo_zip/${zip_file} --project
 done
