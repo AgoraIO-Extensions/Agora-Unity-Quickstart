@@ -90,6 +90,7 @@ echo build_time: $build_time
 echo release_version: $release_version
 echo short_version: $short_version
 echo pwd: `pwd`
+root=`pwd`
 
 set -ex
 
@@ -100,10 +101,11 @@ mkdir build_temp
 cd build_temp
 python3 ${WORKSPACE}/artifactory_utils.py --action=download_file --file=$SDK_Url
 unzip -d ./ ./Agora_Unity_RTC_SDK_*.zip
+ls 
 echo "===========unzip finish================="
 $UNITY_DIR/Unity -quit -batchmode -nographics -createProject "sdk_project"
 echo "===========create sdk_project finish================="
-$UNITY_DIR/Unity -quit -batchmode -nographics -openProjects  "sdk_project" -importPackage "${root}/build_temp/Agora-RTC-Plugin.unitypackage"
+$UNITY_DIR/Unity -quit -batchmode -nographics -openProjects  "./sdk_project" -importPackage "./Agora-RTC-Plugin.unitypackage"
 echo "===========import sdk_project finish================="
 
 cd ${root}
