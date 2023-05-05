@@ -137,7 +137,7 @@ if [ "$Build_Android" == "true" ]; then
 fi
 
 
-echo "===========Wayang build end================="
+echo "===========Demo build end================="
 
 #zip all file
 mkdir Demo_zip
@@ -145,7 +145,7 @@ demo_files=`ls ./Build`
 for file in ${demo_files}
 do
     no_suffix_file=${file%.*}
-    7za a ./wayang_zip/Unity_Demo_${SDK_Version}_${no_suffix_file}_${build_date}_${build_time}.zip ./Build/${file}  
+    7za a ./Demo_zip/Unity_Demo_${SDK_Version}_${no_suffix_file}_${build_date}_${build_time}.zip ./Build/${file}  
 done
 
 #upload all file
