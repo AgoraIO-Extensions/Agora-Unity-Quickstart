@@ -2,7 +2,7 @@ Plugin_Url=$1
 WORKSPACE=$2
 cd build_temp
 python3 ${WORKSPACE}/artifactory_utils.py --action=download_file --file=$Plugin_Url
-unzip -d ./ ./VideoObserver_Plugin_for_All_*.zip
+unzip -d ./ ./VideoObserver_Plugin_*.zip
 ls ./
 
 RTCPluginPath=../API-Example-Unity/Assets/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins
