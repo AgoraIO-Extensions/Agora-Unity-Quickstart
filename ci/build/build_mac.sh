@@ -121,7 +121,7 @@ sed -i "" "s/appID:/appID: ${appID}/g" ./API-Example-Unity/Assets/API-Example/Ap
 #make plugin active
 if [ "$Plugin_Url" != "" ]; then
     echo "PluginScene激活中"
-    sh ./ci/build/package_plugin.sh ${Plugin_Url} ${WORKSPACE}
+    sh ./ci/build/package_plugin.sh ${Plugin_Url} ${WORKSPACE} || exit 1
 else
     echo "Plugin_Url 为空.跳过PluginScene"
 fi
