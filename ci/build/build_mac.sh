@@ -105,7 +105,7 @@ ls
 echo "===========unzip finish================="
 $UNITY_DIR/Unity -quit -batchmode -nographics -createProject "sdk_project"
 echo "===========create sdk_project finish================="
-$UNITY_DIR/Unity -quit -batchmode -nographics -openProjects  "./sdk_project" -importPackage "./Agora-RTC-Plugin.unitypackage"
+$UNITY_DIR/Unity -quit -batchmode -nographics -openProjects  "sdk_project" -importPackage "${root}/build_temp/Agora-RTC-Plugin.unitypackage"
 echo "===========import sdk_project finish================="
 
 cd ${root}
