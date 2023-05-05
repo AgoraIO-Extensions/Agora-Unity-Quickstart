@@ -5,6 +5,10 @@ using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 #endif 
 using UnityEngine;
+using UnityEditor.iOS.Xcode;
+using UnityEditor.iOS.Xcode.Extensions;
+using UnityEditor.Callbacks;
+using System.IO;
 
 namespace Agora_RTC_Plugin.API_Example
 {
@@ -87,6 +91,51 @@ namespace Agora_RTC_Plugin.API_Example
             Debug.Log("Build IPhone: " + message);
 #endif
         }
+
+
+        [PostProcessBuild(2)]
+        public static void OnPostprocessBuild(BuildTarget buildTarget, string path)
+        {
+            if (buildTarget == BuildTarget.iOS)
+            {
+                // linked library
+                string projPath = path + "/Unity-iPhone.xcodeproj/project.pbxproj";
+                PBXProject proj = new PBXProject();
+                proj.ReadFromFile(projPath);
+
+                string target = GetTargetGuid(proj);
+                proj.SetBuildProperty(target, "VALIDATE_WORKSPACE", "YES");
+                proj.SetBuildProperty(target, "PRODUCT_BUNDLE_IDENTIFIER", "io.agora.Unitydemo");
+
+#if UNITY_2019_3_OR_NEWER
+                string unityFrameWorkTarget = proj.GetUnityFrameworkTargetGuid();
+#else
+                string unityFrameWorkTarget = proj.TargetGuidByName("Unity-Framwork");
+#endif
+                proj.SetBuildProperty(unityFrameWorkTarget, "ENABLE_BITCODE", "NO");
+                proj.SetBuildProperty(unityFrameWorkTarget, "CODE_SIGN_STYLE", "Manual");
+                proj.SetBuildProperty(unityFrameWorkTarget, "SUPPORTS_MACCATALYST", "NO");
+
+                // done, write to the project file
+                File.WriteAllText(projPath, proj.WriteToString());
+
+
+                //Set Application supports iTunes file sharing to true
+                string pListPath = path + "/Info.plist";
+                PlistDocument plist = new PlistDocument();
+                plist.ReadFromString(File.ReadAllText(pListPath));
+                PlistElementDict rootDic = plist.root;
+                //Set Application supports iTunes file sharing to true
+                rootDic.SetBoolean("UIFileSharingEnabled", true);
+                rootDic.SetString("NSLocalNetworkUsageDescription", "for wayang");
+                PlistElementArray plistElementArray = rootDic.CreateArray("NSBonjourServices");
+                plistElementArray.AddString("_tictactoe._tcp");
+
+
+                File.WriteAllText(pListPath, plist.WriteToString());
+            }
+        }
+
 
         [MenuItem("Build/Mac")]
         public static void BuildMac()
@@ -184,6 +233,15 @@ namespace Agora_RTC_Plugin.API_Example
             BuildMac();
             BuildWin32();
             BuildWin64();
+        }
+
+        static string GetTargetGuid(PBXProject proj)
+        {
+#if UNITY_2019_3_OR_NEWER
+            return proj.GetUnityMainTargetGuid();
+#else
+            return proj.TargetGuidByName("Unity-iPhone");
+#endif
         }
 
     }

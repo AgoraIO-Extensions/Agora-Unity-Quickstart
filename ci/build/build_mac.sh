@@ -78,7 +78,6 @@ echo Build_IOS: $Build_IOS
 echo Build_IOS_SIGN: $Build_IOS_SIGN
 echo Build_Android: $Build_Android
 echo Plugin_Url: $Plugin_Url
-echo "yangqunshuage"
 
 
 echo Package_Publish: $Package_Publish
@@ -91,3 +90,64 @@ echo build_time: $build_time
 echo release_version: $release_version
 echo short_version: $short_version
 echo pwd: `pwd`
+
+set -ex
+
+UNITY_DIR=/Applications/Unity/Hub/Editor/${Unity_Version}/Unity.app/Contents/MacOS
+
+echo "===========create sdk_project begin================="
+mkdir build_temp
+cd build_temp
+python3 ${WORKSPACE}/artifactory_utils.py --action=download_file --file=$SDK_Url
+unzip -d ./ ./Agora_Unity_RTC_SDK_*.zip
+echo "===========unzip finish================="
+$UNITY_DIR/Unity -quit -batchmode -nographics -createProject "sdk_project"
+echo "===========create sdk_project finish================="
+$UNITY_DIR/Unity -quit -batchmode -nographics -openProjects  "sdk_project" -importPackage "${root}/build_temp/Agora-RTC-Plugin.unitypackage"
+echo "===========import sdk_project finish================="
+
+cd ${root}
+echo "===========Demo build begin================="
+cp -r build_temp/sdk_project/Assets/Agora-RTC-Plugin ./API-Example-Unity/Assets
+echo "===========copy Agora-RTC-Plugin to Assets finish ================="
+
+if [ "$Build_Mac" == "true" ]; then
+    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.CommandBuild.BuildMac   
+fi
+
+if [ "$Build_IOS" == "true" ]; then
+    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -buildTarget ios -executeMethod Agora_RTC_Plugin.API_Example.CommandBuild.BuildIPhone   
+    
+    if [ "$Build_IOS_SIGN" == "true" ]; then
+        sh ./ci/build/package_ios.sh ${WORKSPACE}
+    fi
+fi
+
+if [ "$Build_Win" == "true" ]; then
+    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.CommandBuild.BuildWin32   
+    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.CommandBuild.BuildWin64  
+fi
+
+if [ "$Build_Android" == "true" ]; then
+    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.CommandBuild.BuildAndrod   
+    sh ./ci/build/package_android.sh ${WORKSPACE}
+fi
+
+
+echo "===========Wayang build end================="
+
+#zip all file
+mkdir Demo_zip
+demo_files=`ls ./Build`
+for file in ${demo_files}
+do
+    no_suffix_file=${file%.*}
+    7za a ./wayang_zip/Unity_Demo_${SDK_Version}_${no_suffix_file}_${build_date}_${build_time}.zip ./Build/${file}  
+done
+
+#upload all file
+demo_zips=`ls ./Demo_zip`
+for zip_file in ${Demo_zip}
+do
+   python3 ${WORKSPACE}/artifactory_utils.py --action=upload_file --file=./Demo_zip/${zip_file} --project
+done
