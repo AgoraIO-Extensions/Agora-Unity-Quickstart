@@ -32,3 +32,4 @@ cp -rf ../ci/RawDataPlugins/* ${RTCPluginPath}
 #cs file
 sed -i "" "s/\/\/#define USE_PLUGIN/#define USE_PLUGIN/g" ../API-Example-Unity/Assets/API-Example/Examples/Advanced/Plugin/PluginSceneSample.cs
 
+cd ..
