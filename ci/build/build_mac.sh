@@ -127,12 +127,12 @@ if [ "$Build_IOS" == "true" ]; then
 fi
 
 if [ "$Build_Win" == "true" ]; then
-    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.CommandBuild.BuildWin32   
-    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.CommandBuild.BuildWin64  
+    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.CommandBuild.BuildWin32   
+    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.CommandBuild.BuildWin64  
 fi
 
 if [ "$Build_Android" == "true" ]; then
-    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.CommandBuild.BuildAndrod   
+    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.CommandBuild.BuildAndroid   
     sh ./ci/build/package_android.sh ${WORKSPACE}
 fi
 

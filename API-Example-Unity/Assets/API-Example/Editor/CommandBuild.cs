@@ -35,7 +35,7 @@ namespace Agora_RTC_Plugin.API_Example
         }
 
         [MenuItem("Build/Android")]
-        public static void BuildAndrod()
+        public static void BuildAndroid()
         {
             EditorUserBuildSettings.exportAsGoogleAndroidProject = true;
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
@@ -228,7 +228,7 @@ namespace Agora_RTC_Plugin.API_Example
         [MenuItem("Build/All")]
         public static void BuildAll()
         {
-            BuildAndrod();
+            BuildAndroid();
             BuildIPhone();
             BuildMac();
             BuildWin32();
