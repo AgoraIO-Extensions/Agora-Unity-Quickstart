@@ -78,6 +78,7 @@ echo Build_IOS: $Build_IOS
 echo Build_IOS_SIGN: $Build_IOS_SIGN
 echo Build_Android: $Build_Android
 echo Plugin_Url: $Plugin_Url
+echo appID: $appID
 
 
 echo Package_Publish: $Package_Publish
@@ -113,6 +114,17 @@ echo "===========Demo build begin================="
 rm -rf build_temp/sdk_project/Assets/Agora-RTC-Plugin/API-Example
 cp -r build_temp/sdk_project/Assets/Agora-RTC-Plugin ./API-Example-Unity/Assets
 echo "===========copy Agora-RTC-Plugin to Assets finish ================="
+
+#replace appID 
+sed -i "" "s/appID:/appID: ${appID}/g" ./API-Example-Unity/Assets/API-Example/AppIdInput/AppIdInput.asset
+
+#make plugin active
+if [ "$Plugin_Url" != "" ]; then
+    echo "PluginScene激活中"
+    sh package_plugin.sh ${Plugin_Url} ${WORKSPACE}
+else
+    echo "Plugin_Url 为空.跳过PluginScene"
+fi
 
 if [ "$Build_Mac" == "true" ]; then
     $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.CommandBuild.BuildMac   
