@@ -110,7 +110,7 @@ echo "===========import sdk_project finish================="
 
 cd ${root}
 echo "===========Demo build begin================="
-rm -rf build_temp/sdk_project/Assets/Agora-RTC-Plugin/API-Example-Unity
+rm -rf build_temp/sdk_project/Assets/Agora-RTC-Plugin/API-Example
 cp -r build_temp/sdk_project/Assets/Agora-RTC-Plugin ./API-Example-Unity/Assets
 echo "===========copy Agora-RTC-Plugin to Assets finish ================="
 
