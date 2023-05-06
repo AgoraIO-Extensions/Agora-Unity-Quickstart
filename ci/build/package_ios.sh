@@ -49,11 +49,11 @@ sh ${WORKSPACE}/sign ./Build/unityexample.ipa
 ls ./Build
 # ls ${WORKSPACE}
 
-mv ./unityexample_A.ipa ./Build/Unitywayang_A.ipa 
-mv ./unityexample_B.ipa ./Build/Unitywayang_B.ipa 
-mv ./unityexample_C.ipa ./Build/Unitywayang_C.ipa 
-mv ./unityexample_D.ipa ./Build/Unitywayang_D.ipa 
-mv ./unityexample_E.ipa ./Build/Unitywayang_E.ipa
+mv ./unityexample_A.ipa ./Build/unityexample_A.ipa 
+mv ./unityexample_B.ipa ./Build/unityexample_B.ipa 
+mv ./unityexample_C.ipa ./Build/unityexample_C.ipa 
+mv ./unityexample_D.ipa ./Build/unityexample_D.ipa 
+mv ./unityexample_E.ipa ./Build/unityexample_E.ipa
 
 echo "============Sign IPA Sucess============"
 
