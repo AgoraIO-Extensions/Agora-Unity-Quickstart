@@ -262,7 +262,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
             _agoraVideoRawData = agoraVideoRawData;
         }
 
-        public override bool OnCaptureVideoFrame(VideoFrame videoFrame, VideoFrameBufferConfig config)
+        public override bool OnCaptureVideoFrame(VIDEO_SOURCE_TYPE type, VideoFrame videoFrame)
         {
             Debug.Log("OnCaptureVideoFrame-----------" + " width:" + videoFrame.width + " height:" +
                         videoFrame.height);
@@ -275,9 +275,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
             return true;
         }
 
-        public override bool OnRenderVideoFrame(string channelId, uint uid, VideoFrame videoFrame)
+        public override bool OnRenderVideoFrame(string channelId, uint remoteUid, VideoFrame videoFrame)
         {
-            Debug.Log("OnRenderVideoFrameHandler-----------" + " uid:" + uid + " width:" + videoFrame.width +
+            Debug.Log("OnRenderVideoFrameHandler-----------" + " uid:" + remoteUid + " width:" + videoFrame.width +
                         " height:" + videoFrame.height);
             return true;
         }

@@ -63,7 +63,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             {
                 SetUpUI();
                 InitEngine();
-               
+
             }
         }
         // Update is called once per frame
@@ -82,7 +82,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
 
             JoinChannelButton = GameObject.Find("JoinChannelButton").GetComponent<Button>();
             JoinChannelButton.onClick.AddListener(JoinChannelAndInitMusicContentCenter);
-            
+
             GetMusicChartsButton = GameObject.Find("GetMusicCharts").GetComponent<Button>();
             GetMusicChartsButton.onClick.AddListener(OnGetMusicChartsButtonClick);
             GetMusicChartsButton.gameObject.SetActive(false);
@@ -120,7 +120,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             SearchInputField = GameObject.Find("SearchInputField").GetComponent<InputField>();
             SearchMusicButton = GameObject.Find("SearchMusic").GetComponent<Button>();
             SearchMusicButton.onClick.AddListener(OnSearchMusicButtonClick);
-        
+
         }
 
         private bool CheckAppId()
@@ -134,12 +134,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
 
         private void JoinChannelAndInitMusicContentCenter()
         {
-            if (RtmAppidInputField.text == "") {
-                 this.Log.UpdateLog("Please enter you rtm appid first");
+            if (RtmAppidInputField.text == "")
+            {
+                this.Log.UpdateLog("Please enter you rtm appid first");
                 return;
             }
 
-            if (RtmTokenInputField.text == "") {
+            if (RtmTokenInputField.text == "")
+            {
                 this.Log.UpdateLog("Please enter you rtm token first");
                 return;
             }
@@ -153,7 +155,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
 
             UInt64 mccUid = 0;
             UInt64.TryParse(RtmUidInputField.text, out mccUid);
-            if (mccUid == 0) {
+            if (mccUid == 0)
+            {
                 this.Log.UpdateLog("rtm uid must be UInt64");
                 return;
             }
@@ -164,11 +167,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             var appId = RtmAppidInputField.text;
             var rtmToken = RtmTokenInputField.text;
             MusicContentCenter = RtcEngine.GetMusicContentCenter();
-            var config = new MusicContentCenterConfiguration(appId, rtmToken, mccUid);
+            var config = new MusicContentCenterConfiguration(appId, rtmToken, mccUid, 10);
             var Ret = MusicContentCenter.Initialize(config);
             this.Log.UpdateLog("MusicContentCenter.Initialize: " + Ret);
 
-            if (Ret != 0) {
+            if (Ret != 0)
+            {
                 this.Log.UpdateLog("MusicContentCenter Initialize failed. Please check you appid, token or uid");
                 return;
             }
@@ -271,7 +275,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
                 return;
             }
 
-          
+
             var ret = MusicContentCenter.Preload(this.CurSongCode, "");
             this.Log.UpdateLog("Preload: " + ret);
         }
@@ -305,7 +309,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
 
         void OnSearchMusicButtonClick()
         {
-            if (this.SearchInputField.text == "") {
+            if (this.SearchInputField.text == "")
+            {
                 Debug.Log("SearchInputField text null");
                 return;
             }
@@ -511,14 +516,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             this._sample = sample;
         }
 
-        public override void OnLyricResult(string requestId, string lyricUrl)
+        public override void OnLyricResult(string requestId, string lyricUrl, MusicContentCenterStatusCode error_code)
         {
-            this._sample.Log.UpdateLog(string.Format("OnLyricResult requestId:{0} lyricUrl:{1}", requestId, lyricUrl));
+            this._sample.Log.UpdateLog(string.Format("OnLyricResult requestId:{0} lyricUrl:{1} error_code:{2}", requestId, lyricUrl, error_code));
         }
 
-        public override void OnMusicChartsResult(string requestId, MusicContentCenterStatusCode status, MusicChartInfo[] result)
+        public override void OnMusicChartsResult(string requestId, MusicChartInfo[] result, MusicContentCenterStatusCode error_code)
         {
-            this._sample.Log.UpdateLog(string.Format("OnMusicChartsResult requestId:{0} CopyRightMusicStatusCode:{1} result.count:{2}", requestId, status, result.Length));
+            this._sample.Log.UpdateLog(string.Format("OnMusicChartsResult requestId:{0} error_code:{1} result.count:{2}", requestId, error_code, result.Length));
             Debug.Log(result.ToString());
 
 
@@ -543,9 +548,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             this._sample.Log.UpdateLog("Select your Music Chart item please");
         }
 
-        public override void OnMusicCollectionResult(string requestId, MusicContentCenterStatusCode status, MusicCollection result)
+        public override void OnMusicCollectionResult(string requestId, MusicCollection result, MusicContentCenterStatusCode error_code)
         {
-            this._sample.Log.UpdateLog(string.Format("OnMusicCollectionResult requestId:{0} status:{1} result.count:{2}", requestId, status, result.count));
+            this._sample.Log.UpdateLog(string.Format("OnMusicCollectionResult requestId:{0} error_code:{1} result.count:{2}", requestId, error_code, result.count));
             var str = AgoraJson.ToJson<MusicCollection>(result);
             Debug.Log(str);
 
@@ -553,8 +558,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             this._sample.MusicCollectionSelect.gameObject.SetActive(true);
             this._sample.MusicCollectionSelect.ClearOptions();
             List<Dropdown.OptionData> optionDatas = new List<Dropdown.OptionData>();
-            foreach (var info in result.music) {
-                optionDatas.Add(new Dropdown.OptionData( info.name));
+            foreach (var info in result.music)
+            {
+                optionDatas.Add(new Dropdown.OptionData(info.name));
             }
             this._sample.MusicCollectionSelect.ClearOptions();
             this._sample.MusicCollectionSelect.AddOptions(optionDatas);
@@ -566,22 +572,22 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             this._sample.SelectedMusic.gameObject.SetActive(false);
 
             this._sample.Log.UpdateLog("Select your music item please");
-            
+
         }
 
-        public override void OnPreLoadEvent(long songCode, int percent, PreloadStatusCode status, string msg, string lyricUrl)
+        public override void OnPreLoadEvent(Int64 songCode, int percent, string lyricUrl, PreloadStatusCode status, MusicContentCenterStatusCode error_code)
         {
             Debug.Log("OnPreLoadEvent percent:" + percent);
             if (status == PreloadStatusCode.kPreloadStatusCompleted)
             {
-                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} status:{2}, msg:{3}, string:{4}", songCode, percent, status, msg, lyricUrl));
+                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} lyricUrl:{2} status:{3} error_code:{4}", songCode, percent, lyricUrl, status, error_code));
 
                 this._sample.OpenButton.gameObject.SetActive(true);
                 this._sample.GetLyricButton.gameObject.SetActive(true);
             }
             else if (status == PreloadStatusCode.kPreloadStatusCompleted)
             {
-                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} status:{2}, msg:{3}, string:{4}", songCode, percent, status, msg, lyricUrl));
+                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} lyricUrl:{2} status:{3} error_code:{4}", songCode, percent, lyricUrl, status, error_code));
 
                 this._sample.Log.UpdateLog("PreLoad Error, Please click PreLoad Button again");
             }

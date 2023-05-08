@@ -109,7 +109,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
 
-            var ret = RtcEngine.StartPrimaryCameraCapture(_config1);
+            var ret = RtcEngine.StartCameraCapture(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_PRIMARY, _config1);
             Log.UpdateLog(
                 string.Format("StartPrimaryCameraCapture returns: {0}", ret));
             ChannelMediaOptions options1 = new ChannelMediaOptions();
@@ -125,7 +125,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
 
         public void MainCameraLeaveChannel()
         {
-            RtcEngine.StopPrimaryCameraCapture();
+            RtcEngine.StopCameraCapture(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_PRIMARY);
             var ret = RtcEngine.LeaveChannel();
             Debug.Log("MainCameraLeaveChannel returns: " + ret);
         }
@@ -173,7 +173,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             _config2.cameraDirection = CAMERA_DIRECTION.CAMERA_REAR;
 #endif
 
-            var ret = RtcEngine.StartSecondaryCameraCapture(_config2);
+            var ret = RtcEngine.StartCameraCapture(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_SECONDARY, _config2);
             Log.UpdateLog(
                 string.Format("StartSecondaryCameraCapture returns: {0}", ret));
             ChannelMediaOptions options2 = new ChannelMediaOptions();
@@ -190,7 +190,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
 
         public void SecondCameraLeaveChannel()
         {
-            RtcEngine.StopSecondaryCameraCapture();
+            RtcEngine.StopCameraCapture(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_SECONDARY);
             var ret = RtcEngine.LeaveChannelEx(new RtcConnection(_channelName, 456));
             Debug.Log("SecondCameraLeaveChannel returns: " + ret);
         }
@@ -262,8 +262,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             Debug.Log("OnDestroy");
             if (RtcEngine == null) return;
             RtcEngine.InitEventHandler(null);
-            RtcEngine.StopSecondaryCameraCapture();
-            RtcEngine.StopPrimaryCameraCapture();
+            RtcEngine.StopCameraCapture(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_PRIMARY);
+            RtcEngine.StopCameraCapture(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_SECONDARY);
             RtcEngine.LeaveChannelEx(new RtcConnection(_channelName, 456));
             RtcEngine.LeaveChannel();
             RtcEngine.Dispose();

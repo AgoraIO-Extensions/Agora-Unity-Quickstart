@@ -303,7 +303,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WriteBackVideoRawData
     internal class VideoFrameObserver : IVideoFrameObserver
     {
 
-        public override bool OnCaptureVideoFrame(VideoFrame videoFrame, VideoFrameBufferConfig config)
+        public override bool OnCaptureVideoFrame(VIDEO_SOURCE_TYPE type, VideoFrame videoFrame)
         {
             int length = videoFrame.uStride * videoFrame.height / 2;
             byte[] bytes = new byte[length];

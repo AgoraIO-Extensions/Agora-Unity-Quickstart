@@ -101,7 +101,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
         {
             lock (_rtcLock)
             {
-                var nRet = RtcEngine.SetExternalAudioSource(true, SAMPLE_RATE, CHANNEL, 1);
+                var nRet = RtcEngine.SetExternalAudioSource(true, SAMPLE_RATE, CHANNEL);
                 this.Log.UpdateLog("SetExternalAudioSource nRet:" + nRet);
             }
         }
@@ -196,7 +196,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
                             {
                                 audioFrame.RawBuffer[j] = _audioBuffer.Get();
                             }
-                            nRet = RtcEngine.PushAudioFrame(MEDIA_SOURCE_TYPE.AUDIO_PLAYOUT_SOURCE, audioFrame);
+                            nRet = RtcEngine.PushAudioFrame(audioFrame, 0);
                             //Debug.Log("PushAudioFrame returns: " + nRet);
 
                         }
