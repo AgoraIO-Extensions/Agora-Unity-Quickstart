@@ -135,6 +135,8 @@ if [ "$Build_IOS" == "true" ]; then
     
     if [ "$Build_IOS_SIGN" == "true" ]; then
         sh ./ci/build/package_ios.sh ${WORKSPACE}
+    else 
+        rm -rf ./Build/IPhone
     fi
 fi
 
