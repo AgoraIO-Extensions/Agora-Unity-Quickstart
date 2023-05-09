@@ -24,7 +24,7 @@ cp ./VideoObserver_Plugin_for_Windows/Win32/*.dll ${RTCPluginPath}/x86 || exit 1
 cp ./VideoObserver_Plugin_for_Windows/x64/*.dll ${RTCPluginPath}/x86_64 || exit 1
 
 #mac
-# cp -PRf ./VideoObserver_Plugin_for_macOS/*.bundle ${RTCPluginPath}/macOS || exit 1
+cp -PRf ./VideoObserver_Plugin_for_macOS/*.bundle ${RTCPluginPath}/macOS || exit 1
 
 
 #meta file
