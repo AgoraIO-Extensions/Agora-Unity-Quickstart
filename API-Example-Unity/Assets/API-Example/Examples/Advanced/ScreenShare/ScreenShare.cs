@@ -209,6 +209,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 
 #endif
 
+            PublishBtn.gameObject.SetActive(true);
+            UnpublishBtn.gameObject.SetActive(true);
             //OnPublishButtonClick();
             ScreenShare.MakeVideoView(0, "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_SCREEN);
 
