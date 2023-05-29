@@ -5,11 +5,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
-using Agora.Util;
-using Logger = Agora.Util.Logger;
+
+
 using Random = UnityEngine.Random;
 using System.IO;
 using System.Runtime.InteropServices;
+using UnityEngine.Networking;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDataProviderExample
 {
@@ -57,6 +58,20 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
                 InitEngine();
                 InitMediaPlayer();
                 JoinChannelWithMPK();
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+                //In Android Platform, We need copy file to persistentDataPath.So we can read it.
+                if (File.Exists(Application.persistentDataPath + "/img/MPK.mp4"))
+                {
+                    this.Log.UpdateLog("MPK.mp4 already copy to persistentDataPath");
+                }
+                else
+                {
+                    this.Log.UpdateLog("Start CopyFileToPersistentDataPath");
+                    this.StartCoroutine(CopyFileToPersistentDataPath());
+                }
+#endif
+
             }
         }
 
@@ -188,17 +203,45 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
             this.Log.UpdateLog("Resume returns: " + ret);
         }
 
+        private System.Collections.IEnumerator CopyFileToPersistentDataPath()
+        {
+            var path = Application.streamingAssetsPath + "/img/MPK.mp4";
+            this.Log.UpdateLog("path: " + path);
+
+            UnityWebRequest webRequest = UnityWebRequest.Get(path);
+
+            yield return webRequest.SendWebRequest();
+
+            if (webRequest.isHttpError || webRequest.isNetworkError)
+            {
+                this.Log.UpdateLog(webRequest.error);
+            }
+            else
+            {
+                // Debug.Log(webRequest.downloadHandler.text);
+                byte[] bytes = webRequest.downloadHandler.data;
+                FileInfo file = new FileInfo(Application.persistentDataPath + "/MPK.mp4");
+                Stream stream = file.Create();
+                stream.Write(bytes, 0, bytes.Length);
+                stream.Close();
+                stream.Dispose();
+                this.Log.UpdateLog("MPK.mp4 already copy to persistentDataPath: " + Application.persistentDataPath + "/MPK.mp4");
+            }
+        }
+
         private void OnOpenButtonPress()
         {
             this.customDataProvider = new UserPlayerCustomDataProvider(this);
             string file;
+
 #if UNITY_ANDROID && !UNITY_EDITOR
-        // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
-            file = "/assets/img/MPK.mp4";
+            // On Android We already copy file into persistentDataPath
+            file = Application.persistentDataPath + "/MPK.mp4";
 #else
-            file = Application.streamingAssetsPath + "/img/" + "MPK.mp4";
+            file = Application.streamingAssetsPath + "/img/MPK.mp4";
 #endif
             this.customDataProvider.Open(file);
+            this.Log.UpdateLog("open file:" + file);
 
             var ret = MediaPlayer.OpenWithCustomSource(0, this.customDataProvider);
             this.Log.UpdateLog("OpenWithCustomSource: " + ret);
@@ -471,6 +514,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
                     fis = new FileStream(file, FileMode.Open, FileAccess.Read);
                     fileSize = fis.Length;
                     this._sample.Log.UpdateLog("open file sucess size: " + fileSize);
+                }
+                else
+                {
+                    this._sample.Log.UpdateLog("file not exists");
                 }
 
             }

@@ -3,8 +3,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
-using Agora.Util;
-using Logger = Agora.Util.Logger;
+ 
+ 
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MultChannelPush
 {
@@ -94,6 +94,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MultChannelPush
                     externalVideoFrame.rotation = 180;
                     externalVideoFrame.timestamp = 0;
                     var ret = rtc.PushVideoFrame(externalVideoFrame, _videoTrack1);
+                    this.Log.UpdateLog("PushVideoFrame 1: " + ret);
                 }
 
 
@@ -108,6 +109,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MultChannelPush
                     externalVideoFrame.rotation = 180;
                     externalVideoFrame.timestamp = 0;
                     var ret = rtc.PushVideoFrame(externalVideoFrame, _videoTrack2);
+                    this.Log.UpdateLog("PushVideoFrame 2: " + ret);
                 }
             }
         }

@@ -3,9 +3,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
-using Agora.Util;
+ 
 using System.Collections.Generic;
-using Logger = Agora.Util.Logger;
+ 
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
 {
@@ -35,22 +35,24 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
         internal IMusicPlayer MusicPlayer = null;
 
 
-        internal InputField RtmAppidInputField;
-        internal InputField RtmTokenInputField;
-        internal InputField RtmUidInputField;
-        internal Button JoinChannelButton;
+        public InputField RtmAppidInputField;
+        public InputField RtmTokenInputField;
+        public InputField RtmUidInputField;
+        public Button JoinChannelButton;
 
 
-        internal Button GetMusicChartsButton;
-        internal Dropdown MusicChartsSelect;
-        internal Dropdown MusicCollectionSelect;
-        internal Text SelectedMusic;
-        internal Button PreloadButton;
-        internal Button IsPreloadButton;
-        internal Button OpenButton;
-        internal Button GetLyricButton;
-        internal InputField SearchInputField;
-        internal Button SearchMusicButton;
+        public Button GetMusicChartsButton;
+        public Dropdown MusicChartsSelect;
+        public Dropdown MusicCollectionSelect;
+        public Text SelectedMusic;
+        public Button PreloadButton;
+        public Button IsPreloadButton;
+        public Button OpenButton;
+        public Button GetLyricButton;
+        public InputField SearchInputField;
+        public Button SearchMusicButton;
+        public Button GetChachesButton;
+        public Button RemoveCacheButton;
 
         internal MusicChartInfo[] CurMusicChartInfo = null;
         internal MusicCollection CurMusicCollection = null;
@@ -61,10 +63,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             LoadAssetData();
             if (CheckAppId())
             {
-                SetUpUI();
                 InitEngine();
-               
             }
+            hideUI();
         }
         // Update is called once per frame
         private void Update()
@@ -73,55 +74,24 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             PermissionHelper.RequestCameraPermission();
         }
 
-        private void SetUpUI()
+
+        private void hideUI()
         {
-
-            RtmAppidInputField = GameObject.Find("RtmAppidInputField").GetComponent<InputField>();
-            RtmTokenInputField = GameObject.Find("RtmTokenInputField").GetComponent<InputField>();
-            RtmUidInputField = GameObject.Find("RtmUidInputField").GetComponent<InputField>();
-
-            JoinChannelButton = GameObject.Find("JoinChannelButton").GetComponent<Button>();
-            JoinChannelButton.onClick.AddListener(JoinChannelAndInitMusicContentCenter);
-            
-            GetMusicChartsButton = GameObject.Find("GetMusicCharts").GetComponent<Button>();
-            GetMusicChartsButton.onClick.AddListener(OnGetMusicChartsButtonClick);
             GetMusicChartsButton.gameObject.SetActive(false);
-
-            MusicChartsSelect = GameObject.Find("MusicChartsSelect").GetComponent<Dropdown>();
-            MusicChartsSelect.onValueChanged.AddListener(this.OnMusicChartsSelectValueChanged);
             MusicChartsSelect.gameObject.SetActive(false);
-
-
-            MusicCollectionSelect = GameObject.Find("MusicCollectionSelect").GetComponent<Dropdown>();
-            MusicCollectionSelect.onValueChanged.AddListener(this.OnMusicCollectSelectValueChanged);
             MusicCollectionSelect.gameObject.SetActive(false);
 
-            SelectedMusic = GameObject.Find("SelectedMusic").GetComponent<Text>();
             SelectedMusic.gameObject.SetActive(false);
-
-            PreloadButton = GameObject.Find("Preload").GetComponent<Button>();
-            PreloadButton.onClick.AddListener(OnPreloadButtonClick);
             PreloadButton.gameObject.SetActive(false);
-
-            OpenButton = GameObject.Find("Open").GetComponent<Button>();
-            OpenButton.onClick.AddListener(OnOpenButtonClick);
-            OpenButton.gameObject.SetActive(false);
-
-            GetLyricButton = GameObject.Find("GetLyric").GetComponent<Button>();
-            GetLyricButton.onClick.AddListener(OnGetLyricButtonClick);
-            GetLyricButton.gameObject.SetActive(false);
-
-
-            IsPreloadButton = GameObject.Find("IsPreload").GetComponent<Button>();
-            IsPreloadButton.onClick.AddListener(OnIsPrelaodButtonClick);
             IsPreloadButton.gameObject.SetActive(false);
-
-
-            SearchInputField = GameObject.Find("SearchInputField").GetComponent<InputField>();
-            SearchMusicButton = GameObject.Find("SearchMusic").GetComponent<Button>();
-            SearchMusicButton.onClick.AddListener(OnSearchMusicButtonClick);
-        
+            OpenButton.gameObject.SetActive(false);
+            GetLyricButton.gameObject.SetActive(false);
+            SearchInputField.gameObject.SetActive(false);
+            SearchMusicButton.gameObject.SetActive(false);
+          
+            RemoveCacheButton.gameObject.SetActive(false);
         }
+
 
         private bool CheckAppId()
         {
@@ -129,17 +99,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
-
-
-
-        private void JoinChannelAndInitMusicContentCenter()
+        public void JoinChannelAndInitMusicContentCenter()
         {
-            if (RtmAppidInputField.text == "") {
-                 this.Log.UpdateLog("Please enter you rtm appid first");
+            if (RtmAppidInputField.text == "")
+            {
+                this.Log.UpdateLog("Please enter you rtm appid first");
                 return;
             }
 
-            if (RtmTokenInputField.text == "") {
+            if (RtmTokenInputField.text == "")
+            {
                 this.Log.UpdateLog("Please enter you rtm token first");
                 return;
             }
@@ -153,7 +122,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
 
             UInt64 mccUid = 0;
             UInt64.TryParse(RtmUidInputField.text, out mccUid);
-            if (mccUid == 0) {
+            if (mccUid == 0)
+            {
                 this.Log.UpdateLog("rtm uid must be UInt64");
                 return;
             }
@@ -164,11 +134,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             var appId = RtmAppidInputField.text;
             var rtmToken = RtmTokenInputField.text;
             MusicContentCenter = RtcEngine.GetMusicContentCenter();
-            var config = new MusicContentCenterConfiguration(appId, rtmToken, mccUid);
+            var config = new MusicContentCenterConfiguration(appId, rtmToken, mccUid, 10);
             var Ret = MusicContentCenter.Initialize(config);
             this.Log.UpdateLog("MusicContentCenter.Initialize: " + Ret);
 
-            if (Ret != 0) {
+            if (Ret != 0)
+            {
                 this.Log.UpdateLog("MusicContentCenter Initialize failed. Please check you appid, token or uid");
                 return;
             }
@@ -233,7 +204,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             this.Log.UpdateLog(logPath);
         }
 
-        void OnGetMusicChartsButtonClick()
+        public void OnGetMusicChartsButtonClick()
         {
             string requestId = "";
             var ret = MusicContentCenter.GetMusicCharts(ref requestId);
@@ -241,7 +212,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             this.Log.UpdateLog("requestId: " + requestId);
         }
 
-        void OnMusicChartsSelectValueChanged(int value)
+        public void OnMusicChartsSelectValueChanged(int value)
         {
             var info = this.CurMusicChartInfo[value];
 
@@ -251,7 +222,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             this.Log.UpdateLog("requestId: " + requestId);
         }
 
-        void OnMusicCollectSelectValueChanged(int value)
+        public void OnMusicCollectSelectValueChanged(int value)
         {
             this.CurSongCode = this.CurMusicCollection.music[value].songCode;
             this.SelectedMusic.gameObject.SetActive(true);
@@ -263,7 +234,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
         }
 
 
-        void OnPreloadButtonClick()
+        public void OnPreloadButtonClick()
         {
             if (this.CurSongCode == 0)
             {
@@ -271,12 +242,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
                 return;
             }
 
-          
+
             var ret = MusicContentCenter.Preload(this.CurSongCode, "");
             this.Log.UpdateLog("Preload: " + ret);
         }
 
-        void OnOpenButtonClick()
+        public void OnOpenButtonClick()
         {
             if (this.CurSongCode == 0)
             {
@@ -290,7 +261,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             MusicPlayerExample.MakeVideoView((uint)MusicPlayer.GetId(), "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_MEDIA_PLAYER);
         }
 
-        void OnGetLyricButtonClick()
+        public void OnGetLyricButtonClick()
         {
             if (this.CurSongCode == 0)
             {
@@ -303,9 +274,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             this.Log.UpdateLog("requestId: " + requestId);
         }
 
-        void OnSearchMusicButtonClick()
+        public void OnSearchMusicButtonClick()
         {
-            if (this.SearchInputField.text == "") {
+            if (this.SearchInputField.text == "")
+            {
                 Debug.Log("SearchInputField text null");
                 return;
             }
@@ -316,18 +288,40 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             this.Log.UpdateLog("requestId: " + requestId);
         }
 
-        void OnIsPrelaodButtonClick()
+        public void OnIsPrelaodButtonClick()
         {
-
             if (this.CurSongCode == 0)
             {
                 Debug.Log("this.CurSongCode is 0");
                 return;
             }
 
-            Music music = this.CurMusicCollection.music[0];
             var ret = MusicContentCenter.IsPreloaded(this.CurSongCode);
             this.Log.UpdateLog("IsPreloaded:" + ret);
+        }
+
+        public void OnGetCachesButtonClick()
+        {
+            MusicCacheInfo[] infos = null;
+            int cacheInfoSize = 10;
+            int nRet = MusicContentCenter.GetCaches(ref infos, ref cacheInfoSize);
+            this.Log.UpdateLog("GetCaches: " + nRet);
+            int length = infos.Length;
+            for (int i = 0; i < length; i++)
+            {
+                this.Log.UpdateLog(string.Format("songCode: {0}  status:{1}", infos[i].songCode, infos[i].status));
+            }
+        }
+
+        public void OnRemoveCacheButtonClick()
+        {
+            if (this.CurSongCode == 0)
+            {
+                Debug.Log("this.CurSongCode is 0");
+                return;
+            }
+            int nRet = MusicContentCenter.RemoveCache(this.CurSongCode);
+            this.Log.UpdateLog("RemoveCache: " + nRet);
         }
 
         private void OnDestroy()
@@ -511,18 +505,20 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             this._sample = sample;
         }
 
-        public override void OnLyricResult(string requestId, string lyricUrl)
+        public override void OnLyricResult(string requestId, string lyricUrl, MusicContentCenterStatusCode error_code)
         {
-            this._sample.Log.UpdateLog(string.Format("OnLyricResult requestId:{0} lyricUrl:{1}", requestId, lyricUrl));
+            this._sample.Log.UpdateLog(string.Format("OnLyricResult requestId:{0} lyricUrl:{1} error_code:{2}", requestId, lyricUrl, error_code));
         }
 
-        public override void OnMusicChartsResult(string requestId, MusicContentCenterStatusCode status, MusicChartInfo[] result)
+        public override void OnMusicChartsResult(string requestId, MusicChartInfo[] result, MusicContentCenterStatusCode error_code)
         {
-            this._sample.Log.UpdateLog(string.Format("OnMusicChartsResult requestId:{0} CopyRightMusicStatusCode:{1} result.count:{2}", requestId, status, result.Length));
+            this._sample.Log.UpdateLog(string.Format("OnMusicChartsResult requestId:{0} result.count:{1} error_code:{2} ", requestId, result.Length, error_code));
             Debug.Log(result.ToString());
 
-
+            this._sample.SearchInputField.gameObject.SetActive(true);
             this._sample.SearchMusicButton.gameObject.SetActive(true);
+            this._sample.GetChachesButton.gameObject.SetActive(true);
+            this._sample.RemoveCacheButton.gameObject.SetActive(true);
             this._sample.CurMusicChartInfo = result;
 
             this._sample.MusicChartsSelect.gameObject.SetActive(true);
@@ -543,9 +539,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             this._sample.Log.UpdateLog("Select your Music Chart item please");
         }
 
-        public override void OnMusicCollectionResult(string requestId, MusicContentCenterStatusCode status, MusicCollection result)
+        public override void OnMusicCollectionResult(string requestId, MusicCollection result, MusicContentCenterStatusCode error_code)
         {
-            this._sample.Log.UpdateLog(string.Format("OnMusicCollectionResult requestId:{0} status:{1} result.count:{2}", requestId, status, result.count));
+            this._sample.Log.UpdateLog(string.Format("OnMusicCollectionResult requestId:{0} result.count:{1} error_code:{2}", requestId, result.count, error_code));
             var str = AgoraJson.ToJson<MusicCollection>(result);
             Debug.Log(str);
 
@@ -553,8 +549,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             this._sample.MusicCollectionSelect.gameObject.SetActive(true);
             this._sample.MusicCollectionSelect.ClearOptions();
             List<Dropdown.OptionData> optionDatas = new List<Dropdown.OptionData>();
-            foreach (var info in result.music) {
-                optionDatas.Add(new Dropdown.OptionData( info.name));
+            foreach (var info in result.music)
+            {
+                optionDatas.Add(new Dropdown.OptionData(info.name));
             }
             this._sample.MusicCollectionSelect.ClearOptions();
             this._sample.MusicCollectionSelect.AddOptions(optionDatas);
@@ -566,24 +563,29 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             this._sample.SelectedMusic.gameObject.SetActive(false);
 
             this._sample.Log.UpdateLog("Select your music item please");
-            
+
         }
 
-        public override void OnPreLoadEvent(long songCode, int percent, PreloadStatusCode status, string msg, string lyricUrl)
+        public override void OnPreLoadEvent(Int64 songCode, int percent, string lyricUrl, PreloadStatusCode status, MusicContentCenterStatusCode error_code)
         {
             Debug.Log("OnPreLoadEvent percent:" + percent);
             if (status == PreloadStatusCode.kPreloadStatusCompleted)
             {
-                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} status:{2}, msg:{3}, string:{4}", songCode, percent, status, msg, lyricUrl));
+                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} lyricUrl:{2}, status:{3}, error_code:{4}", songCode, percent, lyricUrl, status, error_code));
 
                 this._sample.OpenButton.gameObject.SetActive(true);
                 this._sample.GetLyricButton.gameObject.SetActive(true);
             }
-            else if (status == PreloadStatusCode.kPreloadStatusCompleted)
+            else if (status == PreloadStatusCode.kPreloadStatusFailed)
             {
-                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} status:{2}, msg:{3}, string:{4}", songCode, percent, status, msg, lyricUrl));
+                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} lyricUrl:{2}, status:{3}, error_code:{4}", songCode, percent, lyricUrl, status, error_code));
 
-                this._sample.Log.UpdateLog("PreLoad Error, Please click PreLoad Button again");
+                this._sample.Log.UpdateLog("PreLoad Failed, Please click PreLoad Button again");
+            }
+            else if (status == PreloadStatusCode.kPreloadStatusRemoved)
+            {
+                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} lyricUrl:{2}, status:{3}, error_code:{4}", songCode, percent, lyricUrl, status, error_code));
+                this._sample.Log.UpdateLog("Remove completed");
             }
         }
     }

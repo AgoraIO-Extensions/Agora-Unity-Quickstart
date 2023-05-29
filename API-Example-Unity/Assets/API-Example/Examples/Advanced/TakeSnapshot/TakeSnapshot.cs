@@ -3,8 +3,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
-using Agora.Util;
-using Logger = Agora.Util.Logger;
+
+
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.TakeSnapshot
 {
@@ -290,7 +290,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.TakeSnapshot
             TakeSnapshot.DestroyVideoView(uid);
         }
 
-        public override void OnSnapshotTaken( RtcConnection connection, uint remoteUid, string filePath, int width, int height, int errCode)
+        public override void OnSnapshotTaken(RtcConnection connection, uint remoteUid, string filePath, int width, int height, int errCode)
         {
             _takeSnapshot.Log.UpdateLog(string.Format("OnSnapshotTaken: {0},{1},{2},{3}", filePath, width, height, errCode));
         }

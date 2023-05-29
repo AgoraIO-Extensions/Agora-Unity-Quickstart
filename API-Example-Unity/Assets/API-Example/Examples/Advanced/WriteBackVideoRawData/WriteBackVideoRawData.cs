@@ -4,8 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
-using Agora.Util;
-using Logger = Agora.Util.Logger;
+ 
+ 
 using System.Runtime.InteropServices;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WriteBackVideoRawData
@@ -170,8 +170,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WriteBackVideoRawData
             }
             // set up transform
             go.transform.Rotate(-90.0f, 0.0f, 0.0f);
-            var yPos = UnityEngine.Random.Range(3.0f, 5.0f);
-            var xPos = UnityEngine.Random.Range(-2.0f, 2.0f);
             go.transform.position = Vector3.zero;
             go.transform.localScale = new Vector3(0.25f, 0.5f, 0.5f);
 
@@ -303,7 +301,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WriteBackVideoRawData
     internal class VideoFrameObserver : IVideoFrameObserver
     {
 
-        public override bool OnCaptureVideoFrame(VideoFrame videoFrame, VideoFrameBufferConfig config)
+        public override bool OnCaptureVideoFrame(VIDEO_SOURCE_TYPE type, VideoFrame videoFrame)
         {
             int length = videoFrame.uStride * videoFrame.height / 2;
             byte[] bytes = new byte[length];

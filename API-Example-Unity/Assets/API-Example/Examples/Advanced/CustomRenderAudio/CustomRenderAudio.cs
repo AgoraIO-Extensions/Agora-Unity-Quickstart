@@ -5,8 +5,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
-using Agora.Util;
-using Logger = Agora.Util.Logger;
+ 
+ 
 using RingBuffer;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
@@ -93,7 +93,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
                 RtcEngineContext context = new RtcEngineContext(_appID, 0,
                                             CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                             AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
-                var ret = RtcEngine.Initialize(context);
+                RtcEngine.Initialize(context);
                 RtcEngine.InitEventHandler(handler);
             }
         }
@@ -166,8 +166,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
             var samplesPerSec = SAMPLE_RATE;
             var byteBuffer = new byte[samples * bytesPerSample];
             var freq = 1000 / PULL_FREQ_PER_SEC;
-
-            var tic = new TimeSpan(DateTime.Now.Ticks);
 
             AudioFrame audioFrame = new AudioFrame(type, samples, BYTES_PER_SAMPLE.TWO_BYTES_PER_SAMPLE, channels, samplesPerSec, null, 0, avsync_type);
             audioFrame.buffer = Marshal.AllocHGlobal(samples * bytesPerSample * channels);

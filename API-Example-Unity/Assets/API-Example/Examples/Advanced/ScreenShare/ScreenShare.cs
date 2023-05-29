@@ -3,9 +3,9 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Agora.Rtc;
-using Agora.Util;
+ 
 using UnityEngine.Serialization;
-using Logger = Agora.Util.Logger;
+ 
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 {
@@ -44,6 +44,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
         public Button ShowIconBtn;
         public RawImage IconImage;
         public RawImage ThumbImage;
+
+        private Rect _originThumRect = new Rect(0,0,500,260);
+        private Rect _originIconRect = new Rect(0,0,289,280);
 
         // Use this for initialization
         private void Start()
@@ -91,7 +94,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
-            RtcEngine.InitEventHandler(new UserEventHandler(this));
+            RtcEngine.InitEventHandler(handler);
         }
 
         private void SetBasicConfiguration()
@@ -155,11 +158,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             WinIdSelect.ClearOptions();
 
             SIZE t = new SIZE();
-            t.width = 360;
-            t.height = 240;
+            t.width = 1280;
+            t.height = 720;
             SIZE s = new SIZE();
-            s.width = 360;
-            s.height = 240;
+            s.width = 640;
+            s.height = 640;
             _screenCaptureSourceInfos = RtcEngine.GetScreenCaptureSources(t, s, true);
 
             WinIdSelect.AddOptions(_screenCaptureSourceInfos.Select(w =>
@@ -191,7 +194,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             {
                 var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
                 Log.UpdateLog(string.Format(">>>>> Start sharing {0}", windowId));
-                var nRet = RtcEngine.StartScreenCaptureByWindowId(ulong.Parse(windowId), default(Rectangle),
+                var nRet = RtcEngine.StartScreenCaptureByWindowId(long.Parse(windowId), default(Rectangle),
                         default(ScreenCaptureParameters));
                 this.Log.UpdateLog("StartScreenCaptureByWindowId:" + nRet);
             }
@@ -206,6 +209,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 
 #endif
 
+            PublishBtn.gameObject.SetActive(true);
+            UnpublishBtn.gameObject.SetActive(true);
             //OnPublishButtonClick();
             ScreenShare.MakeVideoView(0, "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_SCREEN);
 
@@ -249,11 +254,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 #if UNITY_STANDALONE_OSX
             texture = new Texture2D((int)thumbImageBuffer.width, (int)thumbImageBuffer.height, TextureFormat.RGBA32, false);
 #elif UNITY_STANDALONE_WIN
-            texture = new Texture2D((int)thumbImageBuffer.width, (int)thumbImageBuffer.height, TextureFormat.ARGB32, false);
+            texture = new Texture2D((int)thumbImageBuffer.width, (int)thumbImageBuffer.height, TextureFormat.BGRA32, false);
 #endif
             texture.LoadRawTextureData(thumbImageBuffer.buffer);
             texture.Apply();
             ThumbImage.texture = texture;
+
+            float scale = Math.Min((float)_originThumRect.width / (float)thumbImageBuffer.width, (float)_originThumRect.height / (float)thumbImageBuffer.height);
+            ThumbImage.rectTransform.sizeDelta = new Vector2(thumbImageBuffer.width * scale, thumbImageBuffer.height * scale);
         }
 
         public void OnShowIconButtonClick()
@@ -269,11 +277,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 #if UNITY_STANDALONE_OSX
             texture = new Texture2D((int)iconImageBuffer.width, (int)iconImageBuffer.height, TextureFormat.RGBA32, false);
 #elif UNITY_STANDALONE_WIN
-            texture = new Texture2D((int)iconImageBuffer.width, (int)iconImageBuffer.height, TextureFormat.ARGB32, false);
+            texture = new Texture2D((int)iconImageBuffer.width, (int)iconImageBuffer.height, TextureFormat.BGRA32, false);
 #endif
             texture.LoadRawTextureData(iconImageBuffer.buffer);
             texture.Apply();
             IconImage.texture = texture;
+
+
+            float scale = Math.Min((float)_originIconRect.width / (float)iconImageBuffer.width, (float)_originIconRect.height / (float)iconImageBuffer.height);
+            IconImage.rectTransform.sizeDelta = new Vector2(iconImageBuffer.width * scale, iconImageBuffer.height * scale);
+
         }
 
         #endregion

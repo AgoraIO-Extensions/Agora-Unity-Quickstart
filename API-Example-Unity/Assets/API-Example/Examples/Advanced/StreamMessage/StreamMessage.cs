@@ -2,8 +2,6 @@
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
-using Agora.Util;
-using Logger = Agora.Util.Logger;
 using System;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StreamMessage
@@ -104,6 +102,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StreamMessage
             if (text.text == "")
             {
                 Log.UpdateLog("Dont send empty message!");
+                return;
             }
 
             int streamId = this.CreateDataStreamId();

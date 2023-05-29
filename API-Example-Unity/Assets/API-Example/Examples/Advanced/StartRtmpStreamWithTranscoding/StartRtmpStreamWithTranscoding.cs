@@ -2,8 +2,8 @@
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
-using Agora.Util;
-using Logger = Agora.Util.Logger;
+ 
+ 
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRtmpStreamWithTranscoding
 {
@@ -242,8 +242,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRtmpStreamWithTran
             }
             // set up transform
             go.transform.Rotate(-90.0f, 0.0f, 0.0f);
-            var yPos = Random.Range(3.0f, 5.0f);
-            var xPos = Random.Range(-2.0f, 2.0f);
             go.transform.position = Vector3.zero;
             go.transform.localScale = new Vector3(0.25f, 0.5f, 0.5f);
 

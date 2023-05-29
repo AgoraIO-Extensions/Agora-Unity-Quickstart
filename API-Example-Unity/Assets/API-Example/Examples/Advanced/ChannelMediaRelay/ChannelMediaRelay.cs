@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using Agora.Rtc;
-using Agora.Util;
 using UnityEngine.Serialization;
-using Logger = Agora.Util.Logger;
+
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ChannelMediaRelay
 {
@@ -129,8 +128,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ChannelMediaRelay
             };
             config.destCount = 1;
 
-            var nRet = RtcEngine.StartChannelMediaRelay(config);
-            this.Log.UpdateLog("StartChannelMediaRelay nRet:" + nRet + " new ChannelName: " + this._appIdInput.channelName + "_2");
+            var nRet = RtcEngine.StartOrUpdateChannelMediaRelay(config);
+            this.Log.UpdateLog("StartOrUpdateChannelMediaRelay nRet:" + nRet + " new ChannelName: " + this._appIdInput.channelName + "_2");
         }
 
         private void onUpdateButtonClick()
@@ -153,7 +152,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ChannelMediaRelay
             config.destCount = 1;
 
             //after StartChannelMediaRelay you can use StartChannelMediaRelay to remove or relay to anthoner channel
-            var nRet = RtcEngine.UpdateChannelMediaRelay(config);
+            var nRet = RtcEngine.StartOrUpdateChannelMediaRelay(config);
             this.Log.UpdateLog("UpdateChannelMediaRelay nRet:" + nRet + " new ChannelName: " + this._appIdInput.channelName + "_3");
         }
 

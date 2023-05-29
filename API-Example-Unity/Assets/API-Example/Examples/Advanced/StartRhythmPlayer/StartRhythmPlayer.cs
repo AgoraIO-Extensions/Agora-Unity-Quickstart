@@ -3,8 +3,8 @@ using UnityEngine.UI;
 using UnityEngine.Serialization;
 using UnityEngine.SceneManagement;
 using Agora.Rtc;
-using Agora.Util;
-using Logger = Agora.Util.Logger;
+
+
 using System.IO;
 using System;
 
@@ -43,7 +43,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRhythmPlayer
                 InitEngine();
                 JoinChannel();
             }
-           
+
         }
 
         private void Update()
@@ -79,6 +79,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRhythmPlayer
 
             btn = this.gameObject.transform.Find("ConfigButton").GetComponent<Button>();
             btn.onClick.AddListener(OnConfigButtonPress);
+
+            btn = this.gameObject.transform.Find("PublishButton").GetComponent<Button>();
+            btn.onClick.AddListener(OnPublishButtonPress);
+
+            btn = this.gameObject.transform.Find("UnpublishButton").GetComponent<Button>();
+            btn.onClick.AddListener(OnUnpublishButtonPress);
         }
 
         private void InitEngine()
@@ -136,6 +142,22 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRhythmPlayer
             int nRet = RtcEngine.ConfigRhythmPlayer(config);
             this.Log.UpdateLog("ConfigRhythmPlayer nRet:" + nRet);
             this.Log.UpdateLog("beatsPerMeasure is config from 4 to 6");
+        }
+
+        private void OnPublishButtonPress()
+        {
+            ChannelMediaOptions options = new ChannelMediaOptions();
+            options.publishRhythmPlayerTrack.SetValue(true);
+            int nRet = RtcEngine.UpdateChannelMediaOptions(options);
+            this.Log.UpdateLog("UpdateChannelMediaOptions publish rhythmPlayerTrack:" + nRet);
+        }
+
+        private void OnUnpublishButtonPress()
+        {
+            ChannelMediaOptions options = new ChannelMediaOptions();
+            options.publishRhythmPlayerTrack.SetValue(false);
+            int nRet = RtcEngine.UpdateChannelMediaOptions(options);
+            this.Log.UpdateLog("UpdateChannelMediaOptions unpublish rhythmPlayerTrack:" + nRet);
         }
 
         private void OnDestroy()

@@ -3,9 +3,9 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Agora.Rtc;
-using Agora.Util;
+ 
 using UnityEngine.Serialization;
-using Logger = Agora.Util.Logger;
+ 
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCall
 {
@@ -139,7 +139,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
                                         CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
-            RtcEngine.InitEventHandler(new UserEventHandler(this));
+            RtcEngine.InitEventHandler(handler);
         }
 
         private void PrepareScreenCapture()
@@ -199,7 +199,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
             {
                 var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
                 Log.UpdateLog(string.Format(">>>>> Start sharing {0}", windowId));
-                var nRet = RtcEngine.StartScreenCaptureByWindowId(ulong.Parse(windowId), default(Rectangle),
+                var nRet = RtcEngine.StartScreenCaptureByWindowId(long.Parse(windowId), default(Rectangle),
                         default(ScreenCaptureParameters));
                 this.Log.UpdateLog("StartScreenCaptureByWindowId:" + nRet);
             }

@@ -2,8 +2,8 @@
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
-using Agora.Util;
-using Logger = Agora.Util.Logger;
+
+
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetBeautyEffectOptions
 {
@@ -84,6 +84,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetBeautyEffectOptions
                                         AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
+            int nRet = RtcEngine.EnableExtension("agora_video_filters_clear_vision", "clear_vision");
+            this.Log.UpdateLog(string.Format("EnableExtension:{0}", nRet));
         }
 
         private void JoinChannel()
@@ -227,8 +229,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SetBeautyEffectOptions
             }
             // set up transform
             go.transform.Rotate(-90.0f, 0.0f, 0.0f);
-            var yPos = Random.Range(3.0f, 5.0f);
-            var xPos = Random.Range(-2.0f, 2.0f);
             go.transform.position = Vector3.zero;
             go.transform.localScale = new Vector3(0.25f, 0.5f, 0.5f);
 

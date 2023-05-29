@@ -2,8 +2,8 @@
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
-using Agora.Util;
-using Logger = Agora.Util.Logger;
+ 
+ 
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
 {
@@ -139,7 +139,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
 
         void SetUpUI()
         {
-            var bufferLength = _videoFrameHeight * _videoFrameWidth * 4;
             _texture = new Texture2D(_videoFrameWidth, _videoFrameHeight, TextureFormat.RGBA32, false);
             _texture.Apply();
         }
@@ -262,7 +261,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
             _agoraVideoRawData = agoraVideoRawData;
         }
 
-        public override bool OnCaptureVideoFrame(VideoFrame videoFrame, VideoFrameBufferConfig config)
+        public override bool OnCaptureVideoFrame(VIDEO_SOURCE_TYPE type, VideoFrame videoFrame)
         {
             Debug.Log("OnCaptureVideoFrame-----------" + " width:" + videoFrame.width + " height:" +
                         videoFrame.height);

@@ -1,3 +1,4 @@
+
 # Screen sharing
 
 For screen sharing during video calls or interactive live broadcasts, the screen content of the speaker or the host can be shared with other speakers or viewers in the form of video to improve communication efficiency.
@@ -15,12 +16,12 @@ Before use screen sharing, make sure you have implemented basic real-time audio 
 
 ## Android Platform
 
-When use screen sharing on the Android platform, you only need to call `startScreenCapture` to enable screen sharing. You can refer to [agora-unity-example](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/release/4.0.0/API-Example-Unity/Assets/API-Example/Examples/Advanced/ScreenShare) `ScreenShare.cs` implements screen sharing.
+When use screen sharing on the Android platform, you only need to call `startScreenCapture` to enable screen sharing. You can refer to [agora-unity-example](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Advanced/ScreenShare), in which folder `ScreenShare.cs` implements screen sharing.
 
 ## iOS Platform
 
 - Due to system limitations, screen sharing only supports iOS 12.0 or later.
-- This feature requires high device performance, and Agora recommends that you use it on iPhone X and later models.
+- This feature requires high device performance, and Agora recommends that you use it on iPhone X (Nov, 2017) and later models.
 
 ### Technical Principle
 
@@ -132,31 +133,40 @@ Screen sharing on the iOS side is achieved by recording the screen using the iOS
        @end
      ```
 
-4. Select the Extension you created in **TARGETS**, add **Frameworks/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/iOS/** path in **General/Frameworks and Libraries** Download all frameworks.
+4. Select the Extension you created in **TARGETS**, and add all frameworks under the **Frameworks/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/iOS/** path in **General/Frameworks and Libraries**.
+![Unity-iPhone_—_Unity-iPhone_xcodeproj](https://user-images.githubusercontent.com/1261195/231263461-9ef70e04-798e-47f2-95ce-003b91bcf3ce.jpg)
+5. Call `startScreenCapture` in Unity C#, combined with the user's [manual action](#manual-actions), to enable the app to start screen sharing.
 
-5. Call `startScreenCapture`, combined with the user's manual action, to enable the app to start screen sharing.
-
-   - Method 1: Prompt the user to long press the **Screen Recording** button in the iOS control center, and choose to use the extension you created to start recording.
-
-   
-
-### Example Project
-
-Agora in [agora-unity-example](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/release/4.0.0/API-Example-Unity/Assets/API-Example/Examples/Advanced/ScreenShare) provides examples of screen sharing, you can refer to the following files to achieve screen sharing:
-
-- `ScreenShare.cs`
-
-### Development Considerations
+#### Development Considerations
 
 - Make sure the app and extension have the same TARGETS/Deployment/iOS version.
 
 - The Broadcast Upload Extension's memory usage is limited to 50 MB, please make sure that the extension's memory usage for screen sharing does not exceed 50 MB.
 - In the process of screen sharing, you need to call the `muteAllRemoteVideoStreams` and `muteAllRemoteAudioStreams` methods to cancel receiving streams from remote users to avoid repeated subscriptions.
 
+## Manual Actions
+Taking [the ShareScreen demo](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Advanced/ScreenShare) as example, the steps to properly share the screen on iOS should follow the steps:
+1. The order of buttons press should be: Join Channel -> Start Sharing -> Start Publish
+![ss_step1](https://user-images.githubusercontent.com/1261195/231244602-0609459e-aa40-4d0a-a816-7607a15b449f.jpg)
+2. You should see StartScreenCapture call return 0.  Here you may see a white box, since ScreenRecording has not started.
+![ss_step2](https://user-images.githubusercontent.com/1261195/231244623-092d3d71-e198-477c-901a-fd362f2e08cc.jpg)
+3. Access the iOS quick control panel, long press the Screen Recording button
+![ss_step3](https://user-images.githubusercontent.com/1261195/231244635-ef61fa63-a1b9-4dd7-9c51-fc9e991c8528.jpg)
+4. Select the App, in this example, we named it as "AgoraIOSScreenSharing".  And press "Start Broadcast"
+![ss_step4](https://user-images.githubusercontent.com/1261195/231246651-b1c02bc2-bd46-4191-b053-79507aedcb10.jpg)
+5. The "Screen Recording" title should be shown:
+![ss_step5](https://user-images.githubusercontent.com/1261195/231244674-351d667a-7b69-44a1-8901-020df4b6136d.jpg)
+6. Switch back into the App, you should see the local view now is showing the screen.
+![IMG_0061](https://user-images.githubusercontent.com/1261195/231244714-3ae3b7e8-e964-4075-926a-ed23fff17ade.PNG)
+
+ 
+
+
+
 ## API Reference
 
-There are currently some usage restrictions and precautions for the screen sharing function, and there will be charges. Agora recommends that you read the following API reference before calling the API:
+There are currently some usage restrictions and precautions for the screen sharing function, and there could be future changes. Agora recommends that you read the following API reference before calling the API:
 
-- [`startScreenCapture`]()
-- [`stopScreenCapture`]()
-- [`updateScreenCaptureParameters`]()
+- [`startScreenCapture`](https://docs-preprod.agora.io/en/live-streaming-standard-4.x/API%20Reference/unity_ng/API/class_irtcengine.html#api_irtcengine_startscreencapture)
+- [`stopScreenCapture`](https://docs-preprod.agora.io/en/live-streaming-standard-4.x/API%20Reference/unity_ng/API/class_irtcengine.html#api_irtcengine_stopscreencapture)
+- [`updateScreenCaptureParameters`](https://docs-preprod.agora.io/en/live-streaming-standard-4.x/API%20Reference/unity_ng/API/class_irtcengine.html#api_irtcengine_updatescreencaptureparameters)

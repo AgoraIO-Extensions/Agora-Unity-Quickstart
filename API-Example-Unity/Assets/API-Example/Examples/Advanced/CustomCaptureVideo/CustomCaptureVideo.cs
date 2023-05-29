@@ -3,8 +3,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
-using Agora.Util;
-using Logger = Agora.Util.Logger;
+ 
+ 
 
 #if UNITY_2018_1_OR_NEWER
 using Unity.Collections;
@@ -38,7 +38,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
        
         private Texture2D _texture;
         private Rect _rect;
-        private int i = 0;
         private WebCamTexture _webCameraTexture;
         public RawImage RawImage;
         public Vector2 CameraSize = new Vector2(640, 480);

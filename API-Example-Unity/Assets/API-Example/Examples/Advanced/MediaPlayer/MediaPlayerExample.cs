@@ -4,8 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
-using Agora.Util;
-using Logger = Agora.Util.Logger;
+ 
+ 
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
 {
@@ -223,7 +223,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
 
         public void OnOpenWithCustomSource()
         {
-            var ret = MediaPlayer.OpenWithCustomSource(0, new UserPlayerCustomDataProvider(this));
+            var ret = MediaPlayer.OpenWithCustomSource(0, new UserPlayerCustomDataProvider());
             this.Log.UpdateLog("OpenWithCustomSource" + ret);
         }
 
@@ -536,11 +536,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
 
     internal class UserPlayerCustomDataProvider : IMediaPlayerCustomDataProvider
     {
-        MediaPlayerExample _sample;
-
-        internal UserPlayerCustomDataProvider(MediaPlayerExample sample)
+        internal UserPlayerCustomDataProvider()
         {
-            _sample = sample;
+            
         }
 
         public override Int64 OnSeek(Int64 offset, int whence)
