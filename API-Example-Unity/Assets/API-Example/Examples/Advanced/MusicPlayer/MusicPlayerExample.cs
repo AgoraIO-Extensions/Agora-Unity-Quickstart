@@ -516,14 +516,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             this._sample = sample;
         }
 
-        public override void OnLyricResult(string requestId, string lyricUrl, MusicContentCenterStatusCode error_code)
+        public override void OnLyricResult(string requestId, Int64 songCode, string lyricUrl, MusicContentCenterStatusCode errorCode)
         {
-            this._sample.Log.UpdateLog(string.Format("OnLyricResult requestId:{0} lyricUrl:{1} error_code:{2}", requestId, lyricUrl, error_code));
+            this._sample.Log.UpdateLog(string.Format("OnLyricResult requestId:{0} songCode:{1} lyricUrl:{2} errorCode:{3}", requestId, songCode, lyricUrl, errorCode));
         }
 
-        public override void OnMusicChartsResult(string requestId, MusicChartInfo[] result, MusicContentCenterStatusCode error_code)
+        public override void OnMusicChartsResult(string requestId, MusicChartInfo[] result, MusicContentCenterStatusCode errorCode)
         {
-            this._sample.Log.UpdateLog(string.Format("OnMusicChartsResult requestId:{0} error_code:{1} result.count:{2}", requestId, error_code, result.Length));
+            this._sample.Log.UpdateLog(string.Format("OnMusicChartsResult requestId:{0} errorCode:{1} result.count:{2}", requestId, errorCode, result.Length));
             Debug.Log(result.ToString());
 
 
@@ -548,9 +548,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             this._sample.Log.UpdateLog("Select your Music Chart item please");
         }
 
-        public override void OnMusicCollectionResult(string requestId, MusicCollection result, MusicContentCenterStatusCode error_code)
+        public override void OnMusicCollectionResult(string requestId, MusicCollection result, MusicContentCenterStatusCode errorCode)
         {
-            this._sample.Log.UpdateLog(string.Format("OnMusicCollectionResult requestId:{0} error_code:{1} result.count:{2}", requestId, error_code, result.count));
+            this._sample.Log.UpdateLog(string.Format("OnMusicCollectionResult requestId:{0} errorCode:{1} result.count:{2}", requestId, errorCode, result.count));
             var str = AgoraJson.ToJson<MusicCollection>(result);
             Debug.Log(str);
 
@@ -575,22 +575,27 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
 
         }
 
-        public override void OnPreLoadEvent(Int64 songCode, int percent, string lyricUrl, PreloadStatusCode status, MusicContentCenterStatusCode error_code)
+        public override void OnPreLoadEvent(string requestId, Int64 songCode, int percent, string lyricUrl, PreloadStatusCode status, MusicContentCenterStatusCode errorCode)
         {
             Debug.Log("OnPreLoadEvent percent:" + percent);
             if (status == PreloadStatusCode.kPreloadStatusCompleted)
             {
-                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} lyricUrl:{2} status:{3} error_code:{4}", songCode, percent, lyricUrl, status, error_code));
+                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} lyricUrl:{2} status:{3} errorCode:{4}", songCode, percent, lyricUrl, status, errorCode));
 
                 this._sample.OpenButton.gameObject.SetActive(true);
                 this._sample.GetLyricButton.gameObject.SetActive(true);
             }
             else if (status == PreloadStatusCode.kPreloadStatusCompleted)
             {
-                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} lyricUrl:{2} status:{3} error_code:{4}", songCode, percent, lyricUrl, status, error_code));
+                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} lyricUrl:{2} status:{3} errorCode:{4}", songCode, percent, lyricUrl, status, errorCode));
 
                 this._sample.Log.UpdateLog("PreLoad Error, Please click PreLoad Button again");
             }
+        }
+
+        public override void OnSongSimpleInfoResult(string requestId, long songCode, string simpleInfo, MusicContentCenterStatusCode errorCode)
+        {
+            throw new NotImplementedException();
         }
     }
 

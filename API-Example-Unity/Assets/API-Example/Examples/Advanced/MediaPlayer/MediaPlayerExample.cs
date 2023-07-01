@@ -471,11 +471,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
             _sample.Log.UpdateLog(string.Format("OnPreloadEvent src: {0}, @event: {1}", src, @event));
         }
 
-        public override void OnPositionChanged(Int64 position_ms)
+        public override void OnPositionChanged(Int64 positionMs, Int64 timestampMs)
         {
             if (!_sample.isGragged)
             {
-                _sample.Slider.value = position_ms;
+                _sample.Slider.value = positionMs;
             }
         }
     }
