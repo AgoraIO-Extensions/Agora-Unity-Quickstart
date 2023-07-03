@@ -152,7 +152,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
-            RtcEngine.RegisterVideoFrameObserver(new VideoFrameObserver(this), OBSERVER_MODE.RAW_DATA);
+            RtcEngine.RegisterVideoFrameObserver(new VideoFrameObserver(this),
+                VIDEO_OBSERVER_FRAME_TYPE.FRAME_TYPE_RGBA,
+                VIDEO_OBSERVER_POSITION.POSITION_POST_CAPTURER |
+                VIDEO_OBSERVER_POSITION.POSITION_PRE_RENDERER |
+                VIDEO_OBSERVER_POSITION.POSITION_PRE_ENCODER,
+                OBSERVER_MODE.RAW_DATA);
         }
 
         void JoinChannel()
@@ -279,11 +284,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
             Debug.Log("OnRenderVideoFrameHandler-----------" + " uid:" + uid + " width:" + videoFrame.width +
                         " height:" + videoFrame.height);
             return true;
-        }
-
-        public override VIDEO_OBSERVER_FRAME_TYPE GetVideoFormatPreference()
-        {
-            return VIDEO_OBSERVER_FRAME_TYPE.FRAME_TYPE_RGBA;
         }
     }
 
