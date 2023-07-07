@@ -56,10 +56,12 @@ namespace io.agora.rtm.demo
                 RtmClient.Dispose();
                 RtmClient = null;
             }
+#if AGORA_RTC
             if (RtcEngine != null)
             {
                 RtcEngine.Dispose();
             }
+#endif
         }
     }
 }
