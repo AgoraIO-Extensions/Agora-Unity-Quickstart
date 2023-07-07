@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+#if AGORA_RTC
 using Agora.Rtc;
+#endif
 using Agora.Rtm;
 using UnityEngine.Serialization;
 
