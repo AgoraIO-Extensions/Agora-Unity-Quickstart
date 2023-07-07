@@ -18,7 +18,9 @@ public class RtmBase : MonoBehaviour
     public InputField AppIdInputBox;
     public InputField TokenInputBox;
 
-    private IRtcEngine _rtcEngine;
+#if AGORA_RTC
+I   RtcEngine _rtcEngine;
+#endif
     private IRtmClient _rtmClient;
 
 

@@ -4,7 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+#if AGORA_RTC
 using Agora.Rtc;
+#endif
 using Agora.Rtm;
 
 namespace io.agora.rtm.demo
