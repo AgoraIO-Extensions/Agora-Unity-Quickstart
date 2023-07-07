@@ -19,7 +19,7 @@ public class RtmBase : MonoBehaviour
     public InputField TokenInputBox;
 
 #if AGORA_RTC
-I   RtcEngine _rtcEngine;
+    RtcEngine _rtcEngine;
 #endif
     private IRtmClient _rtmClient;
 
