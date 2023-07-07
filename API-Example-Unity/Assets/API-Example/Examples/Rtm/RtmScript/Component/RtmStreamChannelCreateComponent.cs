@@ -1,8 +1,10 @@
-﻿using System.Collections;
+﻿#define AGORA_RTC
+#define AGORA_RTM
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Agora.Rtm;
-using UnityEngine;
 using UnityEngine.UI;
 
 namespace io.agora.rtm.demo
@@ -50,6 +52,7 @@ namespace io.agora.rtm.demo
 
         public void OnGetFromRtcEngine()
         {
+#if AGORA_RTC
             if (this.RtmScene.RtcEngine == null)
             {
                 this.RtmScene.AddMessage("Rtc Engine is null", Message.MessageType.Error);
@@ -77,6 +80,10 @@ namespace io.agora.rtm.demo
             {
                 this.RtmScene.AddMessage("create rtm stream channel failed", Message.MessageType.Error);
             }
+#else
+             this.RtmScene.AddMessage("rtc engine is not include in sdk", Message.MessageType.Error);
+#endif
+
         }
 
 

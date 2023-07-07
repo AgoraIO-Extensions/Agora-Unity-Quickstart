@@ -1,4 +1,7 @@
-﻿using System.Collections;
+﻿#define AGORA_RTC
+#define AGORA_RTM
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Agora.Rtm;

@@ -1,4 +1,7 @@
-﻿using System.Collections;
+﻿#define AGORA_RTC
+#define AGORA_RTM
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Agora.Rtc;
@@ -8,7 +11,9 @@ namespace io.agora.rtm.demo
 {
     public class IRtmScene : MonoBehaviour
     {
+#if AGORA_RTC
         public IRtcEngine RtcEngine = null;
+#endif
         public IRtmClient RtmClient = null;
         public IStreamChannel StreamChannel = null;
         public IRtmLock RtmLock = null;

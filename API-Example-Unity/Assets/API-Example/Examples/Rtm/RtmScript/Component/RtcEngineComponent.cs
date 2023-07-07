@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿#define AGORA_RTC
+#define AGORA_RTM
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,12 +20,18 @@ namespace io.agora.rtm.demo
             this.AppIdInput.text = RtmScene.InfoInput.appID;
             this.TokenInput.text = RtmScene.InfoInput.token;
 
+#if AGORA_RTC
             this.TitleText.text = "RtcEngine not init";
             this.TitleText.color = Color.red;
+#else
+            this.TitleText.text = "RtcEngine not include sdk";
+            this.TitleText.color = Color.yellow;
+#endif
         }
 
         public void OnInit()
         {
+#if AGORA_RTC
             var appId = this.AppIdInput.text;
             if (appId == "")
             {
@@ -39,16 +47,17 @@ namespace io.agora.rtm.demo
                 CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
             int nRet = rtcEngine.Initialize(context);
-            RtmScene.AddMessage("RtcEngine Init :" + nRet, nRet == 0? Message.MessageType.Info: Message.MessageType.Error);
+            RtmScene.AddMessage("RtcEngine Init :" + nRet, nRet == 0 ? Message.MessageType.Info : Message.MessageType.Error);
             rtcEngine.InitEventHandler(handler);
 
             RtmScene.RtcEngine = rtcEngine;
             this.TitleText.text = "RtcEngine already init";
             this.TitleText.color = Color.green;
+#endif
         }
     }
 
-
+#if AGORA_RTC
     internal class UserEventHandler : IRtcEngineEventHandler
     {
         public RtcEngineComponent EngineComponent;
@@ -79,5 +88,6 @@ namespace io.agora.rtm.demo
             this.EngineComponent.RtmScene.AddMessage(show, Message.MessageType.Error);
         }
     }
+#endif
 
 }
