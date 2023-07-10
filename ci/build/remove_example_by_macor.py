@@ -3,10 +3,13 @@ import os
 import re 
 import shutil
 
-# xxxx/xxxx/code
+# xxxx/xxxx/Assets
 assets_root = sys.argv[1]
 RTC = sys.argv[2]
 RTM = sys.argv[3]
+
+
+print('remove example by macor.py {0},{1},{2}'.format(assets_root,RTC,RTM))
 
 def get_all_files(target_dir):
     files = []
