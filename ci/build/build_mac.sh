@@ -109,7 +109,7 @@ python3 ${WORKSPACE}/artifactory_utils.py --action=download_file --file=$SDK_Url
 unzip -d ./ ./Agora_Unity_*_SDK_*.zip
 ls 
 echo "===========unzip finish================="
-if [ "$RTC"=="true" ]; then
+if [ "$RTC" == "true" ]; then
     UNITYPACKAGE_NAME="Agora-RTC-Plugin.unitypackage"
 else 
     UNITYPACKAGE_NAME="Agora-RTM-Plugin.unitypackage"
