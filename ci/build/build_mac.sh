@@ -106,12 +106,18 @@ python3 $root/ci/build/remove_example_by_macor.py $root/API-Example-Unity/Assets
 mkdir build_temp
 cd build_temp
 python3 ${WORKSPACE}/artifactory_utils.py --action=download_file --file=$SDK_Url
-unzip -d ./ ./Agora_Unity_RTC_SDK_*.zip
+unzip -d ./ ./Agora_Unity_*_SDK_*.zip
 ls 
 echo "===========unzip finish================="
+if [ "$RTC"=="true" ]; then
+    UNITYPACKAGE_NAME="Agora-RTC-Plugin.unitypackage"
+else 
+    UNITYPACKAGE_NAME="Agora-RTM-Plugin.unitypackage"
+fi
+
 $UNITY_DIR/Unity -quit -batchmode -nographics -createProject "sdk_project"
 echo "===========create sdk_project finish================="
-$UNITY_DIR/Unity -quit -batchmode -nographics -openProjects  "sdk_project" -importPackage "${root}/build_temp/Agora-RTC-Plugin.unitypackage"
+$UNITY_DIR/Unity -quit -batchmode -nographics -openProjects  "sdk_project" -importPackage "${root}/build_temp/${UNITYPACKAGE_NAME}"
 echo "===========import sdk_project finish================="
 
 cd ${root}
