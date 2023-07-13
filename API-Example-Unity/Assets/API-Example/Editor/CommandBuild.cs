@@ -1,12 +1,17 @@
 ﻿using System.Collections.Generic;
 using UnityEditor;
+using UnityEngine;
 using UnityEditor.Build;
 #if UNITY_2018_4_OR_NEWER
 using UnityEditor.Build.Reporting;
 #endif 
-using UnityEngine;
+
+
+#if UNITY_IOS
 using UnityEditor.iOS.Xcode;
 using UnityEditor.iOS.Xcode.Extensions;
+#endif
+
 using UnityEditor.Callbacks;
 using System.IO;
 
@@ -16,25 +21,43 @@ namespace Agora_RTC_Plugin.API_Example
     {
         private static string[] GetAllScenes()
         {
-
             List<string> scenesList = new List<string>();
-            scenesList.Add("Assets/API-Example/HomeScene.unity");
-
-            string[] resFiles = AssetDatabase.FindAssets("t:Scene", new string[] { "Assets" });
-            for (int i = 0; i < resFiles.Length; i++)
+            string[] allScenes = AssetDatabase.FindAssets("t:Scene", new string[] { "Assets" });
+            string folder = "";
+            for (int i = 0; i < allScenes.Length; i++)
             {
-                resFiles[i] = AssetDatabase.GUIDToAssetPath(resFiles[i]);
-                Debug.Log(resFiles[i]);
-                if (resFiles[i] != "Assets/API-Example/HomeScene.unity")
-                {
-                    scenesList.Add(resFiles[i]);
+                var scenePath = AssetDatabase.GUIDToAssetPath(allScenes[i]);
+                if (scenePath.EndsWith("/HomeScene.unity")) {
+                    folder = scenePath.Substring(0, scenePath.Length - 16);
+                    scenesList.Add(scenePath);
+                    break;
                 }
+            }
+
+            if (scenesList.Count == 0) {
+                throw new System.Exception("Can not find demo HomeScene.unity.");
+            }
+
+            allScenes = AssetDatabase.FindAssets("t:Scene", new string[] { folder });
+            for (int i = 0; i < allScenes.Length; i++)
+            {
+                var scenePath = AssetDatabase.GUIDToAssetPath(allScenes[i]);
+              
+                if (!scenePath.EndsWith("/HomeScene.unity"))
+                {
+                    scenesList.Add(scenePath);
+                }
+            }
+
+
+            foreach (var scene in scenesList) {
+                Debug.Log(scene);
             }
 
             return scenesList.ToArray();
         }
 
-        [MenuItem("Build/Android")]
+        [MenuItem("Build Agora Demo/Android")]
         public static void BuildAndroid()
         {
             EditorUserBuildSettings.exportAsGoogleAndroidProject = true;
@@ -64,7 +87,7 @@ namespace Agora_RTC_Plugin.API_Example
         }
 
 
-        [MenuItem("Build/IPhone")]
+        [MenuItem("Build Agora Demo/IPhone")]
         public static void BuildIPhone()
         {
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
@@ -98,6 +121,7 @@ namespace Agora_RTC_Plugin.API_Example
         {
             if (buildTarget == BuildTarget.iOS)
             {
+#if UNITY_IOS
                 // linked library
                 string projPath = path + "/Unity-iPhone.xcodeproj/project.pbxproj";
                 PBXProject proj = new PBXProject();
@@ -133,11 +157,12 @@ namespace Agora_RTC_Plugin.API_Example
 
 
                 File.WriteAllText(pListPath, plist.WriteToString());
+#endif
             }
         }
 
 
-        [MenuItem("Build/Mac")]
+        [MenuItem("Build Agora Demo/Mac")]
         public static void BuildMac()
         {
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
@@ -166,7 +191,7 @@ namespace Agora_RTC_Plugin.API_Example
         }
 
 
-        [MenuItem("Build/x86")]
+        [MenuItem("Build Agora Demo/x86")]
         public static void BuildWin32()
         {
 
@@ -196,7 +221,7 @@ namespace Agora_RTC_Plugin.API_Example
 
         }
 
-        [MenuItem("Build/x86_64")]
+        [MenuItem("Build Agora Demo/x86_64")]
         public static void BuildWin64()
         {
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
@@ -225,7 +250,7 @@ namespace Agora_RTC_Plugin.API_Example
 
         }
 
-        [MenuItem("Build/All")]
+        [MenuItem("Build Agora Demo/All")]
         public static void BuildAll()
         {
             BuildAndroid();
@@ -235,6 +260,7 @@ namespace Agora_RTC_Plugin.API_Example
             BuildWin64();
         }
 
+#if UNITY_IOS
         static string GetTargetGuid(PBXProject proj)
         {
 #if UNITY_2019_3_OR_NEWER
@@ -243,6 +269,7 @@ namespace Agora_RTC_Plugin.API_Example
             return proj.TargetGuidByName("Unity-iPhone");
 #endif
         }
+#endif
 
     }
 }
