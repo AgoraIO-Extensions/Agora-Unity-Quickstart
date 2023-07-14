@@ -51,7 +51,7 @@ namespace io.agora.rtm.demo
             {
                 options.sendTs = 0;
             }
-            options.type = (RTM_MESSAGE_TYPE)this.enumDropDown.GetSelectValue();
+           
             options.customType = this.CustomTypeInput.text;
 
 

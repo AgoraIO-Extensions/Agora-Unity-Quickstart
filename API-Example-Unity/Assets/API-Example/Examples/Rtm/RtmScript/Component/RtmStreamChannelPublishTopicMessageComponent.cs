@@ -41,7 +41,6 @@ namespace io.agora.rtm.demo
             }
 
             PublishOptions options = new PublishOptions();
-            options.type = (RTM_MESSAGE_TYPE)this.TypeDropDown.GetSelectValue();
             options.sendTs = ulong.Parse(this.SendTsInput.text);
 
             var result = await this.RtmScene.StreamChannel.PublishTopicMessageAsync(topic, message, options);

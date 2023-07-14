@@ -5,8 +5,11 @@ using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 #endif 
 using UnityEngine;
+
+#if UNITY_IOS
 using UnityEditor.iOS.Xcode;
 using UnityEditor.iOS.Xcode.Extensions;
+#endif
 using UnityEditor.Callbacks;
 using System.IO;
 
@@ -45,18 +48,18 @@ namespace Agora_RTC_Plugin.API_Example
             buildPlayerOptions.options = BuildOptions.None;
 
 #if UNITY_2018_4_OR_NEWER
-        BuildReport report = BuildPipeline.BuildPlayer(buildPlayerOptions);
-        BuildSummary summary = report.summary;
+            BuildReport report = BuildPipeline.BuildPlayer(buildPlayerOptions);
+            BuildSummary summary = report.summary;
 
-        if (summary.result == BuildResult.Succeeded)
-        {
-            Debug.Log("Build Android succeeded: " + summary.totalSize + " bytes");
-        }
+            if (summary.result == BuildResult.Succeeded)
+            {
+                Debug.Log("Build Android succeeded: " + summary.totalSize + " bytes");
+            }
 
-        if (summary.result == BuildResult.Failed)
-        {
-            Debug.Log("Build Android failed");
-        }
+            if (summary.result == BuildResult.Failed)
+            {
+                Debug.Log("Build Android failed");
+            }
 #else
             string message = BuildPipeline.BuildPlayer(buildPlayerOptions);
             Debug.Log("Build Android: " + message);
@@ -74,18 +77,18 @@ namespace Agora_RTC_Plugin.API_Example
             buildPlayerOptions.options = BuildOptions.None;
 
 #if UNITY_2018_4_OR_NEWER
-        BuildReport report = BuildPipeline.BuildPlayer(buildPlayerOptions);
-        BuildSummary summary = report.summary;
+            BuildReport report = BuildPipeline.BuildPlayer(buildPlayerOptions);
+            BuildSummary summary = report.summary;
 
-        if (summary.result == BuildResult.Succeeded)
-        {
-            Debug.Log("Build IPhone succeeded: " + summary.totalSize + " bytes");
-        }
+            if (summary.result == BuildResult.Succeeded)
+            {
+                Debug.Log("Build IPhone succeeded: " + summary.totalSize + " bytes");
+            }
 
-        if (summary.result == BuildResult.Failed)
-        {
-            Debug.Log("Build IPhone failed");
-        }
+            if (summary.result == BuildResult.Failed)
+            {
+                Debug.Log("Build IPhone failed");
+            }
 #else
             string message = BuildPipeline.BuildPlayer(buildPlayerOptions);
             Debug.Log("Build IPhone: " + message);
@@ -98,6 +101,7 @@ namespace Agora_RTC_Plugin.API_Example
         {
             if (buildTarget == BuildTarget.iOS)
             {
+#if UNITY_IOS
                 // linked library
                 string projPath = path + "/Unity-iPhone.xcodeproj/project.pbxproj";
                 PBXProject proj = new PBXProject();
@@ -133,6 +137,7 @@ namespace Agora_RTC_Plugin.API_Example
 
 
                 File.WriteAllText(pListPath, plist.WriteToString());
+#endif
             }
         }
 
@@ -147,18 +152,18 @@ namespace Agora_RTC_Plugin.API_Example
             buildPlayerOptions.options = BuildOptions.None;
 
 #if UNITY_2018_4_OR_NEWER
-        BuildReport report = BuildPipeline.BuildPlayer(buildPlayerOptions);
-        BuildSummary summary = report.summary;
+            BuildReport report = BuildPipeline.BuildPlayer(buildPlayerOptions);
+            BuildSummary summary = report.summary;
 
-        if (summary.result == BuildResult.Succeeded)
-        {
-            Debug.Log("Build Mac succeeded: " + summary.totalSize + " bytes");
-        }
+            if (summary.result == BuildResult.Succeeded)
+            {
+                Debug.Log("Build Mac succeeded: " + summary.totalSize + " bytes");
+            }
 
-        if (summary.result == BuildResult.Failed)
-        {
-            Debug.Log("Build Mac failed");
-        }
+            if (summary.result == BuildResult.Failed)
+            {
+                Debug.Log("Build Mac failed");
+            }
 #else
             string message = BuildPipeline.BuildPlayer(buildPlayerOptions);
             Debug.Log("Build Mac: " + message);
@@ -177,18 +182,18 @@ namespace Agora_RTC_Plugin.API_Example
             buildPlayerOptions.options = BuildOptions.None;
 
 #if UNITY_2018_4_OR_NEWER
-        BuildReport report = BuildPipeline.BuildPlayer(buildPlayerOptions);
-        BuildSummary summary = report.summary;
+            BuildReport report = BuildPipeline.BuildPlayer(buildPlayerOptions);
+            BuildSummary summary = report.summary;
 
-        if (summary.result == BuildResult.Succeeded)
-        {
-            Debug.Log("Build x86 succeeded: " + summary.totalSize + " bytes");
-        }
+            if (summary.result == BuildResult.Succeeded)
+            {
+                Debug.Log("Build x86 succeeded: " + summary.totalSize + " bytes");
+            }
 
-        if (summary.result == BuildResult.Failed)
-        {
-            Debug.Log("Build x86 failed");
-        }
+            if (summary.result == BuildResult.Failed)
+            {
+                Debug.Log("Build x86 failed");
+            }
 #else
             string message = BuildPipeline.BuildPlayer(buildPlayerOptions);
             Debug.Log("Build Win32: " + message);
@@ -206,18 +211,18 @@ namespace Agora_RTC_Plugin.API_Example
             buildPlayerOptions.options = BuildOptions.None;
 
 #if UNITY_2018_4_OR_NEWER
-        BuildReport report = BuildPipeline.BuildPlayer(buildPlayerOptions);
-        BuildSummary summary = report.summary;
+            BuildReport report = BuildPipeline.BuildPlayer(buildPlayerOptions);
+            BuildSummary summary = report.summary;
 
-        if (summary.result == BuildResult.Succeeded)
-        {
-            Debug.Log("Build x86_64 succeeded: " + summary.totalSize + " bytes");
-        }
+            if (summary.result == BuildResult.Succeeded)
+            {
+                Debug.Log("Build x86_64 succeeded: " + summary.totalSize + " bytes");
+            }
 
-        if (summary.result == BuildResult.Failed)
-        {
-            Debug.Log("Build x86_64 failed");
-        }
+            if (summary.result == BuildResult.Failed)
+            {
+                Debug.Log("Build x86_64 failed");
+            }
 #else
             string message = BuildPipeline.BuildPlayer(buildPlayerOptions);
             Debug.Log("Build x86_64: " + message);
@@ -235,6 +240,7 @@ namespace Agora_RTC_Plugin.API_Example
             BuildWin64();
         }
 
+#if UNITY_IOS
         static string GetTargetGuid(PBXProject proj)
         {
 #if UNITY_2019_3_OR_NEWER
@@ -243,6 +249,7 @@ namespace Agora_RTC_Plugin.API_Example
             return proj.TargetGuidByName("Unity-iPhone");
 #endif
         }
+#endif
 
     }
 }
