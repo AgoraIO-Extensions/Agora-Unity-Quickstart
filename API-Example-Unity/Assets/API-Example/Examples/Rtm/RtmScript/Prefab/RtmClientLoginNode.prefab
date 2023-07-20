@@ -312,7 +312,7 @@ GameObject:
   - component: {fileID: 275879564923146803}
   - component: {fileID: 275879564923146764}
   m_Layer: 5
-  m_Name: RenewToken
+  m_Name: RenewTokenAsync
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -416,7 +416,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 275879565425063669}
-        m_MethodName: OnRenewToken
+        m_MethodName: OnRenewTokenAsync
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -809,7 +809,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: RenewToken
+  m_Text: RenewTokenAsync
 --- !u!1 &275879565513495691
 GameObject:
   m_ObjectHideFlags: 0
@@ -888,7 +888,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Logout
+  m_Text: LogoutAsync
 --- !u!1 &275879565658654167
 GameObject:
   m_ObjectHideFlags: 0
@@ -981,7 +981,7 @@ GameObject:
   - component: {fileID: 275879566040661844}
   - component: {fileID: 275879566040661845}
   m_Layer: 5
-  m_Name: Logout
+  m_Name: LogoutAsync
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1085,7 +1085,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 275879565425063669}
-        m_MethodName: OnLogout
+        m_MethodName: OnLogoutAsync
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

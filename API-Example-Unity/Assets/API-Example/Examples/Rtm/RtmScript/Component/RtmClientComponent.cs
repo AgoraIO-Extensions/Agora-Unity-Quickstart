@@ -87,7 +87,9 @@ namespace io.agora.rtm.demo
 
         public void OnMessageEvent(MessageEvent @event)
         {
-            RtmScene.AddMessage("OnMessageEvent channelName : " + @event.channelName + " channelTopic :" + @event.channelTopic + " channelType : " + @event.channelType + " publisher : " + @event.publisher + " message : " + @event.message + "customType" + @event, Message.MessageType.TopicMessage);
+            string str = string.Format("OnMessageEvent channelName:{0} channelTopic:{1} channelType:{2} publisher:{3} message:{4} customType:{5}",
+              @event.channelName, @event.channelTopic, @event.channelType, @event.publisher, @event.message.GetData<string>(), @event.customType);
+            RtmScene.AddMessage(str, Message.MessageType.Info);
         }
 
         public void OnPresenceEvent(PresenceEvent @event)

@@ -46,7 +46,7 @@ namespace io.agora.rtm.demo
 
         }
 
-        public void OnLogout()
+        public async void OnLogoutAsync()
         {
             if (RtmScene.RtmClient == null)
             {
@@ -62,13 +62,13 @@ namespace io.agora.rtm.demo
             }
 
 
-            var ret = RtmScene.RtmClient.Logout();
-            RtmScene.AddMessage(string.Format("RtmClient.Logout ret:{0} ", ret.ErrorCode), Message.MessageType.Info);
+            var ret = await RtmScene.RtmClient.LogoutAsync();
+            RtmScene.AddMessage(string.Format("RtmClient.Logout ret:{0} ", ret.Status.ErrorCode), Message.MessageType.Info);
             this.TitleText.text = "RtmClient logout";
             this.TitleText.color = Color.red;
         }
 
-        public void OnRenewToken()
+        public async void OnRenewTokenAsync()
         {
             if (RtmScene.RtmClient == null)
             {
@@ -77,8 +77,8 @@ namespace io.agora.rtm.demo
             }
 
             string token = this.TokenInput.text;
-            RtmStatus rtmStatus = RtmScene.RtmClient.RenewToken(token);
-            RtmScene.AddMessage("rtmClient RenewToken: " + rtmStatus.ErrorCode, Message.MessageType.Info);
+            var res =  await RtmScene.RtmClient.RenewTokenAsync(token);
+            RtmScene.AddMessage("rtmClient RenewToken: " + res.Status.ErrorCode, Message.MessageType.Info);
 
         }
 
