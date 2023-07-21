@@ -122,3 +122,19 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/API-Example/Examples/Advanced/RenderWithYUV/RenderWithYUV.unity
     guid: e4761610ddd74415ba995470c22e2a76
+  - enabled: 1
+    path: Assets/API-Example/Examples/Rtm/RtmScene/RTMClientScene.unity
+    guid: 99fe2bcb1e3ab4b91a986e940d4959aa
+  - enabled: 1
+    path: Assets/API-Example/Examples/Rtm/RtmScene/RTMLockScene.unity
+    guid: c829b36f326764b8198b6a9983c9e8d1
+  - enabled: 1
+    path: Assets/API-Example/Examples/Rtm/RtmScene/RTMPresenceScene.unity
+    guid: 17ff49455d016403f8894d2079b04b7d
+  - enabled: 1
+    path: Assets/API-Example/Examples/Rtm/RtmScene/RTMStorageScene.unity
+    guid: 0608ac396594248f9aaa43a7f7c5da62
+  - enabled: 1
+    path: Assets/API-Example/Examples/Rtm/RtmScene/RTMStreamChannelScene.unity
+    guid: b2f04913a5fb64955be1dafaa562e5d6
+  m_configObjects: {}
