@@ -32,7 +32,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
         public Text LogText;
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
-
+        internal uint AUDIO_TRACK_ID = 0;
         private const int CHANNEL = 2;
         // Please do not change this value because Unity re-samples the sample rate to 48000.
         private const int SAMPLE_RATE = 48000;
@@ -55,7 +55,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
             if (CheckAppId())
             {
                 InitRtcEngine();
-                SetExternalAudioSource();
+                CreateCustomAudioSource();
                 JoinChannel();
                 StartPushAudioFrame();
             }
@@ -92,18 +92,19 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 
                 RtcEngineContext context = new RtcEngineContext(_appID, 0,
                     CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
-                    AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT,AREA_CODE.AREA_CODE_GLOB, new LogConfig("./log.txt"));
+                    AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT, AREA_CODE.AREA_CODE_GLOB, new LogConfig("./log.txt"));
                 RtcEngine.Initialize(context);
                 RtcEngine.InitEventHandler(new UserEventHandler(this));
             }
         }
 
-        private void SetExternalAudioSource()
+        private void CreateCustomAudioSource()
         {
             lock (_rtcLock)
             {
-                var nRet = RtcEngine.SetExternalAudioSource(true, SAMPLE_RATE, CHANNEL);
-                this.Log.UpdateLog("SetExternalAudioSource nRet:" + nRet);
+                AudioTrackConfig audioTrackConfig = new AudioTrackConfig(false);
+                AUDIO_TRACK_ID = RtcEngine.CreateCustomAudioTrack(AUDIO_TRACK_TYPE.AUDIO_TRACK_DIRECT, audioTrackConfig);
+                this.Log.UpdateLog("CreateCustomAudioTrack id:" + AUDIO_TRACK_ID);
             }
         }
 
@@ -128,7 +129,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
                 AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
                 RtcEngine.EnableAudio();
                 RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-                RtcEngine.JoinChannel(_token, _channelName, "");
+                ChannelMediaOptions channelMediaOptions = new ChannelMediaOptions();
+                channelMediaOptions.publishCustomAudioTrack.SetValue(true);
+                channelMediaOptions.publishCustomAudioTrackId.SetValue((int)AUDIO_TRACK_ID);
+                channelMediaOptions.publishMicrophoneTrack.SetValue(false);
+
+                RtcEngine.JoinChannel(_token, _channelName, 0, channelMediaOptions); 
             }
         }
 
@@ -146,6 +152,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
                 if (RtcEngine == null) return;
                 RtcEngine.InitEventHandler(null);
                 RtcEngine.LeaveChannel();
+                RtcEngine.DestroyCustomAudioTrack(AUDIO_TRACK_ID);
                 RtcEngine.Dispose();
                 RtcEngine = null;
             }
@@ -172,7 +179,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
                 samplesPerSec = samplesPerSec,
                 channels = channels,
                 RawBuffer = new byte[samples * bytesPerSample * CHANNEL],
-                renderTimeMs = freq
+                renderTimeMs = 0
             };
 
 
@@ -197,7 +204,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
                             {
                                 audioFrame.RawBuffer[j] = _audioBuffer.Get();
                             }
-                            nRet = RtcEngine.PushAudioFrame(audioFrame);
+                            nRet = RtcEngine.PushAudioFrame(audioFrame, AUDIO_TRACK_ID);
                             //Debug.Log("PushAudioFrame returns: " + nRet);
 
                         }
