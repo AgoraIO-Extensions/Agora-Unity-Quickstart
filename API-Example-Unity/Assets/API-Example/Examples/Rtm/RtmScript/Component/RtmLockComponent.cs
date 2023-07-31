@@ -52,10 +52,11 @@ namespace io.agora.rtm.demo
             }
             else
             {
+                var LockDetailListCount = result.Response.LockDetailList == null ? 0 : result.Response.LockDetailList.Length;
                 string info = string.Format("GetLocks Response: channelName:{0},channelType:{1},count:{2}",
-                    result.Response.ChannelName, result.Response.ChannelType, result.Response.Count);
+                    result.Response.ChannelName, result.Response.ChannelType, LockDetailListCount);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
-                if (result.Response.Count > 0)
+                if (LockDetailListCount > 0)
                 {
                     for (int i = 0; i < result.Response.LockDetailList.Length; i++)
                     {
@@ -133,7 +134,7 @@ namespace io.agora.rtm.demo
             RTM_CHANNEL_TYPE channelType = (RTM_CHANNEL_TYPE)this.ChannelTypeDropDown.GetSelectValue();
 
 
-            var result = await rtmLock.ReleaseLockAsync(channelName, RTM_CHANNEL_TYPE.RTM_CHANNEL_TYPE_MESSAGE, lockName);
+            var result = await rtmLock.ReleaseLockAsync(channelName, RTM_CHANNEL_TYPE.MESSAGE, lockName);
 
             if (result.Status.Error)
             {

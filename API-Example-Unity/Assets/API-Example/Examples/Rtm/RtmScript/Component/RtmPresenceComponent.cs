@@ -67,7 +67,8 @@ namespace io.agora.rtm.demo
                     for (int i = 0; i < result.Response.UserStateList.Length; i++)
                     {
                         var userState = result.Response.UserStateList[i];
-                        string info2 = string.Format("userStateList userId:{0}, stateCount:{1}", userState.userId, userState.statesCount);
+                        var statesCount = userState.states == null ? 0 : userState.states.Length;
+                        string info2 = string.Format("userStateList userId:{0}, stateCount:{1}", userState.userId, statesCount);
                         RtmScene.AddMessage(info2, Message.MessageType.Info);
                     }
                 }
@@ -222,9 +223,9 @@ namespace io.agora.rtm.demo
             {
                 string info = string.Format("rtmPresence.GetState Response");
                 RtmScene.AddMessage(info, Message.MessageType.Info);
-
+                var statesCount = result.Response.State.states == null ? 0 : result.Response.State.states.Length;
                 string info2 = string.Format("userStateList userId:{0}, stateCount:{1}",
-                    result.Response.State.userId, result.Response.State.statesCount);
+                    result.Response.State.userId, statesCount);
                 RtmScene.AddMessage(info2, Message.MessageType.Info);
                 foreach (var stateItem in result.Response.State.states)
                 {

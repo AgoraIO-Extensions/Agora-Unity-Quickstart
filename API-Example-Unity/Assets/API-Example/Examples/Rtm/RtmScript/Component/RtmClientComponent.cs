@@ -115,16 +115,19 @@ namespace io.agora.rtm.demo
             string str = string.Format("OnTopicEvent: channelName:{0} publisher:{1}", @event.channelName, @event.publisher);
             RtmScene.AddMessage(str, Message.MessageType.Info);
 
-            if (@event.topicInfoCount > 0)
+            var topicInfoCount = @event.topicInfos == null ? 0 : @event.topicInfos.Length;
+            if (topicInfoCount > 0)
             {
-                for (ulong i = 0; i < @event.topicInfoCount; i++)
+                for (var i = 0; i < topicInfoCount; i++)
                 {
                     var topicInfo = @event.topicInfos[i];
-                    string str1 = string.Format("|--topicInfo {0}: topic:{1} publisherCount:{2}", i, topicInfo.topic, topicInfo.publisherCount);
+                    var publisherCount = topicInfo.publishers == null ? 0 : topicInfo.publishers.Length;
+                    string str1 = string.Format("|--topicInfo {0}: topic:{1} publisherCount:{2}", i, topicInfo.topic, publisherCount);
                     RtmScene.AddMessage(str1, Message.MessageType.Info);
-                    if (topicInfo.publisherCount > 0)
+
+                    if (publisherCount > 0)
                     {
-                        for (ulong j = 0; j < topicInfo.publisherCount; j++)
+                        for (var j = 0; j < publisherCount; j++)
                         {
                             var publisher = topicInfo.publishers[j];
                             string str2 = string.Format("  |--publisher {0}: userId:{1} meta:{2}", j, publisher.publisherUserId, publisher.publisherMeta);
@@ -137,11 +140,13 @@ namespace io.agora.rtm.demo
 
         public void OnLockEvent(LockEvent @event)
         {
-            string info = string.Format("OnLockEvent channelType:{0}, eventType:{1}, channelName:{2}, count:{3}", @event.channelType, @event.eventType, @event.channelName, @event.count);
+            var count = @event.lockDetailList == null ? 0 : @event.lockDetailList.Length;
+            string info = string.Format("OnLockEvent channelType:{0}, eventType:{1}, channelName:{2}, count:{3}", @event.channelType, @event.eventType, @event.channelName, count);
             RtmScene.AddMessage(info, Message.MessageType.Info);
-            if (@event.count > 0)
+
+            if (count > 0)
             {
-                for (int i = 0; i < @event.lockDetailList.Length; i++)
+                for (var i = 0; i < count; i++)
                 {
                     var detail = @event.lockDetailList[i];
                     string info2 = string.Format("lockDetailList lockName:{0}, owner:{1}, ttl:{2}", detail.lockName, detail.owner, detail.ttl);
