@@ -31,7 +31,6 @@ namespace io.agora.rtm.demo
 
             TopicOptions options = new TopicOptions();
             options.users = this.ContainerUser.GetDataSource();
-            options.userCount = (uint)options.users.Length;
 
             this.RtmScene.AddMessage("Users:\n" + this.ContainerUser.ToString(), Message.MessageType.Info);
 
@@ -43,16 +42,18 @@ namespace io.agora.rtm.demo
             }
             else
             {
-                this.RtmScene.AddMessage("StreamChannel.SubscribeTopic Response:" + " channelName:" + result.Response.ChannelName + " userId :" + result.Response.UserId + " topic :" + result.Response.Topic + " succeedUsersCount :" + result.Response.SucceedUsers.userCount + " failedUsers :" + result.Response.FailedUsers.userCount, Message.MessageType.Info);
+                var succeedUsersCount = result.Response.SucceedUsers == null ? 0 : result.Response.SucceedUsers.Length;
+                var FailedUsersCount = result.Response.FailedUsers == null ? 0 : result.Response.FailedUsers.Length;
+                this.RtmScene.AddMessage("StreamChannel.SubscribeTopic Response:" + " channelName:" + result.Response.ChannelName + " userId :" + result.Response.UserId + " topic :" + result.Response.Topic + " succeedUsersCount :" + succeedUsersCount + " failedUsers :" + FailedUsersCount, Message.MessageType.Info);
 
-                for (int i = 0; i < result.Response.SucceedUsers.userCount; i++)
+                for (int i = 0; i < succeedUsersCount; i++)
                 {
-                    this.RtmScene.AddMessage("succeedUsers index " + i + " UserName is " + result.Response.SucceedUsers.users[i], Message.MessageType.Info);
+                    this.RtmScene.AddMessage("succeedUsers index " + i + " UserName is " + result.Response.SucceedUsers[i], Message.MessageType.Info);
                 }
 
-                for (int i = 0; i < result.Response.FailedUsers.userCount; i++)
+                for (int i = 0; i < FailedUsersCount; i++)
                 {
-                    this.RtmScene.AddMessage("failedUsers index " + i + " UserName is " + result.Response.FailedUsers.users[i], Message.MessageType.Info);
+                    this.RtmScene.AddMessage("failedUsers index " + i + " UserName is " + result.Response.FailedUsers[i], Message.MessageType.Info);
                 }
 
                 ContainerUser.ClearAllNode();
@@ -75,7 +76,6 @@ namespace io.agora.rtm.demo
 
             TopicOptions options = new TopicOptions();
             options.users = this.ContainerUser.GetDataSource();
-            options.userCount = (uint)options.users.Length;
 
             var ret = await this.RtmScene.StreamChannel.UnsubscribeTopicAsync(this.TopicInput.text, options);
             this.RtmScene.AddMessage("StreamChannel.UnsubscribeTopic ret:" + ret, Message.MessageType.Info);
@@ -103,14 +103,15 @@ namespace io.agora.rtm.demo
             else
             {
                 var userList = result.Response.Users;
-                if (userList.userCount == 0)
+                var userCount = userList == null ? 0 : userList.Length;
+                if (userCount == 0)
                 {
                     this.RtmScene.AddMessage("GetSubscribedTopic return size is zero", Message.MessageType.Error);
                 }
                 else
                 {
-                    this.RtmScene.AddMessage("GetSubscribedTopic return size is " + userList.userCount, Message.MessageType.Error);
-                    foreach(var user in userList.users)
+                    this.RtmScene.AddMessage("GetSubscribedTopic return size is " + userCount, Message.MessageType.Error);
+                    foreach (var user in userList)
                     {
                         this.RtmScene.AddMessage("--- " + user, Message.MessageType.Info);
                     }
