@@ -4,8 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
- 
- 
+
+
 using System.Runtime.InteropServices;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WriteBackVideoRawData
@@ -81,7 +81,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WriteBackVideoRawData
 
 
             VideoFrameObserver videoFrameObserver = new VideoFrameObserver();
-            RtcEngine.RegisterVideoFrameObserver(videoFrameObserver, OBSERVER_MODE.INTPTR);
+            //Write back is only effective when the format is YUV420
+            RtcEngine.RegisterVideoFrameObserver(videoFrameObserver,
+                VIDEO_OBSERVER_FRAME_TYPE.FRAME_TYPE_YUV420,
+                VIDEO_OBSERVER_POSITION.POSITION_POST_CAPTURER | VIDEO_OBSERVER_POSITION.POSITION_PRE_RENDERER,
+                OBSERVER_MODE.INTPTR);
         }
 
         private void SetBasicConfiguration()
@@ -324,14 +328,5 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WriteBackVideoRawData
             Marshal.Copy(bytes, 0, videoFrame.vBufferPtr, length);
             return true;
         }
-
-        //Write back is only effective when the format is YUV420
-        public override VIDEO_OBSERVER_FRAME_TYPE GetVideoFormatPreference()
-        {
-            return VIDEO_OBSERVER_FRAME_TYPE.FRAME_TYPE_YUV420;
-        }
-
-
-
     }
 }

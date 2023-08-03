@@ -134,12 +134,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MetadataSample
                 Metadata metadata = new Metadata();
 
                 byte[] strByte = System.Text.Encoding.UTF8.GetBytes(str);
-                metadata.buffer = Marshal.AllocHGlobal(strByte.Length);
-                Marshal.Copy(strByte, 0, metadata.buffer, strByte.Length);
+                metadata.buffer = Marshal.UnsafeAddrOfPinnedArrayElement(strByte, 0);
                 metadata.size = (uint)strByte.Length;
                 int nRet = RtcEngine.SendMetadata(metadata, VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA);
                 this.Log.UpdateLog("SendMetadata:" + nRet);
-                Marshal.FreeHGlobal(metadata.buffer);
                 this.InputField.text = "";
             }
         }
