@@ -26,7 +26,7 @@ def get_all_files(target_dir):
     return files
 
 
-def remove_key_word_in_path(file_path, key_word, suffix = ".cs"):
+def remove_key_word_in_path(file_path, key_word, suffix=".cs"):
     files = get_all_files(file_path)
     for i in range(0, len(files)):
         file_name = files[i]
@@ -58,4 +58,27 @@ if RTM == 'false':
 
 if RTC == 'false':
     remove_key_word_in_path(os.path.join(android_studio_temple, "launcher"),
-                            "implementation files('../unityLibrary/libs/AgoraScreenShareExtension.aar')",".gradle")
+                            "implementation files('../unityLibrary/libs/AgoraScreenShareExtension.aar')", ".gradle")
+
+if RTC == "false":
+    os.remove(os.path.join(assets_root, "API-Example.meta"))
+    os.remove(os.path.join(assets_root, "API-Example/Examples.meta"))
+    os.remove(os.path.join(assets_root, "API-Example/Editor.meta"))
+
+    os.rename(os.path.join(assets_root, "API-Example/HomeScene.unity"),
+              os.path.join(assets_root, "API-Example/RtmHomeScene.unity"))
+    os.rename(os.path.join(assets_root, "API-Example/HomeScene.unity.meta"),
+              os.path.join(assets_root, "API-Example/RtmHomeScene.unity.meta"))
+    os.rename(os.path.join(assets_root, "API-Example/Home.cs"),
+              os.path.join(assets_root, "API-Example/RtmHome.cs"))
+    os.rename(os.path.join(assets_root, "API-Example/Home.cs.meta"),
+              os.path.join(assets_root, "API-Example/RtmHome.cs.meta"))
+
+    os.rename(os.path.join(assets_root, "API-Example/Editor/CommandBuild.cs.meta"),
+              os.path.join(assets_root, "API-Example/Editor/RtmCommandBuild.cs.meta"))
+    os.rename(os.path.join(assets_root, "API-Example/Editor/CommandBuild.cs"),
+              os.path.join(assets_root, "API-Example/Editor/RtmCommandBuild.cs"))
+    remove_key_word_in_path(os.path.join(
+        assets_root, "API-Example/Editor"), "HomeScene.unity", "RtmHomeScene.unity")
+    remove_key_word_in_path(os.path.join(
+        assets_root, "API-Example/Editor"), "Build/", "RtmBuild")
