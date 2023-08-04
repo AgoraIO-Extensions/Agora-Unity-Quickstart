@@ -46,6 +46,8 @@ if RTC == 'false':
         shutil.rmtree(assets_root + "/API-Example/Examples/Basic")
     if os.path.isdir(assets_root + "/API-Example/Examples/Advanced"):
         shutil.rmtree(assets_root + "/API-Example/Examples/Advanced")
+    if os.path.isdir(assets_root + "/API-Example/Tools"):
+        shutil.rmtree(assets_root + "/API-Example/Tools")
 
 if RTM == 'false' and os.path.isdir(assets_root + '/API-Example/Examples/Rtm'):
     shutil.rmtree(assets_root + '/API-Example/Examples/Rtm')
@@ -64,6 +66,7 @@ if RTC == "false":
     os.remove(os.path.join(assets_root, "API-Example.meta"))
     os.remove(os.path.join(assets_root, "API-Example/Examples.meta"))
     os.remove(os.path.join(assets_root, "API-Example/Editor.meta"))
+    os.remove(os.path.join(assets_root, "API-Example/AppIdInput.meta"))
 
     os.rename(os.path.join(assets_root, "API-Example/HomeScene.unity"),
               os.path.join(assets_root, "API-Example/RtmHomeScene.unity"))
@@ -73,12 +76,16 @@ if RTC == "false":
               os.path.join(assets_root, "API-Example/RtmHome.cs"))
     os.rename(os.path.join(assets_root, "API-Example/Home.cs.meta"),
               os.path.join(assets_root, "API-Example/RtmHome.cs.meta"))
+    os.rename(os.path.join(assets_root, "API-Example/AppIdInput/AppIdInput.cs.meta"),
+              os.path.join(assets_root, "API-Example/AppIdInput/RtmAppIdInput.cs.meta"))
+    os.rename(os.path.join(assets_root, "API-Example/AppIdInput/AppIdInput.cs"),
+              os.path.join(assets_root, "API-Example/AppIdInput/RtmAppIdInput.cs"))
+    os.rename(os.path.join(assets_root, "API-Example/AppIdInput/AppIdInput.asset.meta"),
+              os.path.join(assets_root, "API-Example/AppIdInput/RtmAppIdInput.asset.meta"))
+    os.rename(os.path.join(assets_root, "API-Example/AppIdInput/AppIdInput.asset"),
+              os.path.join(assets_root, "API-Example/AppIdInput/RtmAppIdInput.asset"))
 
     os.rename(os.path.join(assets_root, "API-Example/Editor/CommandBuild.cs.meta"),
               os.path.join(assets_root, "API-Example/Editor/RtmCommandBuild.cs.meta"))
     os.rename(os.path.join(assets_root, "API-Example/Editor/CommandBuild.cs"),
               os.path.join(assets_root, "API-Example/Editor/RtmCommandBuild.cs"))
-    remove_key_word_in_path(os.path.join(
-        assets_root, "API-Example/Editor"), "HomeScene.unity", "RtmHomeScene.unity")
-    remove_key_word_in_path(os.path.join(
-        assets_root, "API-Example/Editor"), "Build/", "RtmBuild")
