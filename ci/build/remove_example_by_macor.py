@@ -7,7 +7,8 @@ import shutil
 assets_root = sys.argv[1]
 RTC = sys.argv[2]
 RTM = sys.argv[3]
-android_studio_temple = os.path.join(assets_root, "../../android_studio_template")
+android_studio_temple = os.path.join(
+    assets_root, "../../android_studio_template")
 
 print('remove example by macor.py {0},{1},{2},{3}'.format(
     assets_root, RTC, RTM, android_studio_temple))
@@ -56,5 +57,5 @@ if RTM == 'false':
     remove_key_word_in_path(assets_root, '#define AGORA_RTM')
 
 if RTC == 'false':
-    remove_key_word_in_path(os.path.join(android_studio_temple, "launcher/build.gradle"),
+    remove_key_word_in_path(os.path.join(android_studio_temple, "launcher"),
                             "implementation files('../unityLibrary/libs/AgoraScreenShareExtension.aar')")
