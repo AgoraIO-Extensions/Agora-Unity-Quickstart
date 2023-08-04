@@ -29,16 +29,14 @@ def get_all_files(target_dir):
 def remove_key_word_in_path(file_path, key_word):
     files = get_all_files(file_path)
     for i in range(0, len(files)):
-        file_name = files[i]
-        if file_name.endswith(".cs"):
-            # print(file_name)
-            f = open(file_name, 'r', encoding='UTF-8')
-            content = f.read()
-            content = content.replace(key_word, '')
-            f.close()
-            f = open(file_name, 'w')
-            f.write(content)
-            f.close()
+        file_name = files[i]  
+        f = open(file_name, 'r', encoding='UTF-8')
+        content = f.read()
+        f.close()
+        content = content.replace(key_word, '')
+        f = open(file_name, 'w')
+        f.write(content)
+        f.close()
 
 
 if RTC == 'false':
