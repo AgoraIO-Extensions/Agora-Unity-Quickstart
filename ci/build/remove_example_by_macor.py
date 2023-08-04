@@ -26,10 +26,12 @@ def get_all_files(target_dir):
     return files
 
 
-def remove_key_word_in_path(file_path, key_word):
+def remove_key_word_in_path(file_path, key_word, suffix = ".cs"):
     files = get_all_files(file_path)
     for i in range(0, len(files)):
-        file_name = files[i]  
+        file_name = files[i]
+        if file_name.endswith(suffix) == False:
+            continue
         f = open(file_name, 'r', encoding='UTF-8')
         content = f.read()
         f.close()
@@ -56,4 +58,4 @@ if RTM == 'false':
 
 if RTC == 'false':
     remove_key_word_in_path(os.path.join(android_studio_temple, "launcher"),
-                            "implementation files('../unityLibrary/libs/AgoraScreenShareExtension.aar')")
+                            "implementation files('../unityLibrary/libs/AgoraScreenShareExtension.aar')",".gradle")
