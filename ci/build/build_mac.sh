@@ -168,7 +168,7 @@ echo "===========Demo build end================="
 
 #zip all file
 mkdir Demo_zip
-ls ./Build
+ls ./
 demo_files=`ls ./$BUILD_PATH`
 for file in ${demo_files}
 do
