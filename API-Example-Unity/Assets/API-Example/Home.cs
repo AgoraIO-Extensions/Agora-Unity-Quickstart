@@ -6,7 +6,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-
 #if AGORA_RTC
 using Agora.Rtc;
 using Agora.Util;
@@ -14,11 +13,8 @@ using Agora.Util;
 
 using System;
 
-#if AGORA_RTC
+
 public class Home : MonoBehaviour
-#else
-public class RtmHome : MonoBehaviour
-#endif
 {
     public InputField AppIdInupt;
     public InputField ChannelInput;

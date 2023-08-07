@@ -85,11 +85,12 @@ if RTC == "false":
               os.path.join(assets_root, "API-Example/RtmHome.cs"))
     os.rename(os.path.join(assets_root, "API-Example/Home.cs.meta"),
               os.path.join(assets_root, "API-Example/RtmHome.cs.meta"))
-  
+    replace_key_word_in_file(os.path.join(assets_root, "API-Example/RtmHome.cs"),"public class Home","public class RtmHome")
+    
     os.rename(os.path.join(assets_root, "API-Example/Editor/CommandBuild.cs.meta"),
               os.path.join(assets_root, "API-Example/Editor/RtmCommandBuild.cs.meta"))
     os.rename(os.path.join(assets_root, "API-Example/Editor/CommandBuild.cs"),
               os.path.join(assets_root, "API-Example/Editor/RtmCommandBuild.cs"))
     replace_key_word_in_file(os.path.join(assets_root, "API-Example/Editor/RtmCommandBuild.cs"),"#define AGORA_RTC","")
     replace_key_word_in_file(os.path.join(assets_root, "API-Example/Editor/RtmCommandBuild.cs"),"public class CommandBuild","public class RtmCommandBuild")
-
+   
