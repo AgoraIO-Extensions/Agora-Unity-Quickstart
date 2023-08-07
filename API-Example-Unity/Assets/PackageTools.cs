@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -13,8 +13,8 @@ namespace Agora_RTC_Plugin.API_Example
         public static void ReplaceGUIDs()
         {
             string[] oldGuids = new string[] {
-                "2ca9649af72c248bbab820748557049f",
-                "45e755d1adb9144308cabade1acad67b"
+                "c7b548af9d337405f889b92c979c9e36",
+                "afbde366e660d4272b8d45e2d7d96f50"
             };
 
             foreach (var oldGuid in oldGuids)
@@ -30,6 +30,8 @@ namespace Agora_RTC_Plugin.API_Example
             string[] files = Directory.GetFiles(Application.dataPath, "*.*", SearchOption.AllDirectories);
             foreach (var file in files)
             {
+                if (file.EndsWith(".cs"))
+                    continue;
                 var content = File.ReadAllText(file);
                 if (Regex.IsMatch(content, oldGuid))
                 {
