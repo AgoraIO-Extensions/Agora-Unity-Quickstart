@@ -112,9 +112,11 @@ echo "===========unzip finish================="
 if [ "$RTC" == "true" ]; then
     UNITYPACKAGE_NAME="Agora-RTC-Plugin.unitypackage"
     BUILD_PATH="Build"
+    COMMAND_BUILD="CommandBuild"
 else 
     UNITYPACKAGE_NAME="Agora-RTM-Plugin.unitypackage"
     BUILD_PATH="RtmBuild"
+    COMMAND_BUILD="RtmCommandBuild"
 fi
 
 $UNITY_DIR/Unity -quit -batchmode -nographics -createProject "sdk_project"
@@ -141,11 +143,11 @@ else
 fi
 
 if [ "$Build_Mac" == "true" ]; then
-    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.CommandBuild.BuildMac   
+    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.$COMMAND_BUILD.BuildMac   
 fi
 
 if [ "$Build_IOS" == "true" ]; then
-    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -buildTarget ios -executeMethod Agora_RTC_Plugin.API_Example.CommandBuild.BuildIPhone   
+    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -buildTarget ios -executeMethod Agora_RTC_Plugin.API_Example.$COMMAND_BUILD.BuildIPhone   
     
     if [ "$Build_IOS_SIGN" == "true" ]; then
         sh ./ci/build/package_ios.sh ${WORKSPACE} ${RTC} ${RTM}
@@ -153,12 +155,12 @@ if [ "$Build_IOS" == "true" ]; then
 fi
 
 if [ "$Build_Win" == "true" ]; then
-    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.CommandBuild.BuildWin32   
-    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.CommandBuild.BuildWin64  
+    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.$COMMAND_BUILD.BuildWin32   
+    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.$COMMAND_BUILD.BuildWin64  
 fi
 
 if [ "$Build_Android" == "true" ]; then
-    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.CommandBuild.BuildAndroid   
+    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.$COMMAND_BUILD.BuildAndroid   
     sh ./ci/build/package_android.sh ${WORKSPACE} ${RTC} ${RTM}
 fi
 
