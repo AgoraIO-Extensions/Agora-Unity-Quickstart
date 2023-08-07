@@ -59,10 +59,11 @@ namespace io.agora.rtm.demo
             }
             else
             {
+                var count = result.Response.UserStateList.Length;
                 string info = string.Format("WhoNow Response : count:{0},nextPage:{1}",
-                    result.Response.Count, result.Response.NextPage);
+                    count, result.Response.NextPage);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
-                if (result.Response.Count > 0)
+                if (count > 0)
                 {
                     for (int i = 0; i < result.Response.UserStateList.Length; i++)
                     {
@@ -103,10 +104,11 @@ namespace io.agora.rtm.demo
             }
             else
             {
+                var count = result.Response.Channels.Length;
                 string info = string.Format("WhereNow Response: count:{0}"
-                    , result.Response.Count);
+                    , count);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
-                if (result.Response.Count > 0)
+                if (count > 0)
                 {
                     for (int i = 0; i < result.Response.Channels.Length; i++)
                     {

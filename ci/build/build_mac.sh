@@ -130,7 +130,6 @@ echo "===========copy Agora-*-Plugin to Assets finish ================="
 sed -i "" "s/appID:/appID: ${appID}/g" ./API-Example-Unity/Assets/API-Example/AppIdInput/AppIdInput.asset
 
 
-
 #make plugin active
 if [ "$Plugin_Url" != "" ]; then
     echo "PluginScene激活中"

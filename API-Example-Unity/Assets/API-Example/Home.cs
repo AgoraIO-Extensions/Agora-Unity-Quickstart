@@ -5,13 +5,14 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using Agora.Util;
 
 #if AGORA_RTC
 using Agora.Rtc;
+using Agora.Util;
 #endif
 
 using System;
+
 
 public class Home : MonoBehaviour
 {
@@ -82,8 +83,10 @@ public class Home : MonoBehaviour
 
     private void Awake()
     {
+#if AGORA_RTC
         PermissionHelper.RequestMicrophontPermission();
         PermissionHelper.RequestCameraPermission();
+#endif
 
         GameObject content = GameObject.Find("Content");
         var contentRectTrans = content.GetComponent<RectTransform>();
