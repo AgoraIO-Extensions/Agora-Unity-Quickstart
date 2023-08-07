@@ -14,7 +14,8 @@ namespace Agora_RTC_Plugin.API_Example
         {
             string[] oldGuids = new string[] {
                 "c7b548af9d337405f889b92c979c9e36",
-                "afbde366e660d4272b8d45e2d7d96f50"
+                "afbde366e660d4272b8d45e2d7d96f50",
+                "300c6525f002a4dbaac41a5c4b054e35"
             };
 
             foreach (var oldGuid in oldGuids)
