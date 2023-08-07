@@ -18,11 +18,8 @@ using System.IO;
 
 namespace Agora_RTC_Plugin.API_Example
 {
-#if AGORA_RTC
+
     public class CommandBuild : MonoBehaviour
-#else
-    public class RtmCommandBuild : MonoBehaviour
-#endif
     {
 #if AGORA_RTC
         public const string buildPath = "Build";
