@@ -57,6 +57,8 @@ if RTC == 'false':
         shutil.rmtree(assets_root + "/API-Example/Examples/Advanced")
     if os.path.isdir(assets_root + "/API-Example/Tools"):
         shutil.rmtree(assets_root + "/API-Example/Tools")
+    if os.path.isdir(assets_root + "/API-Example/Prefab"):
+        shutil.rmtree(assets_root + "/API-Example/Prefab")
 
 if RTM == 'false' and os.path.isdir(assets_root + '/API-Example/Examples/Rtm'):
     shutil.rmtree(assets_root + '/API-Example/Examples/Rtm')

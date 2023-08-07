@@ -164,11 +164,11 @@ if [ "$Build_Android" == "true" ]; then
     sh ./ci/build/package_android.sh ${WORKSPACE} ${RTC} ${RTM}
 fi
 
-
 echo "===========Demo build end================="
 
 #zip all file
 mkdir Demo_zip
+ls ./Build
 demo_files=`ls ./$BUILD_PATH`
 for file in ${demo_files}
 do
