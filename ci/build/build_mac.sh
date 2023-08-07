@@ -111,8 +111,10 @@ ls
 echo "===========unzip finish================="
 if [ "$RTC" == "true" ]; then
     UNITYPACKAGE_NAME="Agora-RTC-Plugin.unitypackage"
+    BUILD_PATH="Build"
 else 
     UNITYPACKAGE_NAME="Agora-RTM-Plugin.unitypackage"
+    BUILD_PATH="RtmBuild"
 fi
 
 $UNITY_DIR/Unity -quit -batchmode -nographics -createProject "sdk_project"
@@ -146,7 +148,7 @@ if [ "$Build_IOS" == "true" ]; then
     $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -buildTarget ios -executeMethod Agora_RTC_Plugin.API_Example.CommandBuild.BuildIPhone   
     
     if [ "$Build_IOS_SIGN" == "true" ]; then
-        sh ./ci/build/package_ios.sh ${WORKSPACE}
+        sh ./ci/build/package_ios.sh ${WORKSPACE} ${RTC} ${RTM}
     fi
 fi
 
@@ -157,7 +159,7 @@ fi
 
 if [ "$Build_Android" == "true" ]; then
     $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.CommandBuild.BuildAndroid   
-    sh ./ci/build/package_android.sh ${WORKSPACE}
+    sh ./ci/build/package_android.sh ${WORKSPACE} ${RTC} ${RTM}
 fi
 
 
@@ -165,11 +167,11 @@ echo "===========Demo build end================="
 
 #zip all file
 mkdir Demo_zip
-demo_files=`ls ./Build`
+demo_files=`ls ./$BUILD_PATH`
 for file in ${demo_files}
 do
     no_suffix_file=${file%.*}
-    7za a ./Demo_zip/Unity_Demo_${SDK_Version}_${no_suffix_file}_${build_date}_${build_time}.zip ./Build/${file}  
+    7za a ./Demo_zip/Unity_Demo_${SDK_Version}_${no_suffix_file}_${build_date}_${build_time}.zip ./$BUILD_PATH/${file}  
 done
 
 #upload all file
