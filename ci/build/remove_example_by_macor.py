@@ -71,12 +71,12 @@ if RTM == 'false':
 
 #android
 if RTC == 'false':
-    replace_key_word_in_file(android_studio_temple, "include 'unityLibrary:AgoraRtcEngineKit.plugin'","")
-    replace_key_word_in_file(android_studio_temple, "implementation project('AgoraRtcEngineKit.plugin')","")
+    remove_key_word_in_path(android_studio_temple, "include 'unityLibrary:AgoraRtcEngineKit.plugin'",".gradle")
+    remove_key_word_in_path(android_studio_temple, "implementation project('AgoraRtcEngineKit.plugin')",".gradle")
 
 if RTM == 'false':
-    replace_key_word_in_file(android_studio_temple, "include 'unityLibrary:AgoraRtmEngineKit.plugin'","")
-    replace_key_word_in_file(android_studio_temple, "implementation project('AgoraRtmEngineKit.plugin')","")
+    remove_key_word_in_path(android_studio_temple, "include 'unityLibrary:AgoraRtmEngineKit.plugin'",".gradle")
+    remove_key_word_in_path(android_studio_temple, "implementation project('AgoraRtmEngineKit.plugin')",".gradle")
 
 if RTC == "false":
     os.remove(os.path.join(assets_root, "API-Example.meta"))
