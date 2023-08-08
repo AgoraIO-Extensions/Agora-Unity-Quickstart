@@ -57,9 +57,7 @@ if RTC == 'false':
         shutil.rmtree(assets_root + "/API-Example/Examples/Advanced")
     if os.path.isdir(assets_root + "/API-Example/Tools"):
         shutil.rmtree(assets_root + "/API-Example/Tools")
-    if os.path.isdir(assets_root + "/API-Example/Prefab"):
-        shutil.rmtree(assets_root + "/API-Example/Prefab")
-
+  
 if RTM == 'false' and os.path.isdir(assets_root + '/API-Example/Examples/Rtm'):
     shutil.rmtree(assets_root + '/API-Example/Examples/Rtm')
 
@@ -79,6 +77,7 @@ if RTM == 'false':
     remove_key_word_in_path(android_studio_temple, "implementation project('AgoraRtmEngineKit.plugin')",".gradle")
 
 if RTC == "false":
+    os.remove(os.path.join(assets_root, "API-Example/Prefab.meta"))
     os.remove(os.path.join(assets_root, "API-Example.meta"))
     os.remove(os.path.join(assets_root, "API-Example/Examples.meta"))
     os.remove(os.path.join(assets_root, "API-Example/Editor.meta"))
