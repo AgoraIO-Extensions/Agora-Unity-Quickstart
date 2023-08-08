@@ -7,6 +7,8 @@ using Agora.Rtc;
 using Agora.Util;
 using Logger = Agora.Util.Logger;
 using System.Collections.Generic;
+using io.agora.rtc.demo;
+
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
 {

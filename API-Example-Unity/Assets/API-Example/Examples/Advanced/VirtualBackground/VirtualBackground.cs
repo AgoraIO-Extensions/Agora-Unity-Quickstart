@@ -5,6 +5,7 @@ using Agora.Rtc;
 using Agora.Util;
 using Logger = Agora.Util.Logger;
 using System.IO;
+using io.agora.rtc.demo;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
 {

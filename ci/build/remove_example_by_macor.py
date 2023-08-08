@@ -101,3 +101,5 @@ if RTC == "false":
     replace_key_word_in_file(os.path.join(assets_root, "API-Example/Editor/RtmCommandBuild.cs"),"#define AGORA_RTC","")
     replace_key_word_in_file(os.path.join(assets_root, "API-Example/Editor/RtmCommandBuild.cs"),"public class CommandBuild","public class RtmCommandBuild")
    
+    replace_key_word_in_file(os.path.join(assets_root, "API-Example/AppIdInput/AppIdInput.cs"),"namespace io.agora.rtc.demo","namespace io.agora.rtm.demo")
+   

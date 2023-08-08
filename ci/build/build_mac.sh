@@ -166,9 +166,7 @@ if [ "$Build_Android" == "true" ]; then
         sed -i -e "s/implementation files('..\/unityLibrary\/libs\/AgoraScreenShareExtension.aar')//g" android_studio_template/launcher/build.gradle
         rm -rf android_studio_template/launcher/build.gradle-e
     fi 
-   
     sh ./ci/build/package_android.sh ${WORKSPACE} ${RTC} ${RTM}
-   
 fi
 
 echo "===========Demo build end================="
