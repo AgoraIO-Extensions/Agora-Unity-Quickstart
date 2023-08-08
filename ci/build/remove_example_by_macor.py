@@ -69,9 +69,14 @@ if RTC == 'false':
 if RTM == 'false':
     remove_key_word_in_path(assets_root, '#define AGORA_RTM')
 
+#android
 if RTC == 'false':
-    remove_key_word_in_path(os.path.join(android_studio_temple, "launcher"),
-                            "implementation files('../unityLibrary/libs/AgoraScreenShareExtension.aar')", ".gradle")
+    replace_key_word_in_file(android_studio_temple, "include 'unityLibrary:AgoraRtcEngineKit.plugin'","")
+    replace_key_word_in_file(android_studio_temple, "implementation project('AgoraRtcEngineKit.plugin')","")
+
+if RTM == 'false':
+    replace_key_word_in_file(android_studio_temple, "include 'unityLibrary:AgoraRtmEngineKit.plugin'","")
+    replace_key_word_in_file(android_studio_temple, "implementation project('AgoraRtmEngineKit.plugin')","")
 
 if RTC == "false":
     os.remove(os.path.join(assets_root, "API-Example.meta"))
