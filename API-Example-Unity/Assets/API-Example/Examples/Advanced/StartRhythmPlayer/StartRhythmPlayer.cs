@@ -7,6 +7,7 @@ using Agora.Util;
 using Logger = Agora.Util.Logger;
 using System.IO;
 using System;
+using io.agora.rtc.demo;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRhythmPlayer
 {

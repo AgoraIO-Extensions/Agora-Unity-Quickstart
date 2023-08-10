@@ -57,9 +57,7 @@ if RTC == 'false':
         shutil.rmtree(assets_root + "/API-Example/Examples/Advanced")
     if os.path.isdir(assets_root + "/API-Example/Tools"):
         shutil.rmtree(assets_root + "/API-Example/Tools")
-    if os.path.isdir(assets_root + "/API-Example/Prefab"):
-        shutil.rmtree(assets_root + "/API-Example/Prefab")
-
+  
 if RTM == 'false' and os.path.isdir(assets_root + '/API-Example/Examples/Rtm'):
     shutil.rmtree(assets_root + '/API-Example/Examples/Rtm')
 
@@ -69,11 +67,17 @@ if RTC == 'false':
 if RTM == 'false':
     remove_key_word_in_path(assets_root, '#define AGORA_RTM')
 
+#android
 if RTC == 'false':
-    remove_key_word_in_path(os.path.join(android_studio_temple, "launcher"),
-                            "implementation files('../unityLibrary/libs/AgoraScreenShareExtension.aar')", ".gradle")
+    remove_key_word_in_path(android_studio_temple, "include 'unityLibrary:AgoraRtcEngineKit.plugin'",".gradle")
+    remove_key_word_in_path(android_studio_temple, "implementation project('AgoraRtcEngineKit.plugin')",".gradle")
+
+if RTM == 'false':
+    remove_key_word_in_path(android_studio_temple, "include 'unityLibrary:AgoraRtmEngineKit.plugin'",".gradle")
+    remove_key_word_in_path(android_studio_temple, "implementation project('AgoraRtmEngineKit.plugin')",".gradle")
 
 if RTC == "false":
+    os.remove(os.path.join(assets_root, "API-Example/Prefab.meta"))
     os.remove(os.path.join(assets_root, "API-Example.meta"))
     os.remove(os.path.join(assets_root, "API-Example/Examples.meta"))
     os.remove(os.path.join(assets_root, "API-Example/Editor.meta"))
@@ -95,4 +99,6 @@ if RTC == "false":
               os.path.join(assets_root, "API-Example/Editor/RtmCommandBuild.cs"))
     replace_key_word_in_file(os.path.join(assets_root, "API-Example/Editor/RtmCommandBuild.cs"),"#define AGORA_RTC","")
     replace_key_word_in_file(os.path.join(assets_root, "API-Example/Editor/RtmCommandBuild.cs"),"public class CommandBuild","public class RtmCommandBuild")
+   
+    replace_key_word_in_file(os.path.join(assets_root, "API-Example/AppIdInput/AppIdInput.cs"),"namespace io.agora.rtc.demo","namespace io.agora.rtm.demo")
    

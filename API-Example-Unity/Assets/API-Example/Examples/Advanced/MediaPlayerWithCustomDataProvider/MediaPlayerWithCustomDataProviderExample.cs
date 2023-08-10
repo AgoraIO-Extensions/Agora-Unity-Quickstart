@@ -10,6 +10,8 @@ using Logger = Agora.Util.Logger;
 using Random = UnityEngine.Random;
 using System.IO;
 using System.Runtime.InteropServices;
+using io.agora.rtc.demo;
+
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDataProviderExample
 {

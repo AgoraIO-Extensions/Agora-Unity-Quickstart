@@ -10,6 +10,8 @@ using Logger = Agora.Util.Logger;
 using Unity.Collections;
 #endif
 
+using io.agora.rtc.demo;
+
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
 {
     public class CustomCaptureVideo : MonoBehaviour

@@ -6,6 +6,9 @@ using System.Collections.Generic;
 using UnityEngine;
 #if AGORA_RTC
 using Agora.Rtc;
+using io.agora.rtc.demo;
+#else
+using io.agora.rtm.demo;
 #endif
 using Agora.Rtm;
 

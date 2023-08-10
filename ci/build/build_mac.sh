@@ -161,6 +161,11 @@ fi
 
 if [ "$Build_Android" == "true" ]; then
     $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.$COMMAND_BUILD.BuildAndroid   
+    # aar not exitsts
+    if ! [ -f ./build_temp/sdk_project/Assets/Agora-*-Plugin/Agora-Unity-*-SDK/Plugins/Android/*.aar ]; then
+        sed -i -e "s/implementation files('..\/unityLibrary\/libs\/AgoraScreenShareExtension.aar')//g" android_studio_template/launcher/build.gradle
+        rm -rf android_studio_template/launcher/build.gradle-e
+    fi 
     sh ./ci/build/package_android.sh ${WORKSPACE} ${RTC} ${RTM}
 fi
 

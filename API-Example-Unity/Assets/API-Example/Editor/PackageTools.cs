@@ -16,7 +16,8 @@ namespace Agora_RTC_Plugin.API_Example
                 "c7b548af9d337405f889b92c979c9e36",
                 "afbde366e660d4272b8d45e2d7d96f50",
                 "300c6525f002a4dbaac41a5c4b054e35",
-                "310468f085ef24732beac714c9bb64fd"
+                "310468f085ef24732beac714c9bb64fd",
+                "2496050ad79454c69b7285bad8bdc7d5"
             };
 
             foreach (var oldGuid in oldGuids)

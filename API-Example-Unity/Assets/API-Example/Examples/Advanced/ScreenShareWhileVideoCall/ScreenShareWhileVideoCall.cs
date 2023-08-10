@@ -6,6 +6,7 @@ using Agora.Rtc;
 using Agora.Util;
 using UnityEngine.Serialization;
 using Logger = Agora.Util.Logger;
+using io.agora.rtc.demo;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCall
 {
