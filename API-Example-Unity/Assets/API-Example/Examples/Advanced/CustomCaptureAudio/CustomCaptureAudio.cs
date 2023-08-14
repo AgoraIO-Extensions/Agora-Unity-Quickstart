@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using Agora.Rtc;
 
 using RingBuffer;
+using io.agora.rtc.demo;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 {

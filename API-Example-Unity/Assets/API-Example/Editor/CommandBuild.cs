@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿#define AGORA_RTC
+#define AGORA_RTM
+
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEditor.Build;
@@ -19,16 +22,30 @@ namespace Agora_RTC_Plugin.API_Example
 {
     public class CommandBuild : MonoBehaviour
     {
+#if AGORA_RTC
+        public const string buildPath = "Build";
+#else
+        public const string buildPath = "RtmBuild";
+#endif
+
         private static string[] GetAllScenes()
         {
+#if AGORA_RTC
+            string rootScene = "HomeScene.unity";
+            string menuTitle = "Build Agora Rtc Demo"
+#else
+            string rootScene = "RtmHomeScene.unity";
+            string menuTitle = "Build Agora Rtm Demo"
+#endif
+
             List<string> scenesList = new List<string>();
             string[] allScenes = AssetDatabase.FindAssets("t:Scene", new string[] { "Assets" });
             string folder = "";
             for (int i = 0; i < allScenes.Length; i++)
             {
                 var scenePath = AssetDatabase.GUIDToAssetPath(allScenes[i]);
-                if (scenePath.EndsWith("/HomeScene.unity")) {
-                    folder = scenePath.Substring(0, scenePath.Length - 16);
+                if (scenePath.EndsWith("/"+ rootScene)) {
+                    folder = scenePath.Substring(0, scenePath.Length - rootScene.Length-1);
                     scenesList.Add(scenePath);
                     break;
                 }
@@ -43,12 +60,11 @@ namespace Agora_RTC_Plugin.API_Example
             {
                 var scenePath = AssetDatabase.GUIDToAssetPath(allScenes[i]);
               
-                if (!scenePath.EndsWith("/HomeScene.unity"))
+                if (!scenePath.EndsWith("/" + rootScene))
                 {
                     scenesList.Add(scenePath);
                 }
             }
-
 
             foreach (var scene in scenesList) {
                 Debug.Log(scene);
@@ -57,13 +73,13 @@ namespace Agora_RTC_Plugin.API_Example
             return scenesList.ToArray();
         }
 
-        [MenuItem("Build Agora Demo/Android")]
+        [MenuItem(menuTitle+"/Android")]
         public static void BuildAndroid()
         {
             EditorUserBuildSettings.exportAsGoogleAndroidProject = true;
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
             buildPlayerOptions.scenes = GetAllScenes();
-            buildPlayerOptions.locationPathName = "../Build/android_studio";
+            buildPlayerOptions.locationPathName = "../"+buildPath+"/android_studio";
             buildPlayerOptions.target = BuildTarget.Android;
             buildPlayerOptions.options = BuildOptions.None;
 
@@ -87,12 +103,12 @@ namespace Agora_RTC_Plugin.API_Example
         }
 
 
-        [MenuItem("Build Agora Demo/IPhone")]
+        [MenuItem(menuTitle+"/IPhone")]
         public static void BuildIPhone()
         {
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
             buildPlayerOptions.scenes = GetAllScenes();
-            buildPlayerOptions.locationPathName = "../Build/IPhone";
+            buildPlayerOptions.locationPathName = "../"+buildPath+"/IPhone";
             buildPlayerOptions.target = BuildTarget.iOS;
             buildPlayerOptions.options = BuildOptions.None;
 
@@ -162,12 +178,12 @@ namespace Agora_RTC_Plugin.API_Example
         }
 
 
-        [MenuItem("Build Agora Demo/Mac")]
+        [MenuItem(menuTitle+"/Mac")]
         public static void BuildMac()
         {
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
             buildPlayerOptions.scenes = GetAllScenes();
-            buildPlayerOptions.locationPathName = "../Build/Mac.app";
+            buildPlayerOptions.locationPathName = "../"+buildPath+"/Mac.app";
             buildPlayerOptions.target = BuildTarget.StandaloneOSX;
             buildPlayerOptions.options = BuildOptions.None;
 
@@ -191,13 +207,13 @@ namespace Agora_RTC_Plugin.API_Example
         }
 
 
-        [MenuItem("Build Agora Demo/x86")]
+        [MenuItem(menuTitle+"/x86")]
         public static void BuildWin32()
         {
 
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
             buildPlayerOptions.scenes = GetAllScenes();
-            buildPlayerOptions.locationPathName = "../Build/x86/x86.exe";
+            buildPlayerOptions.locationPathName = "../"+buildPath+"/x86/x86.exe";
             buildPlayerOptions.target = BuildTarget.StandaloneWindows;
             buildPlayerOptions.options = BuildOptions.None;
 
@@ -221,12 +237,12 @@ namespace Agora_RTC_Plugin.API_Example
 
         }
 
-        [MenuItem("Build Agora Demo/x86_64")]
+        [MenuItem(menuTitle+"/x86_64")]
         public static void BuildWin64()
         {
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
             buildPlayerOptions.scenes = GetAllScenes();
-            buildPlayerOptions.locationPathName = "../Build/x86_64/x86_64.exe";
+            buildPlayerOptions.locationPathName = "../"+buildPath+"/x86_64/x86_64.exe";
             buildPlayerOptions.target = BuildTarget.StandaloneWindows64;
             buildPlayerOptions.options = BuildOptions.None;
 
@@ -250,7 +266,7 @@ namespace Agora_RTC_Plugin.API_Example
 
         }
 
-        [MenuItem("Build Agora Demo/All")]
+        [MenuItem(menuTitle+"/All")]
         public static void BuildAll()
         {
             BuildAndroid();

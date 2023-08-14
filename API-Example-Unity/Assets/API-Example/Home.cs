@@ -1,9 +1,19 @@
+#define AGORA_RTC
+#define AGORA_RTM
+
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+#if AGORA_RTC
 using Agora.Rtc;
+using Agora.Util;
+using io.agora.rtc.demo;
+#else
+using io.agora.rtm.demo;
+#endif
+
 using System;
 
 namespace Agora_RTC_Plugin.API_Example
@@ -67,13 +77,25 @@ namespace Agora_RTC_Plugin.API_Example
         "WriteBackVideoRawDataScene"
     };
 
-        private void Awake()
-        {
-            PermissionHelper.RequestMicrophontPermission();
-            PermissionHelper.RequestCameraPermission();
+    private string[] _rtmNameList = {
+        "RtmClientScene",
+        "RtmStreamChannelScene",
+        "RtmLockScene",
+        "RtmPresenceScene",
+        "RtmStorageScene"
+    };
 
-            GameObject content = GameObject.Find("Content");
+    private void Awake()
+    {
+#if AGORA_RTC
+        PermissionHelper.RequestMicrophontPermission();
+        PermissionHelper.RequestCameraPermission();
+#endif
 
+        GameObject content = GameObject.Find("Content");
+        var contentRectTrans = content.GetComponent<RectTransform>();
+
+#if AGORA_RTC
             for (int i = 0; i < _baseSceneNameList.Length; i++)
             {
                 var go = Instantiate(CasePanel, content.transform);
@@ -93,7 +115,19 @@ namespace Agora_RTC_Plugin.API_Example
                 button.onClick.AddListener(OnJoinSceneClicked);
                 button.onClick.AddListener(SetScolllerActive);
             }
+#endif
 
+#if AGORA_RTM
+        for (int i = 0; i < _rtmNameList.Length; i++)
+        {
+            var go = Instantiate(CasePanel, content.transform);
+            var name = go.transform.Find("Text").gameObject.GetComponent<Text>();
+            name.text = _rtmNameList[i];
+            var button = go.transform.Find("Button").gameObject.GetComponent<Button>();
+            button.onClick.AddListener(OnJoinSceneClicked);
+            button.onClick.AddListener(SetScolllerActive);
+        }
+#endif
 
             if (this.AppInputConfig)
             {

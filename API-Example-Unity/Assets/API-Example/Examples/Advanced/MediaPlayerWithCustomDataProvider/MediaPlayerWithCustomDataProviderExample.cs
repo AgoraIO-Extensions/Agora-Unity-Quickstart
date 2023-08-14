@@ -10,7 +10,8 @@ using Agora.Rtc;
 using Random = UnityEngine.Random;
 using System.IO;
 using System.Runtime.InteropServices;
-using UnityEngine.Networking;
+using io.agora.rtc.demo;
+
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDataProviderExample
 {
