@@ -8,7 +8,6 @@ using UnityEngine.SceneManagement;
 
 #if AGORA_RTC
 using Agora.Rtc;
-using Agora.Util;
 using io.agora.rtc.demo;
 #else
 using io.agora.rtm.demo;

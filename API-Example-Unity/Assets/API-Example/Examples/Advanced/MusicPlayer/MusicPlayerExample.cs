@@ -3,9 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
-
 using System.Collections.Generic;
-using Logger = Agora.Util.Logger;
 using io.agora.rtc.demo;
 
 

@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Agora.Rtc;
-
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
-using Logger = Agora.Util.Logger;
 using io.agora.rtc.demo;
 
 
