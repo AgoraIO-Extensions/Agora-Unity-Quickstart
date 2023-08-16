@@ -9,7 +9,6 @@ namespace Agora_RTC_Plugin.API_Example
 {
     public class PackageTools : MonoBehaviour
     {
-        [MenuItem("AgoraRtm/ReplaceGUIDs")]
         public static void ReplaceGUIDs()
         {
             string[] oldGuids = new string[] {
