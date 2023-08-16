@@ -2,11 +2,10 @@
 using System.IO;
 using System.Collections.Generic;
 using Agora.Rtc;
- 
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
- 
+using io.agora.rtc.demo;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscoder
 {
@@ -142,7 +141,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
         {
 
             List<TranscodingVideoStream> list = new List<TranscodingVideoStream>();
-
 
             if (this.TogglePrimartCamera.isOn)
             {

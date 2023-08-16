@@ -1,7 +1,13 @@
 echo `pwd` 
 
 WORKSPACE=$1
-
+RTC=$2
+RTM=$3
+if [ "$RTC" == "true" ]; then
+    BUILD_PATH="Build"
+else 
+    BUILD_PATH="RtmBuild"
+fi
 
 # Project名称
 PROJECT_NAME=Unity-iPhone
@@ -10,9 +16,9 @@ SCHEME_NAME=Unity-iPhone
 ## 编译类型 Debug/Release二选一
 BUILD_TYPE=Release
 ## 项目根路径，xcodeproj/xcworkspace所在路径
-PROJECT_ROOT_PATH=./Build/IPhone
+PROJECT_ROOT_PATH=./$BUILD_PATH/IPhone
 ## 打包生成路径
-PRODUCT_PATH=./Build
+PRODUCT_PATH=./$BUILD_PATH
 
 BUILD_TYPE=Release
 
@@ -39,27 +45,27 @@ echo "============Build Archive Success============"
 
 ## 导出IPA原始的包
 echo "============Export IPA Begin============"
-xcodebuild -exportArchive -archivePath $ARCHIVE_PATH -exportPath ./Build CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO -exportOptionsPlist "./ci/ExportOptions/ExportOptions.plist" -quiet || exit
+xcodebuild -exportArchive -archivePath $ARCHIVE_PATH -exportPath ./$BUILD_PATH CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO -exportOptionsPlist "./ci/ExportOptions/ExportOptions.plist" -quiet || exit
 echo "============Export IPA Success============"
 
 # 给ipa包签名
 echo "============Sign IPA Begin============"
-sh ${WORKSPACE}/sign ./Build/unityexample.ipa
+sh ${WORKSPACE}/sign ./$BUILD_PATH/unityexample.ipa
 
-ls ./Build
+ls ./$BUILD_PATH
 # ls ${WORKSPACE}
 
-mv ./unityexample_A.ipa ./Build/unityexample_A.ipa 
-mv ./unityexample_B.ipa ./Build/unityexample_B.ipa 
-mv ./unityexample_C.ipa ./Build/unityexample_C.ipa 
-mv ./unityexample_D.ipa ./Build/unityexample_D.ipa 
-mv ./unityexample_E.ipa ./Build/unityexample_E.ipa
+mv ./unityexample_A.ipa ./$BUILD_PATH/unityexample_A.ipa 
+mv ./unityexample_B.ipa ./$BUILD_PATH/unityexample_B.ipa 
+mv ./unityexample_C.ipa ./$BUILD_PATH/unityexample_C.ipa 
+mv ./unityexample_D.ipa ./$BUILD_PATH/unityexample_D.ipa 
+mv ./unityexample_E.ipa ./$BUILD_PATH/unityexample_E.ipa
 
 echo "============Sign IPA Sucess============"
 
 echo "============Clear IPA Begin============"
-rm -f ./Build/*.plist
-rm -f ./Build/*.log
-rm -f ./Build/unityexample.ipa
+rm -f ./$BUILD_PATH/*.plist
+rm -f ./$BUILD_PATH/*.log
+rm -f ./$BUILD_PATH/unityexample.ipa
 echo "============Clear IPA End============"
 

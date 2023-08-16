@@ -79,7 +79,8 @@ echo Build_IOS_SIGN: $Build_IOS_SIGN
 echo Build_Android: $Build_Android
 echo Plugin_Url: $Plugin_Url
 echo appID: $appID
-
+echo RTC: $RTC
+echo RTM: $RTM
 
 echo Package_Publish: $Package_Publish
 echo is_tag_fetch: $is_tag_fetch
@@ -98,22 +99,37 @@ set -ex
 UNITY_DIR=/Applications/Unity/Hub/Editor/${Unity_Version}/Unity.app/Contents/MacOS
 
 echo "===========create sdk_project begin================="
+
+#remove api-example AGORA_RTC or AGORA_RTM
+python3 $root/ci/build/remove_example_by_macor.py $root/API-Example-Unity/Assets $RTC $RTM
+
 mkdir build_temp
 cd build_temp
 python3 ${WORKSPACE}/artifactory_utils.py --action=download_file --file=$SDK_Url
-unzip -d ./ ./Agora_Unity_RTC_SDK_*.zip
+unzip -d ./ ./Agora_Unity_*_SDK_*.zip
 ls 
 echo "===========unzip finish================="
+if [ "$RTC" == "true" ]; then
+    UNITYPACKAGE_NAME="Agora-RTC-Plugin.unitypackage"
+    BUILD_PATH="Build"
+    COMMAND_BUILD="CommandBuild"
+else 
+    UNITYPACKAGE_NAME="Agora-RTM-Plugin.unitypackage"
+    BUILD_PATH="RtmBuild"
+    COMMAND_BUILD="RtmCommandBuild"
+fi
+
 $UNITY_DIR/Unity -quit -batchmode -nographics -createProject "sdk_project"
 echo "===========create sdk_project finish================="
-$UNITY_DIR/Unity -quit -batchmode -nographics -openProjects  "sdk_project" -importPackage "${root}/build_temp/Agora-RTC-Plugin.unitypackage"
+$UNITY_DIR/Unity -quit -batchmode -nographics -openProjects  "sdk_project" -importPackage "${root}/build_temp/${UNITYPACKAGE_NAME}"
 echo "===========import sdk_project finish================="
 
 cd ${root}
 echo "===========Demo build begin================="
-rm -rf build_temp/sdk_project/Assets/Agora-RTC-Plugin/API-Example
-cp -r build_temp/sdk_project/Assets/Agora-RTC-Plugin ./API-Example-Unity/Assets
-echo "===========copy Agora-RTC-Plugin to Assets finish ================="
+rm -rf build_temp/sdk_project/Assets/Agora-*-Plugin/API-Example
+cp -r build_temp/sdk_project/Assets/Agora-*-Plugin ./API-Example-Unity/Assets
+echo "===========copy Agora-*-Plugin to Assets finish ================="
+
 
 #replace appID 
 sed -i "" "s/appID:/appID: ${appID}/g" ./API-Example-Unity/Assets/API-Example/AppIdInput/AppIdInput.asset
@@ -127,37 +143,42 @@ else
 fi
 
 if [ "$Build_Mac" == "true" ]; then
-    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.CommandBuild.BuildMac   
+    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.$COMMAND_BUILD.BuildMac   
 fi
 
 if [ "$Build_IOS" == "true" ]; then
-    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -buildTarget ios -executeMethod Agora_RTC_Plugin.API_Example.CommandBuild.BuildIPhone   
+    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -buildTarget ios -executeMethod Agora_RTC_Plugin.API_Example.$COMMAND_BUILD.BuildIPhone   
     
     if [ "$Build_IOS_SIGN" == "true" ]; then
-        sh ./ci/build/package_ios.sh ${WORKSPACE}
+        sh ./ci/build/package_ios.sh ${WORKSPACE} ${RTC} ${RTM}
     fi
 fi
 
 if [ "$Build_Win" == "true" ]; then
-    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.CommandBuild.BuildWin32   
-    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.CommandBuild.BuildWin64  
+    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.$COMMAND_BUILD.BuildWin32   
+    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.$COMMAND_BUILD.BuildWin64  
 fi
 
 if [ "$Build_Android" == "true" ]; then
-    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.CommandBuild.BuildAndroid   
-    sh ./ci/build/package_android.sh ${WORKSPACE}
+    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.$COMMAND_BUILD.BuildAndroid   
+    # aar not exitsts
+    if ! [ -f ./build_temp/sdk_project/Assets/Agora-*-Plugin/Agora-Unity-*-SDK/Plugins/Android/*.aar ]; then
+        sed -i -e "s/implementation files('..\/unityLibrary\/libs\/AgoraScreenShareExtension.aar')//g" android_studio_template/launcher/build.gradle
+        rm -rf android_studio_template/launcher/build.gradle-e
+    fi 
+    sh ./ci/build/package_android.sh ${WORKSPACE} ${RTC} ${RTM}
 fi
-
 
 echo "===========Demo build end================="
 
 #zip all file
 mkdir Demo_zip
-demo_files=`ls ./Build`
+ls ./
+demo_files=`ls ./$BUILD_PATH`
 for file in ${demo_files}
 do
     no_suffix_file=${file%.*}
-    7za a ./Demo_zip/Unity_Demo_${SDK_Version}_${no_suffix_file}_${build_date}_${build_time}.zip ./Build/${file}  
+    7za a ./Demo_zip/Unity_Demo_${SDK_Version}_${no_suffix_file}_${build_date}_${build_time}.zip ./$BUILD_PATH/${file}  
 done
 
 #upload all file

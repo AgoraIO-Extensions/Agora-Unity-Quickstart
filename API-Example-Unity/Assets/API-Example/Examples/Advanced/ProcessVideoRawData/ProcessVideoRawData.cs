@@ -2,8 +2,8 @@
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
- 
- 
+using io.agora.rtc.demo;
+
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
 {
@@ -279,9 +279,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
             return true;
         }
 
-        public override bool OnRenderVideoFrame(string channelId, uint uid, VideoFrame videoFrame)
+        public override bool OnRenderVideoFrame(string channelId, uint remoteUid, VideoFrame videoFrame)
         {
-            Debug.Log("OnRenderVideoFrameHandler-----------" + " uid:" + uid + " width:" + videoFrame.width +
+            Debug.Log("OnRenderVideoFrameHandler-----------" + " uid:" + remoteUid + " width:" + videoFrame.width +
                         " height:" + videoFrame.height);
             return true;
         }

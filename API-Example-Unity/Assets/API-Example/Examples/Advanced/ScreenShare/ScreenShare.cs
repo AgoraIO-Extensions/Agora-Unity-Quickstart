@@ -3,9 +3,8 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Agora.Rtc;
- 
 using UnityEngine.Serialization;
- 
+using io.agora.rtc.demo;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 {

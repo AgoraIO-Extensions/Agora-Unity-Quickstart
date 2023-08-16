@@ -1,9 +1,8 @@
 ﻿using Agora.Rtc;
- 
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
- 
+using io.agora.rtc.demo;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
 {

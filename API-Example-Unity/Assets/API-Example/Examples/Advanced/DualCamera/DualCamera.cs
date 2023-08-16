@@ -2,8 +2,7 @@
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
- 
- 
+using io.agora.rtc.demo;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
 {
@@ -268,7 +267,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             RtcEngine.InitEventHandler(null);
             RtcEngine.StopCameraCapture(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA);
             RtcEngine.StopCameraCapture(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_SECONDARY);
-            RtcEngine.LeaveChannelEx(new RtcConnection(_channelName, 456));
+            RtcEngine.LeaveChannelEx(new RtcConnection(_channelName, UID2));
             RtcEngine.LeaveChannel();
             RtcEngine.Dispose();
         }
