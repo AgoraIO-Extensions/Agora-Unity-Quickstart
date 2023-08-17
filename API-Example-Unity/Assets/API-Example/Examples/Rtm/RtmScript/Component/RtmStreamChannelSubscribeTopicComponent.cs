@@ -34,26 +34,26 @@ namespace io.agora.rtm.demo
 
             this.RtmScene.AddMessage("Users:\n" + this.ContainerUser.ToString(), Message.MessageType.Info);
 
-            var result = await this.RtmScene.StreamChannel.SubscribeTopicAsync(this.TopicInput.text, options);
+            var (status, response) = await this.RtmScene.StreamChannel.SubscribeTopicAsync(this.TopicInput.text, options);
 
-            if (result.Status.Error)
+            if (status.Error)
             {
-                this.RtmScene.AddMessage(string.Format("StreamChannel.SubscribeTopic Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Info);
+                this.RtmScene.AddMessage(string.Format("StreamChannel.SubscribeTopic Status.ErrorCode:{0} ", status.ErrorCode), Message.MessageType.Info);
             }
             else
             {
-                var succeedUsersCount = result.Response.SucceedUsers == null ? 0 : result.Response.SucceedUsers.Length;
-                var FailedUsersCount = result.Response.FailedUsers == null ? 0 : result.Response.FailedUsers.Length;
-                this.RtmScene.AddMessage("StreamChannel.SubscribeTopic Response:" + " channelName:" + result.Response.ChannelName + " userId :" + result.Response.UserId + " topic :" + result.Response.Topic + " succeedUsersCount :" + succeedUsersCount + " failedUsers :" + FailedUsersCount, Message.MessageType.Info);
+                var succeedUsersCount = response.SucceedUsers == null ? 0 : response.SucceedUsers.Length;
+                var FailedUsersCount = response.FailedUsers == null ? 0 : response.FailedUsers.Length;
+                this.RtmScene.AddMessage("StreamChannel.SubscribeTopic Response:" + " channelName:" + response.ChannelName + " userId :" + response.UserId + " topic :" + response.Topic + " succeedUsersCount :" + succeedUsersCount + " failedUsers :" + FailedUsersCount, Message.MessageType.Info);
 
                 for (int i = 0; i < succeedUsersCount; i++)
                 {
-                    this.RtmScene.AddMessage("succeedUsers index " + i + " UserName is " + result.Response.SucceedUsers[i], Message.MessageType.Info);
+                    this.RtmScene.AddMessage("succeedUsers index " + i + " UserName is " + response.SucceedUsers[i], Message.MessageType.Info);
                 }
 
                 for (int i = 0; i < FailedUsersCount; i++)
                 {
-                    this.RtmScene.AddMessage("failedUsers index " + i + " UserName is " + result.Response.FailedUsers[i], Message.MessageType.Info);
+                    this.RtmScene.AddMessage("failedUsers index " + i + " UserName is " + response.FailedUsers[i], Message.MessageType.Info);
                 }
 
                 ContainerUser.ClearAllNode();
@@ -77,8 +77,8 @@ namespace io.agora.rtm.demo
             TopicOptions options = new TopicOptions();
             options.users = this.ContainerUser.GetDataSource();
 
-            var ret = await this.RtmScene.StreamChannel.UnsubscribeTopicAsync(this.TopicInput.text, options);
-            this.RtmScene.AddMessage("StreamChannel.UnsubscribeTopic ret:" + ret, Message.MessageType.Info);
+            var (status, response) = await this.RtmScene.StreamChannel.UnsubscribeTopicAsync(this.TopicInput.text, options);
+            this.RtmScene.AddMessage("StreamChannel.UnsubscribeTopic ret:" + status.ErrorCode, Message.MessageType.Info);
         }
 
         public async void OnGetSubscribedUserList()
@@ -95,14 +95,14 @@ namespace io.agora.rtm.demo
                 return;
             }
 
-            var result = await this.RtmScene.StreamChannel.GetSubscribedUserListAsync(this.TopicInput.text);
-            if (result.Status.Error)
+            var (status, response) = await this.RtmScene.StreamChannel.GetSubscribedUserListAsync(this.TopicInput.text);
+            if (status.Error)
             {
-                this.RtmScene.AddMessage("GetSubscribedTopic ErrorCode:" + result.Status.ErrorCode, Message.MessageType.Info);
+                this.RtmScene.AddMessage("GetSubscribedTopic ErrorCode:" + status.ErrorCode, Message.MessageType.Info);
             }
             else
             {
-                var userList = result.Response.Users;
+                var userList = response.Users;
                 var userCount = userList == null ? 0 : userList.Length;
                 if (userCount == 0)
                 {

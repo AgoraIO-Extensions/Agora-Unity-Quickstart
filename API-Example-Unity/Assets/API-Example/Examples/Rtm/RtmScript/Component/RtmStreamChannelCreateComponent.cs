@@ -101,15 +101,15 @@ namespace io.agora.rtm.demo
             options.withPresence = this.WithPresenceToggle.isOn;
             options.withLock = this.WithLockToggle.isOn;
 
-            var result = await this.RtmScene.StreamChannel.JoinAsync(options);
-            if (result.Status.Error)
+            var (status, response) = await this.RtmScene.StreamChannel.JoinAsync(options);
+            if (status.Error)
             {
-                this.RtmScene.AddMessage(string.Format("Join Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Error);
+                this.RtmScene.AddMessage(string.Format("Join Status.ErrorCode:{0} ", status.ErrorCode), Message.MessageType.Error);
             }
             else
             {
                 string str = string.Format("Join Response: channelName:{0} userId:{1}",
-                    result.Response.ChannelName, result.Response.UserId);
+                    response.ChannelName, response.UserId);
                 this.RtmScene.AddMessage(str, Message.MessageType.Info);
                 this.TitleText.text = "Steam channel already joined";
                 this.TitleText.color = Color.green;
@@ -124,16 +124,16 @@ namespace io.agora.rtm.demo
                 return;
             }
 
-            var result = await this.RtmScene.StreamChannel.LeaveAsync();
+            var (status, response) = await this.RtmScene.StreamChannel.LeaveAsync();
 
-            if (result.Status.Error)
+            if (status.Error)
             {
-                this.RtmScene.AddMessage(string.Format("StreamChannel.Leave Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Error);
+                this.RtmScene.AddMessage(string.Format("StreamChannel.Leave Status.ErrorCode:{0} ", status.ErrorCode), Message.MessageType.Error);
             }
             else
             {
                 string str = string.Format("StreamChannel.Leave Response: channelName:{0} userId:{1}",
-                    result.Response.ChannelName, result.Response.UserId);
+                    response.ChannelName, response.UserId);
                 this.RtmScene.AddMessage(str, Message.MessageType.Info);
                 this.TitleText.text = "Steam channel already leave";
                 this.TitleText.color = Color.red;

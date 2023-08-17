@@ -43,8 +43,8 @@ namespace io.agora.rtm.demo
             PublishOptions options = new PublishOptions();
             options.sendTs = ulong.Parse(this.SendTsInput.text);
 
-            var result = await this.RtmScene.StreamChannel.PublishTopicMessageAsync(topic, message, options);
-            this.RtmScene.AddMessage("StreamChannel.PublishTopicMessage  ret:" + result.Status.ErrorCode, Message.MessageType.Info);
+            var (status, response) = await this.RtmScene.StreamChannel.PublishTopicMessageAsync(topic, message, options);
+            this.RtmScene.AddMessage("StreamChannel.PublishTopicMessage  ret:" + status.ErrorCode, Message.MessageType.Info);
         }
 
 

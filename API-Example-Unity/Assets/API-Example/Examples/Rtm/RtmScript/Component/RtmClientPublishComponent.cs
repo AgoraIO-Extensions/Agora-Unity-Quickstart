@@ -55,11 +55,11 @@ namespace io.agora.rtm.demo
             options.customType = this.CustomTypeInput.text;
 
 
-            var result = await RtmScene.RtmClient.PublishAsync(channelName, message, options);
+            var (status, response) = await RtmScene.RtmClient.PublishAsync(channelName, message, options);
 
-            if (result.Status.Error)
+            if (status.Error)
             {
-                RtmScene.AddMessage(string.Format("rtmClient.Publish Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Error);
+                RtmScene.AddMessage(string.Format("rtmClient.Publish Status.ErrorCode:{0} ", status.ErrorCode), Message.MessageType.Error);
             }
             else
             {

@@ -29,11 +29,11 @@ namespace io.agora.rtm.demo
             }
 
             string token = this.TokenInput.text;
-            var result = await RtmScene.RtmClient.LoginAsync(token);
+            var (status, response) = await RtmScene.RtmClient.LoginAsync(token);
 
-            if (result.Status.Error)
+            if (status.Error)
             {
-                RtmScene.AddMessage("rtmClient.Login + ret:" + result.Status.ErrorCode, Message.MessageType.Error);
+                RtmScene.AddMessage("rtmClient.Login + ret:" + status.ErrorCode, Message.MessageType.Error);
                 this.TitleText.text = "RtmClient login failed";
                 this.TitleText.color = Color.red;
             }
@@ -62,8 +62,8 @@ namespace io.agora.rtm.demo
             }
 
 
-            var ret = await RtmScene.RtmClient.LogoutAsync();
-            RtmScene.AddMessage(string.Format("RtmClient.Logout ret:{0} ", ret.Status.ErrorCode), Message.MessageType.Info);
+            var (status, response) = await RtmScene.RtmClient.LogoutAsync();
+            RtmScene.AddMessage(string.Format("RtmClient.Logout ret:{0} ", status.ErrorCode), Message.MessageType.Info);
             this.TitleText.text = "RtmClient logout";
             this.TitleText.color = Color.red;
         }
@@ -77,8 +77,8 @@ namespace io.agora.rtm.demo
             }
 
             string token = this.TokenInput.text;
-            var res =  await RtmScene.RtmClient.RenewTokenAsync(token);
-            RtmScene.AddMessage("rtmClient RenewToken: " + res.Status.ErrorCode, Message.MessageType.Info);
+            var (status, response) = await RtmScene.RtmClient.RenewTokenAsync(token);
+            RtmScene.AddMessage("rtmClient RenewToken: " + status.ErrorCode, Message.MessageType.Info);
 
         }
 
