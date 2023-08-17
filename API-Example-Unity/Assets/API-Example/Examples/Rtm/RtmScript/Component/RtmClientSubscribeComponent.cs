@@ -45,15 +45,15 @@ namespace io.agora.rtm.demo
                 withLock = WithLockToggle.isOn
             };
 
-            var result = await RtmScene.RtmClient.SubscribeAsync(channelName, subscribeOptions);
+            var (status, response) = await RtmScene.RtmClient.SubscribeAsync(channelName, subscribeOptions);
 
-            if (result.Status.Error)
+            if (status.Error)
             {
-                RtmScene.AddMessage(string.Format("rtmClient.Subscribe Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Error);
+                RtmScene.AddMessage(string.Format("rtmClient.Subscribe Status.ErrorCode:{0} ", status.ErrorCode), Message.MessageType.Error);
             }
             else
             {
-                string info = string.Format("rtmClient.Subscribe Response , channelName:{0}", result.Response.ChannelName);
+                string info = string.Format("rtmClient.Subscribe Response , channelName:{0}", response.ChannelName);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
                 ChannelNameList.Add(channelName);
             }
@@ -69,10 +69,10 @@ namespace io.agora.rtm.demo
             }
 
             string channelName = this.ChannelNameInput.text;
-            var result = await RtmScene.RtmClient.UnsubscribeAsync(channelName);
+            var (status, response) = await RtmScene.RtmClient.UnsubscribeAsync(channelName);
 
-            RtmScene.AddMessage("rtmClient.Unsubscribe  ret:" + result.Status.ErrorCode, Message.MessageType.Info);
-            if (!result.Status.Error)
+            RtmScene.AddMessage("rtmClient.Unsubscribe  ret:" + status.ErrorCode, Message.MessageType.Info);
+            if (!status.Error)
             {
                 ChannelNameList.Remove(channelName);
             }

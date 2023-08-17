@@ -52,22 +52,22 @@ namespace io.agora.rtm.demo
 
             IRtmPresence rtmPresence = this.RtmScene.RtmClient.GetPresence();
 
-            var result = await rtmPresence.WhoNowAsync(channelName, channelType, options);
-            if (result.Status.Error)
+            var (status, response) = await rtmPresence.WhoNowAsync(channelName, channelType, options);
+            if (status.Error)
             {
-                RtmScene.AddMessage(string.Format("WhoNow Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Error);
+                RtmScene.AddMessage(string.Format("WhoNow Status.ErrorCode:{0} ", status.ErrorCode), Message.MessageType.Error);
             }
             else
             {
-                var count = result.Response.UserStateList.Length;
+                var count = response.UserStateList.Length;
                 string info = string.Format("WhoNow Response : count:{0},nextPage:{1}",
-                    count, result.Response.NextPage);
+                    count, response.NextPage);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
                 if (count > 0)
                 {
-                    for (int i = 0; i < result.Response.UserStateList.Length; i++)
+                    for (int i = 0; i < response.UserStateList.Length; i++)
                     {
-                        var userState = result.Response.UserStateList[i];
+                        var userState = response.UserStateList[i];
                         var statesCount = userState.states == null ? 0 : userState.states.Length;
                         string info2 = string.Format("userStateList userId:{0}, stateCount:{1}", userState.userId, statesCount);
                         RtmScene.AddMessage(info2, Message.MessageType.Info);
@@ -97,22 +97,22 @@ namespace io.agora.rtm.demo
 
             IRtmPresence rtmPresence = this.RtmScene.RtmClient.GetPresence();
 
-            var result = await rtmPresence.WhereNowAsync(userId);
-            if (result.Status.Error)
+            var (status, response) = await rtmPresence.WhereNowAsync(userId);
+            if (status.Error)
             {
-                RtmScene.AddMessage(string.Format("WhereNow Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Info);
+                RtmScene.AddMessage(string.Format("WhereNow Status.ErrorCode:{0} ", status.ErrorCode), Message.MessageType.Info);
             }
             else
             {
-                var count = result.Response.Channels.Length;
+                var count = response.Channels.Length;
                 string info = string.Format("WhereNow Response: count:{0}"
                     , count);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
                 if (count > 0)
                 {
-                    for (int i = 0; i < result.Response.Channels.Length; i++)
+                    for (int i = 0; i < response.Channels.Length; i++)
                     {
-                        var channelInfo = result.Response.Channels[i];
+                        var channelInfo = response.Channels[i];
                         string info2 = string.Format("---- channelName:{0}, channelType:{1}", channelInfo.channelName, channelInfo.channelType);
                         RtmScene.AddMessage(info2, Message.MessageType.Info);
                     }
@@ -143,10 +143,10 @@ namespace io.agora.rtm.demo
             RtmScene.AddMessage("stateItem List: \n" + this.ContanierStateItem.ToString(), Message.MessageType.Info);
 
             IRtmPresence rtmPresence = this.RtmScene.RtmClient.GetPresence();
-            var result = await rtmPresence.SetStateAsync(channelName, channelType, stateItems);
-            if (result.Status.Error)
+            var (status, response) = await rtmPresence.SetStateAsync(channelName, channelType, stateItems);
+            if (status.Error)
             {
-                RtmScene.AddMessage(string.Format("SetState Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Error);
+                RtmScene.AddMessage(string.Format("SetState Status.ErrorCode:{0} ", status.ErrorCode), Message.MessageType.Error);
             }
             else
             {
@@ -177,10 +177,10 @@ namespace io.agora.rtm.demo
 
             IRtmPresence rtmPresence = this.RtmScene.RtmClient.GetPresence();
 
-            var result = await rtmPresence.RemoveStateAsync(channelName, channelType, keys);
-            if (result.Status.Error)
+            var (status, response) = await rtmPresence.RemoveStateAsync(channelName, channelType, keys);
+            if (status.Error)
             {
-                RtmScene.AddMessage(string.Format("RemoveState Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Error);
+                RtmScene.AddMessage(string.Format("RemoveState Status.ErrorCode:{0} ", status.ErrorCode), Message.MessageType.Error);
             }
             else
             {
@@ -216,20 +216,20 @@ namespace io.agora.rtm.demo
 
             IRtmPresence rtmPresence = this.RtmScene.RtmClient.GetPresence();
 
-            var result = await rtmPresence.GetStateAsync(channelName, channelType, userId);
-            if (result.Status.Error)
+            var (status, response) = await rtmPresence.GetStateAsync(channelName, channelType, userId);
+            if (status.Error)
             {
-                RtmScene.AddMessage(string.Format("GetState Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Error);
+                RtmScene.AddMessage(string.Format("GetState Status.ErrorCode:{0} ", status.ErrorCode), Message.MessageType.Error);
             }
             else
             {
                 string info = string.Format("rtmPresence.GetState Response");
                 RtmScene.AddMessage(info, Message.MessageType.Info);
-                var statesCount = result.Response.State.states == null ? 0 : result.Response.State.states.Length;
+                var statesCount = response.State.states == null ? 0 : response.State.states.Length;
                 string info2 = string.Format("userStateList userId:{0}, stateCount:{1}",
-                    result.Response.State.userId, statesCount);
+                    response.State.userId, statesCount);
                 RtmScene.AddMessage(info2, Message.MessageType.Info);
-                foreach (var stateItem in result.Response.State.states)
+                foreach (var stateItem in response.State.states)
                 {
                     string info3 = string.Format("key:{0},value:{1}", stateItem.key, stateItem.value);
                     RtmScene.AddMessage(info3, Message.MessageType.Info);

@@ -50,15 +50,15 @@ namespace io.agora.rtm.demo
 
             IRtmStorage rtmStorage = RtmScene.RtmClient.GetStorage();
 
-            var result = await rtmStorage.SetUserMetadataAsync(userId, rtmMetadata, metadataOptions);
-            if (result.Status.Error)
+            var (status, response) = await rtmStorage.SetUserMetadataAsync(userId, rtmMetadata, metadataOptions);
+            if (status.Error)
             {
-                RtmScene.AddMessage(string.Format("SetUserMetadata Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Error);
+                RtmScene.AddMessage(string.Format("SetUserMetadata Status.ErrorCode:{0} ", status.ErrorCode), Message.MessageType.Error);
             }
             else
             {
                 string info = string.Format("SetUserMetadata Response : userId:{0}",
-                    result.Response.UserId);
+                    response.UserId);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
             }
 
@@ -96,15 +96,15 @@ namespace io.agora.rtm.demo
             RtmScene.AddMessage("metadataItem List: \n" + this.ContainerMetadataItem.ToString(), Message.MessageType.Info);
 
             IRtmStorage rtmStorage = RtmScene.RtmClient.GetStorage();
-            var result = await rtmStorage.UpdateUserMetadataAsync(userId, rtmMetadata, metadataOptions);
-            if (result.Status.Error)
+            var (status, response) = await rtmStorage.UpdateUserMetadataAsync(userId, rtmMetadata, metadataOptions);
+            if (status.Error)
             {
-                RtmScene.AddMessage(string.Format("UpdateUserMetadata Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Info);
+                RtmScene.AddMessage(string.Format("UpdateUserMetadata Status.ErrorCode:{0} ", status.ErrorCode), Message.MessageType.Info);
             }
             else
             {
                 string info = string.Format("UpdateUserMetadata Response ,userId:{0}",
-                    result.Response.UserId);
+                    response.UserId);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
             }
 
@@ -142,15 +142,15 @@ namespace io.agora.rtm.demo
             RtmScene.AddMessage("metadataItem List: \n" + this.ContainerMetadataItem.ToString(), Message.MessageType.Info);
 
             IRtmStorage rtmStorage = RtmScene.RtmClient.GetStorage();
-            var result = await rtmStorage.RemoveUserMetadataAsync(userId, rtmMetadata, metadataOptions);
-            if (result.Status.Error)
+            var (status, response) = await rtmStorage.RemoveUserMetadataAsync(userId, rtmMetadata, metadataOptions);
+            if (status.Error)
             {
-                RtmScene.AddMessage(string.Format("RemoveUserMetadata Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Error);
+                RtmScene.AddMessage(string.Format("RemoveUserMetadata Status.ErrorCode:{0} ", status.ErrorCode), Message.MessageType.Error);
             }
             else
             {
                 string info = string.Format("RemoveUserMetadata Response ,userId:{0}",
-                    result.Response.UserId);
+                    response.UserId);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
             }
         }
@@ -171,17 +171,17 @@ namespace io.agora.rtm.demo
 
             string userId = this.UserIdInput.text;
             IRtmStorage rtmStorage = RtmScene.RtmClient.GetStorage();
-            var result = await rtmStorage.GetUserMetadataAsync(userId);
-            if (result.Status.Error)
+            var (status, response) = await rtmStorage.GetUserMetadataAsync(userId);
+            if (status.Error)
             {
-                RtmScene.AddMessage(string.Format("GetUserMetadata Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Info);
+                RtmScene.AddMessage(string.Format("GetUserMetadata Status.ErrorCode:{0} ", status.ErrorCode), Message.MessageType.Info);
             }
             else
             {
                 string info = string.Format("GetUserMetadata Response ,userId:{0}",
-                    result.Response.UserId);
+                    response.UserId);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
-                DisplayRtmMetadata(ref result.Response.Data);
+                DisplayRtmMetadata(ref response.Data);
             }
 
         }
@@ -202,15 +202,15 @@ namespace io.agora.rtm.demo
 
             string userId = this.UserIdInput.text;
             IRtmStorage rtmStorage = RtmScene.RtmClient.GetStorage();
-            var result = await rtmStorage.SubscribeUserMetadataAsync(userId);
-            if (result.Status.Error)
+            var (status, response) = await rtmStorage.SubscribeUserMetadataAsync(userId);
+            if (status.Error)
             {
-                RtmScene.AddMessage(string.Format("SubscribeUserMetadata Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Error);
+                RtmScene.AddMessage(string.Format("SubscribeUserMetadata Status.ErrorCode:{0} ", status.ErrorCode), Message.MessageType.Error);
             }
             else
             {
                 string info = string.Format("SubscribeUserMetadata Response userId:{0}",
-                    result.Response.UserId);
+                    response.UserId);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
             }
 
@@ -232,8 +232,8 @@ namespace io.agora.rtm.demo
 
             string userId = this.UserIdInput.text;
             IRtmStorage rtmStorage = RtmScene.RtmClient.GetStorage();
-            var result = await rtmStorage.UnsubscribeUserMetadataAsync(userId);
-            RtmScene.AddMessage("IRtmStorage.UnsubscribeUserMetadata  ret:" + result.Status.ErrorCode, Message.MessageType.Info);
+            var (status, response) = await rtmStorage.UnsubscribeUserMetadataAsync(userId);
+            RtmScene.AddMessage("IRtmStorage.UnsubscribeUserMetadata  ret:" + status.ErrorCode, Message.MessageType.Info);
 
         }
 

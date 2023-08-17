@@ -49,15 +49,15 @@ namespace io.agora.rtm.demo
                 syncWithMedia = this.SyncWithMediaToggle.isOn
             };
 
-            var result = await this.RtmScene.StreamChannel.JoinTopicAsync(this.TopicInput.text, options);
-            if (result.Status.Error)
+            var (status, response) = await this.RtmScene.StreamChannel.JoinTopicAsync(this.TopicInput.text, options);
+            if (status.Error)
             {
-                this.RtmScene.AddMessage(string.Format("StreamChannel.JoinTopic Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Error);
+                this.RtmScene.AddMessage(string.Format("StreamChannel.JoinTopic Status.ErrorCode:{0} ", status.ErrorCode), Message.MessageType.Error);
             }
             else
             {
                 string str = string.Format("StreamChannel.JoinTopic Response: channelName:{0} userId:{1} topic:{2} meta:{3}",
-                  result.Response.ChannelName, result.Response.UserId, result.Response.Topic, result.Response.Meta);
+                  response.ChannelName, response.UserId, response.Topic, response.Meta);
                 this.RtmScene.AddMessage(str, Message.MessageType.Info);
                 this.TopicList.Add(this.TopicInput.text);
             }
@@ -77,16 +77,16 @@ namespace io.agora.rtm.demo
                 return;
             }
 
-            var result = await this.RtmScene.StreamChannel.LeaveTopicAsync(this.TopicInput.text);
+            var (status, response) = await this.RtmScene.StreamChannel.LeaveTopicAsync(this.TopicInput.text);
 
-            if (result.Status.Error)
+            if (status.Error)
             {
-                this.RtmScene.AddMessage(string.Format("StreamChannel.LeaveTopic Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Info);
+                this.RtmScene.AddMessage(string.Format("StreamChannel.LeaveTopic Status.ErrorCode:{0} ", status.ErrorCode), Message.MessageType.Info);
             }
             else
             {
                 string str = string.Format("StreamChannel.LeaveTopic Response: channelName:{0} userId:{1} topic:{2} meta:{3}",
-                  result.Response.ChannelName, result.Response.UserId, result.Response.Topic, result.Response.Meta);
+                  response.ChannelName, response.UserId, response.Topic, response.Meta);
                 this.RtmScene.AddMessage(str, Message.MessageType.Info);
                 this.TopicList.Remove(this.TopicInput.text);
             }

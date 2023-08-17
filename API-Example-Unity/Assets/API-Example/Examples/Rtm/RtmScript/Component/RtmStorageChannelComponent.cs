@@ -59,15 +59,15 @@ namespace io.agora.rtm.demo
             RtmScene.AddMessage("metadataItem List: " + this.ContainerMetadataItem.ToString(), Message.MessageType.Info);
 
             IRtmStorage rtmStorage = RtmScene.RtmClient.GetStorage();
-            var result = await rtmStorage.SetChannelMetadataAsync(channelName, channelType, rtmMetadata, metadataOptions, lockName);
-            if (result.Status.Error)
+            var (status, response) = await rtmStorage.SetChannelMetadataAsync(channelName, channelType, rtmMetadata, metadataOptions, lockName);
+            if (status.Error)
             {
-                RtmScene.AddMessage(string.Format("SetChannelMetadata Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Info);
+                RtmScene.AddMessage(string.Format("SetChannelMetadata Status.ErrorCode:{0} ", status.ErrorCode), Message.MessageType.Info);
             }
             else
             {
                 string info = string.Format("SetChannelMetadata Response : channelName:{0}, channelType:{1}",
-                    result.Response.ChannelName, result.Response.ChannelType);
+                    response.ChannelName, response.ChannelType);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
             }
         }
@@ -109,15 +109,15 @@ namespace io.agora.rtm.demo
 
 
             IRtmStorage rtmStorage = RtmScene.RtmClient.GetStorage();
-            var result = await rtmStorage.UpdateChannelMetadataAsync(channelName, channelType, rtmMetadata, metadataOptions, lockName);
-            if (result.Status.Error)
+            var (status, response) = await rtmStorage.UpdateChannelMetadataAsync(channelName, channelType, rtmMetadata, metadataOptions, lockName);
+            if (status.Error)
             {
-                RtmScene.AddMessage(string.Format("UpdateChannelMetadata Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Info);
+                RtmScene.AddMessage(string.Format("UpdateChannelMetadata Status.ErrorCode:{0} ", status.ErrorCode), Message.MessageType.Info);
             }
             else
             {
                 string info = string.Format("UpdateChannelMetadata Response: channelName:{0}, channelType:{1}",
-                    result.Response.ChannelName, result.Response.ChannelType);
+                    response.ChannelName, response.ChannelType);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
             }
         }
@@ -159,15 +159,15 @@ namespace io.agora.rtm.demo
 
             IRtmStorage rtmStorage = RtmScene.RtmClient.GetStorage();
 
-            var result = await rtmStorage.RemoveChannelMetadataAsync(channelName, channelType, rtmMetadata, metadataOptions, lockName);
-            if (result.Status.Error)
+            var (status, response) = await rtmStorage.RemoveChannelMetadataAsync(channelName, channelType, rtmMetadata, metadataOptions, lockName);
+            if (status.Error)
             {
-                RtmScene.AddMessage(string.Format("rtmStorage.RemoveChannelMetadata Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Info);
+                RtmScene.AddMessage(string.Format("rtmStorage.RemoveChannelMetadata Status.ErrorCode:{0} ", status.ErrorCode), Message.MessageType.Info);
             }
             else
             {
                 string info = string.Format("rtmStorage.RemoveChannelMetadata Response : channelName:{0}, channelType:{1}",
-                    result.Response.ChannelName, result.Response.ChannelType);
+                    response.ChannelName, response.ChannelType);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
             }
 
@@ -192,17 +192,17 @@ namespace io.agora.rtm.demo
 
             IRtmStorage rtmStorage = RtmScene.RtmClient.GetStorage();
 
-            var result = await rtmStorage.GetChannelMetadataAsync(channelName, channelType);
-            if (result.Status.Error)
+            var (status, response) = await rtmStorage.GetChannelMetadataAsync(channelName, channelType);
+            if (status.Error)
             {
-                RtmScene.AddMessage(string.Format("rtmStorage.GetChannelMetadata Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Info);
+                RtmScene.AddMessage(string.Format("rtmStorage.GetChannelMetadata Status.ErrorCode:{0} ", status.ErrorCode), Message.MessageType.Info);
             }
             else
             {
                 string info = string.Format("rtmStorage.GetChannelMetadata Response ,channelName:{0},channelType:{1}",
-                    result.Response.ChannelName, result.Response.ChannelType);
+                    response.ChannelName, response.ChannelType);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
-                DisplayRtmMetadata(ref result.Response.Data);
+                DisplayRtmMetadata(ref response.Data);
             }
         }
 
