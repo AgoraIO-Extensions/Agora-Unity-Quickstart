@@ -19,6 +19,8 @@ namespace Agora_RTC_Plugin.API_Example
 {
     public class CommandBuild : MonoBehaviour
     {
+        private static bool _triggerdByAgoraMenu = false;
+
         private static string[] GetAllScenes()
         {
             List<string> scenesList = new List<string>();
@@ -60,6 +62,7 @@ namespace Agora_RTC_Plugin.API_Example
         [MenuItem("Build Agora Demo/Android")]
         public static void BuildAndroid()
         {
+            _triggerdByAgoraMenu = true;
             EditorUserBuildSettings.exportAsGoogleAndroidProject = true;
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
             buildPlayerOptions.scenes = GetAllScenes();
@@ -90,6 +93,7 @@ namespace Agora_RTC_Plugin.API_Example
         [MenuItem("Build Agora Demo/IPhone")]
         public static void BuildIPhone()
         {
+            _triggerdByAgoraMenu = true;
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
             buildPlayerOptions.scenes = GetAllScenes();
             buildPlayerOptions.locationPathName = "../Build/IPhone";
@@ -119,7 +123,7 @@ namespace Agora_RTC_Plugin.API_Example
         [PostProcessBuild(2)]
         public static void OnPostprocessBuild(BuildTarget buildTarget, string path)
         {
-            if (buildTarget == BuildTarget.iOS)
+            if (buildTarget == BuildTarget.iOS && _triggerdByAgoraMenu)
             {
 #if UNITY_IOS
                 // linked library
@@ -165,6 +169,7 @@ namespace Agora_RTC_Plugin.API_Example
         [MenuItem("Build Agora Demo/Mac")]
         public static void BuildMac()
         {
+            _triggerdByAgoraMenu = true;
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
             buildPlayerOptions.scenes = GetAllScenes();
             buildPlayerOptions.locationPathName = "../Build/Mac.app";
@@ -194,7 +199,7 @@ namespace Agora_RTC_Plugin.API_Example
         [MenuItem("Build Agora Demo/x86")]
         public static void BuildWin32()
         {
-
+            _triggerdByAgoraMenu = true;
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
             buildPlayerOptions.scenes = GetAllScenes();
             buildPlayerOptions.locationPathName = "../Build/x86/x86.exe";
@@ -224,6 +229,7 @@ namespace Agora_RTC_Plugin.API_Example
         [MenuItem("Build Agora Demo/x86_64")]
         public static void BuildWin64()
         {
+            _triggerdByAgoraMenu = true;
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
             buildPlayerOptions.scenes = GetAllScenes();
             buildPlayerOptions.locationPathName = "../Build/x86_64/x86_64.exe";
