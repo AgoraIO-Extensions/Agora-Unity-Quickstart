@@ -77,10 +77,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
             // Create an instance of the video SDK.
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             // Specify the context configuration to initialize the created instance.
-            RtcEngineContext context = new RtcEngineContext(_appID, 0,
-                                        CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
-                                        AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING, AREA_CODE.AREA_CODE_GLOB, new LogConfig("./log.txt"));
-            RtcEngine.Initialize(context);
+            RtcEngineContext context = new RtcEngineContext();
+            context.appId = _appID;
+            context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
+            context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
+            context.areaCode = AREA_CODE.AREA_CODE_GLOB; RtcEngine.Initialize(context);
 
             // By default Agora subscribes to the audio streams of all remote users.
             // Unsubscribe all remote users; otherwise, the audio reception range you set
@@ -202,7 +203,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
             // Start rendering local video.
             LocalView.SetEnable(true);
             // Join a channel.
-            RtcEngine.JoinChannel(_token, _channelName);
+            RtcEngine.JoinChannel(_token, _channelName, "", 0);
         }
 
         public void Leave()
