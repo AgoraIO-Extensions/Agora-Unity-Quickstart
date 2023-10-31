@@ -1,0 +1,303 @@
+﻿using System;
+using System.Threading;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.Serialization;
+using System.Runtime.InteropServices;
+using Agora.Rtc;
+
+using RingBuffer;
+using io.agora.rtc.demo;
+
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudioS
+{
+    public class CustomCaptureAudioS : MonoBehaviour
+    {
+        [FormerlySerializedAs("appIdInput")]
+        [SerializeField]
+        private AppIdInput _appIdInput;
+
+        [Header("_____________Basic Configuration_____________")]
+        [FormerlySerializedAs("APP_ID")]
+        [SerializeField]
+        private string _appID = "";
+
+        [FormerlySerializedAs("TOKEN")]
+        [SerializeField]
+        private string _token = "";
+
+        [FormerlySerializedAs("CHANNEL_NAME")]
+        [SerializeField]
+        private string _channelName = "";
+
+        public Text LogText;
+        internal Logger Log;
+        internal IRtcEngineS RtcEngine = null;
+        internal uint AUDIO_TRACK_ID = 0;
+        private const int CHANNEL = 2;
+        // Please do not change this value because Unity re-samples the sample rate to 48000.
+        private const int SAMPLE_RATE = 48000;
+
+        // Number of push audio frame per second.
+        private const int PUSH_FREQ_PER_SEC = 20;
+
+        private RingBuffer<byte> _audioBuffer;
+        private bool _startConvertSignal = false;
+
+        private Thread _pushAudioFrameThread;
+        private System.Object _rtcLock = new System.Object();
+
+
+
+        // Use this for initialization
+        private void Start()
+        {
+            LoadAssetData();
+            if (CheckAppId())
+            {
+                InitRtcEngine();
+                CreateCustomAudioSource();
+                JoinChannel();
+                StartPushAudioFrame();
+            }
+        }
+
+        // Update is called once per frame
+        private void Update()
+        {
+            PermissionHelper.RequestMicrophontPermission();
+        }
+
+        //Show data in AgoraBasicProfile
+        [ContextMenu("ShowAgoraBasicProfileData")]
+        private void LoadAssetData()
+        {
+            if (_appIdInput == null) return;
+            _appID = _appIdInput.appID;
+            _token = _appIdInput.token;
+            _channelName = _appIdInput.channelName;
+        }
+
+        private bool CheckAppId()
+        {
+            Log = new Logger(LogText);
+            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
+        }
+
+        private void InitRtcEngine()
+        {
+            lock (_rtcLock)
+            {
+
+                RtcEngine = Agora.Rtc.RtcEngineS.CreateAgoraRtcEngine();
+
+                RtcEngineContextS context = new RtcEngineContextS();
+                context.appId = _appID;
+                context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
+                context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
+                context.areaCode = AREA_CODE.AREA_CODE_GLOB;
+
+                RtcEngine.Initialize(context);
+                RtcEngine.InitEventHandler(new UserEventHandlerS(this));
+            }
+        }
+
+        private void CreateCustomAudioSource()
+        {
+            lock (_rtcLock)
+            {
+                AudioTrackConfig audioTrackConfig = new AudioTrackConfig(false);
+                AUDIO_TRACK_ID = RtcEngine.CreateCustomAudioTrack(AUDIO_TRACK_TYPE.AUDIO_TRACK_DIRECT, audioTrackConfig);
+                this.Log.UpdateLog("CreateCustomAudioTrack id:" + AUDIO_TRACK_ID);
+            }
+        }
+
+        private void StartPushAudioFrame()
+        {
+            // 1-sec-length buffer
+            var bufferLength = SAMPLE_RATE * CHANNEL;
+            _audioBuffer = new RingBuffer<byte>(bufferLength, true);
+            _startConvertSignal = true;
+
+            _pushAudioFrameThread = new Thread(PushAudioFrameThread);
+            _pushAudioFrameThread.Start();
+
+            this.Log.UpdateLog("Because the api of rtcEngine is called in different threads, it is necessary to use locks to ensure that different threads do not call the api of rtcEngine at the same time");
+        }
+
+        private void JoinChannel()
+        {
+            lock (_rtcLock)
+            {
+                RtcEngine.SetAudioProfile(AUDIO_PROFILE_TYPE.AUDIO_PROFILE_MUSIC_HIGH_QUALITY);
+                RtcEngine.SetAudioScenario(AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
+                RtcEngine.EnableAudio();
+                RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+                ChannelMediaOptions channelMediaOptions = new ChannelMediaOptions();
+                channelMediaOptions.publishCustomAudioTrack.SetValue(true);
+                channelMediaOptions.publishCustomAudioTrackId.SetValue((int)AUDIO_TRACK_ID);
+                channelMediaOptions.publishMicrophoneTrack.SetValue(false);
+
+                RtcEngine.JoinChannel(_token, _channelName, "123", channelMediaOptions);
+            }
+        }
+
+        private void OnLeaveBtnClick()
+        {
+            RtcEngine.LeaveChannel();
+        }
+
+        private void OnDestroy()
+        {
+            Debug.Log("OnDestroy");
+
+            lock (_rtcLock)
+            {
+                if (RtcEngine == null) return;
+                RtcEngine.InitEventHandler(null);
+                RtcEngine.LeaveChannel();
+                RtcEngine.DestroyCustomAudioTrack(AUDIO_TRACK_ID);
+                RtcEngine.Dispose();
+                RtcEngine = null;
+            }
+            //need wait pullAudioFrameThread stop 
+            _pushAudioFrameThread.Join();
+
+        }
+
+        private void PushAudioFrameThread()
+        {
+            var bytesPerSample = 2;
+            var type = AUDIO_FRAME_TYPE.FRAME_TYPE_PCM16;
+            var channels = CHANNEL;
+            var samples = SAMPLE_RATE / PUSH_FREQ_PER_SEC;
+            var samplesPerSec = SAMPLE_RATE;
+
+            var freq = 1000 / PUSH_FREQ_PER_SEC;
+
+            var audioFrame = new AudioFrame
+            {
+                bytesPerSample = BYTES_PER_SAMPLE.TWO_BYTES_PER_SAMPLE,
+                type = type,
+                samplesPerChannel = samples,
+                samplesPerSec = samplesPerSec,
+                channels = channels,
+                RawBuffer = new byte[samples * bytesPerSample * CHANNEL],
+                renderTimeMs = 0
+            };
+
+
+            double startMillisecond = GetTimestamp();
+            long tick = 0;
+
+            while (true)
+            {
+                lock (_rtcLock)
+                {
+                    if (RtcEngine == null)
+                    {
+                        break;
+                    }
+
+                    int nRet = -1;
+                    lock (_audioBuffer)
+                    {
+                        if (_audioBuffer.Size > samples * bytesPerSample * CHANNEL)
+                        {
+                            for (var j = 0; j < samples * bytesPerSample * CHANNEL; j++)
+                            {
+                                audioFrame.RawBuffer[j] = _audioBuffer.Get();
+                            }
+                            nRet = RtcEngine.PushAudioFrame(audioFrame, AUDIO_TRACK_ID);
+                            //Debug.Log("PushAudioFrame returns: " + nRet);
+
+                        }
+                    }
+
+                    if (nRet == 0)
+                    {
+                        tick++;
+                        double nextMillisecond = startMillisecond + tick * freq;
+                        double curMillisecond = GetTimestamp();
+                        int sleepMillisecond = (int)Math.Ceiling(nextMillisecond - curMillisecond);
+                        //Debug.Log("sleepMillisecond : " + sleepMillisecond);
+                        if (sleepMillisecond > 0)
+                        {
+                            Thread.Sleep(sleepMillisecond);
+                        }
+                    }
+
+                }
+
+            }
+        }
+
+        private void OnAudioFilterRead(float[] data, int channels)
+        {
+            if (!_startConvertSignal) return;
+            var rescaleFactor = 32767;
+            lock (_audioBuffer)
+            {
+                foreach (var t in data)
+                {
+                    var sample = t;
+                    if (sample > 1) sample = 1;
+                    else if (sample < -1) sample = -1;
+
+                    var shortData = (short)(sample * rescaleFactor);
+                    var byteArr = new byte[2];
+                    byteArr = BitConverter.GetBytes(shortData);
+
+                    _audioBuffer.Put(byteArr[0]);
+                    _audioBuffer.Put(byteArr[1]);
+                }
+            }
+        }
+
+        //get timestamp millisecond
+        private double GetTimestamp()
+        {
+            TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            return ts.TotalMilliseconds;
+        }
+    }
+
+    #region -- Agora Event ---
+
+    internal class UserEventHandlerS : IRtcEngineEventHandlerS
+    {
+        private readonly CustomCaptureAudioS _customAudioSource;
+
+        internal UserEventHandlerS(CustomCaptureAudioS customAudioSource)
+        {
+            _customAudioSource = customAudioSource;
+        }
+
+        public override void OnJoinChannelSuccess(RtcConnectionS connection, int elapsed)
+        {
+            int build = 0;
+            _customAudioSource.Log.UpdateLog(string.Format("sdk version: {0}",
+                _customAudioSource.RtcEngine.GetVersion(ref build)));
+            _customAudioSource.Log.UpdateLog(string.Format(
+                "onJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}", connection.channelId,
+                connection.localUserAccount, elapsed));
+        }
+
+        public override void OnLeaveChannel(RtcConnectionS connection, RtcStats stats)
+        {
+            _customAudioSource.Log.UpdateLog("OnLeaveChannelSuccess");
+        }
+
+        public override void OnError(int error, string msg)
+        {
+            _customAudioSource.Log.UpdateLog(string.Format("OnSDKError error: {0}, msg: {1}", error, msg));
+        }
+
+        public override void OnConnectionLost(RtcConnectionS connection)
+        {
+            _customAudioSource.Log.UpdateLog(string.Format("OnConnectionLost "));
+        }
+    }
+
+    #endregion
+}
