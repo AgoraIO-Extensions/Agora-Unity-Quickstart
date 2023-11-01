@@ -18,7 +18,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
     /// user with respect to the local user.  Move the slider to change remote
     /// user's X value in the coordinate system.
     /// </summary>
-    public class SpatialAudioWithUsers : MonoBehaviour
+    public class SpatialAudioWithUsersS : MonoBehaviour
     {
 
 #if (UNITY_2018_3_OR_NEWER && UNITY_ANDROID)
@@ -41,11 +41,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
         [SerializeField]
         private string _channelName = "";
 
-        private uint remoteUid;
-        internal VideoSurface LocalView;
-        internal VideoSurface RemoteView;
-        internal IRtcEngine RtcEngine;
-        private ILocalSpatialAudioEngine localSpatial;
+        // A variable to save the remote user uid.
+        private string remoteUid;
+        internal VideoSurfaceS LocalView;
+        internal VideoSurfaceS RemoteView;
+        internal IRtcEngineS RtcEngine;
+        private ILocalSpatialAudioEngineS localSpatial;
         // Slider control for spatial audio.
         private Slider distanceSlider;
 
@@ -89,8 +90,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
         private bool CheckAppId()
         {
             Debug.Assert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
-            return _appID.Length > 10;  
+            return _appID.Length > 10;
         }
+
 
         void Update()
         {
@@ -108,9 +110,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
         private void SetupVideoSDKEngine()
         {
             // Create an instance of the video SDK.
-            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = Agora.Rtc.RtcEngineS.CreateAgoraRtcEngine();
             // Specify the context configuration to initialize the created instance.
-            RtcEngineContext context = new RtcEngineContext();
+            RtcEngineContextS context = new RtcEngineContextS();
             context.appId = _appID;
             context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
             context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
@@ -127,7 +129,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
         {
             RtcEngine.EnableAudio();
             // RtcEngine.EnableSpatialAudio(true);
-            LocalSpatialAudioConfig localSpatialAudioConfig = new LocalSpatialAudioConfig();
+            LocalSpatialAudioConfigS localSpatialAudioConfig = new LocalSpatialAudioConfigS();
             localSpatialAudioConfig.rtcEngine = RtcEngine;
             localSpatial = RtcEngine.GetLocalSpatialAudioEngine();
             localSpatial.Initialize();
@@ -151,32 +153,32 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
         private void InitEventHandler()
         {
             // Creates a UserEventHandler instance.
-            UserEventHandler handler = new UserEventHandler(this);
+            UserEventHandlerS handler = new UserEventHandlerS(this);
             RtcEngine.InitEventHandler(handler);
         }
 
-        internal class UserEventHandler : IRtcEngineEventHandler
+        internal class UserEventHandlerS : IRtcEngineEventHandlerS
         {
-            private readonly SpatialAudioWithUsers _videoSample;
+            private readonly SpatialAudioWithUsersS _videoSample;
 
-            internal UserEventHandler(SpatialAudioWithUsers videoSample)
+            internal UserEventHandlerS(SpatialAudioWithUsersS videoSample)
             {
                 _videoSample = videoSample;
             }
             // This callback is triggered when the local user joins the channel.
-            public override void OnJoinChannelSuccess(RtcConnection connection, int elapsed)
+            public override void OnJoinChannelSuccess(RtcConnectionS connection, int elapsed)
             {
                 Debug.Log("You joined channel: " + connection.channelId);
             }
-            public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
+            public override void OnUserJoined(RtcConnectionS connection, string userAccount, int elapsed)
             {
                 // Setup remote view.
-                _videoSample.RemoteView.SetForUser(uid, connection.channelId, VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE);
+                _videoSample.RemoteView.SetForUser(userAccount, connection.channelId, VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE);
                 // Save the remote user ID in a variable.
-                _videoSample.remoteUid = uid;
+                _videoSample.remoteUid = userAccount;
             }
             // This callback is triggered when a remote user leaves the channel or drops offline.
-            public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
+            public override void OnUserOffline(RtcConnectionS connection, string userAccount, USER_OFFLINE_REASON_TYPE reason)
             {
                 _videoSample.RemoteView.SetEnable(false);
             }
@@ -196,7 +198,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
             float[] forward = new float[] { sourceDistance, 0.0F, 0.0F };
             // Update the spatial position of the specified remote user
             RemoteVoicePositionInfo remotePosInfo = new RemoteVoicePositionInfo(position, forward);
-            var rc = localSpatial.UpdateRemotePosition((uint)remoteUid, remotePosInfo);
+            var rc = localSpatial.UpdateRemotePosition(remoteUid, remotePosInfo);
             Debug.Log("Remote user spatial position updated, rc = " + rc);
         }
 
@@ -204,10 +206,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
         private void SetupUI()
         {
             GameObject go = GameObject.Find("LocalView");
-            LocalView = go.AddComponent<VideoSurface>();
+            LocalView = go.AddComponent<VideoSurfaceS>();
             go.transform.Rotate(0.0f, 0.0f, 180.0f);
             go = GameObject.Find("RemoteView");
-            RemoteView = go.AddComponent<VideoSurface>();
+            RemoteView = go.AddComponent<VideoSurfaceS>();
             go.transform.Rotate(0.0f, 0.0f, 180.0f);
             go = GameObject.Find("Leave");
             go.GetComponent<Button>().onClick.AddListener(Leave);
@@ -232,11 +234,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
             // Set the user role as broadcaster.
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             // Set the local video view.
-            LocalView.SetForUser(0, "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA);
+            LocalView.SetForUser("", "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA);
             // Start rendering local video.
             LocalView.SetEnable(true);
             // Join a channel.
-            RtcEngine.JoinChannel(_token, _channelName, "", 0);
+            RtcEngine.JoinChannel(_token, _channelName, "", "123");
         }
 
         public void Leave()

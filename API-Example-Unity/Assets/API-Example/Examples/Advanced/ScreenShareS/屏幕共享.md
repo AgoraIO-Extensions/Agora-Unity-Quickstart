@@ -1,0 +1,169 @@
+# 屏幕共享
+
+在视频通话或互动直播中进行屏幕共享，可以将说话人或主播的屏幕内容，以视频的方式分享给其他说话人或观众观看，以提高沟通效率。
+
+屏幕共享在如下场景中应用广泛：
+
+- 视频会议场景中，屏幕共享可以将讲话者本地的文件、数据、网页、PPT 等画面分享给其他与会人；
+- 在线课堂场景中，屏幕共享可以将老师的课件、笔记、讲课内容等画面展示给学生观看。
+
+自4.0.0 起，Agora 提供 C# API 进行屏幕共享。本文介绍如何使用 4.0.0 版和之后的 Unity SDK 在 Android 和 iOS 平台实现屏幕共享。
+
+## 前提条件
+
+在实现屏幕共享前，请确保已在你的项目中实现基本的实时音视频功能。详见[开始音视频通话](https://docs.agora.io/cn/video-call-4.x/start_call_unity_ng?platform=Unity)或[开始互动直播](https://docs.agora.io/cn/live-streaming-premium-4.x/start_live_unity_ng?platform=Unity)。
+
+## Android 平台
+
+在 Android 平台实现屏幕共享时，只需要调用 `startScreenCapture` 开启屏幕共享。你可以参考 [agora-unity-example](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Advanced/ScreenShare) 中的 `ScreenShare.cs` 实现屏幕共享。
+
+## iOS 平台
+
+- 受系统限制，屏幕共享只支持 iOS 12.0 或之后的系统。
+- 该功能对设备性能要求较高，Agora 推荐你在 iPhone X (2017年11月） 及之后机型上使用。
+
+### 技术原理
+
+iOS 端的屏幕共享是通过在 Extension 中使用 iOS 原生的 ReplayKit 框架实现录制屏幕，然后将屏幕共享流作为一个用户加入频道实现的。由于 Apple 不支持在主 app 进程采集屏幕，因此你需要为屏幕共享流单独创建一个 Extension。
+
+![img](https://web-cdn.agora.io/docs-files/1606368135907)
+
+### 实现步骤
+
+1. 使用Unity Editor build iOS, export Xcode 工程。
+
+2. 前往你的项目文件夹，用 Xcode 打开 `unity-iphone/.xcodeproj` 文件夹。
+
+3. 创建一个 Broadcast Upload Extension 用于开启屏幕共享的进程：
+
+   a. 在 Xcode 点击 **File > New > Target...**, 在弹出的窗口中选择 **Broadcast Upload Extension**, 点击 **Next**。
+
+   ![img](https://web-cdn.agora.io/docs-files/1606368184836)
+
+   b. 在弹出的窗口中填写 **Product Name** 等信息，取消勾选 **Include UI Extension**，点击 **Finish**。Xcode 会自动创建该 Extension 的文件夹，其中包含 `SampleHandler.h` 文件。
+
+   c. 在 **Target** 下选中刚创建的 Extension，点 **General**，在 **Deployment Info** 下将 iOS 的版本设置为 12.0 或之后。请确保app 和 extension有相同的 TARGETS/Deployment/iOS 版本。
+
+   ![img](https://web-cdn.agora.io/docs-files/1652254668249)
+
+   d. 修改 `SampleHandler.h` 文件，以修改实现屏幕共享的代码逻辑：
+
+   - 如果你只需使用 Agora 提供的 `AgoraReplayKitExtension.framework` 中的功能，修改方式为：选中 `Target` 为刚刚创建的 Extension，在 **Info** 中将 **NSExtension > NSExtensionPrincipalClass** 修改为 **AgoraReplayKitHandler** 即可。
+     ![img](https://web-cdn.agora.io/docs-files/1648112619203)
+
+   - 如果你还需要自定义一些业务逻辑，修改方式为：将如下代码替换到 `SampleHandler.h` 文件中：
+
+     ```objectivec
+       // Objective-C
+       #import "SampleHandler.h"
+       #import "AgoraReplayKitExt.h"
+       #import <sys/time.h>
+     
+       @interface SampleHandler ()<AgoraReplayKitExtDelegate>
+     
+       @end
+     
+       @implementation SampleHandler
+     
+       - (void)broadcastStartedWithSetupInfo:(NSDictionary<NSString *,NSObject *> *)setupInfo {
+           // User has requested to start the broadcast. Setup info from the UI extension can be supplied but optional.
+           [[AgoraReplayKitExt shareInstance] start:self];
+     
+       }
+     
+       - (void)broadcastPaused {
+           // User has requested to pause the broadcast. Samples will stop being delivered.
+           NSLog(@"broadcastPaused");
+           [[AgoraReplayKitExt shareInstance] pause];
+       }
+     
+       - (void)broadcastResumed {
+           // User has requested to resume the broadcast. Samples delivery will resume.
+           NSLog(@"broadcastResumed");
+           [[AgoraReplayKitExt shareInstance] resume];
+     
+       }
+     
+       - (void)broadcastFinished {
+           // User has requested to finish the broadcast.
+           NSLog(@"broadcastFinished");
+           [[AgoraReplayKitExt shareInstance] stop];
+     
+       }
+     
+       - (void)processSampleBuffer:(CMSampleBufferRef)sampleBuffer withType:(RPSampleBufferType)sampleBufferType {
+           [[AgoraReplayKitExt shareInstance] pushSampleBuffer:sampleBuffer withType:sampleBufferType];
+       }
+     
+       #pragma mark - AgoraReplayKitExtDelegate
+     
+       - (void)broadcastFinished:(AgoraReplayKitExt *_Nonnull)broadcast reason:(AgoraReplayKitExtReason)reason {
+           switch (reason) {
+               case AgoraReplayKitExtReasonInitiativeStop:
+                   {
+       //                NSDictionary *userInfo = @{NSLocalizedDescriptionKey : @"Host app stop srceen capture"};
+       //                NSError *error = [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:userInfo];
+       //                [self finishBroadcastWithError:error];
+                       NSLog(@"AgoraReplayKitExtReasonInitiativeStop");
+                   }
+                   break;
+               case AgoraReplayKitExtReasonConnectFail:
+                   {
+       //                NSDictionary *userInfo = @{NSLocalizedDescriptionKey : @"Connect host app fail need startScreenCapture in host app"};
+       //                NSError *error = [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:userInfo];
+       //                [self finishBroadcastWithError:error];
+                       NSLog(@"AgoraReplayKitExReasonConnectFail");
+                   }
+                   break;
+     
+               case AgoraReplayKitExtReasonDisconnect:
+                   {
+       //                NSDictionary *userInfo = @{NSLocalizedDescriptionKey : @"disconnect with host app"};
+       //                NSError *error = [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:userInfo];
+       //               [self finishBroadcastWithError:error];
+                       NSLog(@"AgoraReplayKitExReasonDisconnect");
+                   }
+                   break;
+               default:
+                   break;
+           }
+       }
+     
+       @end
+     ```
+
+4. 在 **TARGETS** 中选中你创建的Extension, 在 **General/Frameworks and Libraries** 中添加 **Frameworks/Agora-RTC-Plugin/Agora-Unity-RTC-SDK/Plugins/iOS/**  路径下所有framework。
+
+5. 调用 `startScreenCapture`，并结合用户的手动操作，使 app 开启屏幕共享。
+
+#### 开发注意事项
+
+- 请确保app 和 extension有相同的 TARGETS/Deployment/iOS 版本。
+
+- Broadcast Upload Extension 的内存使用限制为 50 MB，请确保屏幕共享的 Extension 内存使用不超过 50 MB。
+- 屏幕共享的进程中，需要调用 `muteAllRemoteVideoStreams` 和 `muteAllRemoteAudioStreams` 方法取消接收远端用户的流，避免重复订阅。
+
+
+
+## 手动操作
+以[ShareScreen demo](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Advanced/ScreenShare)为例， 在 iOS 上正确共享屏幕的步骤必须遵循以下步骤：
+1.按键顺序为：加入频道->开始分享->开始发布
+![ss_step1](https://user-images.githubusercontent.com/1261195/231244602-0609459e-aa40-4d0a-a816-7607a15b449f.jpg)
+2. 您应该看到 StartScreenCapture 调用返回 0。在这里您可能会看到一个白框，因为 ScreenRecording 尚未启动。
+![ss_step2](https://user-images.githubusercontent.com/1261195/231244623-092d3d71-e198-477c-901a-fd362f2e08cc.jpg)
+3.进入iOS快捷控制面板，长按录屏键
+![ss_step3](https://user-images.githubusercontent.com/1261195/231244635-ef61fa63-a1b9-4dd7-9c51-fc9e991c8528.jpg)
+4. 选择App，本例中我们命名为“AgoraIOSScreenSharing”。 然后按“开始广播”
+![ss_step4](https://user-images.githubusercontent.com/1261195/231246651-b1c02bc2-bd46-4191-b053-79507aedcb10.jpg)
+5.应显示“屏幕录制”标题：
+![ss_step5](https://user-images.githubusercontent.com/1261195/231244674-351d667a-7b69-44a1-8901-020df4b6136d.jpg)
+6. 切换回应用程序，你应该看到本地视图现在显示屏幕。
+![IMG_0061](https://user-images.githubusercontent.com/1261195/231244714-3ae3b7e8-e964-4075-926a-ed23fff17ade.PNG)   
+## API 参考
+
+屏幕共享功能目前存在一些使用限制和注意事项，同时会产生费用，Agora 推荐你在调用 API 前先阅读如下 API 参考：
+
+
+- [`startScreenCapture`](https://docs-preprod.agora.io/en/live-streaming-standard-4.x/API%20Reference/unity_ng/API/class_irtcengine.html#api_irtcengine_startscreencapture)
+- [`stopScreenCapture`](https://docs-preprod.agora.io/en/live-streaming-standard-4.x/API%20Reference/unity_ng/API/class_irtcengine.html#api_irtcengine_stopscreencapture)
+- [`updateScreenCaptureParameters`](https://docs-preprod.agora.io/en/live-streaming-standard-4.x/API%20Reference/unity_ng/API/class_irtcengine.html#api_irtcengine_updatescreencaptureparameters)
