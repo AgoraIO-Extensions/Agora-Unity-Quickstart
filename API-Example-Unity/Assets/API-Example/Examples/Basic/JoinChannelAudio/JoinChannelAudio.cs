@@ -33,7 +33,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
         internal IRtcEngine RtcEngine = null;
 
         private IAudioDeviceManager _audioDeviceManager;
-        private DeviceInfo[] _audioPlaybackDeviceInfos;
+        private AudioDeviceInfo[] _audioPlaybackDeviceInfos;
         public Dropdown _audioDeviceSelect;
 
         // Start is called before the first frame update

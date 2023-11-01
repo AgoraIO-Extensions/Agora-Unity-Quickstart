@@ -33,8 +33,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DeviceManager
 
         private IAudioDeviceManager _audioDeviceManager;
         private IVideoDeviceManager _videoDeviceManager;
-        private DeviceInfo[] _audioRecordingDeviceInfos;
-        private DeviceInfo[] _audioPlaybackDeviceInfos;
+        private AudioDeviceInfo[] _audioRecordingDeviceInfos;
+        private AudioDeviceInfo[] _audioPlaybackDeviceInfos;
         private DeviceInfo[] _videoDeviceInfos;
         private const int DEVICE_INDEX = 0;
 
