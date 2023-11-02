@@ -41,6 +41,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
         [SerializeField]
         private string _channelName = "";
 
+        // A variable to save the remote user uid.
         private uint remoteUid;
         internal VideoSurface LocalView;
         internal VideoSurface RemoteView;
