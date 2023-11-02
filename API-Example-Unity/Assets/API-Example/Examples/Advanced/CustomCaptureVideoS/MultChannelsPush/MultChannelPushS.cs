@@ -78,7 +78,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MultChannelPushS
         private IEnumerator ShareScreen()
         {
             yield return new WaitForEndOfFrame();
-            IRtcEngine rtc = Agora.Rtc.RtcEngine.Instance;
+            IRtcEngineS rtc = Agora.Rtc.RtcEngineS.Instance;
             if (rtc != null)
             {
 

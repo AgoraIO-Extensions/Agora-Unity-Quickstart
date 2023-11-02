@@ -69,7 +69,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.TexturePushS
         private IEnumerator ShareScreen()
         {
             yield return new WaitForEndOfFrame();
-            IRtcEngine rtc = Agora.Rtc.RtcEngine.Instance;
+            IRtcEngineS rtc = Agora.Rtc.RtcEngineS.Instance;
             if (rtc != null)
             {
                 if (_shareData != null && _shareData.Length > 0)
