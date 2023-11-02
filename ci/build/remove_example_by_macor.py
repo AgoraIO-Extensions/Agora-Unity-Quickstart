@@ -121,6 +121,7 @@ video_example_list = [
     {'dir_name': 'API-Example/Examples/Advanced/WriteBackVideoRawDataS', 'scene_name': 'WriteBackVideoRawDataSceneS'},
 ]
 
+
 # xxxx/xxxx/Assets
 assets_root = sys.argv[1]
 RTC = sys.argv[2]
