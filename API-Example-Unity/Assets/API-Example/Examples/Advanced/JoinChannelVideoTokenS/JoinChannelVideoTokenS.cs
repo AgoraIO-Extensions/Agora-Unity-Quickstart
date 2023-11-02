@@ -169,7 +169,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.JoinChannelVideoTokenS
         }
 
         // VIDEO TYPE 1: 3D Object
-        private static VideoSurface MakePlaneSurface(string goName)
+        private static VideoSurfaceS MakePlaneSurface(string goName)
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
@@ -191,7 +191,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.JoinChannelVideoTokenS
             go.transform.localScale = new Vector3(0.25f, 0.5f, .5f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<VideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurfaceS>();
             return videoSurface;
         }
 
