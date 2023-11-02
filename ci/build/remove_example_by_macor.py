@@ -183,7 +183,7 @@ if FULL == 'false':
         e = video_example_list[i]
         # delete case files
         dir_name = e['dir_name']
-        full_path = os.path.join(assets_root, e)
+        full_path = os.path.join(assets_root, dir_name)
         print("remove ing :" + full_path)
         if os.path.exists(full_path):
             shutil.rmtree(full_path)
@@ -196,7 +196,7 @@ if FULL == 'false':
         pa = re.compile(r'"' + scene_name + r'",{0,1}')
         home_cs_string = pa.sub("", home_cs_string)
 
-    home_cs_file = open(os.path.join(assets_root, "API-Example/Home.cs"))
+    home_cs_file = open(os.path.join(assets_root, "API-Example/Home.cs"), 'w')
     home_cs_file.write(home_cs_string)
     home_cs_file.close()
 
