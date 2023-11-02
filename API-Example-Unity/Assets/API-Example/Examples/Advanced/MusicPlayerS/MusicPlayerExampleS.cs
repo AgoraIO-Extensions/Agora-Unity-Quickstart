@@ -366,7 +366,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayerS
         }
 
         // VIDEO TYPE 1: 3D Object
-        private VideoSurface MakePlaneSurface(string goName)
+        private VideoSurfaceS MakePlaneSurface(string goName)
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
@@ -388,7 +388,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayerS
             go.transform.localScale = new Vector3(1.0f, 1.333f, 0.5f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<VideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurfaceS>();
             return videoSurface;
         }
 

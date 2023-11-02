@@ -320,7 +320,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCameraS
         }
 
         // VIDEO TYPE 1: 3D Object
-        private static VideoSurface MakePlaneSurface(string goName)
+        private static VideoSurfaceS MakePlaneSurface(string goName)
         {
             var go = GameObject.Find(goName);
             if (!ReferenceEquals(go, null))
@@ -348,7 +348,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCameraS
             go.transform.localScale = new Vector3(0.25f, 0.5f, 0.5f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<VideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurfaceS>();
             return videoSurface;
         }
 
