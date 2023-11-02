@@ -132,8 +132,8 @@ VOICE = sys.argv[7]
 android_studio_temple = os.path.join(
     assets_root, "../../android_studio_template")
 
-print('remove example by macor.py {0},{1},{2},{3}'.format(
-    assets_root, RTC, RTM, android_studio_temple))
+print('remove example by macor.py {0},{1},{2},{3},{4},{5},{6}'.format(
+    assets_root, RTC, RTM, NUMBER_UID, STRING_UID, FULL, VOICE))
 
 
 def get_all_files(target_dir):
