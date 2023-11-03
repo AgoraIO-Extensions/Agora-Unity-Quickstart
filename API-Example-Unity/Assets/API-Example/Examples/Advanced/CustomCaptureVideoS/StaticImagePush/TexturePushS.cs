@@ -56,6 +56,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.TexturePushS
             StartCoroutine(ShareScreen());
         }
 
+
         //Show data in AgoraBasicProfile
         [ContextMenu("ShowAgoraBasicProfileData")]
         private void LoadAssetData()
