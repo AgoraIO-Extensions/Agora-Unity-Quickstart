@@ -105,6 +105,7 @@ ls
 echo "===========unzip finish================="
 $UNITY_DIR/Unity -quit -batchmode -nographics -createProject "sdk_project"
 echo "===========create sdk_project finish================="
+python3 ../ci/build/set_allowUnsafeCode_true.py $root/build_temp/sdk_project
 $UNITY_DIR/Unity -quit -batchmode -nographics -openProjects "sdk_project" -importPackage "${root}/build_temp/Agora-RTC-Plugin.unitypackage"
 echo "===========import sdk_project finish================="
 
@@ -113,7 +114,7 @@ echo "===========Demo build begin================="
 rm -rf build_temp/sdk_project/Assets/Agora-RTC-Plugin/API-Example
 cp -r build_temp/sdk_project/Assets/Agora-RTC-Plugin ./API-Example-Unity/Assets
 echo "===========copy Agora-RTC-Plugin to Assets finish ================="
-
+python3 ./ci/build/set_allowUnsafeCode_true.py $root/API-Example-Unity
 #replace appID
 sed -i "" "s/appID:/appID: ${appID}/g" ./API-Example-Unity/Assets/API-Example/AppIdInput/AppIdInput.asset
 
