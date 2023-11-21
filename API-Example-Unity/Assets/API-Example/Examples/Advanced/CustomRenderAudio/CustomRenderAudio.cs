@@ -5,8 +5,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
- 
- 
+
+
 using RingBuffer;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
@@ -37,7 +37,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
 
         private const int CHANNEL = 2;
         private const int SAMPLE_RATE = 44100;
-        private const int PULL_FREQ_PER_SEC = 10;
+        private const int PULL_FREQ_PER_SEC = 100;
 
 
         private RingBuffer<float> _audioBuffer;
@@ -124,14 +124,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
         {
 
             // 1-sec-length buffer
-            var bufferLength = SAMPLE_RATE * CHANNEL;
+            var bufferLength = SAMPLE_RATE * CHANNEL * 2;
             _audioBuffer = new RingBuffer<float>(bufferLength, true);
 
             _pullAudioFrameThread = new Thread(PullAudioFrameThread);
             _pullAudioFrameThread.Start();
 
             _audioClip = AudioClip.Create(clipName,
-                SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL, CHANNEL, SAMPLE_RATE, true,
+                SAMPLE_RATE / PULL_FREQ_PER_SEC, CHANNEL, SAMPLE_RATE, true,
                 OnAudioRead);
             aud.clip = _audioClip;
             aud.loop = true;
@@ -162,13 +162,21 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
             var bytesPerSample = 2;
             var type = AUDIO_FRAME_TYPE.FRAME_TYPE_PCM16;
             var channels = CHANNEL;
-            var samples = SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL;
+            var samplesPerChannel = SAMPLE_RATE / PULL_FREQ_PER_SEC;
             var samplesPerSec = SAMPLE_RATE;
-            var byteBuffer = new byte[samples * bytesPerSample];
+            var byteBuffer = new byte[samplesPerChannel * bytesPerSample * channels];
             var freq = 1000 / PULL_FREQ_PER_SEC;
 
-            AudioFrame audioFrame = new AudioFrame(type, samples, BYTES_PER_SAMPLE.TWO_BYTES_PER_SAMPLE, channels, samplesPerSec, null, 0, avsync_type,0);
-            audioFrame.buffer = Marshal.AllocHGlobal(samples * bytesPerSample * channels);
+            AudioFrame audioFrame = new AudioFrame
+            {
+                type = type,
+                samplesPerChannel = samplesPerChannel,
+                bytesPerSample = BYTES_PER_SAMPLE.TWO_BYTES_PER_SAMPLE,
+                channels = channels,
+                samplesPerSec = samplesPerSec,
+                avsync_type = avsync_type
+            };
+            audioFrame.buffer = Marshal.AllocHGlobal(samplesPerChannel * bytesPerSample * channels);
 
             double startMillisecond = GetTimestamp();
             long tick = 0;
