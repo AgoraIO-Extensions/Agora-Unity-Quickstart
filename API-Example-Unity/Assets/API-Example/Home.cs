@@ -2,8 +2,6 @@
 #define AGORA_RTM
 #define AGORA_FULL
 #define AGORA_VOICE
-#define AGORA_STRING_UID
-#define AGORA_NUMBER_UID
 
 using System.Collections;
 using UnityEngine;
@@ -39,7 +37,7 @@ namespace Agora_RTC_Plugin.API_Example
 
         private string[] _rtcNameList = {
 #if AGORA_RTC
-#if AGORA_NUMBER_UID
+//#if AGORA_NUMBER_UID
             "BasicAudioCallScene",
             "BasicVideoCallScene",
             "AudioMixingScene",
@@ -79,47 +77,47 @@ namespace Agora_RTC_Plugin.API_Example
             "VirtualBackgroundScene",
             "VoiceChangerScene",
             "WriteBackVideoRawDataScene",
-#endif
-#if AGORA_STRING_UID
-            "BasicAudioCallSceneS",
-            "BasicVideoCallSceneS",
-            "AudioMixingSceneS",
-            "AudioSpectrumSceneS",
-            "ChannelMediaRelaySceneS",
-            "ContentInspectSceneS",
-            "CustomCaptureAudioSceneS",
-            "CustomCaptureVideoSceneS",
-            "CustomRenderAudioSceneS",
-            "DeviceManagerSceneS",
-            "DualCameraSceneS",
-            "JoinChannelVideoTokenSceneS",
-            "MediaPlayerSceneS",
-            "MediaPlayerWithCustomDataProviderSceneS",
-            "MediaRecorderSceneS",
-            "MetadataSceneS",
-            "MusicPlayerSceneS",
-            "PluginSceneS",
-            "ProcessAudioRawDataSceneS",
-            "ProcessVideoRawDataSceneS",
-            "PushEncodedVideoImageSceneS",
-            "RenderWithYUVS",
-            "ScreenShareSceneS",
-            "ScreenShareWhileVideoCallSceneS",
-            "SetBeautyEffectOptionsSceneS",
-            "SetEncryptionSceneS",
-            "SetVideoEncodeConfigurationSceneS",
-            "SpatialAudioWithMediaPlayerSceneS",
-            "SpatialAudioWithUsersS",
-            "StartDirectCdnStreamingSceneS",
-            "StartLocalVideoTranscoderSceneS",
-            "StartRhythmPlayerSceneS",
-            "StartRtmpStreamWithTranscodingSceneS",
-            "StreamMessageSceneS",
-            "TakeSnapshotSceneS",
-            "VirtualBackgroundSceneS",
-            "VoiceChangerSceneS",
-            "WriteBackVideoRawDataSceneS",
-#endif
+//#endif
+//#if AGORA_STRING_UID
+//            "BasicAudioCallSceneS",
+//            "BasicVideoCallSceneS",
+//            "AudioMixingSceneS",
+//            "AudioSpectrumSceneS",
+//            "ChannelMediaRelaySceneS",
+//            "ContentInspectSceneS",
+//            "CustomCaptureAudioSceneS",
+//            "CustomCaptureVideoSceneS",
+//            "CustomRenderAudioSceneS",
+//            "DeviceManagerSceneS",
+//            "DualCameraSceneS",
+//            "JoinChannelVideoTokenSceneS",
+//            "MediaPlayerSceneS",
+//            "MediaPlayerWithCustomDataProviderSceneS",
+//            "MediaRecorderSceneS",
+//            "MetadataSceneS",
+//            "MusicPlayerSceneS",
+//            "PluginSceneS",
+//            "ProcessAudioRawDataSceneS",
+//            "ProcessVideoRawDataSceneS",
+//            "PushEncodedVideoImageSceneS",
+//            "RenderWithYUVS",
+//            "ScreenShareSceneS",
+//            "ScreenShareWhileVideoCallSceneS",
+//            "SetBeautyEffectOptionsSceneS",
+//            "SetEncryptionSceneS",
+//            "SetVideoEncodeConfigurationSceneS",
+//            "SpatialAudioWithMediaPlayerSceneS",
+//            "SpatialAudioWithUsersS",
+//            "StartDirectCdnStreamingSceneS",
+//            "StartLocalVideoTranscoderSceneS",
+//            "StartRhythmPlayerSceneS",
+//            "StartRtmpStreamWithTranscodingSceneS",
+//            "StreamMessageSceneS",
+//            "TakeSnapshotSceneS",
+//            "VirtualBackgroundSceneS",
+//            "VoiceChangerSceneS",
+//            "WriteBackVideoRawDataSceneS",
+//#endif
 #endif
         };
 

@@ -212,19 +212,19 @@ if RTC == 'false':
 if RTM == 'false' and os.path.isdir(assets_root + '/API-Example/Examples/Rtm'):
     shutil.rmtree(assets_root + '/API-Example/Examples/Rtm')
 
-# remove int example without int uid
-if NUMBER_UID == 'false':
-    for i in range(0, len(number_example_list)):
-        full_path = os.path.join(assets_root, number_example_list[i])
-        if os.path.exists(full_path):
-            shutil.rmtree(full_path)
+# # remove int example without int uid
+# if NUMBER_UID == 'false':
+#     for i in range(0, len(number_example_list)):
+#         full_path = os.path.join(assets_root, number_example_list[i])
+#         if os.path.exists(full_path):
+#             shutil.rmtree(full_path)
 
-# remove string example without string uid
-if STRING_UID == 'false':
-    for i in range(0, len(string_example_list)):
-        full_path = os.path.join(assets_root, string_example_list[i])
-        if os.path.exists(full_path):
-            shutil.rmtree(full_path)
+# # remove string example without string uid
+# if STRING_UID == 'false':
+#     for i in range(0, len(string_example_list)):
+#         full_path = os.path.join(assets_root, string_example_list[i])
+#         if os.path.exists(full_path):
+#             shutil.rmtree(full_path)
 
 ## remove define without rtc
 if RTC == 'false':
