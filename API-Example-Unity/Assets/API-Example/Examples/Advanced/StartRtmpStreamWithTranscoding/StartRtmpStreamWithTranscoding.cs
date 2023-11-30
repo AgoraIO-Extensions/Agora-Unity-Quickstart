@@ -357,9 +357,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRtmpStreamWithTran
             StartRtmpStreamWithTranscoding.DestroyVideoView(uid);
         }
 
-        public override void OnRtmpStreamingStateChanged(string url, RTMP_STREAM_PUBLISH_STATE state, RTMP_STREAM_PUBLISH_ERROR_TYPE errCode)
+        public override void OnRtmpStreamingStateChanged(string url, RTMP_STREAM_PUBLISH_STATE state, RTMP_STREAM_PUBLISH_REASON reason)
         {
-            _sample.Log.UpdateLog(string.Format("OnRtmpStreamingStateChanged url:{0},  state:{1},  errCode:{2}", url, state, errCode));
+            _sample.Log.UpdateLog(string.Format("OnRtmpStreamingStateChanged url:{0},  state:{1},  reason:{2}", url, state, reason));
         }
 
         public override void OnTranscodingUpdated()

@@ -233,9 +233,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartRhythmPlayer
                 (int)reason));
         }
 
-        public override void OnRhythmPlayerStateChanged(RHYTHM_PLAYER_STATE_TYPE state, RHYTHM_PLAYER_ERROR_TYPE errorCode)
+        public override void OnRhythmPlayerStateChanged(RHYTHM_PLAYER_STATE_TYPE state, RHYTHM_PLAYER_REASON reason)
         {
-            _startRhythmPlayer.Log.UpdateLog(string.Format("OnRhythmPlayerStateChanged {0},{1}", state, errorCode));
+            _startRhythmPlayer.Log.UpdateLog(string.Format("OnRhythmPlayerStateChanged {0},{1}", state, reason));
         }
 
     }

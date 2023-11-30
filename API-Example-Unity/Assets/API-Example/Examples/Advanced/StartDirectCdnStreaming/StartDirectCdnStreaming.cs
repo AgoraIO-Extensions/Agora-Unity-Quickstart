@@ -315,9 +315,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
             _startDirectCdnStreaming.Log.UpdateLog("OnConnectionLost ");
         }
 
-        public override void OnDirectCdnStreamingStateChanged(DIRECT_CDN_STREAMING_STATE state, DIRECT_CDN_STREAMING_ERROR error, string message)
+        public override void OnDirectCdnStreamingStateChanged(DIRECT_CDN_STREAMING_STATE state, DIRECT_CDN_STREAMING_REASON reason, string message)
         {
-            _startDirectCdnStreaming.Log.UpdateLog(string.Format("OnDirectCdnStreamingStateChanged state: {0}, error: {1}", state, error));
+            _startDirectCdnStreaming.Log.UpdateLog(string.Format("OnDirectCdnStreamingStateChanged state: {0}, reason: {1}", state, reason));
         }
 
         public override void OnDirectCdnStreamingStats(DirectCdnStreamingStats stats)

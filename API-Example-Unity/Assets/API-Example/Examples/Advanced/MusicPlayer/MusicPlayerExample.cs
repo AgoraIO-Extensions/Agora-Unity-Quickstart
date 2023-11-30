@@ -607,10 +607,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             _sample = sample;
         }
 
-        public override void OnPlayerSourceStateChanged(MEDIA_PLAYER_STATE state, MEDIA_PLAYER_ERROR ec)
+        public override void OnPlayerSourceStateChanged(MEDIA_PLAYER_STATE state, MEDIA_PLAYER_REASON reason)
         {
             _sample.Log.UpdateLog(string.Format(
-                "OnPlayerSourceStateChanged state: {0}, ec: {1}, playId: {2}", state, ec, _sample.MusicPlayer.GetId()));
+                "OnPlayerSourceStateChanged state: {0}, reason: {1}, playId: {2}", state, reason, _sample.MusicPlayer.GetId()));
             Debug.Log("OnPlayerSourceStateChanged");
             if (state == MEDIA_PLAYER_STATE.PLAYER_STATE_OPEN_COMPLETED)
             {

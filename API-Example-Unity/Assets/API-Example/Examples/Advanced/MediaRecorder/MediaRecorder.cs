@@ -331,9 +331,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
             _sample.Log.UpdateLog(string.Format("OnRecorderInfoUpdated fileName: {0}, durationMs: {1} fileSize：{2}", info.fileName, info.durationMs, info.fileSize));
         }
 
-        public override void OnRecorderStateChanged(string channelId, uint uid, RecorderState state, RecorderErrorCode error)
+        public override void OnRecorderStateChanged(string channelId, uint uid, RecorderState state, RecorderReasonCode reason)
         {
-            _sample.Log.UpdateLog(string.Format("OnRecorderStateChanged state: {0}, error: {1}", state, error));
+            _sample.Log.UpdateLog(string.Format("OnRecorderStateChanged state: {0}, error: {1}", state, reason));
 
         }
     }

@@ -342,10 +342,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
             _spatialAudio = spatialAudio;
         }
 
-        public override void OnPlayerSourceStateChanged(MEDIA_PLAYER_STATE state, MEDIA_PLAYER_ERROR ec)
+        public override void OnPlayerSourceStateChanged(MEDIA_PLAYER_STATE state, MEDIA_PLAYER_REASON reason)
         {
             _spatialAudio.Log.UpdateLog(string.Format(
-                "OnPlayerSourceStateChanged state: {0}, ec: {1}, playId: {2}", state, ec, _spatialAudio.MediaPlayer.GetId()));
+                "OnPlayerSourceStateChanged state: {0}, ec: {1}, playId: {2}", state, reason, _spatialAudio.MediaPlayer.GetId()));
             Debug.Log("OnPlayerSourceStateChanged");
             if (state == MEDIA_PLAYER_STATE.PLAYER_STATE_OPEN_COMPLETED)
             {
