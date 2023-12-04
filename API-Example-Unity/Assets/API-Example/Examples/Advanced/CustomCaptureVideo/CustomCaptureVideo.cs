@@ -88,7 +88,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
 
 #if UNITY_2018_1_OR_NEWER
                 NativeArray<byte> nativeByteArray = _texture.GetRawTextureData<byte>();
-                if (_shareData != null && _shareData.Length != nativeByteArray.Length)
+                if (_shareData == null || _shareData.Length != nativeByteArray.Length)
                 {
                     _shareData = new byte[nativeByteArray.Length];
                 }
