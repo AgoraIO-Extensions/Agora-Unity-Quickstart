@@ -53,35 +53,37 @@ namespace io.agora.rtm.demo
         public void OnGetFromRtcEngine()
         {
 #if AGORA_RTC
-            if (this.RtmScene.RtcEngine == null)
-            {
-                this.RtmScene.AddMessage("Rtc Engine is null", Message.MessageType.Error);
-                return;
-            }
+            //if (this.RtmScene.RtcEngine == null)
+            //{
+            //    this.RtmScene.AddMessage("Rtc Engine is null", Message.MessageType.Error);
+            //    return;
+            //}
 
-            if (this.RtmScene.RtmClient == null)
-            {
-                this.RtmScene.AddMessage("Rtm Client is null", Message.MessageType.Error);
-                return;
-            }
+            //if (this.RtmScene.RtmClient == null)
+            //{
+            //    this.RtmScene.AddMessage("Rtm Client is null", Message.MessageType.Error);
+            //    return;
+            //}
 
-            if (this.ChannelNameInput.text == "")
-            {
-                this.RtmScene.AddMessage("Channel name is empty!", Message.MessageType.Error);
-            }
+            //if (this.ChannelNameInput.text == "")
+            //{
+            //    this.RtmScene.AddMessage("Channel name is empty!", Message.MessageType.Error);
+            //}
 
-            this.RtmScene.StreamChannel = this.RtmScene.RtcEngine.GetStreamChannel(this.ChannelNameInput.text);
-            if (this.RtmScene.StreamChannel != null)
-            {
-                this.TitleText.text = "StreamChannel is create from rtmClient";
-                this.TitleText.color = Color.green;
-            }
-            else
-            {
-                this.RtmScene.AddMessage("create rtm stream channel failed", Message.MessageType.Error);
-            }
+            //this.RtmScene.StreamChannel = this.RtmScene.RtcEngine.GetStreamChannel(this.ChannelNameInput.text);
+            //if (this.RtmScene.StreamChannel != null)
+            //{
+            //    this.TitleText.text = "StreamChannel is create from rtmClient";
+            //    this.TitleText.color = Color.green;
+            //}
+            //else
+            //{
+            //    this.RtmScene.AddMessage("create rtm stream channel failed", Message.MessageType.Error);
+            //}
+
+            this.RtmScene.AddMessage("rtc engine is not contains GetStreamChannel", Message.MessageType.Error);
 #else
-             this.RtmScene.AddMessage("rtc engine is not include in sdk", Message.MessageType.Error);
+            this.RtmScene.AddMessage("rtc engine is not include in sdk", Message.MessageType.Error);
 #endif
 
         }

@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Networking.Types;
 #if AGORA_RTC
 using Agora.Rtc;
 #endif
@@ -45,9 +46,10 @@ namespace io.agora.rtm.demo
             IRtcEngineEx rtcEngine = RtcEngine.CreateAgoraRtcEngineEx();
 
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(appId, 0,
-                CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
-                AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
+            RtcEngineContext context = new RtcEngineContext();
+            context.appId = appId;
+            context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
+            context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING;
             int nRet = rtcEngine.Initialize(context);
             RtmScene.AddMessage("RtcEngine Init :" + nRet, nRet == 0 ? Message.MessageType.Info : Message.MessageType.Error);
             rtcEngine.InitEventHandler(handler);

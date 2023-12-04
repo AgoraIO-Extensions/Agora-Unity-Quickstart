@@ -81,6 +81,10 @@ echo Plugin_Url: $Plugin_Url
 echo appID: $appID
 echo RTC: $RTC
 echo RTM: $RTM
+echo NUMBER_UID: $NUMBER_UID
+echo STRING_UID: $STRING_UID
+echo FULL: $FULL
+echo VOICE: $VOICE
 
 echo Package_Publish: $Package_Publish
 echo is_tag_fetch: $is_tag_fetch
@@ -101,7 +105,7 @@ UNITY_DIR=/Applications/Unity/Hub/Editor/${Unity_Version}/Unity.app/Contents/Mac
 echo "===========create sdk_project begin================="
 
 #remove api-example AGORA_RTC or AGORA_RTM
-python3 $root/ci/build/remove_example_by_macor.py $root/API-Example-Unity/Assets $RTC $RTM
+python3 $root/ci/build/remove_example_by_macor.py $root/API-Example-Unity/Assets $RTC $RTM $NUMBER_UID $STRING_UID $FULL $VOICE
 
 mkdir build_temp
 cd build_temp
