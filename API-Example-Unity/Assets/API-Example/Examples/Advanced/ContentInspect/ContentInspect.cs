@@ -76,6 +76,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
             context.areaCode = AREA_CODE.AREA_CODE_GLOB;
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
+            RtcEngine.SetLogFile("/Users/xiayangqun/Documents/agoraSpace/Agora-Unity-RTC-QuickStart-NG-400/API-Example-Unity/rtc.log");
         }
 
         private void JoinChannel()
@@ -103,7 +104,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
             config.modules = new ContentInspectModule[1];
             config.modules[0] = new ContentInspectModule
             {
-                type = CONTENT_INSPECT_TYPE.CONTENT_INSPECT_SUPERVISION,
+                type = CONTENT_INSPECT_TYPE.CONTENT_INSPECT_MODERATION,
                 interval = 1
             };
             config.moduleCount = 1;
@@ -118,7 +119,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ContentInspect
             config.modules = new ContentInspectModule[1];
             config.modules[0] = new ContentInspectModule
             {
-                type = CONTENT_INSPECT_TYPE.CONTENT_INSPECT_SUPERVISION,
+                type = CONTENT_INSPECT_TYPE.CONTENT_INSPECT_MODERATION,
                 interval = 1
             };
             config.moduleCount = 1;
