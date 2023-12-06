@@ -46,7 +46,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MetadataSample
             if (CheckAppId())
             {
                 InitEngine();
-                JoinChannel();
             }
         }
 
@@ -120,12 +119,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MetadataSample
 
             int nRet = this.RtcEngine.SetMaxMetadataSize(size);
             this.Log.UpdateLog("SetMaxMetadataSize:" + nRet);
+            //need RegisterMediaMetadataObserver before JoinChannel
             UserMetadataObserver metadataObserver = new UserMetadataObserver(this);
             RtcEngine.RegisterMediaMetadataObserver(metadataObserver, METADATA_TYPE.VIDEO_METADATA);
             this.Log.UpdateLog("You can send metadata now");
             this.InputField.text = "";
             this.SetMaxSizeButton.gameObject.SetActive(false);
             this.SendButton.gameObject.SetActive(true);
+
+            JoinChannel();
         }
 
         public void OnSendButtonPress()
