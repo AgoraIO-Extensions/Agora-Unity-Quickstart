@@ -127,6 +127,7 @@ else
 fi
 
 $UNITY_DIR/Unity -quit -batchmode -nographics -createProject "sdk_project"
+python3 $root/ci/build/set_allowUnsafeCode_true.py $root/build_temp/sdk_project
 echo "===========create sdk_project finish================="
 $UNITY_DIR/Unity -quit -batchmode -nographics -openProjects "sdk_project" -importPackage "${root}/build_temp/${UNITYPACKAGE_NAME}"
 echo "===========import sdk_project finish================="
