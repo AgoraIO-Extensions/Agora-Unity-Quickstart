@@ -77,9 +77,9 @@ namespace io.agora.rtm.demo
                 //RtmScene.AddMessage("rtmClient.SetParameters + ret:" + ret, Message.MessageType.Info);
 
 
-                RtmScene.AddMessage("rtmClient init success", Message.MessageType.Info);
+                RtmScene.AddMessage("RtmClient init success", Message.MessageType.Info);
                 RtmScene.RtmClient = rtmClient;
-                this.TitleText.text = "RtmClient alread init";
+                this.TitleText.text = "RtmClient initialized";
                 this.TitleText.color = Color.green;
             }
 

@@ -44,12 +44,19 @@ namespace io.agora.rtm.demo
 
         public void OnMark()
         {
-            string show = "already set parameters size:" + ParametersList.Count + "\n";
-            foreach (var parameter in ParametersList)
+            if (ParametersList.Count <= 0)
             {
-                show += ("    " + parameter + "\n");
+                RtmScene.AddMessage("You are not set any parameters yet.", Message.MessageType.Info);
             }
-            RtmScene.AddMessage(show, Message.MessageType.Info);
+            else
+            {
+                string show = "already set parameters size:" + ParametersList.Count + "\n";
+                foreach (var parameter in ParametersList)
+                {
+                    show += ("    " + parameter + "\n");
+                }
+                RtmScene.AddMessage(show, Message.MessageType.Info);
+            }
         }
     }
 }

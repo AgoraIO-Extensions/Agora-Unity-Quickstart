@@ -41,7 +41,7 @@ namespace io.agora.rtm.demo
             this.RtmScene.StreamChannel = this.RtmScene.RtmClient.CreateStreamChannel(this.ChannelNameInput.text);
             if (this.RtmScene.StreamChannel != null)
             {
-                this.TitleText.text = "StreamChannel is create from rtmClient";
+                this.TitleText.text = "StreamChannel is created from rtmClient";
                 this.TitleText.color = Color.green;
             }
             else
@@ -73,7 +73,7 @@ namespace io.agora.rtm.demo
             //this.RtmScene.StreamChannel = this.RtmScene.RtcEngine.GetStreamChannel(this.ChannelNameInput.text);
             //if (this.RtmScene.StreamChannel != null)
             //{
-            //    this.TitleText.text = "StreamChannel is create from rtmClient";
+            //    this.TitleText.text = "StreamChannel is created from rtmClient";
             //    this.TitleText.color = Color.green;
             //}
             //else
