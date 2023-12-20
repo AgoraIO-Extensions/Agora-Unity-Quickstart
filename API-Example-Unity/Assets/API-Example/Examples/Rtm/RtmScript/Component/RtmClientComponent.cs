@@ -63,7 +63,7 @@ namespace io.agora.rtm.demo
                 rtmClient.OnTopicEvent += this.OnTopicEvent;
                 rtmClient.OnStorageEvent += this.OnStorageEvent;
                 rtmClient.OnLockEvent += this.OnLockEvent;
-                rtmClient.OnConnectionStateChange += this.OnConnectionStateChange;
+                rtmClient.OnConnectionStateChanged += this.OnConnectionStateChanged;
                 rtmClient.OnTokenPrivilegeWillExpire += this.OnTokenPrivilegeWillExpire;
 
 
@@ -156,7 +156,7 @@ namespace io.agora.rtm.demo
 
         }
 
-        public void OnConnectionStateChange(string channelName, RTM_CONNECTION_STATE state, RTM_CONNECTION_CHANGE_REASON reason)
+        public void OnConnectionStateChanged(string channelName, RTM_CONNECTION_STATE state, RTM_CONNECTION_CHANGE_REASON reason)
         {
             string str1 = string.Format("OnConnectionStateChange channelName {0}: state:{1} reason:{2}", channelName, state, reason);
             RtmScene.AddMessage(str1, Message.MessageType.Info);

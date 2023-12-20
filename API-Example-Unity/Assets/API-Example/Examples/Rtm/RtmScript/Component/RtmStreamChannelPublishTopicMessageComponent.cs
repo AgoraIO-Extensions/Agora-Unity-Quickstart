@@ -13,14 +13,13 @@ namespace io.agora.rtm.demo
     {
         public InputField TopicInput;
         public InputField MessageInput;
-        public EnumDropDown TypeDropDown;
+        public InputField CustomTypeInput;
         public InputField SendTsInput;
 
 
         public void Start()
         {
             this.SendTsInput.text = "0";
-            this.TypeDropDown.Init<RTM_MESSAGE_TYPE>();
         }
 
         public async void OnPublishTopicMessage()
@@ -40,7 +39,8 @@ namespace io.agora.rtm.demo
                 return;
             }
 
-            PublishOptions options = new PublishOptions();
+            TopicMessageOptions options = new TopicMessageOptions();
+            options.customType = this.CustomTypeInput.text;
             options.sendTs = ulong.Parse(this.SendTsInput.text);
 
             var result = await this.RtmScene.StreamChannel.PublishTopicMessageAsync(topic, message, options);
