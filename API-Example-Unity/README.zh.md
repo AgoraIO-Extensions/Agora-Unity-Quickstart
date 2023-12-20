@@ -54,6 +54,15 @@
 | [VirtualBackground](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Advanced/VirtualBackground) | 开启虚拟背景   | EnableVirtualBackground                 |
 | [VoiceChanger](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Advanced/VoiceChanger) | 变声设置   | SetVoiceBeautifierPreset, SetAudioEffectPreset,SetVoiceConversionPreset,SetLocalVoicePitch, SetLocalVoiceEqualization,   SetLocalVoiceReverb                  |
 
+* **Rtm demos:**
+
+| Demo                                                         | Description                                                  | APIs                                                         |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [IRTMClient](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Rtm/RtmScene/RTMClientScene.unity) | 使用IRtmClient登录并发送或接收消息           | LoginAsync, PublishAsync, OnMessageEvent                          |
+| [IStreamChannel](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Rtm/RtmScene/RTMLockScene.unity) | 创建并加入流通道以发送或接收主题消息           | JoinAsync, JoinTopicAsync, PublishTopicMessageAsync,                                 |
+| [IRtmLock](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Rtm/RtmScene/RTMLockScene.unity) | 锁定或解锁RTM通道中的指定属性。             | SetLockAsync, GetLocksAsync, RemoveLockAsync                                |
+| [IRtmPresence](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Rtm/RtmScene) | 设置频道熟悉并查询用户状态 | GetOnlineUsersAsync, GetUserChannelsAsync, SetStateAsync |
+| [IRtmStorage](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Rtm/RtmScene) | 在频道或用户中存储唯一信息 | SetChannelMetadataAsync, UpdateChannelMetadataAsync, RemoveChannelMetadataAsync, GetChannelMetadataAsync  |
 
 
 ## 如何运行示例程序

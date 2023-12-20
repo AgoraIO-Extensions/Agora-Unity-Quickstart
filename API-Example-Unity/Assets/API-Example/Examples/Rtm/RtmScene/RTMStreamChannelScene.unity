@@ -812,7 +812,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: -150}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &416226695
 MonoBehaviour:
@@ -1236,7 +1236,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.000061035156}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &690512206
@@ -1296,7 +1296,7 @@ MonoBehaviour:
     type: 3}
   MessageColors:
     infoColor: {r: 0.086451516, g: 0.63235295, b: 0.013948975, a: 1}
-    errorColor: {r: 0.6544118, g: 0, b: 0, a: 1}
+    errorColor: {r: 1, g: 0.37254903, b: 0.37254903, a: 1}
     playerColor: {r: 0.15700692, g: 0.20094249, b: 0.64705884, a: 1}
     peerColor: {r: 0.8602941, g: 0.08223397, b: 0.83883053, a: 1}
     channelColor: {r: 0.0064878957, g: 0.027472794, b: 0.44117647, a: 1}
@@ -1429,7 +1429,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0.0000020790649, y: 0.00010050544}
-  m_SizeDelta: {x: 960, y: 5532}
+  m_SizeDelta: {x: 960, y: 5575}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1210535054
 GameObject:
@@ -1537,7 +1537,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 324.4}
-  m_SizeDelta: {x: -960, y: 864.4}
+  m_SizeDelta: {x: -1000, y: 864.4}
   m_Pivot: {x: 1, y: 1}
 --- !u!222 &1348159308
 CanvasRenderer:
@@ -2332,7 +2332,7 @@ PrefabInstance:
     - target: {fileID: 170017332988199367, guid: bcdd3135731384cdc96a0d2374fc274f,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.00004950657
+      value: 0.0006262266
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bcdd3135731384cdc96a0d2374fc274f, type: 3}

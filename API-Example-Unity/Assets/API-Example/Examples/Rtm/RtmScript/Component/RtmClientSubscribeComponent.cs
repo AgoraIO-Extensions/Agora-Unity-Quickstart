@@ -80,12 +80,19 @@ namespace io.agora.rtm.demo
 
         public void OnMark()
         {
-            string show = "alread subscribe channl. size:" + ChannelNameList.Count + "\n";
-            foreach (string channelName in ChannelNameList)
+            if (ChannelNameList.Count <= 0)
             {
-                show += ("    " + channelName + "\n");
+                RtmScene.AddMessage("You are not subscribe any channel yet.", Message.MessageType.Info);
             }
-            RtmScene.AddMessage(show, Message.MessageType.Info);
+            else
+            {
+                string show = "already subscribe channel size: " + ChannelNameList.Count + "\n";
+                foreach (string channelName in ChannelNameList)
+                {
+                    show += ("    " + channelName + "\n");
+                }
+                RtmScene.AddMessage(show, Message.MessageType.Info);
+            }
         }
     }
 }

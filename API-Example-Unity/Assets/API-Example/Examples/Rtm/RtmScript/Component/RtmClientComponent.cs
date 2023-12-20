@@ -63,7 +63,7 @@ namespace io.agora.rtm.demo
                 rtmClient.OnTopicEvent += this.OnTopicEvent;
                 rtmClient.OnStorageEvent += this.OnStorageEvent;
                 rtmClient.OnLockEvent += this.OnLockEvent;
-                rtmClient.OnConnectionStateChange += this.OnConnectionStateChange;
+                rtmClient.OnConnectionStateChanged += this.OnConnectionStateChanged;
                 rtmClient.OnTokenPrivilegeWillExpire += this.OnTokenPrivilegeWillExpire;
 
 
@@ -77,9 +77,9 @@ namespace io.agora.rtm.demo
                 //RtmScene.AddMessage("rtmClient.SetParameters + ret:" + ret, Message.MessageType.Info);
 
 
-                RtmScene.AddMessage("rtmClient init success", Message.MessageType.Info);
+                RtmScene.AddMessage("RtmClient init success", Message.MessageType.Info);
                 RtmScene.RtmClient = rtmClient;
-                this.TitleText.text = "RtmClient alread init";
+                this.TitleText.text = "RtmClient initialized";
                 this.TitleText.color = Color.green;
             }
 
@@ -156,7 +156,7 @@ namespace io.agora.rtm.demo
 
         }
 
-        public void OnConnectionStateChange(string channelName, RTM_CONNECTION_STATE state, RTM_CONNECTION_CHANGE_REASON reason)
+        public void OnConnectionStateChanged(string channelName, RTM_CONNECTION_STATE state, RTM_CONNECTION_CHANGE_REASON reason)
         {
             string str1 = string.Format("OnConnectionStateChange channelName {0}: state:{1} reason:{2}", channelName, state, reason);
             RtmScene.AddMessage(str1, Message.MessageType.Info);

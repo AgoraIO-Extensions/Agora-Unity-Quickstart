@@ -16,13 +16,13 @@ namespace io.agora.rtm.demo
     {
         public InputField ChannelNameInput;
         public InputField MessageInput;
-        public InputField SendTsInput;
-        public InputField CustomTypeInput;
-        public EnumDropDown enumDropDown;
 
+        public EnumDropDown EnumDropDown;
+        public InputField CustomTypeInput;
+    
         public void Start()
         {
-            this.enumDropDown.Init<RTM_MESSAGE_TYPE>();
+            this.EnumDropDown.Init<RTM_CHANNEL_TYPE>();
         }
 
         public async void OnPublish()
@@ -43,17 +43,8 @@ namespace io.agora.rtm.demo
             string channelName = this.ChannelNameInput.text;
 
             PublishOptions options = new PublishOptions();
-            if (this.SendTsInput.text != "")
-            {
-                options.sendTs = ulong.Parse(this.SendTsInput.text);
-            }
-            else
-            {
-                options.sendTs = 0;
-            }
-           
+            options.channelType = (RTM_CHANNEL_TYPE)this.EnumDropDown.GetSelectValue();
             options.customType = this.CustomTypeInput.text;
-
 
             var result = await RtmScene.RtmClient.PublishAsync(channelName, message, options);
 

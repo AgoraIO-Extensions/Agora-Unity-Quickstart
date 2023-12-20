@@ -95,13 +95,19 @@ namespace io.agora.rtm.demo
 
         public void OnMark()
         {
-            string show = "already join topic. size:" + TopicList.Count + "\n";
-            foreach (string topiclName in TopicList)
+            if (TopicList.Count <= 0)
             {
-                show += ("    " + topiclName + "\n");
+                RtmScene.AddMessage("You are not join any topic yet.", Message.MessageType.Info);
             }
-            RtmScene.AddMessage(show, Message.MessageType.Info);
-
+            else
+            {
+                string show = "already join topic number:" + TopicList.Count + "\n";
+                foreach (string topiclName in TopicList)
+                {
+                    show += ("    " + topiclName + "\n");
+                }
+                RtmScene.AddMessage(show, Message.MessageType.Info);
+            }
         }
 
     }
