@@ -58,8 +58,8 @@ namespace io.agora.rtm.demo
             else
             {
                 var count = result.Response.UserStateList.Length;
-                string info = string.Format("WhoNow Response : count:{0},nextPage:{1}",
-                    count, result.Response.NextPage);
+                string info = string.Format("WhoNow Response : count:{0},nextPage:{1},totalOccupancy:{2}",
+                    count, result.Response.NextPage, result.Response.TotalOccupancy);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
                 if (count > 0)
                 {
@@ -74,7 +74,8 @@ namespace io.agora.rtm.demo
             }
         }
 
-        public async void OnGetOnlineUsersAsync() {
+        public async void OnGetOnlineUsersAsync()
+        {
             if (RtmScene.RtmClient == null)
             {
                 RtmScene.AddMessage("Rtm client is null", Message.MessageType.Error);
@@ -106,8 +107,8 @@ namespace io.agora.rtm.demo
             else
             {
                 var count = result.Response.UserStateList.Length;
-                string info = string.Format("GetOnlineUsers Response : count:{0},nextPage:{1}",
-                    count, result.Response.NextPage);
+                string info = string.Format("GetOnlineUsers Response : count:{0},nextPage:{1},totalOccupancy:{2}",
+                    count, result.Response.NextPage, result.Response.TotalOccupancy);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
                 if (count > 0)
                 {
@@ -167,7 +168,8 @@ namespace io.agora.rtm.demo
 
         }
 
-        public async void OnGetUserChannels() {
+        public async void OnGetUserChannels()
+        {
             if (RtmScene.RtmClient == null)
             {
                 RtmScene.AddMessage("Rtm client is null", Message.MessageType.Error);
