@@ -36,13 +36,24 @@ namespace io.agora.rtm.demo
             messageDatas.Enqueue(new MessageData(messageType, message));
         }
 
+        private bool _needScrollToBottom = false;
         void Update()
         {
             if (messageDatas.Count > 0)
             {
                 MessageData messageData = messageDatas.Dequeue();
-
                 AddTextToDisplay(messageData.message, messageData.messageType);
+                _needScrollToBottom = true;
+
+            }
+        }
+
+        private void LateUpdate()
+        {
+            if (_needScrollToBottom)
+            {
+                (this.transform.parent.parent.GetComponent<ScrollRect>()).verticalNormalizedPosition = 0;
+                _needScrollToBottom = false;
             }
         }
 
