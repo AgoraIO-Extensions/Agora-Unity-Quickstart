@@ -24,8 +24,6 @@ namespace io.agora.rtm.demo
             this.ChannelTypeDropDown.Init<RTM_CHANNEL_TYPE>();
         }
 
-
-
         #region Presence
         public async void OnWhoNow()
         {
@@ -74,8 +72,56 @@ namespace io.agora.rtm.demo
                     }
                 }
             }
-
         }
+
+        public async void OnGetOnlineUsersAsync() {
+            if (RtmScene.RtmClient == null)
+            {
+                RtmScene.AddMessage("Rtm client is null", Message.MessageType.Error);
+                return;
+            }
+
+            if (this.ChannelNameInput.text == "")
+            {
+                RtmScene.AddMessage("channel name is empty", Message.MessageType.Error);
+                return;
+            }
+
+            string channelName = this.ChannelNameInput.text;
+            RTM_CHANNEL_TYPE channelType = (RTM_CHANNEL_TYPE)this.ChannelTypeDropDown.GetSelectValue();
+            GetOnlineUsersOptions options = new GetOnlineUsersOptions()
+            {
+                includeUserId = this.IncludeUserIdToggle.isOn,
+                includeState = this.IncludeStateToggle.isOn,
+                page = this.PageInput.text
+            };
+
+            IRtmPresence rtmPresence = this.RtmScene.RtmClient.GetPresence();
+
+            var result = await rtmPresence.GetOnlineUsersAsync(channelName, channelType, options);
+            if (result.Status.Error)
+            {
+                RtmScene.AddMessage(string.Format("GetOnlineUsers Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Error);
+            }
+            else
+            {
+                var count = result.Response.UserStateList.Length;
+                string info = string.Format("GetOnlineUsers Response : count:{0},nextPage:{1}",
+                    count, result.Response.NextPage);
+                RtmScene.AddMessage(info, Message.MessageType.Info);
+                if (count > 0)
+                {
+                    for (int i = 0; i < result.Response.UserStateList.Length; i++)
+                    {
+                        var userState = result.Response.UserStateList[i];
+                        var statesCount = userState.states == null ? 0 : userState.states.Length;
+                        string info2 = string.Format("userStateList userId:{0}, stateCount:{1}", userState.userId, statesCount);
+                        RtmScene.AddMessage(info2, Message.MessageType.Info);
+                    }
+                }
+            }
+        }
+
 
         public async void OnWhereNow()
         {
@@ -119,6 +165,47 @@ namespace io.agora.rtm.demo
                 }
             }
 
+        }
+
+        public async void OnGetUserChannels() {
+            if (RtmScene.RtmClient == null)
+            {
+                RtmScene.AddMessage("Rtm client is null", Message.MessageType.Error);
+                return;
+            }
+
+
+            if (this.WhereNowUserIdInput.text == "")
+            {
+                RtmScene.AddMessage("Get user channel user id is empty", Message.MessageType.Error);
+                return;
+            }
+
+            string userId = this.WhereNowUserIdInput.text;
+
+            IRtmPresence rtmPresence = this.RtmScene.RtmClient.GetPresence();
+
+            var result = await rtmPresence.GetUserChannelsAsync(userId);
+            if (result.Status.Error)
+            {
+                RtmScene.AddMessage(string.Format("GetUserChannel Status.ErrorCode:{0} ", result.Status.ErrorCode), Message.MessageType.Info);
+            }
+            else
+            {
+                var count = result.Response.Channels.Length;
+                string info = string.Format("GetUserChannel Response: count:{0}"
+                    , count);
+                RtmScene.AddMessage(info, Message.MessageType.Info);
+                if (count > 0)
+                {
+                    for (int i = 0; i < result.Response.Channels.Length; i++)
+                    {
+                        var channelInfo = result.Response.Channels[i];
+                        string info2 = string.Format("---- channelName:{0}, channelType:{1}", channelInfo.channelName, channelInfo.channelType);
+                        RtmScene.AddMessage(info2, Message.MessageType.Info);
+                    }
+                }
+            }
         }
 
         public async void OnSetState()
