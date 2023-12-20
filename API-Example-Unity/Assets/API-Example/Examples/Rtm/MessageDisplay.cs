@@ -48,13 +48,19 @@ namespace io.agora.rtm.demo
             }
         }
 
+
         private void LateUpdate()
         {
             if (_needScrollToBottom)
             {
-                (this.transform.parent.parent.GetComponent<ScrollRect>()).verticalNormalizedPosition = 0;
+                this.Invoke("FixSelfPositionToBottom", 0.1f);
                 _needScrollToBottom = false;
             }
+        }
+
+        private void FixSelfPositionToBottom()
+        {
+            (this.transform.parent.parent.GetComponent<ScrollRect>()).verticalNormalizedPosition = 0;
         }
 
         private void AddTextToDisplay(string text, Message.MessageType messageType)
