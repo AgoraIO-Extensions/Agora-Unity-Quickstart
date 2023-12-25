@@ -68,3 +68,34 @@ The HTEffect AR extension currently supports both iOS and Android platforms. Thi
     3. After successfully authenticated, click the <kbd>Join Channel</kbd> button to join the channel, at this time the local image preview will appear on the screen.
 
     4. Click the <kbd>StartEffect</kbd> button to turn on the special effect, then you can observe that the local image has added an old-photo filter.
+
+## 4. Special Notes
+1. The special effect resource files for iOS and Android are independent and cannot be shared. Here, we use the iOS resource file named <font color=green>**HTEffect.bundle**</font>, and the Android resource file named <font color=green>**hteffect**</font>. These two files cannot be mixed.
+
+2. Do not rename the resource files. The plugin reads the resource files based on their names. Renaming the files will result in the inability to read the resource files and may cause crashes.
+
+3. The keywords used in iOS and Android platforms may be different. For example, in the demo, the names of the keys related to authentication are different. Please pay attention to obtaining the latest spelling of the keywords from technical support.
+```cs
+    #if UNITY_IOS
+            jsonDic.Add("key", "Offline license");
+    #elif UNITY_ANDROID
+            jsonDic.Add("license", "Offline license");
+    #endif
+```
+
+
+## 5. FAQ
+Q: Calling EnableExtension and SetExtensionProperty always returns -3.
+A: Please make sure to initialize the plugin before calling StartPreview or JoinChannel, not after.
+
+Q: Debugging on iOS is successful, but calling EnableExtension and SetExtensionProperty on Android always returns negative numbers.  
+A: Please refer to the code in the demo. On the Android platform, you need to call LoadExtensionProvider to load the Android library.
+```cs
+    RtcEngine.LoadExtensionProvider("AgoraTexelJoyExtension", false);
+```
+
+Q: All API calls are successful, but there is no beauty effect. Or the app crashes after calling authentication.  
+A: Please search for the keywords htInitHTEffectOfflineResult/htInitHTEffectOnlineResult in the log. Check if the authentication returns a number greater than 0. If it is less than or equal to 0, it means authentication failed. This could be due to misspelled keywords or incorrect license in the authentication JSON.
+
+Q: The crash log throws an invalid path exception.  
+A: This occurs when the SDK cannot find the special effect resource files after successful authentication. Please make sure the resource files are placed in the correct location and have the correct file name.
