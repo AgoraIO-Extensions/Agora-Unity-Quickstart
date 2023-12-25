@@ -69,6 +69,37 @@
 
     4. 点击 <kbd>StartEffect</kbd> 按钮开启插件效果，此时可以观察到本地图像添加了旧照片风格。
 
+## 4. 特别注意
+1. IOS端和Android的特效资源文件是相互独立而不能共用的。这里我们使用的IOS资源文件为<font color=green>**HTEffect.bundle**</font>。而android资源文件为<font color=green>**hteffect**</font>文件夹。这2个文件不能混用。
+
+2. 不要给资源文件重新命名。插件读取资源文件是根据名字来读取的。如果修改了文件名字会导致无法读取到资源文件。从而造成崩溃。
+
+3. IOS平台和Android的平台的使用的关键字可能不同。例如在demo中。鉴权相关的key的名字就不相同。请注意及时向技术支持获取最新的关键字拼写。
+```cs
+    #if UNITY_IOS
+            jsonDic.Add("key", "Offline license");
+    #elif UNITY_ANDROID
+            jsonDic.Add("license", "Offline license");
+    #endif
+```
+
+## 5. FAQ
+Q: 调用EnableExtension和SetExtensionProperty始终返回-3。  
+A: 请确保在调用StartPreview或者JoinChannel之前初始化插件，而不是之后。  
+
+Q: IOS调试成功，而Android的调用调用EnableExtension和SetExtensionProperty始终返负数。  
+A: 请参照demo里的代码，在Android平台需要额外调用LoadExtensionProvider来加载Android的库。
+    ```cs
+    RtcEngine.LoadExtensionProvider("AgoraTexelJoyExtension", false);
+    ```  
+
+Q: 所有API调用都成功了，但是却没有美颜效果。或者调用完鉴权就崩溃了。  
+A: 请在log搜索 htInitHTEffectOfflineResult/htInitHTEffectOnlineResult关键字。查看鉴权是否返回大于0的数字。如果小于等于0，则说明鉴权失败。这可能是鉴权的json中，关键字拼写失败或者得到的license不对。  
+
+Q: 崩溃信息中抛出了 invalid path exception。  
+A: 这是SDK鉴权成功后无法找到特效资源文件。请确定资源文件确实被放到了该放的位置和资源文件的文件名是对的。
+    
+
 
 
 
