@@ -507,14 +507,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             this._sample = sample;
         }
 
-        public override void OnLyricResult(string requestId, Int64 songCode, string lyricUrl, MusicContentCenterStatusCode errorCode)
+        public override void OnLyricResult(string requestId, Int64 songCode, string lyricUrl, MusicContentCenterStateReason reason)
         {
-            this._sample.Log.UpdateLog(string.Format("OnLyricResult requestId:{0} songCode:{1} lyricUrl:{2} errorCode:{3}", requestId, songCode, lyricUrl, errorCode));
+            this._sample.Log.UpdateLog(string.Format("OnLyricResult requestId:{0} songCode:{1} lyricUrl:{2} reason:{3}", requestId, songCode, lyricUrl, reason));
         }
 
-        public override void OnMusicChartsResult(string requestId, MusicChartInfo[] result, MusicContentCenterStatusCode errorCode)
+        public override void OnMusicChartsResult(string requestId, MusicChartInfo[] result, MusicContentCenterStateReason reason)
         {
-            this._sample.Log.UpdateLog(string.Format("OnMusicChartsResult requestId:{0} result.count:{1} errorCode:{2} ", requestId, result.Length, errorCode));
+            this._sample.Log.UpdateLog(string.Format("OnMusicChartsResult requestId:{0} result.count:{1} reason:{2} ", requestId, result.Length, reason));
             Debug.Log(result.ToString());
 
             this._sample.SearchInputField.gameObject.SetActive(true);
@@ -541,9 +541,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             this._sample.Log.UpdateLog("Select your Music Chart item please");
         }
 
-        public override void OnMusicCollectionResult(string requestId, MusicCollection result, MusicContentCenterStatusCode errorCode)
+        public override void OnMusicCollectionResult(string requestId, MusicCollection result, MusicContentCenterStateReason reason)
         {
-            this._sample.Log.UpdateLog(string.Format("OnMusicCollectionResult requestId:{0} result.count:{1} errorCode:{2}", requestId, result.count, errorCode));
+            this._sample.Log.UpdateLog(string.Format("OnMusicCollectionResult requestId:{0} result.count:{1} reason:{2}", requestId, result.count, reason));
             var str = AgoraJson.ToJson<MusicCollection>(result);
             Debug.Log(str);
 
@@ -568,31 +568,31 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
 
         }
 
-        public override void OnSongSimpleInfoResult(string requestId, Int64 songCode, string simpleInfo, MusicContentCenterStatusCode errorCode)
+        public override void OnSongSimpleInfoResult(string requestId, Int64 songCode, string simpleInfo, MusicContentCenterStateReason reason)
         {
 
         }
 
 
-        public override void OnPreLoadEvent(string requestId, Int64 songCode, int percent, string lyricUrl, PreloadStatusCode status, MusicContentCenterStatusCode errorCode)
+        public override void OnPreLoadEvent(string requestId, Int64 songCode, int percent, string lyricUrl, PreloadState state, MusicContentCenterStateReason reason)
         {
             Debug.Log("OnPreLoadEvent percent:" + percent);
-            if (status == PreloadStatusCode.kPreloadStatusCompleted)
+            if (state == PreloadState.kPreloadStateCompleted)
             {
-                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} lyricUrl:{2}, status:{3}, errorCode:{4}", songCode, percent, lyricUrl, status, errorCode));
+                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} lyricUrl:{2}, state:{3}, reason:{4}", songCode, percent, lyricUrl, state, reason));
 
                 this._sample.OpenButton.gameObject.SetActive(true);
                 this._sample.GetLyricButton.gameObject.SetActive(true);
             }
-            else if (status == PreloadStatusCode.kPreloadStatusFailed)
+            else if (state == PreloadState.kPreloadStateFailed)
             {
-                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} lyricUrl:{2}, status:{3}, errorCode:{4}", songCode, percent, lyricUrl, status, errorCode));
+                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} lyricUrl:{2}, state:{3}, reason:{4}", songCode, percent, lyricUrl, state, reason));
 
                 this._sample.Log.UpdateLog("PreLoad Failed, Please click PreLoad Button again");
             }
-            else if (status == PreloadStatusCode.kPreloadStatusRemoved)
+            else if (state == PreloadState.kPreloadStateRemoved)
             {
-                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} lyricUrl:{2}, status:{3}, errorCode:{4}", songCode, percent, lyricUrl, status, errorCode));
+                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} lyricUrl:{2}, state:{3}, reason:{4}", songCode, percent, lyricUrl, state, reason));
                 this._sample.Log.UpdateLog("Remove completed");
             }
         }
