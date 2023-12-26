@@ -45,6 +45,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
 
                 string fromFile = Path.Combine(Application.streamingAssetsPath, "img/png.png");
                 string toFile = Path.Combine(Application.persistentDataPath, "png.png");
+
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+                fromFile = fromFile.Replace('/', '\\');
+                toFile = toFile.Replace('/', '\\');
+#endif
                 this.CopyFile(fromFile, toFile);
                 Log.UpdateLog("File copy finish: " + toFile);
             }
@@ -135,6 +140,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
 
             source.background_source_type = BACKGROUND_SOURCE_TYPE.BACKGROUND_IMG;
             string filePath = Path.Combine(Application.persistentDataPath, "png.png");
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            filePath = filePath.Replace('/', '\\');   
+#endif
             source.source = filePath;
 
             var segproperty = new SegmentationProperty();
