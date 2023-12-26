@@ -2,10 +2,9 @@
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
- 
- 
 using System.IO;
 using io.agora.rtc.demo;
+using UnityEngine.Networking;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
 {
@@ -43,6 +42,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
                 InitLogFilePath();
                 SetupUI();
                 JoinChannel();
+
+                string fromFile = Path.Combine(Application.streamingAssetsPath, "img/png.png");
+                string toFile = Path.Combine(Application.persistentDataPath, "png.png");
+                this.CopyFile(fromFile, toFile);
+                Log.UpdateLog("File copy finish: " + toFile);
             }
         }
 
@@ -87,7 +91,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            RtcEngine.JoinChannel(_token, _channelName,"",0);
+            RtcEngine.JoinChannel(_token, _channelName, "", 0);
         }
 
         private void InitLogFilePath()
@@ -130,13 +134,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
             var source = new VirtualBackgroundSource();
 
             source.background_source_type = BACKGROUND_SOURCE_TYPE.BACKGROUND_IMG;
-
-#if UNITY_ANDROID && !UNITY_EDITOR
-                // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
-                var filePath = "/assets/img/png.png";
-#else
-            var filePath = Path.Combine(Application.streamingAssetsPath, "img/png.png");
-#endif
+            string filePath = Path.Combine(Application.persistentDataPath, "png.png");
             source.source = filePath;
 
             var segproperty = new SegmentationProperty();
@@ -166,6 +164,34 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
         {
             return _channelName;
         }
+
+        internal void CopyFile(string fromFile, string toFile)
+        {
+            if (Application.platform == RuntimePlatform.Android)
+            {
+                using (UnityWebRequest request = UnityWebRequest.Get(fromFile))
+                {
+                    request.timeout = 3;
+                    request.downloadHandler = new DownloadHandlerFile(toFile);
+                    request.SendWebRequest();
+
+                    float time = Time.time;
+
+                    while (!request.isDone)
+                    {
+                    }
+                    request.Abort();
+
+                    request.disposeDownloadHandlerOnDispose = true;
+                    request.Dispose();
+                }
+            }
+            else
+            {
+                File.Copy(fromFile, toFile, true);
+            }
+        }
+
 
         #region -- Video Render UI Logic ---
 
