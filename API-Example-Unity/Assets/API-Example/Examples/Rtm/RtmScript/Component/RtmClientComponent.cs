@@ -41,6 +41,7 @@ namespace io.agora.rtm.demo
 
             RtmConfig config = new RtmConfig();
             config.appId = appId;
+	    config.areaCode = RTM_AREA_CODE.NA;
             config.userId = username;
             config.presenceTimeout = presenceTimeout;
             config.useStringUserId = this.UseStringUid.isOn;
