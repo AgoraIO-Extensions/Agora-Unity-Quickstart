@@ -106,8 +106,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
             config.intervalInSeconds = 2;
             config.enableAudio = true;
             config.enableVideo = false;
-            config.token = "Your Token";
-            config.channelId = "Your channel id";
+            config.token = this._appID;
+            config.channelId = "echo_test_channel";
             RtcEngine.StartEchoTest(config);
             Log.UpdateLog("StartEchoTest, speak now. You cannot conduct another echo test or join a channel before StopEchoTest");
         }
