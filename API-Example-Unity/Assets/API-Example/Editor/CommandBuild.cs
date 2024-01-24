@@ -25,10 +25,10 @@ namespace Agora_RTC_Plugin.API_Example
 
 #if AGORA_RTC
         public const string buildPath = "Build";
-        public const string menuTitle = "Build Agora Rtc Demo";
+        public const string menuTitle = "Window/Agora Tools/Build";
 #else
         public const string buildPath = "RtmBuild";
-        public const  string menuTitle = "Build Agora Rtm Demo";
+        public const  string menuTitle = "Window/Agora Tools/RtmBuild";
 #endif
 
         private static bool _triggerdByAgoraMenu = false;
