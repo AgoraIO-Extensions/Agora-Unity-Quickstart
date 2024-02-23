@@ -97,6 +97,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
         {
             CheckPermissions();
         }
+
         void OnApplicationQuit()
         {
             if (RtcEngine != null)
@@ -106,6 +107,17 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
                 RtcEngine = null;
             }
         }
+
+        private void OnDestroy()
+        {
+            if (RtcEngine != null)
+            {
+                Leave();
+                RtcEngine.Dispose();
+                RtcEngine = null;
+            }
+        }
+
         private void SetupVideoSDKEngine()
         {
             // Create an instance of the video SDK.
