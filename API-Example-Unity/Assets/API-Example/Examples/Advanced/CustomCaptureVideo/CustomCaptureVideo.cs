@@ -171,10 +171,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
+#if !UNITY_VISIONOS
             if (_webCameraTexture)
             {
                 _webCameraTexture.Stop();
             }
+#endif
             if (RtcEngine == null) return;
             RtcEngine.InitEventHandler(null);
             RtcEngine.LeaveChannel();
