@@ -182,7 +182,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
             };
             audioFrame.buffer = Marshal.AllocHGlobal(samplesPerChannel * bytesPerSample * channels);
 
-
             double startMillisecond = GetTimestamp();
             long tick = 0;
 

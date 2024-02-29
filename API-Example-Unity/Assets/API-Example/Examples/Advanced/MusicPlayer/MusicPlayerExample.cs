@@ -134,7 +134,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             var appId = RtmAppidInputField.text;
             var rtmToken = RtmTokenInputField.text;
             MusicContentCenter = RtcEngine.GetMusicContentCenter();
-            var config = new MusicContentCenterConfiguration(appId, rtmToken, mccUid, 10);
+            var config = new MusicContentCenterConfiguration(appId, rtmToken, mccUid, 10, "");
             var Ret = MusicContentCenter.Initialize(config);
             this.Log.UpdateLog("MusicContentCenter.Initialize: " + Ret);
 

@@ -23,6 +23,7 @@ namespace Agora_RTC_Plugin.API_Example
     public class CommandBuild : MonoBehaviour
     {
 
+
 #if AGORA_RTC
         public const string buildPath = "Build";
         public const string menuTitle = "Window/Agora Tools/Build";
@@ -30,6 +31,7 @@ namespace Agora_RTC_Plugin.API_Example
         public const string buildPath = "RtmBuild";
         public const  string menuTitle = "Window/Agora Tools/RtmBuild";
 #endif
+
 
         private static bool _triggerdByAgoraMenu = false;
 
