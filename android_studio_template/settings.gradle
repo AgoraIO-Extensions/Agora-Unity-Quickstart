@@ -1,2 +1,3 @@
 include ':launcher', ':unityLibrary'
 include 'unityLibrary:AgoraRtcEngineKit.plugin'
+include 'unityLibrary:AgoraRtmEngineKit.plugin'

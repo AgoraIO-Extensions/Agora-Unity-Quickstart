@@ -2,9 +2,9 @@
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
- 
- 
 using System.IO;
+using io.agora.rtc.demo;
+using UnityEngine.Networking;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
 {
@@ -42,6 +42,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
                 InitLogFilePath();
                 SetupUI();
                 JoinChannel();
+
+                string fromFile = Path.Combine(Application.streamingAssetsPath, "img/png.png");
+                string toFile = Path.Combine(Application.persistentDataPath, "png.png");
+
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+                fromFile = fromFile.Replace('/', '\\');
+                toFile = toFile.Replace('/', '\\');
+#endif
+                this.CopyFile(fromFile, toFile);
+                Log.UpdateLog("File copy finish: " + toFile);
             }
         }
 
@@ -72,9 +82,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(_appID, 0,
-                                        CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
-                                        AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
+            RtcEngineContext context = new RtcEngineContext();
+            context.appId = _appID;
+            context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
+            context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
+            context.areaCode = AREA_CODE.AREA_CODE_GLOB;
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
         }
@@ -84,7 +96,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            RtcEngine.JoinChannel(_token, _channelName);
+            RtcEngine.JoinChannel(_token, _channelName, "", 0);
         }
 
         private void InitLogFilePath()
@@ -127,12 +139,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
             var source = new VirtualBackgroundSource();
 
             source.background_source_type = BACKGROUND_SOURCE_TYPE.BACKGROUND_IMG;
-
-#if UNITY_ANDROID && !UNITY_EDITOR
-                // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
-                var filePath = "/assets/img/png.png";
-#else
-            var filePath = Path.Combine(Application.streamingAssetsPath, "img/png.png");
+            string filePath = Path.Combine(Application.persistentDataPath, "png.png");
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            filePath = filePath.Replace('/', '\\');   
 #endif
             source.source = filePath;
 
@@ -163,6 +172,34 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
         {
             return _channelName;
         }
+
+        internal void CopyFile(string fromFile, string toFile)
+        {
+            if (Application.platform == RuntimePlatform.Android)
+            {
+                using (UnityWebRequest request = UnityWebRequest.Get(fromFile))
+                {
+                    request.timeout = 3;
+                    request.downloadHandler = new DownloadHandlerFile(toFile);
+                    request.SendWebRequest();
+
+                    float time = Time.time;
+
+                    while (!request.isDone)
+                    {
+                    }
+                    request.Abort();
+
+                    request.disposeDownloadHandlerOnDispose = true;
+                    request.Dispose();
+                }
+            }
+            else
+            {
+                File.Copy(fromFile, toFile, true);
+            }
+        }
+
 
         #region -- Video Render UI Logic ---
 

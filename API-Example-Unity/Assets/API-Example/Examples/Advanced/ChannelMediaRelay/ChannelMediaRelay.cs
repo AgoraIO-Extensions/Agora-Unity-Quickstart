@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using Agora.Rtc;
 using UnityEngine.Serialization;
-
+using io.agora.rtc.demo;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ChannelMediaRelay
 {
@@ -61,9 +61,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ChannelMediaRelay
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(_appID, 0,
-                CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
-                AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
+            RtcEngineContext context = new RtcEngineContext();
+            context.appId = _appID;
+            context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
+            context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING;
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
         }
@@ -73,7 +74,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ChannelMediaRelay
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
-            RtcEngine.JoinChannel(_token, _channelName, "");
+            RtcEngine.JoinChannel(_token, _channelName, "",0);
         }
 
         private void Update()
@@ -343,12 +344,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ChannelMediaRelay
             _channelMediaRelay.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                 (int)reason));
             ChannelMediaRelay.DestroyVideoView(uid);
-        }
-
-        public override void OnChannelMediaRelayEvent(int code)
-        {
-            _channelMediaRelay.Log.UpdateLog(string.Format("OnChannelMediaRelayEvent: {0}", code));
-
         }
 
         public override void OnChannelMediaRelayStateChanged(int state, int code)

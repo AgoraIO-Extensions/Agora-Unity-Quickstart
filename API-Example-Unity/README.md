@@ -54,6 +54,17 @@ Any scene of this project can run successfully alone.
 | [VirtualBackground](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Advanced/VirtualBackground) | enable virtual background                                    | EnableVirtualBackground                                      |
 | [VoiceChanger](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Advanced/VoiceChanger) | how to modify your voice                                     | SetVoiceBeautifierPreset, SetAudioEffectPreset,SetVoiceConversionPreset,SetLocalVoicePitch, SetLocalVoiceEqualization,   SetLocalVoiceReverb |
 
+* **Rtm demos:**
+
+| Demo                                                         | Description                                                  | APIs                                                         |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [IRTMClient](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Rtm/RtmScene/RTMClientScene.unity) | Use IRtmClient to log in, and send or receive messages            | LoginAsync, PublishAsync, OnMessageEvent                          |
+| [IStreamChannel](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Rtm/RtmScene/RTMLockScene.unity) | Create and join stream channel to send or receive topic messages           | JoinAsync, JoinTopicAsync, PublishTopicMessageAsync,                                 |
+| [IRtmLock](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Rtm/RtmScene/RTMLockScene.unity) | Lock or unlock specified attributes within the RTM channel.             | SetLockAsync, GetLocksAsync, RemoveLockAsync                                |
+| [IRtmPresence](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Rtm/RtmScene) | Set channel attribute and query user status | GetOnlineUsersAsync, GetUserChannelsAsync, SetStateAsync |
+| [IRtmStorage](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Rtm/RtmScene) | Store unique information in the channel or in user | SetChannelMetadataAsync, UpdateChannelMetadataAsync, RemoveChannelMetadataAsync, GetChannelMetadataAsync  |
+
+
 ## How to run the sample project
 
 #### Developer Environment Requirements

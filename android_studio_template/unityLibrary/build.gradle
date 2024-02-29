@@ -6,6 +6,7 @@ apply plugin: 'com.android.library'
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project('AgoraRtcEngineKit.plugin')
+    implementation project('AgoraRtmEngineKit.plugin')
 }
 
 android {

@@ -3,8 +3,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
-
 using System.Collections.Generic;
+using io.agora.rtc.demo;
 
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
@@ -120,8 +120,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             }
 
 
-            UInt64 mccUid = 0;
-            UInt64.TryParse(RtmUidInputField.text, out mccUid);
+            Int64 mccUid = 0;
+            Int64.TryParse(RtmUidInputField.text, out mccUid);
             if (mccUid == 0)
             {
                 this.Log.UpdateLog("rtm uid must be UInt64");
@@ -194,9 +194,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(_appID, 0,
-                CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
-                AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
+            RtcEngineContext context = new RtcEngineContext();
+            context.appId = _appID;
+            context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
+            context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
+            context.areaCode = AREA_CODE.AREA_CODE_GLOB;
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
             var logPath = Application.persistentDataPath + "/rtc.log";
@@ -505,14 +507,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             this._sample = sample;
         }
 
-        public override void OnLyricResult(string requestId, Int64 songCode, string lyricUrl, MusicContentCenterStatusCode errorCode)
+        public override void OnLyricResult(string requestId, Int64 songCode, string lyricUrl, MusicContentCenterStateReason reason)
         {
-            this._sample.Log.UpdateLog(string.Format("OnLyricResult requestId:{0} songCode:{1} lyricUrl:{2} errorCode:{3}", requestId, songCode, lyricUrl, errorCode));
+            this._sample.Log.UpdateLog(string.Format("OnLyricResult requestId:{0} songCode:{1} lyricUrl:{2} reason:{3}", requestId, songCode, lyricUrl, reason));
         }
 
-        public override void OnMusicChartsResult(string requestId, MusicChartInfo[] result, MusicContentCenterStatusCode errorCode)
+        public override void OnMusicChartsResult(string requestId, MusicChartInfo[] result, MusicContentCenterStateReason reason)
         {
-            this._sample.Log.UpdateLog(string.Format("OnMusicChartsResult requestId:{0} result.count:{1} errorCode:{2} ", requestId, result.Length, errorCode));
+            this._sample.Log.UpdateLog(string.Format("OnMusicChartsResult requestId:{0} result.count:{1} reason:{2} ", requestId, result.Length, reason));
             Debug.Log(result.ToString());
 
             this._sample.SearchInputField.gameObject.SetActive(true);
@@ -539,9 +541,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             this._sample.Log.UpdateLog("Select your Music Chart item please");
         }
 
-        public override void OnMusicCollectionResult(string requestId, MusicCollection result, MusicContentCenterStatusCode errorCode)
+        public override void OnMusicCollectionResult(string requestId, MusicCollection result, MusicContentCenterStateReason reason)
         {
-            this._sample.Log.UpdateLog(string.Format("OnMusicCollectionResult requestId:{0} result.count:{1} errorCode:{2}", requestId, result.count, errorCode));
+            this._sample.Log.UpdateLog(string.Format("OnMusicCollectionResult requestId:{0} result.count:{1} reason:{2}", requestId, result.count, reason));
             var str = AgoraJson.ToJson<MusicCollection>(result);
             Debug.Log(str);
 
@@ -566,31 +568,31 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
 
         }
 
-        public override void OnSongSimpleInfoResult(string requestId, Int64 songCode, string simpleInfo, MusicContentCenterStatusCode errorCode)
+        public override void OnSongSimpleInfoResult(string requestId, Int64 songCode, string simpleInfo, MusicContentCenterStateReason reason)
         {
 
         }
 
 
-        public override void OnPreLoadEvent(string requestId, Int64 songCode, int percent, string lyricUrl, PreloadStatusCode status, MusicContentCenterStatusCode errorCode)
+        public override void OnPreLoadEvent(string requestId, Int64 songCode, int percent, string lyricUrl, PreloadState state, MusicContentCenterStateReason reason)
         {
             Debug.Log("OnPreLoadEvent percent:" + percent);
-            if (status == PreloadStatusCode.kPreloadStatusCompleted)
+            if (state == PreloadState.kPreloadStateCompleted)
             {
-                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} lyricUrl:{2}, status:{3}, errorCode:{4}", songCode, percent, lyricUrl, status, errorCode));
+                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} lyricUrl:{2}, state:{3}, reason:{4}", songCode, percent, lyricUrl, state, reason));
 
                 this._sample.OpenButton.gameObject.SetActive(true);
                 this._sample.GetLyricButton.gameObject.SetActive(true);
             }
-            else if (status == PreloadStatusCode.kPreloadStatusFailed)
+            else if (state == PreloadState.kPreloadStateFailed)
             {
-                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} lyricUrl:{2}, status:{3}, errorCode:{4}", songCode, percent, lyricUrl, status, errorCode));
+                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} lyricUrl:{2}, state:{3}, reason:{4}", songCode, percent, lyricUrl, state, reason));
 
                 this._sample.Log.UpdateLog("PreLoad Failed, Please click PreLoad Button again");
             }
-            else if (status == PreloadStatusCode.kPreloadStatusRemoved)
+            else if (state == PreloadState.kPreloadStateRemoved)
             {
-                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} lyricUrl:{2}, status:{3}, errorCode:{4}", songCode, percent, lyricUrl, status, errorCode));
+                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} lyricUrl:{2}, state:{3}, reason:{4}", songCode, percent, lyricUrl, state, reason));
                 this._sample.Log.UpdateLog("Remove completed");
             }
         }
@@ -605,10 +607,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             _sample = sample;
         }
 
-        public override void OnPlayerSourceStateChanged(MEDIA_PLAYER_STATE state, MEDIA_PLAYER_ERROR ec)
+        public override void OnPlayerSourceStateChanged(MEDIA_PLAYER_STATE state, MEDIA_PLAYER_REASON reason)
         {
             _sample.Log.UpdateLog(string.Format(
-                "OnPlayerSourceStateChanged state: {0}, ec: {1}, playId: {2}", state, ec, _sample.MusicPlayer.GetId()));
+                "OnPlayerSourceStateChanged state: {0}, reason: {1}, playId: {2}", state, reason, _sample.MusicPlayer.GetId()));
             Debug.Log("OnPlayerSourceStateChanged");
             if (state == MEDIA_PLAYER_STATE.PLAYER_STATE_OPEN_COMPLETED)
             {

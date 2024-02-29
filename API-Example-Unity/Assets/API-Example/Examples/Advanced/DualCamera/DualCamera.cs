@@ -2,8 +2,7 @@
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
- 
- 
+using io.agora.rtc.demo;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
 {
@@ -93,9 +92,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngineEx();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(_appID, 0,
-                CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
-                AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
+            RtcEngineContext context = new RtcEngineContext();
+            context.appId = _appID;
+            context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
+            context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
+            context.areaCode = AREA_CODE.AREA_CODE_GLOB;
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
 
@@ -268,7 +269,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             RtcEngine.InitEventHandler(null);
             RtcEngine.StopCameraCapture(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA);
             RtcEngine.StopCameraCapture(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_SECONDARY);
-            RtcEngine.LeaveChannelEx(new RtcConnection(_channelName, 456));
+            RtcEngine.LeaveChannelEx(new RtcConnection(_channelName, UID2));
             RtcEngine.LeaveChannel();
             RtcEngine.Dispose();
         }

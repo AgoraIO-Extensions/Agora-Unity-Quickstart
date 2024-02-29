@@ -79,6 +79,12 @@ echo Build_IOS_SIGN: $Build_IOS_SIGN
 echo Build_Android: $Build_Android
 echo Plugin_Url: $Plugin_Url
 echo appID: $appID
+echo RTC: $RTC
+echo RTM: $RTM
+echo NUMBER_UID: $NUMBER_UID
+echo STRING_UID: $STRING_UID
+echo FULL: $FULL
+echo VOICE: $VOICE
 
 echo Package_Publish: $Package_Publish
 echo is_tag_fetch: $is_tag_fetch
@@ -89,6 +95,7 @@ echo build_date: $build_date
 echo build_time: $build_time
 echo release_version: $release_version
 echo short_version: $short_version
+echo robot_key: $robot_key
 echo pwd: $(pwd)
 root=$(pwd)
 
@@ -97,24 +104,41 @@ set -ex
 UNITY_DIR=/Applications/Unity/Hub/Editor/${Unity_Version}/Unity.app/Contents/MacOS
 
 echo "===========create sdk_project begin================="
+
+#remove api-example AGORA_RTC or AGORA_RTM
+python3 $root/ci/build/remove_example_by_macor.py $root/API-Example-Unity/Assets $RTC $RTM $NUMBER_UID $STRING_UID $FULL $VOICE
+
+#allow unsafe code
+python3 $root/ci/build/set_allowUnsafeCode_true.py $root/API-Example-Unity
+
 mkdir build_temp
 cd build_temp
 python3 ${WORKSPACE}/artifactory_utils.py --action=download_file --file=$SDK_Url
-unzip -d ./ ./Agora_Unity_RTC_SDK_*.zip
+unzip -d ./ ./Agora_Unity_*_SDK_*.zip
 ls
 echo "===========unzip finish================="
+if [ "$RTC" == "true" ]; then
+    UNITYPACKAGE_NAME="Agora-RTC-Plugin.unitypackage"
+    BUILD_PATH="Build"
+    COMMAND_BUILD="CommandBuild"
+else
+    UNITYPACKAGE_NAME="Agora-RTM-Plugin.unitypackage"
+    BUILD_PATH="RtmBuild"
+    COMMAND_BUILD="RtmCommandBuild"
+fi
+
 $UNITY_DIR/Unity -quit -batchmode -nographics -createProject "sdk_project"
+python3 $root/ci/build/set_allowUnsafeCode_true.py $root/build_temp/sdk_project
 echo "===========create sdk_project finish================="
-python3 ../ci/build/set_allowUnsafeCode_true.py $root/build_temp/sdk_project
-$UNITY_DIR/Unity -quit -batchmode -nographics -openProjects "sdk_project" -importPackage "${root}/build_temp/Agora-RTC-Plugin.unitypackage"
+$UNITY_DIR/Unity -quit -batchmode -nographics -openProjects "sdk_project" -importPackage "${root}/build_temp/${UNITYPACKAGE_NAME}"
 echo "===========import sdk_project finish================="
 
 cd ${root}
 echo "===========Demo build begin================="
-rm -rf build_temp/sdk_project/Assets/Agora-RTC-Plugin/API-Example
-cp -r build_temp/sdk_project/Assets/Agora-RTC-Plugin ./API-Example-Unity/Assets
-echo "===========copy Agora-RTC-Plugin to Assets finish ================="
-python3 ./ci/build/set_allowUnsafeCode_true.py $root/API-Example-Unity
+rm -rf build_temp/sdk_project/Assets/Agora-*-Plugin/API-Example
+cp -r build_temp/sdk_project/Assets/Agora-*-Plugin ./API-Example-Unity/Assets
+echo "===========copy Agora-*-Plugin to Assets finish ================="
+
 #replace appID
 sed -i "" "s/appID:/appID: ${appID}/g" ./API-Example-Unity/Assets/API-Example/AppIdInput/AppIdInput.asset
 
@@ -126,46 +150,80 @@ else
     echo "Plugin_Url 为空.跳过PluginScene"
 fi
 
+upload_file_array=()
+upload_file_and_clear() {
+    #zip all file
+    mkdir Demo_zip
+    demo_files=$(ls ./$BUILD_PATH)
+    for file in ${demo_files}; do
+        no_suffix_file=${file%.*}
+        7za a ./Demo_zip/Unity_Demo_${SDK_Version}_${no_suffix_file}_${build_date}_${build_time}.zip ./$BUILD_PATH/${file}
+    done
+
+    #upload all file
+    demo_zips=$(ls ./Demo_zip)
+    for zip_file in ${demo_zips}; do
+        download_file=$(python3 ${WORKSPACE}/artifactory_utils.py --action=upload_file --file=./Demo_zip/${zip_file} --project)
+        payload1='{
+                "msgtype": "text",
+                "text": {
+                    "content": "Unity Demo 【'${SDK_Version}'】 打包:\n'${download_file}'"
+                }
+            }'
+
+        # 发送 POST 请求
+        curl -k -X POST -H "Content-Type: application/json; charset=UTF-8" \
+            -d "$payload1" \
+            "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=$robot_key"
+
+        upload_file_array+=('\n'==========='\n'${download_file})
+    done
+
+    #clear all file
+    rm -rf ./Demo_zip
+    rm -r $BUILD_PATH/*
+}
+
 if [ "$Build_Mac" == "true" ]; then
-    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.CommandBuild.BuildMac
+    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.$COMMAND_BUILD.BuildMac
+    upload_file_and_clear
 fi
 
 if [ "$Build_IOS" == "true" ]; then
-    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -buildTarget ios -executeMethod Agora_RTC_Plugin.API_Example.CommandBuild.BuildIPhone
+    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -buildTarget ios -executeMethod Agora_RTC_Plugin.API_Example.$COMMAND_BUILD.BuildIPhone
 
     if [ "$Build_IOS_SIGN" == "true" ]; then
-        sh ./ci/build/package_ios.sh ${WORKSPACE}
+        sh ./ci/build/package_ios.sh ${WORKSPACE} ${RTC} ${RTM}
     fi
+    upload_file_and_clear
 fi
 
 if [ "$Build_Win" == "true" ]; then
-    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.CommandBuild.BuildWin32
-    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.CommandBuild.BuildWin64
+    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.$COMMAND_BUILD.BuildWin32
+    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.$COMMAND_BUILD.BuildWin64
+    upload_file_and_clear
 fi
 
 if [ "$Build_Android" == "true" ]; then
-    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.CommandBuild.BuildAndroid
+    $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.$COMMAND_BUILD.BuildAndroid
     # aar not exitsts
     if ! [ -f ./build_temp/sdk_project/Assets/Agora-*-Plugin/Agora-Unity-*-SDK/Plugins/Android/*.aar ]; then
         sed -i -e "s/implementation files('..\/unityLibrary\/libs\/AgoraScreenShareExtension.aar')//g" android_studio_template/launcher/build.gradle
         rm -rf android_studio_template/launcher/build.gradle-e
     fi
-
-    sh ./ci/build/package_android.sh ${WORKSPACE}
+    sh ./ci/build/package_android.sh ${WORKSPACE} ${RTC} ${RTM}
+    upload_file_and_clear
 fi
 
-echo "===========Demo build end================="
+upload_file_array_str="${upload_file_array[*]}"
+payload1='{
+            "msgtype": "text",
+            "text": {
+                "content": "Unity Demo 【'${SDK_Version}'】 本次打包结束:\n'${upload_file_array_str}'"
+            }
+        }'
 
-#zip all file
-mkdir Demo_zip
-demo_files=$(ls ./Build)
-for file in ${demo_files}; do
-    no_suffix_file=${file%.*}
-    7za a ./Demo_zip/Unity_Demo_${SDK_Version}_${no_suffix_file}_${build_date}_${build_time}.zip ./Build/${file}
-done
-
-#upload all file
-demo_zips=$(ls ./Demo_zip)
-for zip_file in ${demo_zips}; do
-    python3 ${WORKSPACE}/artifactory_utils.py --action=upload_file --file=./Demo_zip/${zip_file} --project
-done
+# 发送 POST 请求
+curl -k -X POST -H "Content-Type: application/json; charset=UTF-8" \
+    -d "$payload1" \
+    "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=$robot_key"

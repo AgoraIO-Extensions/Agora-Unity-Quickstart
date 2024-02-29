@@ -2,8 +2,8 @@
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
- 
- 
+using io.agora.rtc.demo;
+
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
 {
@@ -94,9 +94,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(_appID, 0,
-                CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
-                AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING,AREA_CODE.AREA_CODE_GLOB, new LogConfig("./log.txt"));
+            RtcEngineContext context = new RtcEngineContext();
+            context.appId = _appID;
+            context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
+            context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
+            context.areaCode = AREA_CODE.AREA_CODE_GLOB;
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
         }
@@ -329,9 +331,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
             _sample.Log.UpdateLog(string.Format("OnRecorderInfoUpdated fileName: {0}, durationMs: {1} fileSize：{2}", info.fileName, info.durationMs, info.fileSize));
         }
 
-        public override void OnRecorderStateChanged(string channelId, uint uid, RecorderState state, RecorderErrorCode error)
+        public override void OnRecorderStateChanged(string channelId, uint uid, RecorderState state, RecorderReasonCode reason)
         {
-            _sample.Log.UpdateLog(string.Format("OnRecorderStateChanged state: {0}, error: {1}", state, error));
+            _sample.Log.UpdateLog(string.Format("OnRecorderStateChanged state: {0}, error: {1}", state, reason));
 
         }
     }

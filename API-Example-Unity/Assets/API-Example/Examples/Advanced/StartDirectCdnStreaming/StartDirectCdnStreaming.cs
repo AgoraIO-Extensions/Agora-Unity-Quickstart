@@ -1,9 +1,8 @@
 ﻿using Agora.Rtc;
- 
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
- 
+using io.agora.rtc.demo;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
 {
@@ -70,9 +69,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(_appID, 0,
-                CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
-                AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT);
+            RtcEngineContext context = new RtcEngineContext();
+            context.appId = _appID;
+            context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
+            context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
+            context.areaCode = AREA_CODE.AREA_CODE_GLOB;
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
         }
@@ -314,9 +315,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
             _startDirectCdnStreaming.Log.UpdateLog("OnConnectionLost ");
         }
 
-        public override void OnDirectCdnStreamingStateChanged(DIRECT_CDN_STREAMING_STATE state, DIRECT_CDN_STREAMING_ERROR error, string message)
+        public override void OnDirectCdnStreamingStateChanged(DIRECT_CDN_STREAMING_STATE state, DIRECT_CDN_STREAMING_REASON reason, string message)
         {
-            _startDirectCdnStreaming.Log.UpdateLog(string.Format("OnDirectCdnStreamingStateChanged state: {0}, error: {1}", state, error));
+            _startDirectCdnStreaming.Log.UpdateLog(string.Format("OnDirectCdnStreamingStateChanged state: {0}, reason: {1}", state, reason));
         }
 
         public override void OnDirectCdnStreamingStats(DirectCdnStreamingStats stats)

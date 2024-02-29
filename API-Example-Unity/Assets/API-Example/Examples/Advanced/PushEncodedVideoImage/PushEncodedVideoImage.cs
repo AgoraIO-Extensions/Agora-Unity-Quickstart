@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Agora.Rtc;
-
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using io.agora.rtc.demo;
 
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
@@ -65,9 +65,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngineEx();
             UserEventHandler handler = new UserEventHandler(this);
-            RtcEngineContext context = new RtcEngineContext(_appID, 0,
-                CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING,
-                AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING);
+            RtcEngineContext context = new RtcEngineContext();
+            context.appId = _appID;
+            context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
+            context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING;
+            context.areaCode = AREA_CODE.AREA_CODE_GLOB;
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
             RtcEngine.RegisterVideoEncodedFrameObserver(new VideoEncodedImageReceiver(), OBSERVER_MODE.INTPTR);
@@ -87,7 +89,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.PushEncodedVideoImage
             option.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             option.channelProfile.SetValue(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING);
 
-            var nRet = RtcEngine.JoinChannel(_token, _channelName);
+            var nRet = RtcEngine.JoinChannel(_token, _channelName, "", 0);
             this.Log.UpdateLog("joinChanne1: nRet" + nRet);
         }
 
