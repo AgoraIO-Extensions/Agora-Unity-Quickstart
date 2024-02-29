@@ -8,9 +8,6 @@ using Agora.Rtc;
 
 using RingBuffer;
 using io.agora.rtc.demo;
-using System.IO;
-using System.Collections.Generic;
-using UnityEngine.Analytics;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 {
@@ -37,13 +34,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
         internal uint AUDIO_TRACK_ID = 0;
-        // This depends on the audio file you open
         private const int CHANNEL = 2;
-        // This depends on the audio file you open
-        private const int SAMPLE_RATE = 44100;
+        // Please do not change this value because Unity re-samples the sample rate to 48000.
+        private const int SAMPLE_RATE = 48000;
 
         // Number of push audio frame per second.
         private const int PUSH_FREQ_PER_SEC = 20;
+
+        private RingBuffer<byte> _audioBuffer;
+        private bool _startConvertSignal = false;
 
         private Thread _pushAudioFrameThread;
         private System.Object _rtcLock = new System.Object();
@@ -115,6 +114,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 
         private void StartPushAudioFrame()
         {
+            // 1-sec-length buffer
+            var bufferLength = SAMPLE_RATE * CHANNEL;
+            _audioBuffer = new RingBuffer<byte>(bufferLength, true);
+            _startConvertSignal = true;
+
             _pushAudioFrameThread = new Thread(PushAudioFrameThread);
             _pushAudioFrameThread.Start();
 
@@ -185,16 +189,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 
             double startMillisecond = GetTimestamp();
             long tick = 0;
-#if UNITY_ANDROID && !UNITY_EDITOR
-            // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
-            string filePath = "/assets/audio/pcm16.wav";
-#else
-            string filePath = Application.streamingAssetsPath + "/audio/" + "pcm16.wav";
-#endif
-            FileStream fileStream = new FileStream(filePath, FileMode.Open);
+
             while (true)
             {
-                int nRet = -1;
                 lock (_rtcLock)
                 {
                     if (RtcEngine == null)
@@ -202,43 +199,59 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
                         break;
                     }
 
-                    int bytesRead =  fileStream.Read(audioFrame.RawBuffer, 0, audioFrame.RawBuffer.Length);
-                    nRet = RtcEngine.PushAudioFrame(audioFrame, AUDIO_TRACK_ID);
-
-                    if (bytesRead == 0)
+                    int nRet = -1;
+                    lock (_audioBuffer)
                     {
-                        //Set the position of FileStream to return to the file header to restart reading data
-                        fileStream.Seek(0, SeekOrigin.Begin);
+                        if (_audioBuffer.Size > samples * bytesPerSample * CHANNEL)
+                        {
+                            for (var j = 0; j < samples * bytesPerSample * CHANNEL; j++)
+                            {
+                                audioFrame.RawBuffer[j] = _audioBuffer.Get();
+                            }
+                            nRet = RtcEngine.PushAudioFrame(audioFrame, AUDIO_TRACK_ID);
+                            //Debug.Log("PushAudioFrame returns: " + nRet);
+
+                        }
                     }
+
+                    if (nRet == 0)
+                    {
+                        tick++;
+                        double nextMillisecond = startMillisecond + tick * freq;
+                        double curMillisecond = GetTimestamp();
+                        int sleepMillisecond = (int)Math.Ceiling(nextMillisecond - curMillisecond);
+                        //Debug.Log("sleepMillisecond : " + sleepMillisecond);
+                        if (sleepMillisecond > 0)
+                        {
+                            Thread.Sleep(sleepMillisecond);
+                        }
+                    }
+
                 }
 
-                if (nRet == 0)
-                {
-                    tick++;
-                    double nextMillisecond = startMillisecond + tick * freq;
-                    double curMillisecond = GetTimestamp();
-                    int sleepMillisecond = (int)Math.Ceiling(nextMillisecond - curMillisecond);
-                    Debug.Log("sleepMillisecond : " + sleepMillisecond);
-                    if (sleepMillisecond > 0)
-                    {
-                        Thread.Sleep(sleepMillisecond);
-                    }
-                    else
-                    {
-                        Debug.Log("Sleep 1ms--1");
-                        Thread.Sleep(1);
-                    }
-                }
-                else
-                {
-                    Debug.Log("Sleep freq");
-                    Thread.Sleep(freq);
-                    startMillisecond = GetTimestamp();
-                    tick = 0;
+            }
+        }
 
+        private void OnAudioFilterRead(float[] data, int channels)
+        {
+            if (!_startConvertSignal) return;
+            var rescaleFactor = 32767;
+            lock (_audioBuffer)
+            {
+                foreach (var t in data)
+                {
+                    var sample = t;
+                    if (sample > 1) sample = 1;
+                    else if (sample < -1) sample = -1;
+
+                    var shortData = (short)(sample * rescaleFactor);
+                    var byteArr = new byte[2];
+                    byteArr = BitConverter.GetBytes(shortData);
+
+                    _audioBuffer.Put(byteArr[0]);
+                    _audioBuffer.Put(byteArr[1]);
                 }
             }
-            fileStream.Close();
         }
 
         //get timestamp millisecond

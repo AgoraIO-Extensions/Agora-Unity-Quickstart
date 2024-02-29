@@ -110,7 +110,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
 
         public void JoinChannel()
         {
-            RtcEngine.JoinChannel(_token, _channelName, "", 0);
+            RtcEngine.JoinChannel(_token, _channelName,"",0);
         }
 
         public void LeaveChannel()
@@ -182,19 +182,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
 
             videoSurface.OnTextureSizeModify += (int width, int height) =>
             {
+                float scale = (float)height / (float)width;
+
                 if (usePlane)
-                {
-                    //If render in MeshRenderer, just set localSize with MeshRenderer
-                    float scale = (float)height / (float)width;
                     videoSurface.transform.localScale = new Vector3(-30, 30, 30 * scale);
-                }
                 else
-                {
-                    //If render in RawImage. just set rawImage size.
-                    RectTransform rectTransform = videoSurface.GetComponent<RectTransform>();
-                    rectTransform.sizeDelta = new Vector2(width / 2, height / 2);
-                    rectTransform.localScale = Vector3.one;
-                }
+                    videoSurface.transform.localScale = new Vector3(-5, 5 * scale, 1);
 
                 Debug.Log("OnTextureSizeModify: " + width + "  " + height);
             };
