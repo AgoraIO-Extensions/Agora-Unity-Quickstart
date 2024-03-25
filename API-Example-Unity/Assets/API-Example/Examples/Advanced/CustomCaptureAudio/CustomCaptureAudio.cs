@@ -34,7 +34,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
         internal uint AUDIO_TRACK_ID = 0;
-        private const int CHANNEL = 2;
+        //You should check Force to Mono with audio file so it will always same in all platform 
+        private const int CHANNEL = 1;
         // Please do not change this value because Unity re-samples the sample rate to 48000.
         private const int SAMPLE_RATE = 48000;
 
