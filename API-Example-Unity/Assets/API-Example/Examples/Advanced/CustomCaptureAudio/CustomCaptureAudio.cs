@@ -34,7 +34,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
 
-        private const int CHANNEL = 2;
+        //You should check Force to Mono with audio file so it will always same in all platform 
+        private const int CHANNEL = 1;
         // Please do not change this value because Unity re-samples the sample rate to 48000.
         private const int SAMPLE_RATE = 48000;
         private const int PUSH_FREQ_PER_SEC = 10;
@@ -180,6 +181,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 
             while (true)
             {
+                int nRet = -1;
                 lock (_rtcLock)
                 {
                     if (RtcEngine == null)
@@ -187,36 +189,48 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
                         break;
                     }
 
-                    int nRet = -1;
                     lock (_audioBuffer)
                     {
-                        if (_audioBuffer.Size > samples * bytesPerSample * CHANNEL)
+                        if (_audioBuffer.Size >= samples * bytesPerSample * CHANNEL)
                         {
                             for (var j = 0; j < samples * bytesPerSample * CHANNEL; j++)
                             {
                                 audioFrame.RawBuffer[j] = _audioBuffer.Get();
                             }
-                            nRet = RtcEngine.PushAudioFrame(audioFrame, 0);
-                            //Debug.Log("PushAudioFrame returns: " + nRet);
-
                         }
                     }
-
-                    if (nRet == 0)
-                    {
-                        tick++;
-                        double nextMillisecond = startMillisecond + tick * freq;
-                        double curMillisecond = GetTimestamp();
-                        int sleepMillisecond = (int)Math.Ceiling(nextMillisecond - curMillisecond);
-                        //Debug.Log("sleepMillisecond : " + sleepMillisecond);
-                        if (sleepMillisecond > 0)
-                        {
-                            Thread.Sleep(sleepMillisecond);
-                        }
-                    }
-
+                    nRet = RtcEngine.PushAudioFrame(audioFrame, 0);
                 }
 
+                if (nRet == 0)
+                {
+                    tick++;
+                    double nextMillisecond = startMillisecond + tick * freq;
+                    double curMillisecond = GetTimestamp();
+                    int sleepMillisecond = (int)Math.Ceiling(nextMillisecond - curMillisecond);
+                    Debug.Log("sleepMillisecond : " + sleepMillisecond);
+                    if (sleepMillisecond > 0)
+                    {
+                        Thread.Sleep(sleepMillisecond);
+                    }
+                    else
+                    {
+                        Debug.Log("Sleep 1ms--1");
+                        Thread.Sleep(1);
+                    }
+                }
+                else
+                {
+                    Debug.Log("Sleep 1ms--2");
+                    lock (_audioBuffer)
+                    {
+                        _audioBuffer.Clear();
+                    }
+                    Thread.Sleep(freq);
+                    startMillisecond = GetTimestamp();
+                    tick = 0;
+
+                }
             }
         }
 
