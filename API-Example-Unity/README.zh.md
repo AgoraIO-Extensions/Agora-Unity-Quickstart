@@ -27,6 +27,9 @@
 | [ContentInspect](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Advanced/ContentInspect) | 内容鉴定 | SetContentInspect |
 | [CustomCaptureAudio](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Advanced/CustomCaptureAudio) | 推送外部音频帧     | PushAudioFrame                                               |
 | [CustomCaptureVideo](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Advanced/CustomCaptureVideo) | 推送外部视频帧     | PushVideoFrame                                               |
+| [CustomCaptureVideo/StaticImagePush](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Advanced/CustomCaptureVideo/StaticImagePush) | 推送一张静态图片作为外部视频帧 | PushVideoFrame, CreateCustomVideoTrack                                          |
+| [CustomCaptureVideo/MultChannelsPush](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Advanced/CustomCaptureVideo/MultChannelsPush) | 利用多频道推送2张静态图片作为外部视频帧 | PushVideoFrame, CreateCustomVideoTrack, JoinChannelEx                                       |
+| [CustomCaptureVideo/WebCamWithVirtualCamPush](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Advanced/CustomCaptureVideo/WebCamWithVirtualCamPush) | 同时推送摄像头和自采集视频（Unity虚拟镜头）| PushVideoFrame, CreateCustomVideoTrack, JoinChannelEx                                          |
 | [CustomRenderAudio](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Advanced/CustomRenderAudio) |  拉取远端音频数据 | PullAudioFrame                                               |
 | [DeviceManager](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Advanced/DeviceManager) | 获取当前的音视频设备信息      | GetAudioDeviceManager, GetVideoDeviceManager |
 | [DualCamera](https://github.com/AgoraIO-Extensions/Agora-Unity-Quickstart/tree/main/API-Example-Unity/Assets/API-Example/Examples/Advanced/DualCamera) | 双摄像头工作  | StartPrimaryCameraCapture, StartSecondaryCameraCapture |
@@ -106,3 +109,4 @@
 ## 代码许可
 
 示例项目遵守 MIT 许可证。
+
