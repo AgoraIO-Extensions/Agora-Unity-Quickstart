@@ -5,9 +5,9 @@ using UnityEngine.Serialization;
 using Agora.Rtc;
 using io.agora.rtc.demo;
 
-namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MultChannelPush
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WebCamWithVirtualCamPush
 {
-    public class MultChannelPush : MonoBehaviour
+    public class WebCamWithVirtualCamPush : MonoBehaviour
     {
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
@@ -26,25 +26,38 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MultChannelPush
         [SerializeField]
         private string _channelName = "";
 
+        [Header("_____________VirtualCam Configuration_____________")]
+        [SerializeField]
+        private Camera VirtualCam;
+        [SerializeField]
+        private RenderTexture VirtualCamRT;
+
+        [Header("Video Encoder Config")]
+        [SerializeField]
+        private VideoDimensions dimensions = new VideoDimensions
+        {
+            width = 1920,
+            height = 1080
+        };
+
+        // Pixel format
+        public static TextureFormat ConvertFormat = TextureFormat.RGBA32;
+        public static VIDEO_PIXEL_FORMAT PixelFormat = VIDEO_PIXEL_FORMAT.VIDEO_PIXEL_RGBA;
+
+        // perspective camera buffer
+        private Texture2D BufferTexture = null;
+
+
         public Text LogText;
         internal Logger Log;
         internal IRtcEngineEx RtcEngine = null;
 
-        public Texture2D ShareTexture1;
-        public Texture2D ShareTexture2;
-
-        private byte[] _shareData1 = null;
-        private byte[] _shareData2 = null;
-
-        private Rect _rect1;
-        private Rect _rect2;
-
-        private uint _videoTrack1 = 0;
         private uint _videoTrack2 = 0;
 
         private uint _uid1 = 123;
         private uint _uid2 = 456;
 
+        private object _lock = new object();
         // Use this for initialization
         private void Start()
         {
@@ -52,7 +65,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MultChannelPush
             if (CheckAppId())
             {
                 InitEngine();
-                SetExternalVideoSource();
                 InitTexture();
                 JoinChannel1();
                 JoinChannel2();
@@ -62,7 +74,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MultChannelPush
         private void Update()
         {
             PermissionHelper.RequestMicrophontPermission();
-            StartCoroutine(ShareScreen());
+            ShareRenderTexture();
         }
 
         //Show data in AgoraBasicProfile
@@ -75,63 +87,60 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MultChannelPush
             _channelName = _appIdInput.channelName;
         }
 
-        private IEnumerator ShareScreen()
+        long _pushCount = 0;
+        /// <summary>
+        /// Push frame to the remote client.  This is the same code that does ScreenSharing.
+        /// </summary>
+        /// <param name="bytes">raw video image data</param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="onFinish">callback upon finish of the function</param>
+        /// <returns></returns>
+        IEnumerator PushFrame(byte[] bytes, int width, int height, System.Action onFinish)
         {
+            if (bytes == null || bytes.Length == 0)
+            {
+                Debug.LogError("Zero bytes found!!!!");
+                yield break;
+            }
             yield return new WaitForEndOfFrame();
-            IRtcEngine rtc = Agora.Rtc.RtcEngine.Instance;
-            if (rtc != null)
+
+            //if the engine is present
+            if (RtcEngine != null)
             {
+                //Create a new external video frame
+                ExternalVideoFrame externalVideoFrame = new ExternalVideoFrame();
+                //Set the buffer type of the video frame
+                externalVideoFrame.type = VIDEO_BUFFER_TYPE.VIDEO_BUFFER_RAW_DATA;
+                // Set the video pixel format
+                externalVideoFrame.format = PixelFormat; // VIDEO_PIXEL_RGBA
+                                                         //apply raw data you are pulling from the rectangle you created earlier to the video frame
+                externalVideoFrame.buffer = bytes;
 
-                if (_videoTrack1 != 0)
+                //Set the width of the video frame (in pixels)
+                externalVideoFrame.stride = width;
+                //Set the height of the video frame
+                externalVideoFrame.height = height;
+
+                externalVideoFrame.rotation = 180;
+                // increment i with the video timestamp
+                //externalVideoFrame.timestamp = System.DateTime.Now.Ticks;
+                externalVideoFrame.timestamp = 0;
+                //Push the external video frame with the frame we just created
+                int a = 0;
+                lock (_lock)
                 {
-                    ExternalVideoFrame externalVideoFrame = new ExternalVideoFrame();
-                    externalVideoFrame.type = VIDEO_BUFFER_TYPE.VIDEO_BUFFER_RAW_DATA;
-                    externalVideoFrame.format = VIDEO_PIXEL_FORMAT.VIDEO_PIXEL_RGBA;
-                    externalVideoFrame.buffer = _shareData1;
-                    externalVideoFrame.stride = (int)_rect1.width;
-                    externalVideoFrame.height = (int)_rect1.height;
-                    externalVideoFrame.rotation = 180;
-                    externalVideoFrame.timestamp = 0;
-                    var ret = rtc.PushVideoFrame(externalVideoFrame, _videoTrack1);
-                    this.Log.UpdateLog("PushVideoFrame 1: " + ret);
+                    RtcEngine.PushVideoFrame(externalVideoFrame, _videoTrack2);
                 }
-
-
-                if (_videoTrack2 != 0)
-                {
-                    ExternalVideoFrame externalVideoFrame = new ExternalVideoFrame();
-                    externalVideoFrame.type = VIDEO_BUFFER_TYPE.VIDEO_BUFFER_RAW_DATA;
-                    externalVideoFrame.format = VIDEO_PIXEL_FORMAT.VIDEO_PIXEL_RGBA;
-                    externalVideoFrame.buffer = _shareData2;
-                    externalVideoFrame.stride = (int)_rect2.width;
-                    externalVideoFrame.height = (int)_rect2.height;
-                    externalVideoFrame.rotation = 180;
-                    externalVideoFrame.timestamp = 0;
-                    var ret = rtc.PushVideoFrame(externalVideoFrame, _videoTrack2);
-                    this.Log.UpdateLog("PushVideoFrame 2: " + ret);
-                }
+                if (++_pushCount % 100 == 0) Debug.Log(" pushVideoFrame(" + _pushCount + ") size:" + bytes.Length + " => " + a);
             }
+
+            yield return null;
+            onFinish();
         }
-
-
-        private byte[] convertColor32(Color32[] colors)
-        {
-            byte[] ret = new byte[colors.Length * 4];
-            int i = 0;
-            foreach (var color in colors)
-            {
-                ret[i++] = color.r;
-                ret[i++] = color.g;
-                ret[i++] = color.b;
-                ret[i++] = color.a;
-            }
-            return ret;
-        }
-
 
         private void InitEngine()
         {
-
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngineEx();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext();
@@ -145,24 +154,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MultChannelPush
             RtcEngine.EnableVideo();
         }
 
-        private void SetExternalVideoSource()
-        {
-            var ret = RtcEngine.SetExternalVideoSource(true, false, EXTERNAL_VIDEO_SOURCE_TYPE.VIDEO_FRAME, new SenderOptions());
-            this.Log.UpdateLog("SetExternalVideoSource returns:" + ret);
-        }
-
         private void JoinChannel1()
         {
-            _videoTrack1 = RtcEngine.CreateCustomVideoTrack();
             ChannelMediaOptions channelMediaOptions = new ChannelMediaOptions();
-            channelMediaOptions.publishCustomVideoTrack.SetValue(true);
-            channelMediaOptions.customVideoTrackId.SetValue(_videoTrack1);
+            channelMediaOptions.publishCameraTrack.SetValue(true);
+            channelMediaOptions.publishMicrophoneTrack.SetValue(true);
             channelMediaOptions.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             RtcEngine.JoinChannelEx(_token, new RtcConnection(_channelName, _uid1), channelMediaOptions);
-
-            VideoEncoderConfiguration videoEncoderConfiguration = new VideoEncoderConfiguration();
-            videoEncoderConfiguration.dimensions = new VideoDimensions((int)_rect1.width, (int)_rect1.height);
-            RtcEngine.SetVideoEncoderConfigurationEx(videoEncoderConfiguration, new RtcConnection(_channelName, _uid1));
         }
 
 
@@ -171,13 +169,22 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MultChannelPush
             _videoTrack2 = RtcEngine.CreateCustomVideoTrack();
             ChannelMediaOptions channelMediaOptions = new ChannelMediaOptions();
             channelMediaOptions.publishCustomVideoTrack.SetValue(true);
+            channelMediaOptions.publishMicrophoneTrack.SetValue(false);
+            channelMediaOptions.autoSubscribeAudio.SetValue(false);
             channelMediaOptions.customVideoTrackId.SetValue(_videoTrack2);
             channelMediaOptions.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             RtcEngine.JoinChannelEx(_token, new RtcConnection(_channelName, _uid2), channelMediaOptions);
 
-            VideoEncoderConfiguration videoEncoderConfiguration = new VideoEncoderConfiguration();
-            videoEncoderConfiguration.dimensions = new VideoDimensions((int)_rect2.width, (int)_rect2.height);
-            RtcEngine.SetVideoEncoderConfigurationEx(videoEncoderConfiguration, new RtcConnection(_channelName, _uid2));
+            VideoEncoderConfiguration config = new VideoEncoderConfiguration
+            {
+                bitrate = 0,
+                minBitrate = 1,
+                dimensions = this.dimensions,
+                orientationMode = ORIENTATION_MODE.ORIENTATION_MODE_ADAPTIVE,
+                degradationPreference = DEGRADATION_PREFERENCE.MAINTAIN_FRAMERATE,
+                mirrorMode = VIDEO_MIRROR_MODE_TYPE.VIDEO_MIRROR_MODE_ENABLED
+            };
+            RtcEngine.SetVideoEncoderConfigurationEx(config, new RtcConnection(_channelName, _uid2));
         }
 
         private bool CheckAppId()
@@ -189,16 +196,34 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MultChannelPush
         private void InitTexture()
         {
 
-            Color32[] color32s = ShareTexture1.GetPixels32(0);
-            _shareData1 = convertColor32(color32s);
-            _rect1 = new UnityEngine.Rect(0, 0, ShareTexture1.width, ShareTexture1.height);
-
-            color32s = ShareTexture2.GetPixels32(0);
-            _shareData2 = convertColor32(color32s);
-            _rect2 = new UnityEngine.Rect(0, 0, ShareTexture2.width, ShareTexture2.height);
-
+            RenderTexture renderTexture = VirtualCamRT;
+            if (renderTexture != null)
+            {
+                BufferTexture = new Texture2D(renderTexture.width, renderTexture.height, ConvertFormat, false);
+            }
         }
 
+        private void ShareRenderTexture()
+        {
+            if (BufferTexture == null) // offlined
+            {
+                return;
+            }
+            Camera targetCamera = VirtualCam;
+            RenderTexture.active = targetCamera.targetTexture; // the targetTexture holds render texture
+            Rect rect = new Rect(0, 0, targetCamera.targetTexture.width, targetCamera.targetTexture.height);
+            BufferTexture.ReadPixels(rect, 0, 0);
+            BufferTexture.Apply();
+            byte[] bytes = BufferTexture.GetRawTextureData();
+
+            StartCoroutine(PushFrame(bytes, (int)rect.width, (int)rect.height,
+             () =>
+             {
+                 bytes = null;
+             }));
+
+            RenderTexture.active = null;
+        }
 
         private void OnDestroy()
         {
@@ -243,8 +268,19 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MultChannelPush
 
                 videoSurface.OnTextureSizeModify += (int width, int height) =>
                 {
-                    float scale = (float)height / (float)width;
-                    videoSurface.transform.localScale = new Vector3(-5, 5 * scale, 1);
+                    var transform = videoSurface.GetComponent<RectTransform>();
+                    if (transform)
+                    {
+                        //If render in RawImage. just set rawImage size.
+                        transform.sizeDelta = new Vector2(width / 2, height / 2);
+                        transform.localScale = Vector3.one;
+                    }
+                    else
+                    {
+                        //If render in MeshRenderer, just set localSize with MeshRenderer
+                        float scale = (float)height / (float)width;
+                        videoSurface.transform.localScale = new Vector3(-1, 1, scale);
+                    }
                     Debug.Log("OnTextureSizeModify: " + width + "  " + height);
                 };
 
@@ -312,9 +348,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MultChannelPush
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
-        private readonly MultChannelPush _sample;
+        private readonly WebCamWithVirtualCamPush _sample;
 
-        internal UserEventHandler(MultChannelPush sample)
+        internal UserEventHandler(WebCamWithVirtualCamPush sample)
         {
             _sample = sample;
         }
@@ -354,14 +390,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MultChannelPush
         {
             _sample.Log.UpdateLog(
                 string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-            MultChannelPush.MakeVideoView(uid, _sample.GetChannelName());
+            WebCamWithVirtualCamPush.MakeVideoView(uid, _sample.GetChannelName());
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
         {
             _sample.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                 (int)reason));
-            MultChannelPush.DestroyVideoView(uid);
+            WebCamWithVirtualCamPush.DestroyVideoView(uid);
         }
     }
 
