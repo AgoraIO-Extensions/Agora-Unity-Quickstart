@@ -86,6 +86,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
             options.enableAudioRecordingOrPlayout.SetValue(true);
             options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             RtcEngine.JoinChannel(_token, _channelName, this.Uid1, options);
+            RtcEngine.MuteRemoteAudioStream(Uid2, true);
+            RtcEngine.MuteRemoteVideoStream(Uid2, true);
         }
 
         private void ScreenShareJoinChannel()
