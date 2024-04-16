@@ -167,11 +167,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
 
 #if UNITY_IPHONE
             CameraCapturerConfiguration cameraCapturerConfiguration = new CameraCapturerConfiguration();
-            cameraCapturerConfiguration.cameraDirection = CAMERA_DIRECTION.CAMERA_REAR;
+            cameraCapturerConfiguration.cameraDirection.SetValue(CAMERA_DIRECTION.CAMERA_REAR);
             int nRet = RtcEngine.EnableMultiCamera(true, cameraCapturerConfiguration);
             this.Log.UpdateLog("EnableMultiCamera :" + nRet);
 
-            _config2.cameraDirection = CAMERA_DIRECTION.CAMERA_REAR;
+            _config2.cameraDirection.SetValue(CAMERA_DIRECTION.CAMERA_REAR);
 #endif
 
             var ret = RtcEngine.StartCameraCapture(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_SECONDARY, _config2);
