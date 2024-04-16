@@ -241,7 +241,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             if (_videoDeviceInfos.Length >= 1)
             {
 
-                _config1.deviceId = _videoDeviceInfos[0].deviceId;
+                _config1.deviceId.SetValue(_videoDeviceInfos[0].deviceId);
                 Debug.Log("PrimaryCamera: " + _config1.deviceId);
                 _config1.format = new VideoFormat();
             }
@@ -251,7 +251,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             if (_videoDeviceInfos.Length >= 2)
             {
 
-                _config2.deviceId = _videoDeviceInfos[1].deviceId;
+                _config2.deviceId.SetValue(_videoDeviceInfos[1].deviceId);
                 Debug.Log("SecondaryCamera: " + _config2.deviceId);
                 _config2.format = new VideoFormat();
             }
