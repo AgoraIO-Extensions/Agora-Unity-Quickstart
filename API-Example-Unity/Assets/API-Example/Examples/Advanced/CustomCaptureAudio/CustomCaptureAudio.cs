@@ -177,7 +177,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
                 _pushAudioFrameThread = new Thread(threadStart);
                 _pushAudioFrameThread.Start(filePath);
             };
-
+            this.Log.UpdateLog("Because the api of rtcEngine is called in different threads, it is necessary to use locks to ensure that different threads do not call the api of rtcEngine at the same time");
             StartCoroutine(PreparationFilePath(action));
         }
 
