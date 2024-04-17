@@ -11,6 +11,10 @@ using io.agora.rtc.demo;
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine.Analytics;
+using UnityEngine.Networking;
+using System.Collections;
+using System.Threading.Tasks;
+using System.Data.Common;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 {
@@ -107,18 +111,74 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
         {
             lock (_rtcLock)
             {
-                AudioTrackConfig audioTrackConfig = new AudioTrackConfig(false);
+                AudioTrackConfig audioTrackConfig = new AudioTrackConfig(true);
                 AUDIO_TRACK_ID = RtcEngine.CreateCustomAudioTrack(AUDIO_TRACK_TYPE.AUDIO_TRACK_DIRECT, audioTrackConfig);
                 this.Log.UpdateLog("CreateCustomAudioTrack id:" + AUDIO_TRACK_ID);
             }
         }
 
+        private IEnumerator PreparationFilePath(Action<string> callback)
+        {
+#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR          
+            string fromPath = Path.Combine(Application.streamingAssetsPath, "audio/pcm16.wav");
+            string filePath = Path.Combine(Application.persistentDataPath, "pcm16.wav");
+            if (fromPath.Contains("://") || fromPath.Contains(":///"))
+            {
+                using (UnityWebRequest www = UnityWebRequest.Get(fromPath))
+                {
+                    yield return www.SendWebRequest();
+
+
+                    if (www.result != UnityWebRequest.Result.Success)
+                    {
+                        Debug.LogError("Failed to load file: " + www.error);
+                    }
+                    else
+                    {
+
+                        try
+                        {
+                            File.WriteAllBytes(filePath, www.downloadHandler.data);
+                            Debug.Log("File successfully copied to " + filePath);
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogError("Failed to save file: " + e.Message);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                try
+                {
+                    File.Copy(fromPath, filePath, true);
+                    Debug.Log("File successfully copied to " + filePath);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("Failed to copy file: " + e.Message);
+                }
+            }
+#else
+            string filePath = Path.Combine(Application.streamingAssetsPath, "audio/pcm16.wav");
+#endif
+
+            callback(filePath);
+            yield break;
+        }
+
+
         private void StartPushAudioFrame()
         {
-            _pushAudioFrameThread = new Thread(PushAudioFrameThread);
-            _pushAudioFrameThread.Start();
+            Action<string> action = (filePath) =>
+            {
+                ParameterizedThreadStart threadStart = new ParameterizedThreadStart(PushAudioFrameThread);
+                _pushAudioFrameThread = new Thread(threadStart);
+                _pushAudioFrameThread.Start(filePath);
+            };
 
-            this.Log.UpdateLog("Because the api of rtcEngine is called in different threads, it is necessary to use locks to ensure that different threads do not call the api of rtcEngine at the same time");
+            StartCoroutine(PreparationFilePath(action));
         }
 
         private void JoinChannel()
@@ -134,7 +194,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
                 channelMediaOptions.publishCustomAudioTrackId.SetValue((int)AUDIO_TRACK_ID);
                 channelMediaOptions.publishMicrophoneTrack.SetValue(false);
 
-                RtcEngine.JoinChannel(_token, _channelName, 0, channelMediaOptions); 
+                RtcEngine.JoinChannel(_token, _channelName, 0, channelMediaOptions);
             }
         }
 
@@ -161,8 +221,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 
         }
 
-        private void PushAudioFrameThread()
+        private void PushAudioFrameThread(object file)
         {
+            string filePath = (string)file;
             var bytesPerSample = 2;
             var type = AUDIO_FRAME_TYPE.FRAME_TYPE_PCM16;
             var channels = CHANNEL;
@@ -185,12 +246,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 
             double startMillisecond = GetTimestamp();
             long tick = 0;
-#if UNITY_ANDROID && !UNITY_EDITOR
-            // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
-            string filePath = "/assets/audio/pcm16.wav";
-#else
-            string filePath = Application.streamingAssetsPath + "/audio/" + "pcm16.wav";
-#endif
             FileStream fileStream = new FileStream(filePath, FileMode.Open);
             while (true)
             {
