@@ -169,8 +169,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_Sprite: {fileID: 21300000, guid: 324ce637d63c74a3cb57f5b6180892ad, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
@@ -218,8 +216,6 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.ScrollRect+ScrollRectEvent, UnityEngine.UI, Version=1.0.0.0,
-      Culture=neutral, PublicKeyToken=null
 --- !u!224 &175986686 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4569088790870854134, guid: cb2f5fb209ae7464092b16dc55eac0e6,
@@ -319,8 +315,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-    m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
-      Culture=neutral, PublicKeyToken=null
 --- !u!114 &190397815
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -340,8 +334,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   m_Type: 1
   m_PreserveAspect: 0
@@ -447,8 +439,6 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.Scrollbar+ScrollEvent, UnityEngine.UI, Version=1.0.0.0,
-      Culture=neutral, PublicKeyToken=null
 --- !u!114 &219462862
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -468,8 +458,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   m_Type: 1
   m_PreserveAspect: 0
@@ -685,7 +673,7 @@ PrefabInstance:
     - target: {fileID: 7545935990554849871, guid: 0c9783117a0a24b2e981c48a5029eee9,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -2629
+      value: -2695.4
       objectReference: {fileID: 0}
     - target: {fileID: 7545935990554849871, guid: 0c9783117a0a24b2e981c48a5029eee9,
         type: 3}
@@ -958,8 +946,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_Sprite: {fileID: 0}
   m_Type: 1
   m_PreserveAspect: 0
@@ -1081,11 +1067,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1209699310}
     m_Modifications:
-    - target: {fileID: 1774090762500586685, guid: 0be118ca3f4a646fa89f0c3ff756232c,
-        type: 3}
-      propertyPath: m_Name
-      value: RtmClientPublishNode
-      objectReference: {fileID: 0}
     - target: {fileID: 1774090762500586684, guid: 0be118ca3f4a646fa89f0c3ff756232c,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1149,7 +1130,7 @@ PrefabInstance:
     - target: {fileID: 1774090762500586684, guid: 0be118ca3f4a646fa89f0c3ff756232c,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -2137.6
+      value: -2204
       objectReference: {fileID: 0}
     - target: {fileID: 1774090762500586684, guid: 0be118ca3f4a646fa89f0c3ff756232c,
         type: 3}
@@ -1190,6 +1171,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1774090762500586685, guid: 0be118ca3f4a646fa89f0c3ff756232c,
+        type: 3}
+      propertyPath: m_Name
+      value: RtmClientPublishNode
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0be118ca3f4a646fa89f0c3ff756232c, type: 3}
@@ -1356,8 +1342,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 14
@@ -1570,8 +1554,6 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.ScrollRect+ScrollRectEvent, UnityEngine.UI, Version=1.0.0.0,
-      Culture=neutral, PublicKeyToken=null
 --- !u!1001 &1627448251
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1579,11 +1561,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1209699310}
     m_Modifications:
-    - target: {fileID: 2922019599043538722, guid: 6e9f8032ce73b4b579169ce45fcc8db0,
-        type: 3}
-      propertyPath: m_Name
-      value: RtmClientSubsribeNode
-      objectReference: {fileID: 0}
     - target: {fileID: 2922019599043538721, guid: 6e9f8032ce73b4b579169ce45fcc8db0,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1647,7 +1624,7 @@ PrefabInstance:
     - target: {fileID: 2922019599043538721, guid: 6e9f8032ce73b4b579169ce45fcc8db0,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -1561.9001
+      value: -1598.5
       objectReference: {fileID: 0}
     - target: {fileID: 2922019599043538721, guid: 6e9f8032ce73b4b579169ce45fcc8db0,
         type: 3}
@@ -1657,7 +1634,7 @@ PrefabInstance:
     - target: {fileID: 2922019599043538721, guid: 6e9f8032ce73b4b579169ce45fcc8db0,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 518.3
+      value: 591.43475
       objectReference: {fileID: 0}
     - target: {fileID: 2922019599043538721, guid: 6e9f8032ce73b4b579169ce45fcc8db0,
         type: 3}
@@ -1688,6 +1665,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2922019599043538722, guid: 6e9f8032ce73b4b579169ce45fcc8db0,
+        type: 3}
+      propertyPath: m_Name
+      value: RtmClientSubsribeNode
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6e9f8032ce73b4b579169ce45fcc8db0, type: 3}
@@ -1755,8 +1737,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   m_Type: 1
   m_PreserveAspect: 0
@@ -1832,8 +1812,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_Sprite: {fileID: 10917, guid: 0000000000000000f000000000000000, type: 0}
   m_Type: 1
   m_PreserveAspect: 0
@@ -1922,8 +1900,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 14
@@ -1954,11 +1930,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1209699310}
     m_Modifications:
-    - target: {fileID: 275879565425063665, guid: cf6287ff3a55b4a5d98b815e4bdfbee4,
-        type: 3}
-      propertyPath: m_Name
-      value: RtmClientLoginNode
-      objectReference: {fileID: 0}
     - target: {fileID: 275879565425063664, guid: cf6287ff3a55b4a5d98b815e4bdfbee4,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2063,6 +2034,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 275879565425063665, guid: cf6287ff3a55b4a5d98b815e4bdfbee4,
+        type: 3}
+      propertyPath: m_Name
+      value: RtmClientLoginNode
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cf6287ff3a55b4a5d98b815e4bdfbee4, type: 3}
