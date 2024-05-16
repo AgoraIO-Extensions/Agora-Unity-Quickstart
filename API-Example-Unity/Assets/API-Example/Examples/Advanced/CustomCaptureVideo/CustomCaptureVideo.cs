@@ -40,7 +40,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
        
         private Texture2D _texture;
         private Rect _rect;
+
+#if !UNITY_VISIONOS
         private WebCamTexture _webCameraTexture;
+#endif
         public RawImage RawImage;
         public Vector2 CameraSize = new Vector2(640, 480);
         public int CameraFPS = 15;
@@ -50,7 +53,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
         // Use this for initialization
         private void Start()
         {
+
             LoadAssetData();
+#if !UNITY_VISIONOS
             if (CheckAppId())
             {
                 InitCameraDevice();
@@ -59,6 +64,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
                 SetExternalVideoSource();
                 JoinChannel();
             }
+#else
+            Log.UpdateLog("Not support WebCamTexture in Vision os");
+#endif
+
         }
 
         private void Update()
@@ -155,19 +164,23 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
 
         private void InitCameraDevice()
         {
+#if !UNITY_VISIONOS
             WebCamDevice[] devices = WebCamTexture.devices;
             _webCameraTexture = new WebCamTexture(devices[0].name, (int)CameraSize.x, (int)CameraSize.y, CameraFPS);
             RawImage.texture = _webCameraTexture;
             _webCameraTexture.Play();
+#endif
         }
 
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
+#if !UNITY_VISIONOS
             if (_webCameraTexture)
             {
                 _webCameraTexture.Stop();
             }
+#endif
             if (RtcEngine == null) return;
             RtcEngine.InitEventHandler(null);
             RtcEngine.LeaveChannel();
