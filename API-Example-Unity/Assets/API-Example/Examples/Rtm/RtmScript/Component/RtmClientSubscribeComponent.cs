@@ -19,6 +19,7 @@ namespace io.agora.rtm.demo
         public Toggle WithMetadataToggle;
         public Toggle WithPersenceToggle;
         public Toggle WithLockToggle;
+        public Toggle BeQuietToggle;
 
         public List<string> ChannelNameList = new List<string>();
 
@@ -42,7 +43,8 @@ namespace io.agora.rtm.demo
                 withMessage = WithMessageToggle.isOn,
                 withMetadata = WithMessageToggle.isOn,
                 withPresence = WithPersenceToggle.isOn,
-                withLock = WithLockToggle.isOn
+                withLock = WithLockToggle.isOn,
+                beQuiet = BeQuietToggle.isOn
             };
 
             var result = await RtmScene.RtmClient.SubscribeAsync(channelName, subscribeOptions);

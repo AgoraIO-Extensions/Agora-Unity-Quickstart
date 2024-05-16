@@ -167,11 +167,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
 
 #if UNITY_IPHONE
             CameraCapturerConfiguration cameraCapturerConfiguration = new CameraCapturerConfiguration();
-            cameraCapturerConfiguration.cameraDirection = CAMERA_DIRECTION.CAMERA_REAR;
+            cameraCapturerConfiguration.cameraDirection.SetValue(CAMERA_DIRECTION.CAMERA_REAR);
             int nRet = RtcEngine.EnableMultiCamera(true, cameraCapturerConfiguration);
             this.Log.UpdateLog("EnableMultiCamera :" + nRet);
 
-            _config2.cameraDirection = CAMERA_DIRECTION.CAMERA_REAR;
+            _config2.cameraDirection.SetValue(CAMERA_DIRECTION.CAMERA_REAR);
 #endif
 
             var ret = RtcEngine.StartCameraCapture(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_SECONDARY, _config2);
@@ -241,7 +241,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             if (_videoDeviceInfos.Length >= 1)
             {
 
-                _config1.deviceId = _videoDeviceInfos[0].deviceId;
+                _config1.deviceId.SetValue(_videoDeviceInfos[0].deviceId);
                 Debug.Log("PrimaryCamera: " + _config1.deviceId);
                 _config1.format = new VideoFormat();
             }
@@ -251,7 +251,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             if (_videoDeviceInfos.Length >= 2)
             {
 
-                _config2.deviceId = _videoDeviceInfos[1].deviceId;
+                _config2.deviceId.SetValue(_videoDeviceInfos[1].deviceId);
                 Debug.Log("SecondaryCamera: " + _config2.deviceId);
                 _config2.format = new VideoFormat();
             }
@@ -311,8 +311,19 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
 
             videoSurface.OnTextureSizeModify += (int width, int height) =>
             {
-                float scale = (float)height / (float)width;
-                videoSurface.transform.localScale = new Vector3(-5, 5 * scale, 1);
+                var transform = videoSurface.GetComponent<RectTransform>();
+                if (transform)
+                {
+                    //If render in RawImage. just set rawImage size.
+                    transform.sizeDelta = new Vector2(width / 2, height / 2);
+                    transform.localScale = Vector3.one;
+                }
+                else
+                {
+                    //If render in MeshRenderer, just set localSize with MeshRenderer
+                    float scale = (float)height / (float)width;
+                    videoSurface.transform.localScale = new Vector3(-1, 1, scale);
+                }
                 Debug.Log("OnTextureSizeModify: " + width + "  " + height);
             };
 

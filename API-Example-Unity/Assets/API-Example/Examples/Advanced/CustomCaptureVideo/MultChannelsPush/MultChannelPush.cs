@@ -158,7 +158,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MultChannelPush
             channelMediaOptions.publishCustomVideoTrack.SetValue(true);
             channelMediaOptions.customVideoTrackId.SetValue(_videoTrack1);
             channelMediaOptions.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            RtcEngine.JoinChannelEx("", new RtcConnection(_channelName, _uid1), channelMediaOptions);
+            RtcEngine.JoinChannelEx(_token, new RtcConnection(_channelName, _uid1), channelMediaOptions);
 
             VideoEncoderConfiguration videoEncoderConfiguration = new VideoEncoderConfiguration();
             videoEncoderConfiguration.dimensions = new VideoDimensions((int)_rect1.width, (int)_rect1.height);
@@ -173,7 +173,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MultChannelPush
             channelMediaOptions.publishCustomVideoTrack.SetValue(true);
             channelMediaOptions.customVideoTrackId.SetValue(_videoTrack2);
             channelMediaOptions.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            RtcEngine.JoinChannelEx("", new RtcConnection(_channelName, _uid2), channelMediaOptions);
+            RtcEngine.JoinChannelEx(_token, new RtcConnection(_channelName, _uid2), channelMediaOptions);
 
             VideoEncoderConfiguration videoEncoderConfiguration = new VideoEncoderConfiguration();
             videoEncoderConfiguration.dimensions = new VideoDimensions((int)_rect2.width, (int)_rect2.height);

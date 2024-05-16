@@ -17,6 +17,7 @@ namespace io.agora.rtm.demo
         public Toggle WithMetadataToggle;
         public Toggle WithPresenceToggle;
         public Toggle WithLockToggle;
+        public Toggle BeQuietToggle;
 
         void Start()
         {
@@ -38,15 +39,16 @@ namespace io.agora.rtm.demo
                 this.RtmScene.AddMessage("Channel name is empty!", Message.MessageType.Error);
             }
 
-            this.RtmScene.StreamChannel = this.RtmScene.RtmClient.CreateStreamChannel(this.ChannelNameInput.text);
-            if (this.RtmScene.StreamChannel != null)
+            int errorCode = 0;
+            this.RtmScene.StreamChannel = this.RtmScene.RtmClient.CreateStreamChannel(this.ChannelNameInput.text, ref errorCode);
+            if (this.RtmScene.StreamChannel != null && errorCode == 0)
             {
                 this.TitleText.text = "StreamChannel is created from rtmClient";
                 this.TitleText.color = Color.green;
             }
             else
             {
-                this.RtmScene.AddMessage("create rtm stream channel failed", Message.MessageType.Error);
+                this.RtmScene.AddMessage("create rtm stream channel failed: " + errorCode, Message.MessageType.Error);
             }
         }
 
@@ -102,6 +104,7 @@ namespace io.agora.rtm.demo
             options.withMetadata = this.WithMetadataToggle.isOn;
             options.withPresence = this.WithPresenceToggle.isOn;
             options.withLock = this.WithLockToggle.isOn;
+            options.beQuiet = this.BeQuietToggle.isOn;
 
             var result = await this.RtmScene.StreamChannel.JoinAsync(options);
             if (result.Status.Error)

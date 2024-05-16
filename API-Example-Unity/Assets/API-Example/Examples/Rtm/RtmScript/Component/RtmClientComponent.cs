@@ -58,6 +58,7 @@ namespace io.agora.rtm.demo
             if (rtmClient != null)
             {
                 //add observer
+                rtmClient.OnLinkStateEvent += this.OnLinkStateEvent;
                 rtmClient.OnMessageEvent += this.OnMessageEvent;
                 rtmClient.OnPresenceEvent += this.OnPresenceEvent;
                 rtmClient.OnTopicEvent += this.OnTopicEvent;
@@ -65,17 +66,6 @@ namespace io.agora.rtm.demo
                 rtmClient.OnLockEvent += this.OnLockEvent;
                 rtmClient.OnConnectionStateChanged += this.OnConnectionStateChanged;
                 rtmClient.OnTokenPrivilegeWillExpire += this.OnTokenPrivilegeWillExpire;
-
-
-                //var ret = rtmClient.SetParameters("{\"rtm.link_address0\":[\"183.131.160.141\", 9130]}");
-                //RtmScene.AddMessage("rtmClient.SetParameters + ret:" + ret, Message.MessageType.Info);
-                //ret = rtmClient.SetParameters("{\"rtm.link_address1\":[\"183.131.160.142\", 9131]}");
-                //RtmScene.AddMessage("rtmClient.SetParameters + ret:" + ret, Message.MessageType.Info);
-                //ret = rtmClient.SetParameters("{\"rtm.link_encryption\": false}");
-                //RtmScene.AddMessage("rtmClient.SetParameters + ret:" + ret, Message.MessageType.Info);
-                ////ret = rtmClient.SetParameters("{\"rtm.ap_address\":[\"114.236.137.40\", 8443]}");
-                //RtmScene.AddMessage("rtmClient.SetParameters + ret:" + ret, Message.MessageType.Info);
-
 
                 RtmScene.AddMessage("RtmClient init success", Message.MessageType.Info);
                 RtmScene.RtmClient = rtmClient;
@@ -85,34 +75,51 @@ namespace io.agora.rtm.demo
 
         }
 
+        public void OnLinkStateEvent(LinkStateEvent @event)
+        {
+            string str = string.Format("OnLinkStateEventHandler currentState:{0} previousState:{1} serviceType:{2} operation:{3} reason:{4} isResumed:{5} timestamp:{6}",
+                @event.currentState, @event.previousState, @event.serviceType, @event.operation, @event.reason, @event.isResumed, @event.timestamp);
+            RtmScene.AddMessage(str, Message.MessageType.Info);
+            RtmScene.AddMessage("affectedChannels", Message.MessageType.Info);
+            foreach (var channel in @event.affectedChannels)
+            {
+                RtmScene.AddMessage("--" + channel, Message.MessageType.Info);
+            }
+            RtmScene.AddMessage("unrestoredChannels", Message.MessageType.Info);
+            foreach (var channel in @event.unrestoredChannels)
+            {
+                RtmScene.AddMessage("--" + channel, Message.MessageType.Info);
+            }
+        }
+
         public void OnMessageEvent(MessageEvent @event)
         {
-            string str = string.Format("OnMessageEvent channelName:{0} channelTopic:{1} channelType:{2} publisher:{3} message:{4} customType:{5}",
-              @event.channelName, @event.channelTopic, @event.channelType, @event.publisher, @event.message.GetData<string>(), @event.customType);
+            string str = string.Format("OnMessageEvent channelName:{0} channelTopic:{1} channelType:{2} publisher:{3} message:{4} customType:{5} timestamp:{6}",
+              @event.channelName, @event.channelTopic, @event.channelType, @event.publisher, @event.message.GetData<string>(), @event.customType, @event.timestamp);
             RtmScene.AddMessage(str, Message.MessageType.Info);
         }
 
         public void OnPresenceEvent(PresenceEvent @event)
         {
-            string str = string.Format("OnPresenceEvent: type:{0} channelType:{1} channelName:{2} publisher:{3}",
-                @event.type, @event.channelType, @event.channelName, @event.publisher);
+            string str = string.Format("OnPresenceEvent: type:{0} channelType:{1} channelName:{2} publisher:{3} timestamp:{4}",
+                @event.type, @event.channelType, @event.channelName, @event.publisher, @event.timestamp);
             RtmScene.AddMessage(str, Message.MessageType.Info);
         }
 
         public void OnStorageEvent(StorageEvent @event)
         {
-            string str = string.Format("OnStorageEvent: channelType:{0} storageType:{1} eventType:{2} target:{3}",
-                @event.channelType, @event.storageType, @event.eventType, @event.target);
+            string str = string.Format("OnStorageEvent: channelType:{0} storageType:{1} eventType:{2} target:{3} timestamp:{4}",
+                @event.channelType, @event.storageType, @event.eventType, @event.target, @event.timestamp);
             RtmScene.AddMessage(str, Message.MessageType.Info);
             if (@event.data != null)
             {
-                DisplayRtmMetadata(ref @event.data);
+                DisplayRtmMetadata(@event.data);
             }
         }
 
         public void OnTopicEvent(TopicEvent @event)
         {
-            string str = string.Format("OnTopicEvent: channelName:{0} publisher:{1}", @event.channelName, @event.publisher);
+            string str = string.Format("OnTopicEvent: channelName:{0} publisher:{1} timestamp:{2}", @event.channelName, @event.publisher, @event.timestamp);
             RtmScene.AddMessage(str, Message.MessageType.Info);
 
             var topicInfoCount = @event.topicInfos == null ? 0 : @event.topicInfos.Length;
@@ -141,7 +148,7 @@ namespace io.agora.rtm.demo
         public void OnLockEvent(LockEvent @event)
         {
             var count = @event.lockDetailList == null ? 0 : @event.lockDetailList.Length;
-            string info = string.Format("OnLockEvent channelType:{0}, eventType:{1}, channelName:{2}, count:{3}", @event.channelType, @event.eventType, @event.channelName, count);
+            string info = string.Format("OnLockEvent channelType:{0}, eventType:{1}, channelName:{2}, count:{3} timestamp:{4}", @event.channelType, @event.eventType, @event.channelName, count, @event.timestamp);
             RtmScene.AddMessage(info, Message.MessageType.Info);
 
             if (count > 0)
@@ -168,12 +175,12 @@ namespace io.agora.rtm.demo
             RtmScene.AddMessage(str1, Message.MessageType.Info);
         }
 
-        private void DisplayRtmMetadata(ref RtmMetadata data)
+        private void DisplayRtmMetadata(Agora.Rtm.Metadata data)
         {
             RtmScene.AddMessage("RtmMetadata.majorRevision:" + data.majorRevision, Message.MessageType.Info);
-            if (data.metadataItemsSize > 0)
+            if (data.items.Length > 0)
             {
-                foreach (var item in data.metadataItems)
+                foreach (var item in data.items)
                 {
                     RtmScene.AddMessage(string.Format("key:{0},value:{1},authorUserId:{2},revision:{3},updateTs:{4}", item.key, item.value, item.authorUserId, item.revision, item.updateTs), Message.MessageType.Info);
                 }

@@ -43,9 +43,9 @@ namespace io.agora.rtm.demo
                 recordUserId = RecordUserIdToggle.isOn,
                 recordTs = RecordTsToggle.isOn
             };
-            RtmMetadata rtmMetadata = new RtmMetadata();
+            Agora.Rtm.Metadata rtmMetadata = new Agora.Rtm.Metadata();
             rtmMetadata.majorRevision = long.Parse(this.MajorRevisionInput.text);
-            rtmMetadata.metadataItems = this.ContainerMetadataItem.GetDataSource();
+            rtmMetadata.items = this.ContainerMetadataItem.GetDataSource();
             RtmScene.AddMessage("metadataItem List: \n" + this.ContainerMetadataItem.ToString(), Message.MessageType.Info);
 
             IRtmStorage rtmStorage = RtmScene.RtmClient.GetStorage();
@@ -90,9 +90,9 @@ namespace io.agora.rtm.demo
                 recordUserId = RecordUserIdToggle.isOn,
                 recordTs = RecordTsToggle.isOn
             };
-            RtmMetadata rtmMetadata = new RtmMetadata();
+            Agora.Rtm.Metadata rtmMetadata = new Agora.Rtm.Metadata();
             rtmMetadata.majorRevision = long.Parse(this.MajorRevisionInput.text);
-            rtmMetadata.metadataItems = this.ContainerMetadataItem.GetDataSource();
+            rtmMetadata.items = this.ContainerMetadataItem.GetDataSource();
             RtmScene.AddMessage("metadataItem List: \n" + this.ContainerMetadataItem.ToString(), Message.MessageType.Info);
 
             IRtmStorage rtmStorage = RtmScene.RtmClient.GetStorage();
@@ -136,9 +136,9 @@ namespace io.agora.rtm.demo
                 recordUserId = RecordUserIdToggle.isOn,
                 recordTs = RecordTsToggle.isOn
             };
-            RtmMetadata rtmMetadata = new RtmMetadata();
+            Agora.Rtm.Metadata rtmMetadata = new Agora.Rtm.Metadata();
             rtmMetadata.majorRevision = long.Parse(this.MajorRevisionInput.text);
-            rtmMetadata.metadataItems = this.ContainerMetadataItem.GetDataSource();
+            rtmMetadata.items = this.ContainerMetadataItem.GetDataSource();
             RtmScene.AddMessage("metadataItem List: \n" + this.ContainerMetadataItem.ToString(), Message.MessageType.Info);
 
             IRtmStorage rtmStorage = RtmScene.RtmClient.GetStorage();
@@ -181,7 +181,7 @@ namespace io.agora.rtm.demo
                 string info = string.Format("GetUserMetadata Response ,userId:{0}",
                     result.Response.UserId);
                 RtmScene.AddMessage(info, Message.MessageType.Info);
-                DisplayRtmMetadata(ref result.Response.Data);
+                DisplayRtmMetadata(result.Response.Data);
             }
 
         }
@@ -237,12 +237,12 @@ namespace io.agora.rtm.demo
 
         }
 
-        private void DisplayRtmMetadata(ref RtmMetadata data)
+        private void DisplayRtmMetadata(Agora.Rtm.Metadata data)
         {
             RtmScene.AddMessage("RtmMetadata.majorRevision:" + data.majorRevision, Message.MessageType.Info);
-            if (data.metadataItemsSize > 0)
+            if (data.items.Length > 0)
             {
-                foreach (var item in data.metadataItems)
+                foreach (var item in data.items)
                 {
                     RtmScene.AddMessage(string.Format("---- key:{0},value:{1},authorUserId:{2},revision:{3},updateTs:{4}", item.key, item.value, item.authorUserId, item.revision, item.updateTs), Message.MessageType.Info);
                 }
