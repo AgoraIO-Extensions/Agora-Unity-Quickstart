@@ -4,7 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Networking.Types;
 #if AGORA_RTC
 using Agora.Rtc;
 #endif
