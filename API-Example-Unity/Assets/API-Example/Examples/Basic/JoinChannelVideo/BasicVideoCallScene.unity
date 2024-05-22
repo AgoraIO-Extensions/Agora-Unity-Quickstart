@@ -2666,7 +2666,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 344699563}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.2954
+  m_Size: 0.29540002
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3543,6 +3543,8 @@ MonoBehaviour:
   LogText: {fileID: 962585302}
   _videoDeviceSelect: {fileID: 1215221842}
   _areaSelect: {fileID: 1344214402}
+  _videoQualityItemPrefab: {fileID: 1023552476726468, guid: 689252d2a8bdd47ad9329a3178bd7d9f,
+    type: 2}
 --- !u!1 &1344214401
 GameObject:
   m_ObjectHideFlags: 0
