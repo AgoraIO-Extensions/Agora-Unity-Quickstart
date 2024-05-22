@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using UnityEngine;
+using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
@@ -34,15 +35,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
         private IAudioDeviceManager _audioDeviceManager;
         private DeviceInfo[] _audioPlaybackDeviceInfos;
         public Dropdown _audioDeviceSelect;
+        public Dropdown _areaSelect;
 
         // Start is called before the first frame update
         private void Start()
         {
             LoadAssetData();
+            PrepareAreaList();
             if (CheckAppId())
             {
-                InitRtcEngine();
-                SetBasicConfiguration();
+                RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             }
 
 #if UNITY_IOS || UNITY_ANDROID
@@ -77,28 +79,45 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
             _channelName = _appIdInput.channelName;
         }
 
-        private void InitRtcEngine()
+        private void PrepareAreaList() {
+            int index = 0;
+            var areaList = new List<Dropdown.OptionData>();
+            var enumNames = Enum.GetNames(typeof(AREA_CODE));
+            foreach (var name in enumNames) {
+                areaList.Add(new Dropdown.OptionData(name));
+                if (name == "AREA_CODE_GLOB") {
+                    index = areaList.Count - 1;
+                }
+            }
+            _areaSelect.ClearOptions();
+            _areaSelect.AddOptions(areaList.ToList());
+            _areaSelect.value = index;
+        }
+
+        #region -- Button Events ---
+        public void InitRtcEngine()
         {
-            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
+            var text =this._areaSelect.captionText.text;
+            AREA_CODE areaCode = (AREA_CODE)Enum.Parse(typeof(AREA_CODE), text);
+            this.Log.UpdateLog("Select AREA_CODE : " + areaCode);
+
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext();
             context.appId = _appID;
             context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
             context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
-            context.areaCode = AREA_CODE.AREA_CODE_GLOB;
+            context.areaCode = areaCode;
 
-            RtcEngine.Initialize(context);
+            var result = RtcEngine.Initialize(context);
+            this.Log.UpdateLog("Initialize result : " + result);
+
             RtcEngine.InitEventHandler(handler);
-        }
 
-        private void SetBasicConfiguration()
-        {
             RtcEngine.EnableAudio();
             RtcEngine.SetChannelProfile(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_COMMUNICATION);
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
         }
 
-        #region -- Button Events ---
 
         public void StartEchoTest()
         {

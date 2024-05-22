@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
 using io.agora.rtc.demo;
+using System.Collections.Generic;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
 {
@@ -34,15 +35,17 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
         public Dropdown _videoDeviceSelect;
         private IVideoDeviceManager _videoDeviceManager;
         private DeviceInfo[] _videoDeviceInfos;
+        public Dropdown _areaSelect;
+
 
         // Use this for initialization
         private void Start()
         {
             LoadAssetData();
+            PrepareAreaList();
             if (CheckAppId())
             {
-                InitEngine();
-                SetBasicConfiguration();
+                RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             }
 
 #if UNITY_IOS || UNITY_ANDROID
@@ -78,21 +81,45 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
-        private void InitEngine()
+        private void PrepareAreaList()
         {
-            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
+            int index = 0;
+            var areaList = new List<Dropdown.OptionData>();
+            var enumNames = Enum.GetNames(typeof(AREA_CODE));
+            foreach (var name in enumNames)
+            {
+                areaList.Add(new Dropdown.OptionData(name));
+                if (name == "AREA_CODE_GLOB")
+                {
+                    index = areaList.Count - 1;
+                }
+            }
+            _areaSelect.ClearOptions();
+            _areaSelect.AddOptions(areaList.ToList());
+            _areaSelect.value = index;
+        }
+
+        #region -- Button Events ---
+
+        public void InitEngine()
+        {
+            var text = this._areaSelect.captionText.text;
+            AREA_CODE areaCode = (AREA_CODE)Enum.Parse(typeof(AREA_CODE), text);
+            this.Log.UpdateLog("Select AREA_CODE : " + areaCode);
+
+           
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext();
             context.appId = _appID;
             context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
             context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
-            context.areaCode = AREA_CODE.AREA_CODE_GLOB;
-            RtcEngine.Initialize(context);
-            RtcEngine.InitEventHandler(handler);
-        }
+            context.areaCode = areaCode;
+            var result = RtcEngine.Initialize(context);
+            this.Log.UpdateLog("Initialize result : " + result);
 
-        private void SetBasicConfiguration()
-        {
+            RtcEngine.InitEventHandler(handler);
+
+
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
             VideoEncoderConfiguration config = new VideoEncoderConfiguration();
@@ -103,8 +130,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             RtcEngine.SetChannelProfile(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_COMMUNICATION);
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
         }
-
-#region -- Button Events ---
 
         public void JoinChannel()
         {
@@ -385,16 +410,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             _videoSample.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                 (int)reason));
             JoinChannelVideo.DestroyVideoView(uid);
-        }
-
-        public override void OnUplinkNetworkInfoUpdated(UplinkNetworkInfo info)
-        {
-            _videoSample.Log.UpdateLog("OnUplinkNetworkInfoUpdated");
-        }
-
-        public override void OnDownlinkNetworkInfoUpdated(DownlinkNetworkInfo info)
-        {
-            _videoSample.Log.UpdateLog("OnDownlinkNetworkInfoUpdated");
         }
     }
 
