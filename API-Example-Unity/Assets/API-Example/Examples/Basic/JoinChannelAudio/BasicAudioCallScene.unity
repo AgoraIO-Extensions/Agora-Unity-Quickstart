@@ -2539,8 +2539,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -127.6, y: -38.5}
-  m_SizeDelta: {x: -255.2, y: -77.1}
+  m_AnchoredPosition: {x: -127.6, y: 48.7}
+  m_SizeDelta: {x: -255.2, y: -251.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1032453668
 MonoBehaviour:
@@ -2785,6 +2785,69 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.ScrollRect+ScrollRectEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
+--- !u!1 &1167184849
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1167184850}
+  - component: {fileID: 1167184852}
+  - component: {fileID: 1167184851}
+  m_Layer: 5
+  m_Name: QualityPanel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1167184850
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1167184849}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1672362567}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 430.9, y: 87.20001}
+  m_SizeDelta: {x: 861.8, y: 180}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1167184851
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1167184849}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -405508275, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_Spacing: 10
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+--- !u!222 &1167184852
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1167184849}
 --- !u!1 &1201633680
 GameObject:
   m_ObjectHideFlags: 0
@@ -3757,7 +3820,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 866830371}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.2954
+  m_Size: 0.29540002
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -4164,6 +4227,7 @@ RectTransform:
   - {fileID: 1436156620}
   - {fileID: 1032453667}
   - {fileID: 1130196806}
+  - {fileID: 1167184850}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4190,6 +4254,9 @@ MonoBehaviour:
   LogText: {fileID: 1032453668}
   _audioDeviceSelect: {fileID: 311133358}
   _areaSelect: {fileID: 1755373117}
+  _qualityPanel: {fileID: 1167184850}
+  _qualityItemPrefab: {fileID: 1553885602131326, guid: 2d9b69a4d3953420f87769b273119654,
+    type: 2}
 --- !u!1 &1690032017
 GameObject:
   m_ObjectHideFlags: 0
