@@ -40,6 +40,7 @@ namespace Agora_RTC_Plugin.API_Example
 //#if AGORA_NUMBER_UID
             "BasicAudioCallScene",
             "BasicVideoCallScene",
+            "AudioCallRouteScene",
             "AudioMixingScene",
             "AudioSpectrumScene",
             "ChannelMediaRelayScene",

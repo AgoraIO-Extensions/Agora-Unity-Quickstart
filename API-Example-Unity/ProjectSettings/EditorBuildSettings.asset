@@ -15,6 +15,9 @@ EditorBuildSettings:
     path: Assets/API-Example/Examples/Basic/JoinChannelVideo/BasicVideoCallScene.unity
     guid: 3f201b178f99f4b41a325391c1b284b8
   - enabled: 1
+    path: Assets/API-Example/Examples/Advanced/AudioCallRoute/AudioCallRouteScene.unity
+    guid: 435a2b5cb07044455a255bc25f5dfdd4
+  - enabled: 1
     path: Assets/API-Example/Examples/Advanced/AudioMixing/AudioMixingScene.unity
     guid: 8cb5873d5ce2441c58f975843144f122
   - enabled: 1
