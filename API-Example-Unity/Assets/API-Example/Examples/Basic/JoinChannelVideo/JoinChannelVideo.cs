@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
 using io.agora.rtc.demo;
+using System.Collections.Generic;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
 {
@@ -34,15 +35,18 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
         public Dropdown _videoDeviceSelect;
         private IVideoDeviceManager _videoDeviceManager;
         private DeviceInfo[] _videoDeviceInfos;
+        public Dropdown _areaSelect;
+        public GameObject _videoQualityItemPrefab;
+
 
         // Use this for initialization
         private void Start()
         {
             LoadAssetData();
+            PrepareAreaList();
             if (CheckAppId())
             {
-                InitEngine();
-                SetBasicConfiguration();
+                RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             }
 
 #if UNITY_IOS || UNITY_ANDROID
@@ -78,21 +82,45 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
-        private void InitEngine()
+        private void PrepareAreaList()
         {
-            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
+            int index = 0;
+            var areaList = new List<Dropdown.OptionData>();
+            var enumNames = Enum.GetNames(typeof(AREA_CODE));
+            foreach (var name in enumNames)
+            {
+                areaList.Add(new Dropdown.OptionData(name));
+                if (name == "AREA_CODE_GLOB")
+                {
+                    index = areaList.Count - 1;
+                }
+            }
+            _areaSelect.ClearOptions();
+            _areaSelect.AddOptions(areaList.ToList());
+            _areaSelect.value = index;
+        }
+
+        #region -- Button Events ---
+
+        public void InitEngine()
+        {
+            var text = this._areaSelect.captionText.text;
+            AREA_CODE areaCode = (AREA_CODE)Enum.Parse(typeof(AREA_CODE), text);
+            this.Log.UpdateLog("Select AREA_CODE : " + areaCode);
+
+
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext();
             context.appId = _appID;
             context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
             context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
-            context.areaCode = AREA_CODE.AREA_CODE_GLOB;
-            RtcEngine.Initialize(context);
-            RtcEngine.InitEventHandler(handler);
-        }
+            context.areaCode = areaCode;
+            var result = RtcEngine.Initialize(context);
+            this.Log.UpdateLog("Initialize result : " + result);
 
-        private void SetBasicConfiguration()
-        {
+            RtcEngine.InitEventHandler(handler);
+
+
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
             VideoEncoderConfiguration config = new VideoEncoderConfiguration();
@@ -104,12 +132,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
         }
 
-#region -- Button Events ---
-
         public void JoinChannel()
         {
-            RtcEngine.JoinChannel(_token, _channelName,"",0);
-            MakeVideoView(0);
+            RtcEngine.JoinChannel(_token, _channelName, "", 0);
+            var node = MakeVideoView(0);
+            CreateLocalVideoCallQualityPanel(node);
         }
 
         public void LeaveChannel()
@@ -120,7 +147,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
         public void StartPreview()
         {
             RtcEngine.StartPreview();
-            MakeVideoView(0);
+            var node = MakeVideoView(0);
+            CreateLocalVideoCallQualityPanel(node);
         }
 
         public void StopPreview()
@@ -195,7 +223,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             Log.UpdateLog("SelectVideoCaptureDevice ret:" + ret + " , DeviceId: " + deviceId);
         }
 
-#endregion
+        #endregion
 
         private void OnDestroy()
         {
@@ -211,19 +239,19 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             return _channelName;
         }
 
-#region -- Video Render UI Logic ---
+        #region -- Video Render UI Logic ---
 
-        internal static void MakeVideoView(uint uid, string channelId = "")
+        internal static GameObject MakeVideoView(uint uid, string channelId = "")
         {
             var go = GameObject.Find(uid.ToString());
             if (!ReferenceEquals(go, null))
             {
-                return; // reuse
+                return go; // reuse
             }
 
             // create a GameObject and assign to this new user
             var videoSurface = MakeImageSurface(uid.ToString());
-            if (ReferenceEquals(videoSurface, null)) return;
+            if (ReferenceEquals(videoSurface, null)) return null;
             // configure videoSurface
             if (uid == 0)
             {
@@ -253,6 +281,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             };
 
             videoSurface.SetEnable(true);
+            return videoSurface.gameObject;
         }
 
         // VIDEO TYPE 1: 3D Object
@@ -327,10 +356,43 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             }
         }
 
-#endregion
+        #endregion
+
+
+        public void CreateLocalVideoCallQualityPanel(GameObject parent)
+        {
+            if (parent.GetComponentInChildren<LocalVideoCallQualityPanel>() != null)
+                return;
+
+            var panel = GameObject.Instantiate(this._videoQualityItemPrefab, parent.transform);
+            panel.AddComponent<LocalVideoCallQualityPanel>();
+
+        }
+
+        public LocalVideoCallQualityPanel GetLocalVideoCallQualityPanel()
+        {
+            var go = GameObject.Find("0");
+            return go.GetComponentInChildren<LocalVideoCallQualityPanel>();
+        }
+
+        public void CreateRemoteVideoCallQualityPanel(GameObject parent, uint uid)
+        {
+            if (parent.GetComponentInChildren<RemoteVideoCallQualityPanel>() != null)
+                return;
+
+            var panel = GameObject.Instantiate(this._videoQualityItemPrefab, parent.transform);
+            var comp = panel.AddComponent<RemoteVideoCallQualityPanel>();
+            comp.Uid = uid;
+        }
+
+        public RemoteVideoCallQualityPanel GetRemoteVideoCallQualityPanel(uint uid)
+        {
+            var go = GameObject.Find(uid.ToString());
+            return go.GetComponentInChildren<RemoteVideoCallQualityPanel>();
+        }
     }
 
-#region -- Agora Event ---
+    #region -- Agora Event ---
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
@@ -377,7 +439,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
             _videoSample.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-            JoinChannelVideo.MakeVideoView(uid, _videoSample.GetChannelName());
+            var node = JoinChannelVideo.MakeVideoView(uid, _videoSample.GetChannelName());
+            _videoSample.CreateRemoteVideoCallQualityPanel(node, uid);
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
@@ -387,16 +450,77 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             JoinChannelVideo.DestroyVideoView(uid);
         }
 
-        public override void OnUplinkNetworkInfoUpdated(UplinkNetworkInfo info)
+        //Quality monitoring during calls
+        public override void OnRtcStats(RtcConnection connection, RtcStats stats)
         {
-            _videoSample.Log.UpdateLog("OnUplinkNetworkInfoUpdated");
+            var panel = _videoSample.GetLocalVideoCallQualityPanel();
+            if (panel != null)
+            {
+                panel.Stats = stats;
+                panel.RefreshPanel();
+            }
         }
 
-        public override void OnDownlinkNetworkInfoUpdated(DownlinkNetworkInfo info)
+        public override void OnLocalAudioStats(RtcConnection connection, LocalAudioStats stats)
         {
-            _videoSample.Log.UpdateLog("OnDownlinkNetworkInfoUpdated");
+            var panel = _videoSample.GetLocalVideoCallQualityPanel();
+            if (panel != null)
+            {
+                panel.AudioStats = stats;
+                panel.RefreshPanel();
+            }
+        }
+
+        public override void OnLocalAudioStateChanged(RtcConnection connection, LOCAL_AUDIO_STREAM_STATE state, LOCAL_AUDIO_STREAM_REASON reason)
+        {
+
+        }
+
+        public override void OnRemoteAudioStats(RtcConnection connection, RemoteAudioStats stats)
+        {
+            var panel = _videoSample.GetRemoteVideoCallQualityPanel(stats.uid);
+            if (panel != null)
+            {
+                panel.AudioStats = stats;
+                panel.RefreshPanel();
+            }
+        }
+
+        public override void OnRemoteAudioStateChanged(RtcConnection connection, uint remoteUid, REMOTE_AUDIO_STATE state, REMOTE_AUDIO_STATE_REASON reason, int elapsed)
+        {
+
+        }
+
+        public override void OnLocalVideoStats(RtcConnection connection, LocalVideoStats stats)
+        {
+            var panel = _videoSample.GetLocalVideoCallQualityPanel();
+            if (panel != null)
+            {
+                panel.VideoStats = stats;
+                panel.RefreshPanel();
+            }
+        }
+
+        public override void OnLocalVideoStateChanged(RtcConnection connection, LOCAL_VIDEO_STREAM_STATE state, LOCAL_VIDEO_STREAM_REASON reason)
+        {
+
+        }
+
+        public override void OnRemoteVideoStats(RtcConnection connection, RemoteVideoStats stats)
+        {
+            var panel = _videoSample.GetRemoteVideoCallQualityPanel(stats.uid);
+            if (panel != null)
+            {
+                panel.VideoStats = stats;
+                panel.RefreshPanel();
+            }
+        }
+
+        public override void OnRemoteVideoStateChanged(RtcConnection connection, uint remoteUid, REMOTE_VIDEO_STATE state, REMOTE_VIDEO_STATE_REASON reason, int elapsed)
+        {
+
         }
     }
 
-#endregion
+    #endregion
 }

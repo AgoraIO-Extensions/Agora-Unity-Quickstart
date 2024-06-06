@@ -13,8 +13,6 @@ using System.Collections.Generic;
 using UnityEngine.Analytics;
 using UnityEngine.Networking;
 using System.Collections;
-using System.Threading.Tasks;
-using System.Data.Common;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 {
