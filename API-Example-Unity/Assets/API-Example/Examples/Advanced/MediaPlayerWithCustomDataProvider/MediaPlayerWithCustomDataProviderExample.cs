@@ -246,7 +246,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
             this.customDataProvider.Open(file);
             this.Log.UpdateLog("open file:" + file);
 
-            var ret = MediaPlayer.OpenWithCustomSource(0, this.customDataProvider);
+
+            MediaSource mediaSource = new MediaSource();
+            mediaSource.provider = customDataProvider;
+            var ret = MediaPlayer.OpenWithMediaSource(mediaSource);
             this.Log.UpdateLog("OpenWithCustomSource: " + ret);
 
 
