@@ -133,7 +133,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
             connection.channelId = channelName;
             connection.localUid = uid;
             ChannelMediaOptions options = new ChannelMediaOptions();
-            options.autoSubscribeAudio.SetValue(true);
+            //Do not default to subscribing to remote audio streams,
+            //as the spatial sound interface will
+            //automatically help us subscribe based on location
+            options.autoSubscribeAudio.SetValue(false);
             options.autoSubscribeVideo.SetValue(true);
             options.publishCameraTrack.SetValue(true);
             options.publishMicrophoneTrack.SetValue(false);
@@ -224,6 +227,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
             if (RtcEngine == null) return;
             RtcEngine.InitEventHandler(null);
             RtcEngine.LeaveChannel();
+            SpatialAudioEngine.Dispose();
             RtcEngine.Dispose();
         }
 
@@ -428,6 +432,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
             if (uid == _spatialAudio.UidUseInMPK)
             {
                 _spatialAudio.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+
+                //When remote mpk joined. Set its initial position
+                float[] positionRemote = { 0.0f, 0.0f, 0.0f };
+                float[] forwardRemote = { 0, 0, 0 };
+                RemoteVoicePositionInfo remoteVoicePositionInfo = new RemoteVoicePositionInfo(positionRemote, forwardRemote);
+                var ret = _spatialAudio.SpatialAudioEngine.UpdateRemotePositionEx(_spatialAudio.UidUseInMPK, remoteVoicePositionInfo, new RtcConnection(_spatialAudio.GetChannelName(), _spatialAudio.UidUseInEx));
 
             }
             else if (uid == _spatialAudio.UidUseInEx)
