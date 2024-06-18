@@ -90,7 +90,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
         private bool CheckAppId()
         {
             Debug.Assert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
-            return _appID.Length > 10;  
+            return _appID.Length > 10;
         }
 
         void Update()
@@ -128,20 +128,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
             context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
             context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
             context.areaCode = AREA_CODE.AREA_CODE_GLOB; RtcEngine.Initialize(context);
-
-            // By default Agora subscribes to the audio streams of all remote users.
-            // Unsubscribe all remote users; otherwise, the audio reception range you set
-            // is invalid.
-            RtcEngine.MuteLocalAudioStream(true);
-            RtcEngine.MuteAllRemoteAudioStreams(true);
         }
 
         private void configureSpatialAudioEngine()
         {
             RtcEngine.EnableAudio();
             // RtcEngine.EnableSpatialAudio(true);
-            LocalSpatialAudioConfig localSpatialAudioConfig = new LocalSpatialAudioConfig();
-            localSpatialAudioConfig.rtcEngine = RtcEngine;
             localSpatial = RtcEngine.GetLocalSpatialAudioEngine();
             localSpatial.Initialize();
 
@@ -187,6 +179,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
                 _videoSample.RemoteView.SetForUser(uid, connection.channelId, VIDEO_SOURCE_TYPE.VIDEO_SOURCE_REMOTE);
                 // Save the remote user ID in a variable.
                 _videoSample.remoteUid = uid;
+
+                _videoSample.ResetRemoteAudioPosition();
+
             }
             // This callback is triggered when a remote user leaves the channel or drops offline.
             public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
@@ -207,6 +202,23 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
             // This parameter is an array of length 3,
             // The three values represent the front, right, and top coordinates
             float[] forward = new float[] { sourceDistance, 0.0F, 0.0F };
+            // Update the spatial position of the specified remote user
+            RemoteVoicePositionInfo remotePosInfo = new RemoteVoicePositionInfo(position, forward);
+            var rc = localSpatial.UpdateRemotePosition((uint)remoteUid, remotePosInfo);
+            Debug.Log("Remote user spatial position updated, rc = " + rc);
+        }
+
+        public void ResetRemoteAudioPosition()
+        {
+            this.distanceSlider.value = 0;
+            // Set the coordinates in the world coordinate system.
+            // This parameter is an array of length 3
+            // The three values represent the front, right, and top coordinates
+            float[] position = new float[] { 0, 4.0F, 0.0F };
+            // Set the unit vector of the x axis in the coordinate system.
+            // This parameter is an array of length 3,
+            // The three values represent the front, right, and top coordinates
+            float[] forward = new float[] { 0, 0.0F, 0.0F };
             // Update the spatial position of the specified remote user
             RemoteVoicePositionInfo remotePosInfo = new RemoteVoicePositionInfo(position, forward);
             var rc = localSpatial.UpdateRemotePosition((uint)remoteUid, remotePosInfo);
@@ -248,12 +260,23 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
             LocalView.SetForUser(0, "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA);
             // Start rendering local video.
             LocalView.SetEnable(true);
+
+            ChannelMediaOptions options = new ChannelMediaOptions();
+            //Do not default to subscribing to remote audio streams,
+            //as the spatial sound interface will
+            //automatically help us subscribe based on location
+            options.autoSubscribeAudio.SetValue(false);
+            options.autoSubscribeVideo.SetValue(true);
+            options.publishCameraTrack.SetValue(true);
+            options.publishMicrophoneTrack.SetValue(true);
+
             // Join a channel.
-            RtcEngine.JoinChannel(_token, _channelName, "", 0);
+            RtcEngine.JoinChannel(_token, _channelName, 0, options);
         }
 
         public void Leave()
         {
+            RtcEngine.GetLocalSpatialAudioEngine().ClearRemotePositions();
             // Leaves the channel.
             RtcEngine.LeaveChannel();
             // Disable the video modules.
