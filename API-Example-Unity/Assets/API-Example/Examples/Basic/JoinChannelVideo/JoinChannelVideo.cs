@@ -119,7 +119,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             this.Log.UpdateLog("Initialize result : " + result);
 
             RtcEngine.InitEventHandler(handler);
-
+            RtcEngine.SetParameters("rtc.log_filter", 65535);
 
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
@@ -130,6 +130,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             RtcEngine.SetVideoEncoderConfiguration(config);
             RtcEngine.SetChannelProfile(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_COMMUNICATION);
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+
+            var logFile = Application.persistentDataPath + "/rtc.log";
+            RtcEngine.SetLogFile(logFile);
+            this.Log.UpdateLog("logFile:" + logFile);
+
         }
 
         public void JoinChannel()
