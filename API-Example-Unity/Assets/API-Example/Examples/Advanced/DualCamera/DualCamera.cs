@@ -99,7 +99,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DualCamera
             context.areaCode = AREA_CODE.AREA_CODE_GLOB;
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
-
+            var ret = RtcEngine.SetParameters("rtc.video.enable_pvc", false);
+            this.Log.UpdateLog("SetParameters: " + ret);
 
         }
 
