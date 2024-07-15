@@ -135,8 +135,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             RtcEngine.SetLogFile(logFile);
             this.Log.UpdateLog("logFile:" + logFile);
 
-            var ret = RtcEngine.SetParameters("rtc.video.enable_pvc", false);
-            this.Log.UpdateLog("SetParameters: " + ret);
+            var ret = RtcEngine.SetParameters("rtc.capture_disable_metal_comp", true);
+            this.Log.UpdateLog("SetParameters rtc.capture_disable_metal_comp:  " + ret);
 
         }
 
