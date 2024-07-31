@@ -157,7 +157,7 @@ upload_file_and_clear() {
 
     #clear all file
     rm -rf ./Demo_zip
-    rm -r $BUILD_PATH/*
+    rm -r ./Build/*
 }
 
 if [ "$Build_Mac" == "true" ]; then
