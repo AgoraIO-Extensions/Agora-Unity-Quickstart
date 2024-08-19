@@ -120,6 +120,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 
         public void OnPublishButtonClick()
         {
+            int ret = 0;
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.publishCameraTrack.SetValue(false);
             options.publishScreenTrack.SetValue(true);
@@ -128,7 +129,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             options.publishScreenCaptureAudio.SetValue(true);
             options.publishScreenCaptureVideo.SetValue(true);
 #endif
-            var ret = RtcEngine.UpdateChannelMediaOptions(options);
+
+
+#if UNITY_EDITOR_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
+            //If you want to share audio when sharing the desktop screen, you need to use this interface.
+            //For details, please refer to the annotation of this interface
+            //ret = RtcEngine.EnableLoopbackRecording(true, "");
+            //Debug.Log("EnableLoopbackRecording returns: " + ret);
+#endif
+
+            ret = RtcEngine.UpdateChannelMediaOptions(options);
             Debug.Log("UpdateChannelMediaOptions returns: " + ret);
 
             PublishBtn.gameObject.SetActive(false);
