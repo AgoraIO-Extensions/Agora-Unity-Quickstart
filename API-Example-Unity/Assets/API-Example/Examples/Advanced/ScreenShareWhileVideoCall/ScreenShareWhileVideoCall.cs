@@ -108,7 +108,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
 #if UNITY_EDITOR_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
             //If you want to share audio when sharing the desktop screen, you need to use this interface.
             //For details, please refer to the annotation of this interface
-            //ret = RtcEngine.EnableLoopbackRecording(true, "");
+            //ret = RtcEngine.EnableLoopbackRecordingEx(new RtcConnection(_channelName, this.Uid2), true, "");
             //Debug.Log("EnableLoopbackRecording returns: " + ret);
 #endif
             options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
