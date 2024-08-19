@@ -93,6 +93,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
 
         private void ScreenShareJoinChannel()
         {
+            int ret = 0;
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.autoSubscribeAudio.SetValue(false);
             options.autoSubscribeVideo.SetValue(false);
@@ -103,8 +104,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
             options.publishScreenCaptureAudio.SetValue(true);
             options.publishScreenCaptureVideo.SetValue(true);
 #endif
+
+#if UNITY_EDITOR_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
+            //If you want to share audio when sharing the desktop screen, you need to use this interface.
+            //For details, please refer to the annotation of this interface
+            //ret = RtcEngine.EnableLoopbackRecording(true, "");
+            //Debug.Log("EnableLoopbackRecording returns: " + ret);
+#endif
             options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            var ret = RtcEngine.JoinChannelEx(_token, new RtcConnection(_channelName, this.Uid2), options);
+            ret = RtcEngine.JoinChannelEx(_token, new RtcConnection(_channelName, this.Uid2), options);
             Debug.Log("JoinChannelEx returns: " + ret);
         }
 
