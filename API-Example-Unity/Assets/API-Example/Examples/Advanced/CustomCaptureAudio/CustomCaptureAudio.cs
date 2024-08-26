@@ -40,10 +40,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
         internal uint AUDIO_TRACK_ID = 0;
-        //// This depends on the audio file you open
-        //private const int CHANNEL = 2;
-        //// This depends on the audio file you open
-        //private const int SAMPLE_RATE = 44100;
+       
 
         // Number of push audio frame per second.
         private const int PUSH_FREQ_PER_SEC = 20;
@@ -223,14 +220,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 
         private bool ReadAudioHeaderAndDetectFormat(FileStream fileStream, AudioFrame audioFrame)
         {
-            // 确保文件至少有44字节（WAV文件头的最小大小）
+            // Ensure that the file has at least 44 bytes (the minimum size for WAV file headers)
             if (fileStream.Length < 44)
             {
                 Debug.LogError("File is too short to be a valid WAV file.");
                 return false;
             }
 
-            // 读取RIFF头
+            // Read RIFF header
             byte[] riffHeader = new byte[4];
             fileStream.Read(riffHeader, 0, 4);
             string riff = System.Text.Encoding.ASCII.GetString(riffHeader);
@@ -240,12 +237,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
                 return false;
             }
 
-            // 读取文件大小（不包括头信息8字节）
+            // Read file size (excluding header information of 8 bytes)
             byte[] fileSizeBytes = new byte[4];
             fileStream.Read(fileSizeBytes, 0, 4);
             int fileSize = BitConverter.ToInt32(fileSizeBytes, 0);
 
-            // 读取WAVE标记
+            // Read WAVE tag
             byte[] waveHeader = new byte[4];
             fileStream.Read(waveHeader, 0, 4);
             string wave = System.Text.Encoding.ASCII.GetString(waveHeader);
@@ -255,7 +252,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
                 return false;
             }
 
-            // 读取格式块标记 "fmt "
+            // Read format block tag 'fmt '
             byte[] fmtHeader = new byte[4];
             fileStream.Read(fmtHeader, 0, 4);
             string fmt = System.Text.Encoding.ASCII.GetString(fmtHeader);
@@ -265,12 +262,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
                 return false;
             }
 
-            // 读取格式块大小
+            // Read format block size
             byte[] fmtSizeBytes = new byte[4];
             fileStream.Read(fmtSizeBytes, 0, 4);
             int fmtSize = BitConverter.ToInt32(fmtSizeBytes, 0);
 
-            // 读取音频格式（PCM = 1）
+            // Read audio format (PCM=1)
             byte[] audioFormatBytes = new byte[2];
             fileStream.Read(audioFormatBytes, 0, 2);
             int audioFormat = BitConverter.ToInt16(audioFormatBytes, 0);
@@ -280,27 +277,27 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
                 return false;
             }
 
-            // 读取通道数
+            // Read the number of channels
             byte[] channelsBytes = new byte[2];
             fileStream.Read(channelsBytes, 0, 2);
             int channels = BitConverter.ToInt16(channelsBytes, 0);
 
-            // 读取采样率
+            // Read sampling rate
             byte[] sampleRateBytes = new byte[4];
             fileStream.Read(sampleRateBytes, 0, 4);
             int sampleRate = BitConverter.ToInt32(sampleRateBytes, 0);
 
-            // 读取字节率（数据传输率）
+            // Read byte rate (data transfer rate)
             byte[] byteRateBytes = new byte[4];
             fileStream.Read(byteRateBytes, 0, 4);
             int byteRate = BitConverter.ToInt32(byteRateBytes, 0);
 
-            // 读取块对齐
+            // Read block alignment
             byte[] blockAlignBytes = new byte[2];
             fileStream.Read(blockAlignBytes, 0, 2);
             int blockAlign = BitConverter.ToInt16(blockAlignBytes, 0);
 
-            // 读取位深度
+            // Read bit depth
             byte[] bitsPerSampleBytes = new byte[2];
             fileStream.Read(bitsPerSampleBytes, 0, 2);
             int bitsPerSample = BitConverter.ToInt16(bitsPerSampleBytes, 0);
@@ -392,24 +389,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
                 return;
             }
 
-            //var bytesPerSample = 2;
-            //var type = AUDIO_FRAME_TYPE.FRAME_TYPE_PCM16;
-            //var channels = CHANNEL;
-            //var samples = SAMPLE_RATE / PUSH_FREQ_PER_SEC;
-            //var samplesPerSec = SAMPLE_RATE;
-
             var freq = 1000 / PUSH_FREQ_PER_SEC;
-
-            //var audioFrame = new AudioFrame
-            //{
-            //    bytesPerSample = BYTES_PER_SAMPLE.TWO_BYTES_PER_SAMPLE,
-            //    type = type,
-            //    samplesPerChannel = samples,
-            //    samplesPerSec = samplesPerSec,
-            //    channels = channels,
-            //    RawBuffer = new byte[samples * bytesPerSample * CHANNEL],
-            //    renderTimeMs = 0
-            //};
 
             SeekToAudioData(fileStream);
             double startMillisecond = GetTimestamp();

@@ -158,11 +158,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
 
         private void JoinChannelEx()
         {
-
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
 
-            //加入频道1
             uint videoTrack1 = RtcEngine.CreateCustomVideoTrack();
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
@@ -171,11 +169,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
             options.customVideoTrackId.SetValue(videoTrack1);
             options.autoSubscribeAudio.SetValue(false);
             options.autoSubscribeVideo.SetValue(false);
-
             RtcEngine.JoinChannelEx(_token, new RtcConnection("channel_id_1", 123), options);
 
-
-            //加入频道2
             uint videoTrack2 = RtcEngine.CreateCustomVideoTrack();
             ChannelMediaOptions options2 = new ChannelMediaOptions();
             options2.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
