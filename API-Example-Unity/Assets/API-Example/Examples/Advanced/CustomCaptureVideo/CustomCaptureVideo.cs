@@ -3,8 +3,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
- 
- 
+
+
 
 #if UNITY_2018_1_OR_NEWER
 using Unity.Collections;
@@ -35,9 +35,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
 
         public Text LogText;
         internal Logger Log;
-        internal IRtcEngine RtcEngine = null;
+        internal IRtcEngineEx RtcEngine = null;
 
-       
+
         private Texture2D _texture;
         private Rect _rect;
 
@@ -48,6 +48,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
         public Vector2 CameraSize = new Vector2(640, 480);
         public int CameraFPS = 15;
         private byte[] _shareData;
+        private uint _videoTrack;
 
 
         // Use this for initialization
@@ -61,7 +62,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
                 InitCameraDevice();
                 InitTexture();
                 InitEngine();
-                SetExternalVideoSource();
+                CreateCustomVideoTrack();
                 JoinChannel();
             }
 #else
@@ -118,14 +119,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
                 externalVideoFrame.cropBottom = 10;
                 externalVideoFrame.rotation = 180;
                 externalVideoFrame.timestamp = System.DateTime.Now.Ticks / 10000;
-                var ret = rtc.PushVideoFrame(externalVideoFrame);
+                var ret = rtc.PushVideoFrame(externalVideoFrame, _videoTrack);
                 Debug.Log("PushVideoFrame ret = " + ret + "time: " + System.DateTime.Now.Millisecond);
             }
         }
 
         private void InitEngine()
         {
-            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
+            RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngineEx();
             UserEventHandler handler = new UserEventHandler(this);
             RtcEngineContext context = new RtcEngineContext();
             context.appId = _appID;
@@ -136,10 +137,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
             RtcEngine.InitEventHandler(handler);
         }
 
-        private void SetExternalVideoSource()
+        private void CreateCustomVideoTrack()
         {
-            var ret = RtcEngine.SetExternalVideoSource(true, false, EXTERNAL_VIDEO_SOURCE_TYPE.VIDEO_FRAME, new SenderOptions());
-            this.Log.UpdateLog("SetExternalVideoSource returns:" + ret);
+            _videoTrack = RtcEngine.CreateCustomVideoTrack();
+            this.Log.UpdateLog("CreateCustomVideoTrack returns:" + _videoTrack);
         }
 
         private void JoinChannel()
@@ -147,7 +148,44 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            RtcEngine.JoinChannel(_token, _channelName,"",0);
+            ChannelMediaOptions options = new ChannelMediaOptions();
+            options.publishCameraTrack.SetValue(false);
+            options.publishCustomVideoTrack.SetValue(true);
+            options.customVideoTrackId.SetValue(_videoTrack);
+
+            RtcEngine.JoinChannel(_token, _channelName, 0, options);
+        }
+
+        private void JoinChannelEx()
+        {
+
+            RtcEngine.EnableAudio();
+            RtcEngine.EnableVideo();
+
+            //加入频道1
+            uint videoTrack1 = RtcEngine.CreateCustomVideoTrack();
+            ChannelMediaOptions options = new ChannelMediaOptions();
+            options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            options.publishCameraTrack.SetValue(false);
+            options.publishCustomVideoTrack.SetValue(true);
+            options.customVideoTrackId.SetValue(videoTrack1);
+            options.autoSubscribeAudio.SetValue(false);
+            options.autoSubscribeVideo.SetValue(false);
+
+            RtcEngine.JoinChannelEx(_token, new RtcConnection("channel_id_1", 123), options);
+
+
+            //加入频道2
+            uint videoTrack2 = RtcEngine.CreateCustomVideoTrack();
+            ChannelMediaOptions options2 = new ChannelMediaOptions();
+            options2.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            options2.publishCameraTrack.SetValue(false);
+            options2.publishCustomVideoTrack.SetValue(true);
+            options2.customVideoTrackId.SetValue(videoTrack2);
+            options2.autoSubscribeAudio.SetValue(false);
+            options2.autoSubscribeVideo.SetValue(false);
+
+            RtcEngine.JoinChannelEx(_token, new RtcConnection("channel_id_2", 123), options2);
         }
 
         private bool CheckAppId()
@@ -182,6 +220,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
             }
 #endif
             if (RtcEngine == null) return;
+            RtcEngine.DestroyCustomVideoTrack(_videoTrack);
             RtcEngine.InitEventHandler(null);
             RtcEngine.LeaveChannel();
             RtcEngine.Dispose();

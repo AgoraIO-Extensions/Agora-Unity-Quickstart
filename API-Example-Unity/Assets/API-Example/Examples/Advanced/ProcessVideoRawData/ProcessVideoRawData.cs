@@ -35,51 +35,65 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
         internal int WriteCount;
         internal int ReadCount;
 
-        internal byte[] VideoBuffer = new byte[0];
 
-        private int _videoFrameWidth = 1080;
-        public int VideoFrameWidth
-        {
-            set
-            {
-                if (value != _videoFrameWidth)
-                {
-                    _videoFrameWidth = value;
-                    _needResize = true;
-                }
 
-            }
+        //private int _videoFrameWidth = 1080;
+        //public int VideoFrameWidth
+        //{
+        //    set
+        //    {
+        //        if (value != _videoFrameWidth)
+        //        {
+        //            _videoFrameWidth = value;
+        //            _needResize = true;
+        //        }
 
-            get
-            {
-                return _videoFrameWidth;
-            }
-        }
+        //    }
 
-        private int _videoFrameHeight = 720;
-        public int VideoFrameHeight
-        {
-            set
-            {
-                if (value != _videoFrameHeight)
-                {
-                    _videoFrameHeight = value;
-                    _needResize = true;
-                }
+        //    get
+        //    {
+        //        return _videoFrameWidth;
+        //    }
+        //}
 
-            }
+        //private int _videoFrameHeight = 720;
+        //public int VideoFrameHeight
+        //{
+        //    set
+        //    {
+        //        if (value != _videoFrameHeight)
+        //        {
+        //            _videoFrameHeight = value;
+        //            _needResize = true;
+        //        }
 
-            get
-            {
-                return _videoFrameHeight;
+        //    }
 
-            }
-        }
+        //    get
+        //    {
+        //        return _videoFrameHeight;
 
-        private bool _needResize = false;
+        //    }
+        //}
+
+        //private bool _needResize = false;
         public GameObject VideoView;
-        private Texture2D _texture;
+        public Texture2D _texture;
+        public int _videoSourceWidth = 960;
+        public int _videoSourceHeight = 540;
+        public bool _isNewFrame = false;
+        public byte[] _videoBuffer = new byte[960 * 540];
+
         private bool _isTextureAttach = false;
+
+
+        private void Awake()
+        {
+            _texture = new Texture2D(_videoSourceWidth, _videoSourceHeight, TextureFormat.RGBA32, false);
+            _texture.Apply();
+            var rd = VideoView.GetComponent<RawImage>();
+            rd.texture = _texture;
+        }
 
 
         void Start()
@@ -99,26 +113,22 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
             PermissionHelper.RequestMicrophontPermission();
             PermissionHelper.RequestCameraPermission();
 
-            if (!_isTextureAttach)
+            lock (_videoBuffer)
             {
-                var rd = VideoView.GetComponent<RawImage>();
-                rd.texture = _texture;
-                _isTextureAttach = true;
-            }
-            else if (VideoBuffer != null && VideoBuffer.Length != 0 && !_needResize)
-            {
-                lock (VideoBuffer)
+                if (_isNewFrame)
                 {
-                    _texture.LoadRawTextureData(VideoBuffer);
+                    if (_videoSourceWidth != _texture.width || _videoSourceHeight != _texture.height)
+                    {
+                        _texture.Resize(_videoSourceWidth, _videoSourceHeight);
+                       
+                    }
+                    Debug.Log("_texture: " + _texture.width + " : " + _texture.height);
+                    _texture.LoadRawTextureData(_videoBuffer);
                     _texture.Apply();
+                    _isNewFrame = false;
                 }
             }
-            else if (_needResize)
-            {
-                _texture.Resize(_videoFrameWidth, _videoFrameHeight);
-                _texture.Apply();
-                _needResize = false;
-            }
+
         }
 
         bool CheckAppId()
@@ -139,8 +149,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
 
         void SetUpUI()
         {
-            _texture = new Texture2D(_videoFrameWidth, _videoFrameHeight, TextureFormat.RGBA32, false);
-            _texture.Apply();
+            //_texture = new Texture2D(_videoFrameWidth, _videoFrameHeight, TextureFormat.RGBA32, false);
+            //_texture.Apply();
         }
 
         void InitEngine()
@@ -165,7 +175,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
         void JoinChannel()
         {
             VideoEncoderConfiguration config = new VideoEncoderConfiguration();
-            config.dimensions = new VideoDimensions(_videoFrameWidth, _videoFrameHeight);
+            config.dimensions = new VideoDimensions(_videoSourceHeight, _videoSourceHeight);
             RtcEngine.SetVideoEncoderConfiguration(config);
 
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
@@ -270,13 +280,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
 
         public override bool OnCaptureVideoFrame(VIDEO_SOURCE_TYPE type, VideoFrame videoFrame)
         {
-            Debug.Log("OnCaptureVideoFrame-----------" + " width:" + videoFrame.width + " height:" +
-                        videoFrame.height);
-            _agoraVideoRawData.VideoFrameWidth = videoFrame.width;
-            _agoraVideoRawData.VideoFrameHeight = videoFrame.height;
-            lock (_agoraVideoRawData.VideoBuffer)
+            lock (_agoraVideoRawData._videoBuffer)
             {
-                _agoraVideoRawData.VideoBuffer = videoFrame.yBuffer;
+                Debug.Log("OnCaptureVideoFrame----------- width:" + videoFrame.width +
+                      " height:" + videoFrame.height);
+                _agoraVideoRawData._videoSourceWidth = videoFrame.width;
+                _agoraVideoRawData._videoSourceHeight = videoFrame.height;
+                _agoraVideoRawData._videoBuffer = videoFrame.yBuffer;
+                Debug.Log("_videoBuffer length: " + _agoraVideoRawData._videoBuffer.Length);
+                _agoraVideoRawData._isNewFrame = true;
             }
             return true;
         }
