@@ -35,57 +35,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
         internal int WriteCount;
         internal int ReadCount;
 
-
-
-        //private int _videoFrameWidth = 1080;
-        //public int VideoFrameWidth
-        //{
-        //    set
-        //    {
-        //        if (value != _videoFrameWidth)
-        //        {
-        //            _videoFrameWidth = value;
-        //            _needResize = true;
-        //        }
-
-        //    }
-
-        //    get
-        //    {
-        //        return _videoFrameWidth;
-        //    }
-        //}
-
-        //private int _videoFrameHeight = 720;
-        //public int VideoFrameHeight
-        //{
-        //    set
-        //    {
-        //        if (value != _videoFrameHeight)
-        //        {
-        //            _videoFrameHeight = value;
-        //            _needResize = true;
-        //        }
-
-        //    }
-
-        //    get
-        //    {
-        //        return _videoFrameHeight;
-
-        //    }
-        //}
-
-        //private bool _needResize = false;
         public GameObject VideoView;
         public Texture2D _texture;
         public int _videoSourceWidth = 960;
         public int _videoSourceHeight = 540;
         public bool _isNewFrame = false;
         public byte[] _videoBuffer = new byte[960 * 540];
-
-        private bool _isTextureAttach = false;
-
 
         private void Awake()
         {
