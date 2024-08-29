@@ -62,6 +62,7 @@ namespace Agora_RTC_Plugin.API_Example
             "ProcessVideoRawDataScene",
             "PushEncodedVideoImageScene",
             "RenderWithYUV",
+            "RenderWithAlpha",
             "ScreenShareScene",
             "ScreenShareWhileVideoCallScene",
             "SetBeautyEffectOptionsScene",
