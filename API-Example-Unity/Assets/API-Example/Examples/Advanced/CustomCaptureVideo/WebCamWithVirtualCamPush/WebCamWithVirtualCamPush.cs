@@ -39,6 +39,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WebCamWithVirtualCamPus
             width = 1920,
             height = 1080
         };
+        [SerializeField]
+        bool MirrodMode = false;
 
         // Pixel format
         public static TextureFormat ConvertFormat = TextureFormat.RGBA32;
@@ -54,8 +56,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WebCamWithVirtualCamPus
 
         private uint _videoTrack2 = 0;
 
-        private uint _uid1 = 123;
-        private uint _uid2 = 456;
+        internal uint WebCamUID = 123;
+        internal uint VirtualCamUID = 456;
 
         private object _lock = new object();
         // Use this for initialization
@@ -160,7 +162,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WebCamWithVirtualCamPus
             channelMediaOptions.publishCameraTrack.SetValue(true);
             channelMediaOptions.publishMicrophoneTrack.SetValue(true);
             channelMediaOptions.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            RtcEngine.JoinChannelEx(_token, new RtcConnection(_channelName, _uid1), channelMediaOptions);
+            RtcEngine.JoinChannelEx(_token, new RtcConnection(_channelName, WebCamUID), channelMediaOptions);
         }
 
 
@@ -173,7 +175,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WebCamWithVirtualCamPus
             channelMediaOptions.autoSubscribeAudio.SetValue(false);
             channelMediaOptions.customVideoTrackId.SetValue(_videoTrack2);
             channelMediaOptions.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            RtcEngine.JoinChannelEx(_token, new RtcConnection(_channelName, _uid2), channelMediaOptions);
+            RtcEngine.JoinChannelEx(_token, new RtcConnection(_channelName, VirtualCamUID), channelMediaOptions);
 
             VideoEncoderConfiguration config = new VideoEncoderConfiguration
             {
@@ -182,9 +184,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WebCamWithVirtualCamPus
                 dimensions = this.dimensions,
                 orientationMode = ORIENTATION_MODE.ORIENTATION_MODE_ADAPTIVE,
                 degradationPreference = DEGRADATION_PREFERENCE.MAINTAIN_FRAMERATE,
-                mirrorMode = VIDEO_MIRROR_MODE_TYPE.VIDEO_MIRROR_MODE_ENABLED
+                mirrorMode = this.MirrodMode? VIDEO_MIRROR_MODE_TYPE.VIDEO_MIRROR_MODE_ENABLED : VIDEO_MIRROR_MODE_TYPE.VIDEO_MIRROR_MODE_DISABLED
             };
-            RtcEngine.SetVideoEncoderConfigurationEx(config, new RtcConnection(_channelName, _uid2));
+            RtcEngine.SetVideoEncoderConfigurationEx(config, new RtcConnection(_channelName, VirtualCamUID));
         }
 
         private bool CheckAppId()
@@ -388,9 +390,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WebCamWithVirtualCamPus
 
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
-            _sample.Log.UpdateLog(
-                string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-            WebCamWithVirtualCamPush.MakeVideoView(uid, _sample.GetChannelName());
+            if (uid != _sample.VirtualCamUID)
+            {
+                _sample.Log.UpdateLog(
+                    string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+                WebCamWithVirtualCamPush.MakeVideoView(uid, _sample.GetChannelName());
+            }
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)

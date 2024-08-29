@@ -39,10 +39,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
         internal uint AUDIO_TRACK_ID = 0;
-        // This depends on the audio file you open
-        private const int CHANNEL = 2;
-        // This depends on the audio file you open
-        private const int SAMPLE_RATE = 44100;
+       
 
         // Number of push audio frame per second.
         private const int PUSH_FREQ_PER_SEC = 20;
@@ -219,32 +216,184 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 
         }
 
+
+        private bool ReadAudioHeaderAndDetectFormat(FileStream fileStream, AudioFrame audioFrame)
+        {
+            // Ensure that the file has at least 44 bytes (the minimum size for WAV file headers)
+            if (fileStream.Length < 44)
+            {
+                Debug.LogError("File is too short to be a valid WAV file.");
+                return false;
+            }
+
+            // Read RIFF header
+            byte[] riffHeader = new byte[4];
+            fileStream.Read(riffHeader, 0, 4);
+            string riff = System.Text.Encoding.ASCII.GetString(riffHeader);
+            if (riff != "RIFF")
+            {
+                Debug.LogError("Not a valid WAV file.");
+                return false;
+            }
+
+            // Read file size (excluding header information of 8 bytes)
+            byte[] fileSizeBytes = new byte[4];
+            fileStream.Read(fileSizeBytes, 0, 4);
+            int fileSize = BitConverter.ToInt32(fileSizeBytes, 0);
+
+            // Read WAVE tag
+            byte[] waveHeader = new byte[4];
+            fileStream.Read(waveHeader, 0, 4);
+            string wave = System.Text.Encoding.ASCII.GetString(waveHeader);
+            if (wave != "WAVE")
+            {
+                Debug.LogError("Not a valid WAV file.");
+                return false;
+            }
+
+            // Read format block tag 'fmt '
+            byte[] fmtHeader = new byte[4];
+            fileStream.Read(fmtHeader, 0, 4);
+            string fmt = System.Text.Encoding.ASCII.GetString(fmtHeader);
+            if (fmt != "fmt ")
+            {
+                Debug.LogError("Unsupported format chunk.");
+                return false;
+            }
+
+            // Read format block size
+            byte[] fmtSizeBytes = new byte[4];
+            fileStream.Read(fmtSizeBytes, 0, 4);
+            int fmtSize = BitConverter.ToInt32(fmtSizeBytes, 0);
+
+            // Read audio format (PCM=1)
+            byte[] audioFormatBytes = new byte[2];
+            fileStream.Read(audioFormatBytes, 0, 2);
+            int audioFormat = BitConverter.ToInt16(audioFormatBytes, 0);
+            if (audioFormat != 1)
+            {
+                Debug.LogError("Unsupported audio format.");
+                return false;
+            }
+
+            // Read the number of channels
+            byte[] channelsBytes = new byte[2];
+            fileStream.Read(channelsBytes, 0, 2);
+            int channels = BitConverter.ToInt16(channelsBytes, 0);
+
+            // Read sampling rate
+            byte[] sampleRateBytes = new byte[4];
+            fileStream.Read(sampleRateBytes, 0, 4);
+            int sampleRate = BitConverter.ToInt32(sampleRateBytes, 0);
+
+            // Read byte rate (data transfer rate)
+            byte[] byteRateBytes = new byte[4];
+            fileStream.Read(byteRateBytes, 0, 4);
+            int byteRate = BitConverter.ToInt32(byteRateBytes, 0);
+
+            // Read block alignment
+            byte[] blockAlignBytes = new byte[2];
+            fileStream.Read(blockAlignBytes, 0, 2);
+            int blockAlign = BitConverter.ToInt16(blockAlignBytes, 0);
+
+            // Read bit depth
+            byte[] bitsPerSampleBytes = new byte[2];
+            fileStream.Read(bitsPerSampleBytes, 0, 2);
+            int bitsPerSample = BitConverter.ToInt16(bitsPerSampleBytes, 0);
+
+            Debug.Log($"Format: PCM");
+            Debug.Log($"Channels: {channels}");
+            Debug.Log($"Sample Rate: {sampleRate} Hz");
+            Debug.Log($"Byte Rate: {byteRate} bps");
+            Debug.Log($"Block Align: {blockAlign}");
+            Debug.Log($"Bits Per Sample: {bitsPerSample} bits");
+
+
+            audioFrame.bytesPerSample = BYTES_PER_SAMPLE.TWO_BYTES_PER_SAMPLE;
+            audioFrame.type = AUDIO_FRAME_TYPE.FRAME_TYPE_PCM16;
+            audioFrame.samplesPerSec = sampleRate;
+            audioFrame.samplesPerChannel = sampleRate / PUSH_FREQ_PER_SEC;
+            audioFrame.channels = channels;
+            audioFrame.renderTimeMs = 0;
+            audioFrame.RawBuffer = new byte[audioFrame.samplesPerChannel * (int)BYTES_PER_SAMPLE.TWO_BYTES_PER_SAMPLE * channels];
+            return true;
+        }
+
+
+        private void SeekToAudioData(FileStream fileStream)
+        {
+            byte[] buffer = new byte[4];
+            fileStream.Seek(0, SeekOrigin.Begin);
+            if (fileStream.Read(buffer, 0, 4) != 4)
+            {
+                throw new Exception("Failed to read RIFF header.");
+            }
+            string riff = System.Text.Encoding.UTF8.GetString(buffer);
+            if (riff != "RIFF")
+            {
+                throw new Exception("Not a valid WAV file.");
+            }
+
+
+            if (fileStream.Read(buffer, 0, 4) != 4)
+            {
+                throw new Exception("Failed to read file size.");
+            }
+            int fileSize = BitConverter.ToInt32(buffer, 0);
+
+            if (fileStream.Read(buffer, 0, 4) != 4)
+            {
+                throw new Exception("Failed to read WAVE marker.");
+            }
+            string wave = System.Text.Encoding.UTF8.GetString(buffer);
+            if (wave != "WAVE")
+            {
+                throw new Exception("Not a valid WAV file.");
+            }
+
+            while (fileStream.Position < fileSize + 8)
+            {
+                if (fileStream.Read(buffer, 0, 4) != 4)
+                {
+                    throw new Exception("Failed to read chunk ID.");
+                }
+                string chunkId = System.Text.Encoding.UTF8.GetString(buffer);
+                if (fileStream.Read(buffer, 0, 4) != 4)
+                {
+                    throw new Exception("Failed to read chunk size.");
+                }
+                int chunkSize = BitConverter.ToInt32(buffer, 0);
+
+                if (chunkId == "data")
+                {
+                    Debug.Log("Audio data chunk found at position: " + fileStream.Position);
+                    return;
+                }
+                else
+                {
+                    fileStream.Seek(chunkSize, SeekOrigin.Current);
+                }
+            }
+
+        }
+
         private void PushAudioFrameThread(object file)
         {
+
             string filePath = (string)file;
-            var bytesPerSample = 2;
-            var type = AUDIO_FRAME_TYPE.FRAME_TYPE_PCM16;
-            var channels = CHANNEL;
-            var samples = SAMPLE_RATE / PUSH_FREQ_PER_SEC;
-            var samplesPerSec = SAMPLE_RATE;
+            FileStream fileStream = new FileStream(filePath, FileMode.Open);
+            var audioFrame = new AudioFrame();
+            if (ReadAudioHeaderAndDetectFormat(fileStream, audioFrame) == false)
+            {
+                return;
+            }
 
             var freq = 1000 / PUSH_FREQ_PER_SEC;
 
-            var audioFrame = new AudioFrame
-            {
-                bytesPerSample = BYTES_PER_SAMPLE.TWO_BYTES_PER_SAMPLE,
-                type = type,
-                samplesPerChannel = samples,
-                samplesPerSec = samplesPerSec,
-                channels = channels,
-                RawBuffer = new byte[samples * bytesPerSample * CHANNEL],
-                renderTimeMs = 0
-            };
-
-
+            SeekToAudioData(fileStream);
             double startMillisecond = GetTimestamp();
             long tick = 0;
-            FileStream fileStream = new FileStream(filePath, FileMode.Open);
+
             while (true)
             {
                 int nRet = -1;
@@ -255,13 +404,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
                         break;
                     }
 
-                    int bytesRead =  fileStream.Read(audioFrame.RawBuffer, 0, audioFrame.RawBuffer.Length);
+                    int bytesRead = fileStream.Read(audioFrame.RawBuffer, 0, audioFrame.RawBuffer.Length);
                     nRet = RtcEngine.PushAudioFrame(audioFrame, AUDIO_TRACK_ID);
 
                     if (bytesRead == 0)
                     {
                         //Set the position of FileStream to return to the file header to restart reading data
-                        fileStream.Seek(0, SeekOrigin.Begin);
+                        SeekToAudioData(fileStream);
                     }
                 }
 

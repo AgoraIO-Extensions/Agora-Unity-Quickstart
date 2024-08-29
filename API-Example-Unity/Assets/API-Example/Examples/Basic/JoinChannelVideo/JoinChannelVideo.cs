@@ -501,11 +501,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             }
         }
 
-        public override void OnLocalVideoStateChanged(RtcConnection connection, LOCAL_VIDEO_STREAM_STATE state, LOCAL_VIDEO_STREAM_REASON reason)
-        {
-
-        }
-
         public override void OnRemoteVideoStats(RtcConnection connection, RemoteVideoStats stats)
         {
             var panel = _videoSample.GetRemoteVideoCallQualityPanel(stats.uid);

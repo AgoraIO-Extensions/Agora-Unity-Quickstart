@@ -101,6 +101,8 @@ video_example_list = [
     {'dir_name': 'API-Example/Examples/Advanced/PushEncodedVideoImageS', 'scene_name': 'PushEncodedVideoImageSceneS'},
     {'dir_name': 'API-Example/Examples/Advanced/RenderWithYUV', 'scene_name': 'RenderWithYUV'},
     {'dir_name': 'API-Example/Examples/Advanced/RenderWithYUVS', 'scene_name': 'RenderWithYUVS'},
+    {'dir_name': 'API-Example/Examples/Advanced/RenderWithAlpha', 'scene_name': 'RenderWithAlpha'},
+    {'dir_name': 'API-Example/Examples/Advanced/RenderWithAlphaS', 'scene_name': 'RenderWithAlphaS'},
     {'dir_name': 'API-Example/Examples/Advanced/ScreenShare', 'scene_name': 'ScreenShareScene'},
     {'dir_name': 'API-Example/Examples/Advanced/ScreenShareS', 'scene_name': 'ScreenShareSceneS'},
     {'dir_name': 'API-Example/Examples/Advanced/ScreenShareWhileVideoCall',
