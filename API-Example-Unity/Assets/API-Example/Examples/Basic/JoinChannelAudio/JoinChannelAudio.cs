@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
+using System.Collections.Generic;
 using io.agora.rtc.demo;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
@@ -34,6 +35,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
         private IAudioDeviceManager _audioDeviceManager;
         private DeviceInfo[] _audioPlaybackDeviceInfos;
         public Dropdown _audioDeviceSelect;
+        public ISet<uint> members = new HashSet<uint>();
 
         // Start is called before the first frame update
         private void Start()
@@ -60,6 +62,57 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
         {
             PermissionHelper.RequestMicrophontPermission();
         }
+
+
+        private void OnApplicationPause(bool focus)
+        {
+            if (focus)
+            {
+                Debug.Log("OnAppEnterBackground");
+                this.OnAppEnterBackground();
+            }
+            else
+            {
+                Debug.Log("OnAppBackFront");
+                this.OnAppBackFront();
+            }
+        }
+
+        public void OnAppEnterBackground()
+        {
+            //ChannelMediaOptions option = new ChannelMediaOptions();
+            //option.publishCameraTrack.SetValue(false);
+            //option.publishMicrophoneTrack.SetValue(false);
+            //option.autoSubscribeAudio.SetValue(false);
+            //option.autoSubscribeVideo.SetValue(false);
+            //option.publishCustomAudioTrack.SetValue(false);
+            //_rtcEngineEx.UpdateChannelMediaOptions(option);
+            //#if AGORA_WWISE
+            //#if UNITY_IOS
+            //AkSoundEngine.Suspend(false);
+            //#endif
+            //#endif
+            RtcEngine.MuteLocalAudioStream(true);
+            foreach (var uid in members)
+            {
+                RtcEngine.MuteRemoteAudioStream(uid, true);
+            }
+        }
+        public void OnAppBackFront()
+        {
+            //_rtcEngineEx.UpdateChannelMediaOptions(_curOptions);
+            //#if AGORA_WWISE
+            //#if UNITY_IOS
+            //AkSoundEngine.WakeupFromSuspend();
+            //#endif
+            //#endif
+            RtcEngine.MuteLocalAudioStream(false);
+            foreach (var uid in members)
+            {
+                RtcEngine.MuteRemoteAudioStream(uid, false);
+            }
+        }
+
 
         private bool CheckAppId()
         {
@@ -228,12 +281,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
             _audioSample.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
+            _audioSample.members.Add(uid);
         }
 
         public override void OnUserOffline(RtcConnection connection, uint uid, USER_OFFLINE_REASON_TYPE reason)
         {
             _audioSample.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                 (int)reason));
+            _audioSample.members.Remove(uid);
         }
     }
 
