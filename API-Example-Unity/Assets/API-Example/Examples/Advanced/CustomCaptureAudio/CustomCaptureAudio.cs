@@ -106,7 +106,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
         {
             lock (_rtcLock)
             {
-                AudioTrackConfig audioTrackConfig = new AudioTrackConfig(true);
+                AudioTrackConfig audioTrackConfig = new AudioTrackConfig(true, false);
                 AUDIO_TRACK_ID = RtcEngine.CreateCustomAudioTrack(AUDIO_TRACK_TYPE.AUDIO_TRACK_MIXABLE, audioTrackConfig);
                 this.Log.UpdateLog("CreateCustomAudioTrack id:" + AUDIO_TRACK_ID);
             }

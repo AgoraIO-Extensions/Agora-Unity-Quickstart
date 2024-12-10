@@ -13,9 +13,9 @@ using System.Runtime.InteropServices;
 using io.agora.rtc.demo;
 using UnityEngine.Networking;
 
-namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDataProviderExample
+namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerOpenWithMediaSourceExample
 {
-    public class MediaPlayerWithCustomDataProviderExample : MonoBehaviour
+    public class MediaPlayerOpenWithMediaSourceExample : MonoBehaviour
     {
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
@@ -251,13 +251,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
             mediaSource.provider = customDataProvider;
             var ret = MediaPlayer.OpenWithMediaSource(mediaSource);
             this.Log.UpdateLog("OpenWithCustomSource: " + ret);
-
-
-            //var source = new MediaSource();
-            //source.provider = this.customDataProvider;
-            //source.autoPlay = false;
-            //var ret = MediaPlayer.OpenWithMediaSource(source);
-            //this.Log.UpdateLog("OpenWithMediaSource: " + ret);
         }
 
 
@@ -422,9 +415,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
 
     internal class MpkEventHandler : IMediaPlayerSourceObserver
     {
-        private readonly MediaPlayerWithCustomDataProviderExample _sample;
+        private readonly MediaPlayerOpenWithMediaSourceExample _sample;
 
-        internal MpkEventHandler(MediaPlayerWithCustomDataProviderExample sample)
+        internal MpkEventHandler(MediaPlayerOpenWithMediaSourceExample sample)
         {
             _sample = sample;
         }
@@ -436,13 +429,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
             Debug.Log("OnPlayerSourceStateChanged");
             if (state == MEDIA_PLAYER_STATE.PLAYER_STATE_OPEN_COMPLETED)
             {
-                MediaPlayerWithCustomDataProviderExample.MakeVideoView((uint)_sample.MediaPlayer.GetId(), "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_MEDIA_PLAYER);
+                MediaPlayerOpenWithMediaSourceExample.MakeVideoView((uint)_sample.MediaPlayer.GetId(), "", VIDEO_SOURCE_TYPE.VIDEO_SOURCE_MEDIA_PLAYER);
                 _sample.EnableUI(true);
                 _sample.Log.UpdateLog("Open Complete. Click start to play media");
             }
             else if (state == MEDIA_PLAYER_STATE.PLAYER_STATE_STOPPED)
             {
-                MediaPlayerWithCustomDataProviderExample.DestroyVideoView((uint)_sample.MediaPlayer.GetId());
+                MediaPlayerOpenWithMediaSourceExample.DestroyVideoView((uint)_sample.MediaPlayer.GetId());
                 _sample.EnableUI(false);
             }
         }
@@ -455,9 +448,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
-        private readonly MediaPlayerWithCustomDataProviderExample _sample;
+        private readonly MediaPlayerOpenWithMediaSourceExample _sample;
 
-        internal UserEventHandler(MediaPlayerWithCustomDataProviderExample sample)
+        internal UserEventHandler(MediaPlayerOpenWithMediaSourceExample sample)
         {
             _sample = sample;
         }
@@ -485,7 +478,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
         public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
         {
             _sample.Log.UpdateLog("OnLeaveChannel");
-            MediaPlayerWithCustomDataProviderExample.DestroyVideoView(0);
+            MediaPlayerOpenWithMediaSourceExample.DestroyVideoView(0);
         }
 
         public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole,
@@ -503,20 +496,20 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
         {
             _sample.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                 (int)reason));
-            MediaPlayerWithCustomDataProviderExample.DestroyVideoView(uid);
+            MediaPlayerOpenWithMediaSourceExample.DestroyVideoView(uid);
         }
     }
 
     internal class UserPlayerCustomDataProvider : IMediaPlayerCustomDataProvider
     {
 
-        MediaPlayerWithCustomDataProviderExample _sample;
+        MediaPlayerOpenWithMediaSourceExample _sample;
         private FileStream fis = null;
 
         private Int64 fileSize = 0;
 
 
-        internal UserPlayerCustomDataProvider(MediaPlayerWithCustomDataProviderExample sample)
+        internal UserPlayerCustomDataProvider(MediaPlayerOpenWithMediaSourceExample sample)
         {
             _sample = sample;
 
