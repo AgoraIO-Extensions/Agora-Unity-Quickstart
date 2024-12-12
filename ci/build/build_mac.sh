@@ -114,15 +114,13 @@ python3 $root/ci/build/set_allowUnsafeCode_true.py $root/API-Example-Unity
 mkdir build_temp
 cd build_temp
 python3 ${WORKSPACE}/artifactory_utils.py --action=download_file --file=$SDK_Url
-unzip -d ./ ./Agora_Unity_*_SDK_*.zip
+unzip -d ./ ./*_Unity_*_SDK_*.zip
 ls
 echo "===========unzip finish================="
 if [ "$RTC" == "true" ]; then
-    UNITYPACKAGE_NAME="Agora-RTC-Plugin.unitypackage"
     BUILD_PATH="Build"
     COMMAND_BUILD="CommandBuild"
 else
-    UNITYPACKAGE_NAME="Agora-RTM-Plugin.unitypackage"
     BUILD_PATH="RtmBuild"
     COMMAND_BUILD="RtmCommandBuild"
 fi
@@ -130,14 +128,14 @@ fi
 $UNITY_DIR/Unity -quit -batchmode -nographics -createProject "sdk_project"
 python3 $root/ci/build/set_allowUnsafeCode_true.py $root/build_temp/sdk_project
 echo "===========create sdk_project finish================="
-$UNITY_DIR/Unity -quit -batchmode -nographics -openProjects "sdk_project" -importPackage "${root}/build_temp/${UNITYPACKAGE_NAME}"
+$UNITY_DIR/Unity -quit -batchmode -nographics -openProjects "sdk_project" -importPackage ${root}/build_temp/*-*-Plugin.unitypackage
 echo "===========import sdk_project finish================="
 
 cd ${root}
 echo "===========Demo build begin================="
-rm -rf build_temp/sdk_project/Assets/Agora-*-Plugin/API-Example
-cp -r build_temp/sdk_project/Assets/Agora-*-Plugin ./API-Example-Unity/Assets
-echo "===========copy Agora-*-Plugin to Assets finish ================="
+rm -rf build_temp/sdk_project/Assets/*-*-Plugin/API-Example
+cp -r build_temp/sdk_project/Assets/*-*-Plugin ./API-Example-Unity/Assets
+echo "===========copy *-*-Plugin to Assets finish ================="
 
 #replace appID
 sed -i "" "s/appID:/appID: ${appID}/g" ./API-Example-Unity/Assets/API-Example/AppIdInput/AppIdInput.asset
@@ -207,7 +205,7 @@ fi
 if [ "$Build_Android" == "true" ]; then
     $UNITY_DIR/Unity -quit -batchmode -nographics -projectPath "./API-Example-Unity" -executeMethod Agora_RTC_Plugin.API_Example.$COMMAND_BUILD.BuildAndroid
     # aar not exitsts
-    if ! [ -f ./build_temp/sdk_project/Assets/Agora-*-Plugin/Agora-Unity-*-SDK/Plugins/Android/*.aar ]; then
+    if ! [ -f ./build_temp/sdk_project/Assets/*-*-Plugin/*-Unity-*-SDK/Plugins/Android/*.aar ]; then
         sed -i -e "s/implementation files('..\/unityLibrary\/libs\/AgoraScreenShareExtension.aar')//g" android_studio_template/launcher/build.gradle
         rm -rf android_studio_template/launcher/build.gradle-e
     fi
