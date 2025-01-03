@@ -32,8 +32,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
         internal IRtcEngine RtcEngine = null;
         internal IMediaPlayer MediaPlayer = null;
 
-        private const string MPK_URL = "https://agoracdn.s3.us-west-1.amazonaws.com/videos/Agora.io-Interactions.mp4";
-        private const string PRELOAD_URL = "https://agoracdn.s3.us-west-1.amazonaws.com/videos/Agora+Quality+Comparison+Jellyfish.mp4";
+        private const string MPK_URL = "https://download.agora.io/demo/test/Agora.io-Interactions.mp4";
+        private const string PRELOAD_URL = "https://download.agora.io/demo/test/Agora_revolution.mov";
 
         public Button PlayButton;
         public Button StopButton;
@@ -213,6 +213,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
 #if UNITY_ANDROID && !UNITY_EDITOR
                 // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
                 path = "/assets/img/MPK.mp4";
+#elif UNITY_OPENHARMONY && !UNITY_EDITOR
+                var AgoraRtcWrapperNative = new OpenHarmonyJSClass("AgoraRtcWrapperNative");
+                path = AgoraRtcWrapperNative.CallStatic<string>("copyFileToSandBox", Path.Combine(Application.streamingAssetsPath, "img/MPK.mp4"));
 #else
                 path = Path.Combine(Application.streamingAssetsPath, "img/MPK.mp4");
 #endif

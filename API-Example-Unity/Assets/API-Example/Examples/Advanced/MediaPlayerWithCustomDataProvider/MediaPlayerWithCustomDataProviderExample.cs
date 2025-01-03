@@ -73,6 +73,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
                 }
 #endif
 
+ 
+
             }
         }
 
@@ -240,6 +242,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
 #if UNITY_ANDROID && !UNITY_EDITOR
             // On Android We already copy file into persistentDataPath
             file = Application.persistentDataPath + "/MPK.mp4";
+#elif UNITY_OPENHARMONY && !UNITY_EDITOR
+            var AgoraRtcWrapperNative = new OpenHarmonyJSClass("AgoraRtcWrapperNative");
+            file = AgoraRtcWrapperNative.CallStatic<string>("copyFileToSandBox", Path.Combine(Application.streamingAssetsPath, "img/MPK.mp4"));
 #else
             file = Application.streamingAssetsPath + "/img/MPK.mp4";
 #endif

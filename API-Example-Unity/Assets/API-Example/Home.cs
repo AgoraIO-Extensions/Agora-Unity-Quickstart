@@ -176,8 +176,6 @@ namespace Agora_RTC_Plugin.API_Example
         // Start is called before the first frame update
         private void Start()
         {
-
-
         }
 
         // Update is called once per frame

@@ -74,7 +74,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessVideoRawData
                 {
                     if (_videoSourceWidth != _texture.width || _videoSourceHeight != _texture.height)
                     {
-                        _texture.Resize(_videoSourceWidth, _videoSourceHeight);
+                        _texture.Reinitialize(_videoSourceWidth, _videoSourceHeight);
                        
                     }
                     Debug.Log("_texture: " + _texture.width + " : " + _texture.height);

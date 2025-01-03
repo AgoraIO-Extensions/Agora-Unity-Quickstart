@@ -39,7 +39,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
         internal uint AUDIO_TRACK_ID = 0;
-       
+
 
         // Number of push audio frame per second.
         private const int PUSH_FREQ_PER_SEC = 20;
@@ -114,7 +114,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 
         private IEnumerator PreparationFilePath(Action<string> callback)
         {
-#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR          
+#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
             string fromPath = Path.Combine(Application.streamingAssetsPath, "audio/pcm16.wav");
             string filePath = Path.Combine(Application.persistentDataPath, "pcm16.wav");
             if (fromPath.Contains("://") || fromPath.Contains(":///"))
@@ -155,6 +155,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
                     Debug.LogError("Failed to copy file: " + e.Message);
                 }
             }
+#elif UNITY_OPENHARMONY && !UNITY_EDITOR
+            var AgoraRtcWrapperNative = new OpenHarmonyJSClass("AgoraRtcWrapperNative");
+            string filePath = AgoraRtcWrapperNative.CallStatic<string>("copyFileToSandBox", Path.Combine(Application.streamingAssetsPath, "audio/pcm16.wav"));
 #else
             string filePath = Path.Combine(Application.streamingAssetsPath, "audio/pcm16.wav");
 #endif

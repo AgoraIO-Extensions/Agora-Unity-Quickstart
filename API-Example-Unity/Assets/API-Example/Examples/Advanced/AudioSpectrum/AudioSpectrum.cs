@@ -36,7 +36,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
         internal IMediaPlayer MediaPlayer = null;
 
         private const string MPK_URL =
-            "https://agoracdn.s3.us-west-1.amazonaws.com/videos/Agora.io-Interactions.mp4";
+            "https://download.agora.io/demo/test/Agora_revolution.mov";
 
         private Button _button1;
         private Button _button2;
