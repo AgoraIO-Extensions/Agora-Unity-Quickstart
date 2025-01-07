@@ -3,6 +3,8 @@ using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
 using io.agora.rtc.demo;
+using System.Threading.Tasks;
+using System.IO;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
 {
@@ -25,7 +27,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
         [SerializeField]
         private string _channelName = "";
 
-        [SerializeField] public string Sound_URL = "";
+        [SerializeField] public string Sound_URL = "https://download.agora.io/demo/test/Greetings_from_Chuck.3gp";
 
         private string _localPath = "";
 
@@ -37,12 +39,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
         private Toggle _loopbackToggle;
 
         // Start is called before the first frame update
-        private void Start()
+        private async void Start()
         {
             LoadAssetData();
             if (CheckAppId())
             {
-                InitRtcEngine();
+                await InitRtcEngine();
                 SetupUI();
                 // enable it after joining
                 EnableUI(false);
@@ -71,7 +73,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
             return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
-        private void InitRtcEngine()
+        private async Task InitRtcEngine()
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
@@ -83,7 +85,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
             context.areaCode = AREA_CODE.AREA_CODE_GLOB;
 
 
-            RtcEngine.Initialize(context);
+            int ret = await RtcEngine.Initialize(context);
+            Debug.Log("RtcEngine.Initialize: " + ret);
             RtcEngine.InitEventHandler(handler);
         }
 
@@ -100,6 +103,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
 #if UNITY_ANDROID && !UNITY_EDITOR
             // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
             _localPath = "/assets/audio/Agora.io-Interactions.mp3";
+#elif UNITY_OPENHARMONY
+            var AgoraRtcWrapperNative = new OpenHarmonyJSClass("AgoraRtcWrapperNative");
+            _localPath = AgoraRtcWrapperNative.CallStatic<string>("copyFileToSandBox", Path.Combine(Application.streamingAssetsPath, "audio/Agora.io-Interactions.mp3"));
 #else
             _localPath = Application.streamingAssetsPath + "/audio/" + "Agora.io-Interactions.mp3";
 #endif
@@ -144,13 +150,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
 
         #endregion
 
-        private void OnDestroy()
+        private async void OnDestroy()
         {
             Debug.Log("OnDestroy");
             if (RtcEngine == null) return;
             RtcEngine.InitEventHandler(null);
             RtcEngine.LeaveChannel();
-            RtcEngine.Dispose();
+            int result = await RtcEngine.Dispose();
+            Debug.Log("RtcEngine.Dispose finish: " + result);
         }
 
 

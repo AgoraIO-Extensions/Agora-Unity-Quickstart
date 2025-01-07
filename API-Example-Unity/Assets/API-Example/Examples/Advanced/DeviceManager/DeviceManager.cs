@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
 using io.agora.rtc.demo;
+using System.Threading.Tasks;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DeviceManager
 {
@@ -38,7 +39,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DeviceManager
         private const int DEVICE_INDEX = 0;
 
         // Start is called before the first frame update
-        private void Start()
+        private async void Start()
         {
 #if UNITY_IPHONE || UNITY_ANDROID
             this.LogText.text = "iOS/Android is not supported, but you could see how it works on the Editor for Windows/MacOS";
@@ -48,7 +49,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DeviceManager
             if (CheckAppId())
             {
                 CheckAppId();
-                InitRtcEngine();
+                await InitRtcEngine();
                 CallDeviceManagerApi();
             }
 #endif
@@ -75,7 +76,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DeviceManager
             _channelName = _appIdInput.channelName;
         }
 
-        private void InitRtcEngine()
+        private async Task InitRtcEngine()
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
@@ -84,7 +85,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DeviceManager
             context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
             context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
             context.areaCode = AREA_CODE.AREA_CODE_GLOB;
-            RtcEngine.Initialize(context);
+            var result =await RtcEngine.Initialize(context);
+            Debug.Log("RtcEngine.Initialize: " + result);
             RtcEngine.InitEventHandler(handler);
         }
 
@@ -152,13 +154,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.DeviceManager
             if (_audioDeviceManager != null) _audioDeviceManager.SetPlaybackDeviceVolume(100);
         }
 
-        private void OnDestroy()
+        private async void OnDestroy()
         {
             Debug.Log("OnDestroy");
             if (RtcEngine == null) return;
             RtcEngine.InitEventHandler(null);
             RtcEngine.LeaveChannel();
-            RtcEngine.Dispose();
+            await RtcEngine.Dispose();
         }
     }
 

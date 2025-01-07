@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
 using io.agora.rtc.demo;
+using System.Threading.Tasks;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Basic.AudioCallRoute
 {
@@ -33,12 +34,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.AudioCallRoute
 
 
         // Start is called before the first frame update
-        private void Start()
+        private async void Start()
         {
             LoadAssetData();
             if (CheckAppId())
             {
-                InitRtcEngine();
+                await InitRtcEngine();
             }
         }
 
@@ -63,7 +64,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.AudioCallRoute
             _channelName = _appIdInput.channelName;
         }
 
-        public void InitRtcEngine()
+        public async Task InitRtcEngine()
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
 
@@ -74,7 +75,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.AudioCallRoute
             context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
             context.areaCode = AREA_CODE.AREA_CODE_GLOB;
 
-            var result = RtcEngine.Initialize(context);
+            var result = await RtcEngine.Initialize(context);
             this.Log.UpdateLog("Initialize result : " + result);
 
             RtcEngine.InitEventHandler(handler);
@@ -110,13 +111,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.AudioCallRoute
 
         #endregion
 
-        private void OnDestroy()
+        private async void OnDestroy()
         {
             Debug.Log("OnDestroy");
             if (RtcEngine == null) return;
             RtcEngine.InitEventHandler(null);
             RtcEngine.LeaveChannel();
-            RtcEngine.Dispose();
+            int result = await RtcEngine.Dispose();
+            Debug.Log("RtcEngine.Dispose finish: " + result);
         }
     }
 

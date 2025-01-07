@@ -5,7 +5,7 @@ using UnityEngine.Serialization;
 using Agora.Rtc;
 using System.Collections.Generic;
 using io.agora.rtc.demo;
-
+using System.Threading.Tasks;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
 {
@@ -58,12 +58,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
         internal MusicCollection CurMusicCollection = null;
         internal Int64 CurSongCode = 0;
 
-        private void Start()
+        private async void Start()
         {
             LoadAssetData();
             if (CheckAppId())
             {
-                InitEngine();
+                await InitEngine();
             }
             hideUI();
         }
@@ -128,7 +128,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
                 return;
             }
             RtcEngine.EnableAudio();
-            RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
 
             var appId = RtmAppidInputField.text;
@@ -190,7 +189,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             _channelName = _appIdInput.channelName;
         }
 
-        private void InitEngine()
+        private async Task InitEngine()
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
@@ -199,7 +198,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
             context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
             context.areaCode = AREA_CODE.AREA_CODE_GLOB;
-            RtcEngine.Initialize(context);
+            var result = await RtcEngine.Initialize(context);
+            Debug.Log("RtcEngine.Initialize: " + result); 
             RtcEngine.InitEventHandler(handler);
             var logPath = Application.persistentDataPath + "/rtc.log";
             RtcEngine.SetLogFile(logPath);
@@ -326,7 +326,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             this.Log.UpdateLog("RemoveCache: " + nRet);
         }
 
-        private void OnDestroy()
+        private async void OnDestroy()
         {
             Debug.Log("OnDestroy");
             if (RtcEngine == null) return;
@@ -336,8 +336,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
 
             RtcEngine.InitEventHandler(null);
             RtcEngine.LeaveChannel();
-            RtcEngine.Dispose();
-            RtcEngine = null;
+            await RtcEngine.Dispose();
         }
 
         #region -- Video Render UI Logic ---

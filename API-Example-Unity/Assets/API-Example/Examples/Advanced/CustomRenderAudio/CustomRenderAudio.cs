@@ -47,19 +47,23 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
 
         private Thread _pullAudioFrameThread;
         private System.Object _rtcLock = new System.Object();
+        private bool _startedSignal = false;
+        private System.Object _signalLock = new System.Object();
 
-        private int _writeCount;
-        private int _readCount;
+
 
         private void Start()
         {
             LoadAssetData();
             if (CheckAppId())
             {
-                InitRtcEngine();
-                JoinChannel();
-                var aud = InitAudioSource();
-                StartPullAudioFrame(aud, "externalClip");
+                InitRtcEngine(() =>
+                {
+                    JoinChannel();
+                    var aud = InitAudioSource();
+                    StartPullAudioFrame(aud, "externalClip");
+                });
+
             }
         }
 
@@ -84,7 +88,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
             _channelName = _appIdInput.channelName;
         }
 
-        private void InitRtcEngine()
+        private void InitRtcEngine(Action action)
         {
             lock (_rtcLock)
             {
@@ -97,8 +101,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
                 context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
                 context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
                 context.areaCode = AREA_CODE.AREA_CODE_GLOB;
-                RtcEngine.Initialize(context);
-                RtcEngine.InitEventHandler(handler);
+                RtcEngine.Initialize(context).ContinueWith(task =>
+                {
+                    Debug.Log("RtcEngine.Initialize: " + task.Result);
+                    RtcEngine.InitEventHandler(handler);
+                    action();
+                });
             }
         }
 
@@ -110,7 +118,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
                 //no enableAudioDevice to set false？ how this methond work?
                 var nRet = RtcEngine.SetExternalAudioSink(true, SAMPLE_RATE, CHANNEL);
                 this.Log.UpdateLog("SetExternalAudioSink ret:" + nRet);
-                RtcEngine.JoinChannel(_token, _channelName,"",0);
+                RtcEngine.JoinChannel(_token, _channelName, "", 0);
             }
         }
 
@@ -131,8 +139,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
             var bufferLength = SAMPLE_RATE * CHANNEL * 2;
             _audioBuffer = new RingBuffer<float>(bufferLength, true);
 
-            _pullAudioFrameThread = new Thread(PullAudioFrameThread);
-            _pullAudioFrameThread.Start();
+
 
             _audioClip = AudioClip.Create(clipName,
                 SAMPLE_RATE / PULL_FREQ_PER_SEC, CHANNEL, SAMPLE_RATE, true,
@@ -141,6 +148,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
             aud.loop = true;
             aud.Play();
 
+
+            _startedSignal = true;
+            _pullAudioFrameThread = new Thread(PullAudioFrameThread);
+            _pullAudioFrameThread.Start();
             this.Log.UpdateLog("Because the api of rtcEngine is called in different threads, it is necessary to use locks to ensure that different threads do not call the api of rtcEngine at the same time");
 
         }
@@ -148,16 +159,24 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
+            lock (_signalLock)
+            {
+                _startedSignal = false;
+            }
+            //need wait pullAudioFrameThread stop 
+            _pullAudioFrameThread.Join();
+
             lock (_rtcLock)
             {
                 if (RtcEngine == null) return;
                 RtcEngine.InitEventHandler(null);
                 RtcEngine.LeaveChannel();
-                RtcEngine.Dispose();
-                RtcEngine = null;
+                var task = RtcEngine.Dispose().ContinueWith(task =>
+                {
+                    Debug.Log("RtcEngine.Dispose: " + task.Result);
+                });
             }
-            //need wait pullAudioFrameThread stop 
-            _pullAudioFrameThread.Join();
+
         }
 
         private void PullAudioFrameThread()
@@ -170,7 +189,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
             var samplesPerSec = SAMPLE_RATE;
             var byteBuffer = new byte[samplesPerChannel * bytesPerSample * channels];
             var freq = 1000 / PULL_FREQ_PER_SEC;
-            
+
             AudioFrame audioFrame = new AudioFrame
             {
                 type = type,
@@ -187,6 +206,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
 
             while (true)
             {
+                lock (_signalLock)
+                {
+                    if (_startedSignal == false)
+                    {
+                        break;
+                    }
+                }
 
                 int nRet;
                 lock (_rtcLock)
@@ -207,8 +233,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
                         {
                             _audioBuffer.Put(floatArray);
                         }
-                        _writeCount += floatArray.Length;
-
+                      
+                        Debug.Log(string.Format("byteBuffer {0},{1},{2},{3},{4}", byteBuffer[0], byteBuffer[1], byteBuffer[2], byteBuffer[3], byteBuffer[4]));
                     }
                 }
 
@@ -262,7 +288,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
                 //readCount += 1;
             }
 
-            //Debug.LogFormat("buffer length remains: {0}", _writeCount - _readCount);
+            Debug.LogFormat("buffer length remains: ");
         }
 
         //get timestamp millisecond

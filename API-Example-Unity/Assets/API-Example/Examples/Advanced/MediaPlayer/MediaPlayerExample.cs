@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
 using io.agora.rtc.demo;
+using System.Threading.Tasks;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
 {
@@ -49,16 +50,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
         public InputField InputField;
         public Slider Slider;
         internal bool isGragged;
-       
+
         // Use this for initialization
-        private void Start()
+        private async void Start()
         {
             LoadAssetData();
             if (CheckAppId())
             {
                 EnableUI(false);
-                InitEngine();
-                SetBasicConfiguration();
+                await InitEngine();
+                await SetBasicConfiguration();
                 InitMediaPlayer();
             }
         }
@@ -101,7 +102,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
             _channelName = _appIdInput.channelName;
         }
 
-        private void InitEngine()
+        private async Task InitEngine()
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
@@ -110,7 +111,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
             context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
             context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
             context.areaCode = AREA_CODE.AREA_CODE_GLOB;
-            RtcEngine.Initialize(context);
+            var result = await RtcEngine.Initialize(context);
+            Debug.Log("RtcEngine.Initialize: " + result);
             RtcEngine.InitEventHandler(handler);
             var logFile = Application.persistentDataPath + "/rtc.log";
             RtcEngine.SetLogFile(logFile);
@@ -131,10 +133,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
             this.Log.UpdateLog("playerId id: " + MediaPlayer.GetId());
         }
 
-        private void SetBasicConfiguration()
+        private async Task SetBasicConfiguration()
         {
             RtcEngine.EnableAudio();
-            RtcEngine.EnableVideo();
+            await RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
         }
 
@@ -305,7 +307,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
 
         #endregion
 
-        private void OnDestroy()
+        private async void OnDestroy()
         {
             Debug.Log("OnDestroy");
             if (RtcEngine == null) return;
@@ -314,8 +316,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
                 RtcEngine.DestroyMediaPlayer(MediaPlayer);
             RtcEngine.InitEventHandler(null);
             RtcEngine.LeaveChannel();
-            RtcEngine.Dispose();
-            RtcEngine = null;
+            await RtcEngine.DisableVideo();
+            await RtcEngine.Dispose();
         }
 
         internal string GetChannelName()
@@ -546,7 +548,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
     {
         internal UserPlayerCustomDataProvider()
         {
-            
+
         }
 
         public override Int64 OnSeek(Int64 offset, int whence)

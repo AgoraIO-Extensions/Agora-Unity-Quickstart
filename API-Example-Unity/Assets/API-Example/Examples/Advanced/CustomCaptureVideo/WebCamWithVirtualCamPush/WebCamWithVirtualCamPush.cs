@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
 using io.agora.rtc.demo;
+using System.Threading.Tasks;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WebCamWithVirtualCamPush
 {
@@ -61,12 +62,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WebCamWithVirtualCamPus
 
         private object _lock = new object();
         // Use this for initialization
-        private void Start()
+        private async void Start()
         {
             LoadAssetData();
             if (CheckAppId())
             {
-                InitEngine();
+                await InitEngine();
                 InitTexture();
                 JoinChannel1();
                 JoinChannel2();
@@ -141,7 +142,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WebCamWithVirtualCamPus
             onFinish();
         }
 
-        private void InitEngine()
+        private async Task InitEngine()
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngineEx();
             UserEventHandler handler = new UserEventHandler(this);
@@ -150,10 +151,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WebCamWithVirtualCamPus
             context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
             context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
             context.areaCode = AREA_CODE.AREA_CODE_GLOB;
-            RtcEngine.Initialize(context);
+            var result = await RtcEngine.Initialize(context);
+            Debug.Log("RtcEngine.Initialize: " + result);
             RtcEngine.InitEventHandler(handler);
             RtcEngine.EnableAudio();
-            RtcEngine.EnableVideo();
+            await RtcEngine.EnableVideo();
         }
 
         private void JoinChannel1()
@@ -184,7 +186,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WebCamWithVirtualCamPus
                 dimensions = this.dimensions,
                 orientationMode = ORIENTATION_MODE.ORIENTATION_MODE_ADAPTIVE,
                 degradationPreference = DEGRADATION_PREFERENCE.MAINTAIN_FRAMERATE,
-                mirrorMode = this.MirrodMode? VIDEO_MIRROR_MODE_TYPE.VIDEO_MIRROR_MODE_ENABLED : VIDEO_MIRROR_MODE_TYPE.VIDEO_MIRROR_MODE_DISABLED
+                mirrorMode = this.MirrodMode ? VIDEO_MIRROR_MODE_TYPE.VIDEO_MIRROR_MODE_ENABLED : VIDEO_MIRROR_MODE_TYPE.VIDEO_MIRROR_MODE_DISABLED
             };
             RtcEngine.SetVideoEncoderConfigurationEx(config, new RtcConnection(_channelName, VirtualCamUID));
         }
@@ -227,7 +229,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WebCamWithVirtualCamPus
             RenderTexture.active = null;
         }
 
-        private void OnDestroy()
+        private async void OnDestroy()
         {
             Debug.Log("OnDestroy");
 
@@ -235,7 +237,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WebCamWithVirtualCamPus
             {
                 RtcEngine.InitEventHandler(null);
                 RtcEngine.LeaveChannel();
-                RtcEngine.Dispose();
+                await RtcEngine.DisableVideo();
+                await RtcEngine.Dispose();
             }
         }
 

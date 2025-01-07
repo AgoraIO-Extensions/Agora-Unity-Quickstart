@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
 using io.agora.rtc.demo;
+using System.Threading.Tasks;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.TexturePush
 {
@@ -38,15 +39,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.TexturePush
         public Texture2D ShareTexture;
 
         // Use this for initialization
-        private void Start()
+        private async void Start()
         {
             LoadAssetData();
             if (CheckAppId())
             {
-                InitEngine();
+                await InitEngine();
                 SetExternalVideoSource();
                 InitTexture();
-                JoinChannel();
+                await JoinChannel();
             }
         }
 
@@ -107,7 +108,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.TexturePush
         }
 
 
-        private void InitEngine()
+        private async Task InitEngine()
         {
 
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
@@ -117,7 +118,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.TexturePush
             context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
             context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
             context.areaCode = AREA_CODE.AREA_CODE_GLOB;
-            RtcEngine.Initialize(context);
+            var result = await RtcEngine.Initialize(context);
+            Debug.Log("RtcEngine.Initialize: " + result);
             RtcEngine.InitEventHandler(handler);
         }
 
@@ -128,10 +130,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.TexturePush
             this.Log.UpdateLog("SetExternalVideoSource returns:" + ret);
         }
 
-        private void JoinChannel()
+        private async Task JoinChannel()
         {
             RtcEngine.EnableAudio();
-            RtcEngine.EnableVideo();
+            await RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             RtcEngine.JoinChannel(_token, _channelName, "", 0);
         }
@@ -165,7 +167,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.TexturePush
         }
 
 
-        private void OnDestroy()
+        private async void OnDestroy()
         {
             Debug.Log("OnDestroy");
 
@@ -173,7 +175,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.TexturePush
             {
                 RtcEngine.InitEventHandler(null);
                 RtcEngine.LeaveChannel();
-                RtcEngine.Dispose();
+                await RtcEngine.DisableVideo();
+                await RtcEngine.Dispose();
             }
         }
 

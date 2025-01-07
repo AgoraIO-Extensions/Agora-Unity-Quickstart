@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
 using io.agora.rtc.demo;
+using System.Threading.Tasks;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
 {
@@ -46,16 +47,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
         private Toggle _urlToggle;
 
         // Use this for initialization
-        private void Start()
+        private async void Start()
         {
             LoadAssetData();
             if (CheckAppId())
             {
                 SetUpUI();
                 EnableUI(false);
-                InitEngine();
+                await InitEngine();
                 InitMediaPlayer();
-                JoinChannelWithMPK();
+                await JoinChannelWithMPK();
             }
         }
 
@@ -127,7 +128,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
             _channelName = _appIdInput.channelName;
         }
 
-        private void InitEngine()
+        private async Task InitEngine()
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
@@ -135,7 +136,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
             context.appId = _appID;
             context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
             context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING;
-            RtcEngine.Initialize(context);
+            int result = await RtcEngine.Initialize(context);
+            Debug.Log("RtcEngine.Initialize: " + result);
             RtcEngine.InitEventHandler(handler);
         }
 
@@ -155,10 +157,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
             MediaPlayer.RegisterMediaPlayerAudioSpectrumObserver(new UserAudioSpectrumObserver(this), 16);
         }
 
-        private void JoinChannelWithMPK()
+        private async Task JoinChannelWithMPK()
         {
             RtcEngine.EnableAudio();
-            RtcEngine.EnableVideo();
+            await RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
 
             ChannelMediaOptions options = new ChannelMediaOptions();
@@ -246,7 +248,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
             Debug.Log("GetPlaySrc:" + MediaPlayer.GetPlaySrc());
         }
 
-        private void OnDestroy()
+        private async void OnDestroy()
         {
             Debug.Log("OnDestroy");
             if (RtcEngine == null) return;
@@ -255,8 +257,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
                 RtcEngine.DestroyMediaPlayer(MediaPlayer);
             RtcEngine.InitEventHandler(null);
             RtcEngine.LeaveChannel();
-            RtcEngine.Dispose();
-            RtcEngine = null;
+            await RtcEngine.DisableVideo();
+            int result = await RtcEngine.Dispose();
+            Debug.Log("RtcEngine.Dispose finish: " + result);
         }
 
         internal string GetChannelName()

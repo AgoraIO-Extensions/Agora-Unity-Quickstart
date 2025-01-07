@@ -13,6 +13,9 @@ using System.Collections.Generic;
 using UnityEngine.Analytics;
 using UnityEngine.Networking;
 using System.Collections;
+using System.Threading.Tasks;
+using static UnityEngine.Networking.UnityWebRequest;
+using static System.Collections.Specialized.BitVector32;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 {
@@ -46,6 +49,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 
         private Thread _pushAudioFrameThread;
         private System.Object _rtcLock = new System.Object();
+        private bool _startedSignal = false;
+        private System.Object _signalLock = new System.Object();
 
 
 
@@ -55,10 +60,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
             LoadAssetData();
             if (CheckAppId())
             {
-                InitRtcEngine();
-                CreateCustomAudioSource();
-                JoinChannel();
-                StartPushAudioFrame();
+                StartCoroutine(PreparationFilePath((filePath) =>
+                {
+                    InitRtcEngine(() =>
+                    {
+                        CreateCustomAudioSource();
+                        JoinChannel();
+                        StartPushAudioFrame(filePath);
+                    });
+                }));
             }
         }
 
@@ -84,11 +94,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
             return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
-        private void InitRtcEngine()
+        private void InitRtcEngine(Action action)
         {
             lock (_rtcLock)
             {
-
                 RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
 
                 RtcEngineContext context = new RtcEngineContext();
@@ -97,8 +106,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
                 context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
                 context.areaCode = AREA_CODE.AREA_CODE_GLOB;
 
-                RtcEngine.Initialize(context);
-                RtcEngine.InitEventHandler(new UserEventHandler(this));
+                RtcEngine.Initialize(context).ContinueWith(task =>
+                {
+                    Debug.Log("RtcEngine.Initialize: " + task.Result);
+                    RtcEngine.InitEventHandler(new UserEventHandler(this));
+                    action();
+                });
             }
         }
 
@@ -167,16 +180,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
         }
 
 
-        private void StartPushAudioFrame()
+        private void StartPushAudioFrame(string filePath)
         {
-            Action<string> action = (filePath) =>
-            {
-                ParameterizedThreadStart threadStart = new ParameterizedThreadStart(PushAudioFrameThread);
-                _pushAudioFrameThread = new Thread(threadStart);
-                _pushAudioFrameThread.Start(filePath);
-            };
+            _startedSignal = true;
+            ParameterizedThreadStart threadStart = new ParameterizedThreadStart(PushAudioFrameThread);
+            _pushAudioFrameThread = new Thread(threadStart);
+            _pushAudioFrameThread.Start(filePath);
             this.Log.UpdateLog("Because the api of rtcEngine is called in different threads, it is necessary to use locks to ensure that different threads do not call the api of rtcEngine at the same time");
-            StartCoroutine(PreparationFilePath(action));
         }
 
         private void JoinChannel()
@@ -205,18 +215,23 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
         {
             Debug.Log("OnDestroy");
 
+            lock (_signalLock)
+            {
+                _startedSignal = false;
+            }
+            //need wait pullAudioFrameThread stop 
+            _pushAudioFrameThread.Join();
             lock (_rtcLock)
             {
                 if (RtcEngine == null) return;
                 RtcEngine.InitEventHandler(null);
                 RtcEngine.LeaveChannel();
                 RtcEngine.DestroyCustomAudioTrack(AUDIO_TRACK_ID);
-                RtcEngine.Dispose();
-                RtcEngine = null;
+                RtcEngine.Dispose().ContinueWith((task) =>
+                {
+                    Debug.Log("RtcEngine.Dispose: " + task.Result);
+                });
             }
-            //need wait pullAudioFrameThread stop 
-            _pushAudioFrameThread.Join();
-
         }
 
 
@@ -399,6 +414,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
 
             while (true)
             {
+                lock (_signalLock)
+                {
+                    if (_startedSignal == false)
+                    {
+                        break;
+                    }
+                }
+
                 int nRet = -1;
                 lock (_rtcLock)
                 {
