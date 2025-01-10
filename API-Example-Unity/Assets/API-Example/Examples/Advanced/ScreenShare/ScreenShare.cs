@@ -56,7 +56,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             {
                 await InitEngine();
                 await SetBasicConfiguration();
-#if UNITY_ANDROID || UNITY_IPHONE
+#if UNITY_ANDROID || UNITY_IPHONE || UNITY_OPENHARMONY
                 GetSourceBtn.gameObject.SetActive(false);
                 WinIdSelect.gameObject.SetActive(false);
                 UpdateShareBtn.gameObject.SetActive(true);
@@ -127,7 +127,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             options.publishCameraTrack.SetValue(false);
             options.publishScreenTrack.SetValue(true);
 
-#if UNITY_ANDROID || UNITY_IPHONE
+#if UNITY_ANDROID || UNITY_IPHONE ||  UNITY_OPENHARMONY
             options.publishScreenCaptureAudio.SetValue(true);
             options.publishScreenCaptureVideo.SetValue(true);
 #endif
@@ -153,7 +153,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             options.publishCameraTrack.SetValue(true);
             options.publishScreenTrack.SetValue(false);
 
-#if UNITY_ANDROID || UNITY_IPHONE
+#if UNITY_ANDROID || UNITY_IPHONE || UNITY_OPENHARMONY
             options.publishScreenCaptureAudio.SetValue(false);
             options.publishScreenCaptureVideo.SetValue(false);
 #endif
@@ -191,7 +191,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             if (StartShareBtn != null) StartShareBtn.gameObject.SetActive(false);
             if (StopShareBtn != null) StopShareBtn.gameObject.SetActive(true);
 
-#if UNITY_ANDROID || UNITY_IPHONE
+#if UNITY_ANDROID || UNITY_IPHONE || UNITY_OPENHARMONY
             var parameters2 = new ScreenCaptureParameters2();
             parameters2.captureAudio = true;
             parameters2.captureVideo = true;
