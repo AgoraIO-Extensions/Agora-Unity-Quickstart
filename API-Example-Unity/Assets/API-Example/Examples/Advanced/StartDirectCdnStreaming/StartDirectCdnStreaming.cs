@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using io.agora.rtc.demo;
+using System.Threading.Tasks;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
 {
@@ -31,14 +32,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
         internal IRtcEngine RtcEngine = null;
 
         // Use this for initialization
-        void Start()
+        async void Start()
         {
             LoadAssetData();
             if (CheckAppId())
             {
-                InitEngine();
+                await InitEngine();
                 SetUpUI();
-                SetProfile();
+                await SetProfile();
             }
         }
 
@@ -65,7 +66,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
             _channelName = _appIdInput.channelName;
         }
 
-        private void InitEngine()
+        private async Task InitEngine()
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
@@ -74,7 +75,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
             context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
             context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
             context.areaCode = AREA_CODE.AREA_CODE_GLOB;
-            RtcEngine.Initialize(context);
+            await RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
         }
 
@@ -126,15 +127,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
             this.Log.UpdateLog("StopDirectCdnStreaming:" + nRet);
         }
 
-        private void SetProfile()
+        private async Task SetProfile()
         {
             RtcEngine.EnableAudio();
-            RtcEngine.EnableVideo();
+            await RtcEngine.EnableVideo();
             RtcEngine.SetChannelProfile(CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING);
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
         }
 
-        private void OnDestroy()
+        private async void OnDestroy()
         {
             Debug.Log("OnDestroy");
             if (RtcEngine == null) return;
@@ -142,7 +143,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
             DestroyVideoView(0);
             RtcEngine.StopPreview();
             RtcEngine.StopDirectCdnStreaming();
-            RtcEngine.Dispose();
+            await RtcEngine.DisableVideo();
+            await RtcEngine.Dispose();
         }
 
         internal string GetChannelName()

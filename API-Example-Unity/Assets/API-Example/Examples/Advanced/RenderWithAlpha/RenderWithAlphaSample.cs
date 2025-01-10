@@ -9,6 +9,7 @@ using Agora.Rtc;
 using System.Collections.Generic;
 using io.agora.rtc.demo;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithAlphaSample
 {
@@ -44,13 +45,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithAlphaSample
         private int _textureHeight;
 
         // Use this for initialization
-        private void Start()
+        private async void Start()
         {
 
             LoadAssetData();
             if (CheckAppId())
             {
-                InitEngine();
+                await InitEngine();
             }
         }
 
@@ -77,7 +78,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithAlphaSample
             return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
-        private void InitEngine()
+        private async Task InitEngine()
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
@@ -86,11 +87,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithAlphaSample
             context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
             context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
             context.areaCode = AREA_CODE.AREA_CODE_GLOB;
-            RtcEngine.Initialize(context);
+            await RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             RtcEngine.EnableAudio();
-            RtcEngine.EnableVideo();
+            await RtcEngine.EnableVideo();
         }
 
         #region -- Button Events ---
@@ -210,8 +211,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithAlphaSample
         public void InitTextureDataWithAlphaStitchMode()
         {
             Color32[] color32s = TextureWithAlphaBuffer.GetPixels32(0);
-           
-       
+
+
             var width = TextureWithAlphaBuffer.width;
             var height = TextureWithAlphaBuffer.height;
             TextureWithAlphaStitchMode = new Texture2D(width, height * 2, TextureFormat.RGBA32, false);
@@ -295,13 +296,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithAlphaSample
 
         #endregion
 
-        private void OnDestroy()
+        private async void OnDestroy()
         {
             Debug.Log("OnDestroy");
             if (RtcEngine == null) return;
             RtcEngine.InitEventHandler(null);
             RtcEngine.LeaveChannel();
-            RtcEngine.Dispose();
+            await RtcEngine.DisableVideo();
+            int result = await RtcEngine.Dispose();
+            Debug.Log("RtcEngine.Dispose finish: " + result);
         }
 
         internal string GetChannelName()

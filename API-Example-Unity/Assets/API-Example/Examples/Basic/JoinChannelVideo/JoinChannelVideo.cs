@@ -102,7 +102,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
 
         #region -- Button Events ---
 
-        public void InitEngine()
+        public async void InitEngine()
         {
             var text = this._areaSelect.captionText.text;
             AREA_CODE areaCode = (AREA_CODE)Enum.Parse(typeof(AREA_CODE), text);
@@ -115,14 +115,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
             context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
             context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
             context.areaCode = areaCode;
-            var result = RtcEngine.Initialize(context);
+            var result = await RtcEngine.Initialize(context);
             this.Log.UpdateLog("Initialize result : " + result);
 
             RtcEngine.InitEventHandler(handler);
 
 
             RtcEngine.EnableAudio();
-            RtcEngine.EnableVideo();
+            int ret = await RtcEngine.EnableVideo();
+            this.Log.UpdateLog("EnableVideo: " + ret);
             VideoEncoderConfiguration config = new VideoEncoderConfiguration();
             config.dimensions = new VideoDimensions(640, 360);
             config.frameRate = 15;
@@ -225,13 +226,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
 
         #endregion
 
-        private void OnDestroy()
+
+        private async void OnDestroy()
         {
             Debug.Log("OnDestroy");
             if (RtcEngine == null) return;
             RtcEngine.InitEventHandler(null);
             RtcEngine.LeaveChannel();
-            RtcEngine.Dispose();
+            await RtcEngine.DisableVideo();
+            int result = await RtcEngine.Dispose();
+            Debug.Log("RtcEngine.Dispose finish: " + result);
         }
 
         internal string GetChannelName()

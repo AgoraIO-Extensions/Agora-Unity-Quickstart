@@ -5,6 +5,7 @@ using Agora.Rtc;
 using System.IO;
 using io.agora.rtc.demo;
 using UnityEngine.Networking;
+using System.Threading.Tasks;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
 {
@@ -30,27 +31,28 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
         public Text LogText;
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
+        string toFile = "";
 
 
         // Use this for initialization
-        private void Start()
+        private async void Start()
         {
             LoadAssetData();
             if (CheckAppId())
             {
-                InitEngine();
+                await InitEngine();
                 InitLogFilePath();
                 SetupUI();
-                JoinChannel();
+                await JoinChannel();
 
                 string fromFile = Path.Combine(Application.streamingAssetsPath, "img/png.png");
-                string toFile = Path.Combine(Application.persistentDataPath, "png.png");
+                toFile = Path.Combine(Application.persistentDataPath, "png.png");
 
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
                 fromFile = fromFile.Replace('/', '\\');
                 toFile = toFile.Replace('/', '\\');
 #endif
-                this.CopyFile(fromFile, toFile);
+                toFile = this.CopyFile(fromFile, toFile);
                 Log.UpdateLog("File copy finish: " + toFile);
             }
         }
@@ -78,7 +80,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
             return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
-        private void InitEngine()
+        private async Task InitEngine()
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
@@ -87,14 +89,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
             context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
             context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
             context.areaCode = AREA_CODE.AREA_CODE_GLOB;
-            RtcEngine.Initialize(context);
+            await RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
         }
 
-        private void JoinChannel()
+        private async Task JoinChannel()
         {
             RtcEngine.EnableAudio();
-            RtcEngine.EnableVideo();
+            await RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             RtcEngine.JoinChannel(_token, _channelName, "", 0);
         }
@@ -139,7 +141,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
             var source = new VirtualBackgroundSource();
 
             source.background_source_type = BACKGROUND_SOURCE_TYPE.BACKGROUND_IMG;
-            string filePath = Path.Combine(Application.persistentDataPath, "png.png");
+            string filePath = toFile;
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             filePath = filePath.Replace('/', '\\');   
 #endif
@@ -159,13 +161,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
         }
 
 
-        private void OnDestroy()
+        private async void OnDestroy()
         {
             Debug.Log("OnDestroy");
             if (RtcEngine == null) return;
             RtcEngine.InitEventHandler(null);
             RtcEngine.LeaveChannel();
-            RtcEngine.Dispose();
+            await RtcEngine.DisableVideo();
+            await RtcEngine.Dispose();
         }
 
         internal string GetChannelName()
@@ -173,8 +176,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
             return _channelName;
         }
 
-        internal void CopyFile(string fromFile, string toFile)
+        internal string CopyFile(string fromFile, string toFile)
         {
+#if UNITY_OPENHARMONY
+         var AgoraRtcWrapperNative = new OpenHarmonyJSClass("AgoraRtcWrapperNative");
+         toFile = AgoraRtcWrapperNative.CallStatic<string>("copyFileToSandBox", fromFile);
+         return toFile;
+#else 
             if (Application.platform == RuntimePlatform.Android)
             {
                 using (UnityWebRequest request = UnityWebRequest.Get(fromFile))
@@ -198,6 +206,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
             {
                 File.Copy(fromFile, toFile, true);
             }
+
+            return toFile;
+#endif
         }
 
 

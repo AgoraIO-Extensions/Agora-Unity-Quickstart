@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
 using io.agora.rtc.demo;
+using System.Threading.Tasks;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPlayer
 {
@@ -33,7 +34,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
 
 
         private const string MPK_URL =
-            "https://agoracdn.s3.us-west-1.amazonaws.com/videos/Agora.io-Interactions.mp4";
+            "https://download.agora.io/demo/test/Agora.io-Interactions.mp4";
 
         private Button _button1;
         private Button _button2;
@@ -45,16 +46,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
         public ILocalSpatialAudioEngine SpatialAudioEngine;
         public int x = 0;
         // Use this for initialization
-        private void Start()
+        private async void Start()
         {
             LoadAssetData();
             if (CheckAppId())
             {
                 SetUpUI();
-                InitEngine();
+                await InitEngine();
                 InitMediaPlayer();
                 InitSpatialAudioEngine();
-                JoinChannelEx(_channelName, UidUseInEx);
+                await JoinChannelEx(_channelName, UidUseInEx);
 
                 //We use the mpk to simulate the voice of remote users.
                 JoinChannelExWithMPK(_channelName, UidUseInMPK, MediaPlayer.GetId());
@@ -84,7 +85,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
             return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
-        private void InitEngine()
+        private async Task InitEngine()
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngineEx();
             UserEventHandler handler = new UserEventHandler(this);
@@ -95,7 +96,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
             context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
             context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING;
             context.areaCode = AREA_CODE.AREA_CODE_GLOB;
-            var ret = RtcEngine.Initialize(context);
+            var ret = await RtcEngine.Initialize(context);
             Debug.Log("Agora: Initialize " + ret);
             RtcEngine.InitEventHandler(handler);
         }
@@ -122,10 +123,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
             SpatialAudioEngine.SetAudioRecvRange(30);
         }
 
-        private void JoinChannelEx(string channelName, uint uid)
+        private async Task JoinChannelEx(string channelName, uint uid)
         {
             RtcEngine.EnableAudio();
-            RtcEngine.EnableVideo();
+            await RtcEngine.EnableVideo();
             RtcEngine.EnableSpatialAudio(true);
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
 
@@ -221,14 +222,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithMediaPl
             MediaPlayer.AdjustPlayoutVolume(0);
         }
 
-        private void OnDestroy()
+        private async void OnDestroy()
         {
             Debug.Log("OnDestroy");
             if (RtcEngine == null) return;
             RtcEngine.InitEventHandler(null);
             RtcEngine.LeaveChannel();
             SpatialAudioEngine.Dispose();
-            RtcEngine.Dispose();
+            await RtcEngine.DisableVideo();
+            await RtcEngine.Dispose();
         }
 
         internal string GetChannelName()

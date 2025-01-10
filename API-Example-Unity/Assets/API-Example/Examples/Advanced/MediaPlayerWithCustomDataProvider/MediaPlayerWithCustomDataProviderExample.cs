@@ -12,6 +12,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using io.agora.rtc.demo;
 using UnityEngine.Networking;
+using System.Threading.Tasks;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDataProviderExample
 {
@@ -49,16 +50,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
 
 
         // Use this for initialization
-        private void Start()
+        private async void Start()
         {
             LoadAssetData();
             if (CheckAppId())
             {
                 SetUpUI();
                 //EnableUI(false);
-                InitEngine();
+                await InitEngine();
                 InitMediaPlayer();
-                JoinChannelWithMPK();
+                await JoinChannelWithMPK();
 
 #if UNITY_ANDROID && !UNITY_EDITOR
                 //In Android Platform, We need copy file to persistentDataPath.So we can read it.
@@ -72,6 +73,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
                     this.StartCoroutine(CopyFileToPersistentDataPath());
                 }
 #endif
+
+ 
 
             }
         }
@@ -128,7 +131,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
             _channelName = _appIdInput.channelName;
         }
 
-        private void InitEngine()
+        private async Task InitEngine()
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
@@ -137,7 +140,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
             context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
             context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_GAME_STREAMING;
             context.areaCode = AREA_CODE.AREA_CODE_GLOB;
-            RtcEngine.Initialize(context);
+            var result = await RtcEngine.Initialize(context);
+            Debug.Log("RtcEngine.Initialize: " + result);
             RtcEngine.InitEventHandler(handler);
             var logFile = Application.persistentDataPath + "/rtc.log";
             RtcEngine.SetLogFile(logFile);
@@ -159,10 +163,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
         }
 
 
-        private void JoinChannelWithMPK()
+        private async Task JoinChannelWithMPK()
         {
             RtcEngine.EnableAudio();
-            RtcEngine.EnableVideo();
+            await RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
 
             ChannelMediaOptions options = new ChannelMediaOptions();
@@ -240,6 +244,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
 #if UNITY_ANDROID && !UNITY_EDITOR
             // On Android We already copy file into persistentDataPath
             file = Application.persistentDataPath + "/MPK.mp4";
+#elif UNITY_OPENHARMONY && !UNITY_EDITOR
+            var AgoraRtcWrapperNative = new OpenHarmonyJSClass("AgoraRtcWrapperNative");
+            file = AgoraRtcWrapperNative.CallStatic<string>("copyFileToSandBox", Path.Combine(Application.streamingAssetsPath, "img/MPK.mp4"));
 #else
             file = Application.streamingAssetsPath + "/img/MPK.mp4";
 #endif
@@ -285,7 +292,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
             Debug.Log("GetPlaySrc:" + MediaPlayer.GetPlaySrc());
         }
 
-        private void OnDestroy()
+        private async void OnDestroy()
         {
             Debug.Log("OnDestroy");
             if (RtcEngine == null) return;
@@ -302,9 +309,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
 
             RtcEngine.InitEventHandler(null);
             RtcEngine.LeaveChannel();
-            RtcEngine.Dispose();
-            RtcEngine = null;
-
+            await RtcEngine.DisableVideo();
+            await RtcEngine.Dispose();
         }
 
 

@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
 using io.agora.rtc.demo;
-
+using System.Threading.Tasks;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
 {
@@ -37,15 +37,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
 
 
         // Use this for initialization
-        private void Start()
+        private async void Start()
         {
             LoadAssetData();
             if (CheckAppId())
             {
                 SetUpUI();
                 EnableUI(false);
-                InitEngine();
-                JoinChannel();
+                await InitEngine();
+                await JoinChannel();
             }
         }
 
@@ -90,7 +90,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
             _channelName = _appIdInput.channelName;
         }
 
-        private void InitEngine()
+        private async Task InitEngine()
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
@@ -99,15 +99,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
             context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
             context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
             context.areaCode = AREA_CODE.AREA_CODE_GLOB;
-            RtcEngine.Initialize(context);
+            var result = await RtcEngine.Initialize(context);
+            Debug.Log("RtcEngine.Initialize: " + result);
             RtcEngine.InitEventHandler(handler);
         }
 
 
-        private void JoinChannel()
+        private async Task JoinChannel()
         {
             RtcEngine.EnableAudio();
-            RtcEngine.EnableVideo();
+            await RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
 
             ChannelMediaOptions options = new ChannelMediaOptions();
@@ -139,15 +140,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaRecorder
         }
 
 
-        private void OnDestroy()
+        private async void OnDestroy()
         {
             Debug.Log("OnDestroy");
             if (RtcEngine == null) return;
 
             RtcEngine.InitEventHandler(null);
             RtcEngine.LeaveChannel();
-            RtcEngine.Dispose();
-            RtcEngine = null;
+            await RtcEngine.DisableVideo();
+            await RtcEngine.Dispose();
         }
 
         internal string GetChannelName()

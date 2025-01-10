@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using io.agora.rtc.demo;
 using UnityEngine.Serialization;
+using System.Threading.Tasks;
 #if (UNITY_2018_3_OR_NEWER && UNITY_ANDROID)
 using UnityEngine.Android;
 #endif
@@ -51,12 +52,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
         private Slider distanceSlider;
 
         // Start is called before the first frame update
-        void Start()
+        async void Start()
         {
             LoadAssetData();
             if (CheckAppId())
             {
-                SetupVideoSDKEngine();
+                await SetupVideoSDKEngine();
                 configureSpatialAudioEngine();
 
                 InitEventHandler();
@@ -98,27 +99,26 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
             CheckPermissions();
         }
 
-        void OnApplicationQuit()
+        async void OnApplicationQuit()
         {
             if (RtcEngine != null)
             {
-                Leave();
-                RtcEngine.Dispose();
+               
+                await RtcEngine.Dispose();
                 RtcEngine = null;
             }
         }
 
-        private void OnDestroy()
+        private async void OnDestroy()
         {
             if (RtcEngine != null)
             {
-                Leave();
-                RtcEngine.Dispose();
-                RtcEngine = null;
+                await RtcEngine.DisableVideo();
+                await RtcEngine.Dispose();
             }
         }
 
-        private void SetupVideoSDKEngine()
+        private async Task SetupVideoSDKEngine()
         {
             // Create an instance of the video SDK.
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
@@ -127,7 +127,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
             context.appId = _appID;
             context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
             context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
-            context.areaCode = AREA_CODE.AREA_CODE_GLOB; RtcEngine.Initialize(context);
+            context.areaCode = AREA_CODE.AREA_CODE_GLOB;
+            await RtcEngine.Initialize(context);
         }
 
         private void configureSpatialAudioEngine()
@@ -250,10 +251,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
 
         }
 
-        public void Join()
+        public async void Join()
         {
             // Enable the video module.
-            RtcEngine.EnableVideo();
+            await RtcEngine.EnableVideo();
             // Set the user role as broadcaster.
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             // Set the local video view.
@@ -274,13 +275,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
             RtcEngine.JoinChannel(_token, _channelName, 0, options);
         }
 
-        public void Leave()
+        public async void Leave()
         {
             RtcEngine.GetLocalSpatialAudioEngine().ClearRemotePositions();
             // Leaves the channel.
             RtcEngine.LeaveChannel();
             // Disable the video modules.
-            RtcEngine.DisableVideo();
+            await RtcEngine.DisableVideo();
             // Stops rendering the remote video.
             RemoteView.SetEnable(false);
             // Stops rendering the local video.

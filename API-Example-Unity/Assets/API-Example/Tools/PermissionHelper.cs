@@ -6,6 +6,10 @@ using UnityEngine;
 using UnityEngine.Android;
 #endif
 
+#if UNITY_OPENHARMONY
+using UnityEngine.OpenHarmony;
+#endif
+
 namespace Agora_RTC_Plugin.API_Example
 {
     public class PermissionHelper
@@ -18,6 +22,13 @@ namespace Agora_RTC_Plugin.API_Example
 			Permission.RequestUserPermission(Permission.Microphone);
 		}
 #endif
+#if UNITY_OPENHARMONY
+            if (!Permission.HasUserAuthorizedPermission(Permission.Microphone))
+            {
+                Permission.RequestUserPermission(Permission.Microphone);
+            }
+#endif
+
         }
 
         public static void RequestCameraPermission()
@@ -27,6 +38,12 @@ namespace Agora_RTC_Plugin.API_Example
 		{                 
 			Permission.RequestUserPermission(Permission.Camera);
 		}
+#endif
+#if UNITY_OPENHARMONY
+            if (!Permission.HasUserAuthorizedPermission(Permission.Camera))
+            {
+                Permission.RequestUserPermission(Permission.Camera);
+            }
 #endif
         }
     }

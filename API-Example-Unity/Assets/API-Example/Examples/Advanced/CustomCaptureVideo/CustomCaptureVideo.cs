@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 using Agora.Rtc;
+using System.Threading.Tasks;
 
 
 
@@ -41,7 +42,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
         private Texture2D _texture;
         private Rect _rect;
 
-#if !UNITY_VISIONOS
+#if !UNITY_VISIONOS && !UNITY_OPENHARMONY
         private WebCamTexture _webCameraTexture;
 #endif
         public RawImage RawImage;
@@ -52,23 +53,19 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
 
 
         // Use this for initialization
-        private void Start()
+        private async void Start()
         {
 
             LoadAssetData();
-#if !UNITY_VISIONOS
+
             if (CheckAppId())
             {
                 InitCameraDevice();
                 InitTexture();
-                InitEngine();
+                await InitEngine();
                 CreateCustomVideoTrack();
-                JoinChannel();
+                await JoinChannel();
             }
-#else
-            Log.UpdateLog("Not support WebCamTexture in Vision os");
-#endif
-
         }
 
         private void Update()
@@ -124,7 +121,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
             }
         }
 
-        private void InitEngine()
+        private async Task InitEngine()
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngineEx();
             UserEventHandler handler = new UserEventHandler(this);
@@ -133,7 +130,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
             context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
             context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
             context.areaCode = AREA_CODE.AREA_CODE_GLOB;
-            RtcEngine.Initialize(context);
+            var result = await RtcEngine.Initialize(context);
+            Debug.Log("RtcEngine.Initialize: " + result);
             RtcEngine.InitEventHandler(handler);
         }
 
@@ -143,10 +141,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
             this.Log.UpdateLog("CreateCustomVideoTrack returns:" + _videoTrack);
         }
 
-        private void JoinChannel()
+        private async Task JoinChannel()
         {
             RtcEngine.EnableAudio();
-            RtcEngine.EnableVideo();
+            var result = await RtcEngine.EnableVideo();
+            Debug.Log(" RtcEngine.EnableVideo:" + result);
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.publishCameraTrack.SetValue(false);
@@ -156,32 +155,33 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
             RtcEngine.JoinChannel(_token, _channelName, 0, options);
         }
 
-        private void JoinChannelEx()
-        {
-            RtcEngine.EnableAudio();
-            RtcEngine.EnableVideo();
+        //private async void JoinChannelEx()
+        //{
+        //    RtcEngine.EnableAudio();
+        //    var result = await RtcEngine.EnableVideo();
+        //    Debug.Log(" RtcEngine.EnableVideo:" + result);
 
-            uint videoTrack1 = RtcEngine.CreateCustomVideoTrack();
-            ChannelMediaOptions options = new ChannelMediaOptions();
-            options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            options.publishCameraTrack.SetValue(false);
-            options.publishCustomVideoTrack.SetValue(true);
-            options.customVideoTrackId.SetValue(videoTrack1);
-            options.autoSubscribeAudio.SetValue(false);
-            options.autoSubscribeVideo.SetValue(false);
-            RtcEngine.JoinChannelEx(_token, new RtcConnection("channel_id_1", 123), options);
+        //    uint videoTrack1 = RtcEngine.CreateCustomVideoTrack();
+        //    ChannelMediaOptions options = new ChannelMediaOptions();
+        //    options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+        //    options.publishCameraTrack.SetValue(false);
+        //    options.publishCustomVideoTrack.SetValue(true);
+        //    options.customVideoTrackId.SetValue(videoTrack1);
+        //    options.autoSubscribeAudio.SetValue(false);
+        //    options.autoSubscribeVideo.SetValue(false);
+        //    RtcEngine.JoinChannelEx(_token, new RtcConnection("channel_id_1", 123), options);
 
-            uint videoTrack2 = RtcEngine.CreateCustomVideoTrack();
-            ChannelMediaOptions options2 = new ChannelMediaOptions();
-            options2.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            options2.publishCameraTrack.SetValue(false);
-            options2.publishCustomVideoTrack.SetValue(true);
-            options2.customVideoTrackId.SetValue(videoTrack2);
-            options2.autoSubscribeAudio.SetValue(false);
-            options2.autoSubscribeVideo.SetValue(false);
+        //    uint videoTrack2 = RtcEngine.CreateCustomVideoTrack();
+        //    ChannelMediaOptions options2 = new ChannelMediaOptions();
+        //    options2.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+        //    options2.publishCameraTrack.SetValue(false);
+        //    options2.publishCustomVideoTrack.SetValue(true);
+        //    options2.customVideoTrackId.SetValue(videoTrack2);
+        //    options2.autoSubscribeAudio.SetValue(false);
+        //    options2.autoSubscribeVideo.SetValue(false);
 
-            RtcEngine.JoinChannelEx(_token, new RtcConnection("channel_id_2", 123), options2);
-        }
+        //    RtcEngine.JoinChannelEx(_token, new RtcConnection("channel_id_2", 123), options2);
+        //}
 
         private bool CheckAppId()
         {
@@ -197,7 +197,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
 
         private void InitCameraDevice()
         {
-#if !UNITY_VISIONOS
+#if !UNITY_VISIONOS  && !UNITY_OPENHARMONY
             WebCamDevice[] devices = WebCamTexture.devices;
             _webCameraTexture = new WebCamTexture(devices[0].name, (int)CameraSize.x, (int)CameraSize.y, CameraFPS);
             RawImage.texture = _webCameraTexture;
@@ -205,10 +205,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
 #endif
         }
 
-        private void OnDestroy()
+        private async void OnDestroy()
         {
             Debug.Log("OnDestroy");
-#if !UNITY_VISIONOS
+#if !UNITY_VISIONOS  && !UNITY_OPENHARMONY
             if (_webCameraTexture)
             {
                 _webCameraTexture.Stop();
@@ -218,7 +218,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureVideo
             RtcEngine.DestroyCustomVideoTrack(_videoTrack);
             RtcEngine.InitEventHandler(null);
             RtcEngine.LeaveChannel();
-            RtcEngine.Dispose();
+            await RtcEngine.DisableVideo();
+            await RtcEngine.Dispose();
         }
 
         internal string GetChannelName()

@@ -100,7 +100,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
         }
 
         #region -- Button Events ---
-        public void InitRtcEngine()
+        public async void InitRtcEngine()
         {
             var text = this._areaSelect.captionText.text;
             AREA_CODE areaCode = (AREA_CODE)Enum.Parse(typeof(AREA_CODE), text);
@@ -113,7 +113,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
             context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
             context.areaCode = areaCode;
 
-            var result = RtcEngine.Initialize(context);
+            var result = await RtcEngine.Initialize(context);
             this.Log.UpdateLog("Initialize result : " + result);
 
             RtcEngine.InitEventHandler(handler);
@@ -199,13 +199,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelAudio
 
         #endregion
 
-        private void OnDestroy()
+        private async void OnDestroy()
         {
             Debug.Log("OnDestroy");
             if (RtcEngine == null) return;
             RtcEngine.InitEventHandler(null);
             RtcEngine.LeaveChannel();
-            RtcEngine.Dispose();
+            int result = await RtcEngine.Dispose();
+            Debug.Log("RtcEngine.Dispose finish: " + result);
         }
 
 

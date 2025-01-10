@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Agora.Rtc;
 using UnityEngine.Serialization;
 using io.agora.rtc.demo;
+using System.Threading.Tasks;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 {
@@ -48,14 +49,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
         private Rect _originIconRect = new Rect(0, 0, 289, 280);
 
         // Use this for initialization
-        private void Start()
+        private async void Start()
         {
             LoadAssetData();
             if (CheckAppId())
             {
-                InitEngine();
-                SetBasicConfiguration();
-#if UNITY_ANDROID || UNITY_IPHONE
+                await InitEngine();
+                await SetBasicConfiguration();
+#if UNITY_ANDROID || UNITY_IPHONE || UNITY_OPENHARMONY
                 GetSourceBtn.gameObject.SetActive(false);
                 WinIdSelect.gameObject.SetActive(false);
                 UpdateShareBtn.gameObject.SetActive(true);
@@ -85,7 +86,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             _channelName = _appIdInput.channelName;
         }
 
-        private void InitEngine()
+        private async Task InitEngine()
         {
             RtcEngine = Agora.Rtc.RtcEngine.CreateAgoraRtcEngine();
             UserEventHandler handler = new UserEventHandler(this);
@@ -94,14 +95,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             context.channelProfile = CHANNEL_PROFILE_TYPE.CHANNEL_PROFILE_LIVE_BROADCASTING;
             context.audioScenario = AUDIO_SCENARIO_TYPE.AUDIO_SCENARIO_DEFAULT;
             context.areaCode = AREA_CODE.AREA_CODE_GLOB;
-            RtcEngine.Initialize(context);
+            await RtcEngine.Initialize(context);
+
             RtcEngine.InitEventHandler(handler);
         }
 
-        private void SetBasicConfiguration()
+        private async Task SetBasicConfiguration()
         {
             RtcEngine.EnableAudio();
-            RtcEngine.EnableVideo();
+            await RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
         }
 
@@ -125,7 +127,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             options.publishCameraTrack.SetValue(false);
             options.publishScreenTrack.SetValue(true);
 
-#if UNITY_ANDROID || UNITY_IPHONE
+#if UNITY_ANDROID || UNITY_IPHONE ||  UNITY_OPENHARMONY
             options.publishScreenCaptureAudio.SetValue(true);
             options.publishScreenCaptureVideo.SetValue(true);
 #endif
@@ -151,7 +153,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             options.publishCameraTrack.SetValue(true);
             options.publishScreenTrack.SetValue(false);
 
-#if UNITY_ANDROID || UNITY_IPHONE
+#if UNITY_ANDROID || UNITY_IPHONE || UNITY_OPENHARMONY
             options.publishScreenCaptureAudio.SetValue(false);
             options.publishScreenCaptureVideo.SetValue(false);
 #endif
@@ -189,7 +191,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             if (StartShareBtn != null) StartShareBtn.gameObject.SetActive(false);
             if (StopShareBtn != null) StopShareBtn.gameObject.SetActive(true);
 
-#if UNITY_ANDROID || UNITY_IPHONE
+#if UNITY_ANDROID || UNITY_IPHONE || UNITY_OPENHARMONY
             var parameters2 = new ScreenCaptureParameters2();
             parameters2.captureAudio = true;
             parameters2.captureVideo = true;
@@ -302,13 +304,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
 
         #endregion
 
-        private void OnDestroy()
+        private async void OnDestroy()
         {
             Debug.Log("OnDestroy");
             if (RtcEngine == null) return;
             RtcEngine.InitEventHandler(null);
             RtcEngine.LeaveChannel();
-            RtcEngine.Dispose();
+            await RtcEngine.DisableVideo();
+            await RtcEngine.Dispose();
         }
 
         internal string GetChannelName()
