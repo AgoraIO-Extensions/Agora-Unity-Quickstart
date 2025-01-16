@@ -19,6 +19,7 @@ namespace io.agora.rtm.demo
 
         public EnumDropDown EnumDropDown;
         public InputField CustomTypeInput;
+        public Toggle StoreInHistoryToggle;
     
         public void Start()
         {
@@ -45,6 +46,7 @@ namespace io.agora.rtm.demo
             PublishOptions options = new PublishOptions();
             options.channelType = (RTM_CHANNEL_TYPE)this.EnumDropDown.GetSelectValue();
             options.customType = this.CustomTypeInput.text;
+            options.storeInHistory = this.StoreInHistoryToggle.isOn;
 
             var result = await RtmScene.RtmClient.PublishAsync(channelName, message, options);
 
