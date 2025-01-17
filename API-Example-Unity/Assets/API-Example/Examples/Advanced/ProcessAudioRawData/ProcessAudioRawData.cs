@@ -106,21 +106,20 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
             RtcEngine.InitEventHandler(handler);
 
             RtcEngine.SetPlaybackAudioFrameParameters(SAMPLE_RATE, CHANNEL,
-                RAW_AUDIO_FRAME_OP_MODE_TYPE.RAW_AUDIO_FRAME_OP_MODE_READ_ONLY, 1024);
+                RAW_AUDIO_FRAME_OP_MODE_TYPE.RAW_AUDIO_FRAME_OP_MODE_READ_WRITE, 1024);
             RtcEngine.SetRecordingAudioFrameParameters(SAMPLE_RATE, CHANNEL,
-                RAW_AUDIO_FRAME_OP_MODE_TYPE.RAW_AUDIO_FRAME_OP_MODE_READ_ONLY, 1024);
+                RAW_AUDIO_FRAME_OP_MODE_TYPE.RAW_AUDIO_FRAME_OP_MODE_READ_WRITE, 1024);
             RtcEngine.SetMixedAudioFrameParameters(SAMPLE_RATE, CHANNEL, 1024);
             RtcEngine.SetEarMonitoringAudioFrameParameters(SAMPLE_RATE, CHANNEL,
-                RAW_AUDIO_FRAME_OP_MODE_TYPE.RAW_AUDIO_FRAME_OP_MODE_READ_ONLY, 1024); 
-            
+                RAW_AUDIO_FRAME_OP_MODE_TYPE.RAW_AUDIO_FRAME_OP_MODE_READ_WRITE, 1024);
+
             RtcEngine.RegisterAudioFrameObserver(new AudioFrameObserver(this),
-                 AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_PLAYBACK|
-                 AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_RECORD|
-                 AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_MIXED|
-                 AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_BEFORE_MIXING|
+                 AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_PLAYBACK |
+                 AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_RECORD |
+                 AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_MIXED |
+                 AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_BEFORE_MIXING |
                  AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_EAR_MONITORING,
                 OBSERVER_MODE.RAW_DATA);
-            RtcEngine.AdjustPlaybackSignalVolume(0);
         }
 
         void JoinChannel()
@@ -247,7 +246,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
         internal AudioFrameObserver(ProcessAudioRawData agoraAudioRawData)
         {
             _agoraAudioRawData = agoraAudioRawData;
-   
+
         }
 
         public override bool OnRecordAudioFrame(string channelId, AudioFrame audioFrame)
@@ -268,6 +267,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
                 _agoraAudioRawData._writeCount += floatArray.Length;
                 _agoraAudioRawData._count++;
             }
+
+            //make audoFrame rawdata empty so sdk will not playback any sound
+            Array.Clear(audioFrame.RawBuffer, 0, audioFrame.RawBuffer.Length);
+            System.Runtime.InteropServices.Marshal.Copy(audioFrame.RawBuffer, 0, audioFrame.buffer, audioFrame.RawBuffer.Length);
             return true;
         }
 
