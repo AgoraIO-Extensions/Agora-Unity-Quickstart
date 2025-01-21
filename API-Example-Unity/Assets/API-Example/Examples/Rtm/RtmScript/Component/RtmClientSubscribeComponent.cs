@@ -41,7 +41,7 @@ namespace io.agora.rtm.demo
             SubscribeOptions subscribeOptions = new SubscribeOptions()
             {
                 withMessage = WithMessageToggle.isOn,
-                withMetadata = WithMessageToggle.isOn,
+                withMetadata = WithMetadataToggle.isOn,
                 withPresence = WithPersenceToggle.isOn,
                 withLock = WithLockToggle.isOn,
                 beQuiet = BeQuietToggle.isOn
