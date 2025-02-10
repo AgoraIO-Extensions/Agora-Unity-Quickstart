@@ -106,7 +106,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer2
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.autoSubscribeAudio.SetValue(true);
             options.autoSubscribeVideo.SetValue(true);
-            options.publishMicrophoneTrack.SetValue(false);
+            options.publishMicrophoneTrack.SetValue(true);
             options.publishCameraTrack.SetValue(false);
             options.publishMediaPlayerAudioTrack.SetValue(true);
             options.publishMediaPlayerVideoTrack.SetValue(true);
