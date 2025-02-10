@@ -120,9 +120,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             }
 
 
-            Int64 mccUid = 0;
-            Int64.TryParse(RtmUidInputField.text, out mccUid);
-            if (mccUid == 0)
+
+            if (RtmUidInputField.text == "")
             {
                 this.Log.UpdateLog("rtm uid must be UInt64");
                 return;
@@ -131,16 +130,32 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             RtcEngine.EnableVideo();
             RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
 
-            var appId = RtmAppidInputField.text;
-            var rtmToken = RtmTokenInputField.text;
+
             MusicContentCenter = RtcEngine.GetMusicContentCenter();
-            var config = new MusicContentCenterConfiguration(appId, rtmToken, mccUid, 10, "");
+            var config = new MusicContentCenterConfiguration(10);
             var Ret = MusicContentCenter.Initialize(config);
             this.Log.UpdateLog("MusicContentCenter.Initialize: " + Ret);
+            if (Ret != 0)
+            {
+                this.Log.UpdateLog("MusicContentCenter Initialize failed");
+                return;
+            }
+
+            var appId = RtmAppidInputField.text;
+            var rtmToken = RtmTokenInputField.text;
+            var rtmUid = RtmUidInputField.text;
+            var vendorConfig = new MusicContentCenterVendorDefaultConfiguration();
+            vendorConfig.appId = appId;
+            vendorConfig.token = rtmToken;
+            vendorConfig.userId = rtmUid;
+            string vendorString = Agora.Rtc.AgoraJson.ToJson(vendorConfig);
+            Ret = MusicContentCenter.AddVendor(MusicContentCenterVendorID.kMusicContentCenterVendorDefault, vendorString);
+            this.Log.UpdateLog("MusicContentCenter.AddVendor: " + Ret);
+
 
             if (Ret != 0)
             {
-                this.Log.UpdateLog("MusicContentCenter Initialize failed. Please check you appid, token or uid");
+                this.Log.UpdateLog("MusicContentCenter AddVendor failed. Please check you appid, token or uid");
                 return;
             }
 
@@ -244,9 +259,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
                 return;
             }
 
-
-            var ret = MusicContentCenter.Preload(this.CurSongCode, "");
+            string requestId = "";
+            var ret = MusicContentCenter.Preload(ref requestId, this.CurSongCode);
             this.Log.UpdateLog("Preload: " + ret);
+            this.Log.UpdateLog("requestId: " + requestId);
         }
 
         public void OnOpenButtonClick()
@@ -311,7 +327,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
             int length = infos.Length;
             for (int i = 0; i < length; i++)
             {
-                this.Log.UpdateLog(string.Format("songCode: {0}  status:{1}", infos[i].songCode, infos[i].status));
+                this.Log.UpdateLog(string.Format("songCode: {0}  musicStatus:{1} lyricStatus:{2}", infos[i].songCode, infos[i].musicStatus, infos[i].lyricStatus));
             }
         }
 
@@ -585,27 +601,34 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer
         }
 
 
-        public override void OnPreLoadEvent(string requestId, Int64 songCode, int percent, string lyricUrl, PreloadState state, MusicContentCenterStateReason reason)
+        public override void OnPreLoadEvent(string requestId, long internalSongCode, int percent, string payload, MusicContentCenterState status, MusicContentCenterStateReason reason)
         {
             Debug.Log("OnPreLoadEvent percent:" + percent);
-            if (state == PreloadState.kPreloadStateCompleted)
-            {
-                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} lyricUrl:{2}, state:{3}, reason:{4}", songCode, percent, lyricUrl, state, reason));
+            this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent internalSongCode:{0} percent:{1} payload:{2}, status:{3}, reason:{4}", internalSongCode, percent, payload, status, reason));
 
+            if (status == MusicContentCenterState.kMusicContentCenterStatePreloadOk)
+            {
                 this._sample.OpenButton.gameObject.SetActive(true);
                 this._sample.GetLyricButton.gameObject.SetActive(true);
             }
-            else if (state == PreloadState.kPreloadStateFailed)
+            else if (status == MusicContentCenterState.kMusicContentCenterStatePreloadFailed)
             {
-                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} lyricUrl:{2}, state:{3}, reason:{4}", songCode, percent, lyricUrl, state, reason));
-
                 this._sample.Log.UpdateLog("PreLoad Failed, Please click PreLoad Button again");
             }
-            else if (state == PreloadState.kPreloadStateRemoved)
+            else if (status == MusicContentCenterState.kMusicContentCenterStatePreloadRemoved)
             {
-                this._sample.Log.UpdateLog(string.Format("OnPreLoadEvent songCode:{0} percent:{1} lyricUrl:{2}, state:{3}, reason:{4}", songCode, percent, lyricUrl, state, reason));
                 this._sample.Log.UpdateLog("Remove completed");
             }
+        }
+
+        public override void OnLyricInfoResult(string requestId, long songCode, ILyricInfo lyricInfo, MusicContentCenterStateReason reason)
+        {
+
+        }
+
+        public override void OnStartScoreResult(long internalSongCode, MusicContentCenterState status, MusicContentCenterStateReason reason)
+        {
+
         }
     }
 
