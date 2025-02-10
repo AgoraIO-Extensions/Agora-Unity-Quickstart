@@ -57,6 +57,7 @@ namespace Agora_RTC_Plugin.API_Example
             "MediaRecorderScene",
             "MetadataScene",
             "MusicPlayerScene",
+            "MusicPlayerScene2",
             "PluginScene",
             "ProcessAudioRawDataScene",
             "ProcessVideoRawDataScene",
