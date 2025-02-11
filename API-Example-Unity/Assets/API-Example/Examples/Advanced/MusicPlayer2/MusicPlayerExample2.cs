@@ -28,6 +28,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer2
         [SerializeField]
         private string _channelName = "";
 
+
+
+        public uint channelUserId = 123;
         public Text LogText;
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
@@ -78,19 +81,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer2
                 return;
             }
 
-            var vendorConfig = new MusicContentCenterVendor2Configuration();
-            vendorConfig.appId = "appid";
-            vendorConfig.appKey = "appkey";
-            vendorConfig.token = "token";
-            vendorConfig.userId = "userId";
-            vendorConfig.deviceId = "deviceId";
-            vendorConfig.urlTokenExpireTime = 3600;
-            vendorConfig.chargeMode = (int)ChargeMode.kChargeModeMonthly;
 
-
-            string vendorString = Agora.Rtc.AgoraJson.ToJson(vendorConfig);
-            Ret = MusicContentCenter.AddVendor(MusicContentCenterVendorID.kMusicContentCenterVendor2, vendorString);
-            this.Log.UpdateLog("MusicContentCenter.AddVendor: " + Ret);
 
 
             if (Ret != 0)
@@ -124,7 +115,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer2
             }
 
             options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
-            var ret = RtcEngine.JoinChannel(_token, _channelName, 0, options);
+            var ret = RtcEngine.JoinChannel(_token, _channelName, this.channelUserId, options);
             this.Log.UpdateLog("RtcEngineController JoinChannel_MPK returns: " + ret);
         }
 
@@ -152,6 +143,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer2
             var logPath = Application.persistentDataPath + "/rtc.log";
             RtcEngine.SetLogFile(logPath);
             this.Log.UpdateLog(logPath);
+            //RtcEngine.SetParameters("rtc.enable_debug_log", true);
+        }
+
+        public string GetChannelName()
+        {
+            return this._channelName;
         }
 
 
@@ -459,6 +456,24 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer2
             _sample.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                     connection.channelId, connection.localUid, elapsed));
+
+
+
+            var vendorConfig = new MusicContentCenterVendor2Configuration();
+            vendorConfig.appId = "appid";
+            vendorConfig.appKey = "appkey";
+            vendorConfig.token = "token";
+            vendorConfig.userId = "userId";
+            vendorConfig.deviceId = "deviceId";
+            vendorConfig.urlTokenExpireTime = 3600;
+            vendorConfig.chargeMode = (int)ChargeMode.kChargeModeOnce;
+            vendorConfig.channelId = _sample.GetChannelName();
+            vendorConfig.channelUserId = _sample.channelUserId.ToString();
+
+
+            string vendorString = Agora.Rtc.AgoraJson.ToJson(vendorConfig);
+            var Ret = _sample.MusicContentCenter.AddVendor(MusicContentCenterVendorID.kMusicContentCenterVendor2, vendorString);
+            _sample.Log.UpdateLog("MusicContentCenter.AddVendor: " + Ret);
         }
 
         public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
@@ -525,7 +540,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer2
 
             if (status == MusicContentCenterState.kMusicContentCenterStatePreloadOk)
             {
-                
+
             }
             else if (status == MusicContentCenterState.kMusicContentCenterStatePreloadFailed)
             {
@@ -581,13 +596,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer2
     {
         public override bool OnRecordAudioFrame(string channelId, AudioFrame audioFrame)
         {
-            Debug.Log("OnRecordAudioFrame-----------");
+            Debug.Log("OnRecordAudioFrame-----------:" + channelId);
             return true;
         }
 
         public override bool OnPlaybackAudioFrame(string channelId, AudioFrame audioFrame)
         {
-            Debug.Log("OnPlaybackAudioFrame-----------");
+            Debug.Log("OnPlaybackAudioFrame-----------:" + channelId);
             return true;
         }
 
@@ -595,7 +610,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer2
                                                         uint uid,
                                                         AudioFrame audio_frame)
         {
-            Debug.Log("OnPlaybackAudioFrameBeforeMixing-----------");
+            Debug.Log("OnPlaybackAudioFrameBeforeMixing-----------:" + channel_id);
             return true;
         }
 
@@ -603,7 +618,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer2
                                                         string uid,
                                                         AudioFrame audio_frame)
         {
-            Debug.Log("OnPlaybackAudioFrameBeforeMixing2-----------");
+            Debug.Log("OnPlaybackAudioFrameBeforeMixing2-----------: " + channel_id);
             return true;
         }
     }
@@ -618,7 +633,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer2
 
         public override void OnLineScore(long songCode, LineScoreData lineScoreData)
         {
-            string foramt = string.Format("songCode: {0}, progressInMs: {1}, index: {2}, totalLines: {3}, " +
+            string foramt = string.Format("OnLineScore songCode: {0}, progressInMs: {1}, index: {2}, totalLines: {3}, " +
                 "pitchScore: {4}, cumulativePitchScore: {5}, energyScore: {6}",
                 songCode, lineScoreData.progressInMs, lineScoreData.index, lineScoreData.totalLines,
                 lineScoreData.pitchScore, lineScoreData.cumulativePitchScore, lineScoreData.energyScore
@@ -628,7 +643,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer2
 
         public override void OnPitch(long songCode, RawScoreData rawScoreData)
         {
-            string foramt = string.Format("songCode: {0}, progressInMs: {1}, speakerPitch: {2}, pitchScore: {3}",
+            string foramt = string.Format("OnPitch songCode: {0}, progressInMs: {1}, speakerPitch: {2}, pitchScore: {3}",
                songCode, rawScoreData.progressInMs, rawScoreData.speakerPitch, rawScoreData.pitchScore
                );
             this._sample.Log.UpdateLog(foramt);
