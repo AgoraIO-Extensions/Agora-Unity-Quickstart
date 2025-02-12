@@ -81,9 +81,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer2
                 return;
             }
 
-
-
-
             if (Ret != 0)
             {
                 this.Log.UpdateLog("MusicContentCenter AddVendor failed. Please check you appid, token or uid");
@@ -92,31 +89,17 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer2
 
 
             MusicContentCenter.RegisterEventHandler(new UserMusicContentCenterEventHandler(this));
-            MusicPlayer = MusicContentCenter.CreateMusicPlayer();
-
+          
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.autoSubscribeAudio.SetValue(true);
             options.autoSubscribeVideo.SetValue(true);
             options.publishMicrophoneTrack.SetValue(true);
             options.publishCameraTrack.SetValue(false);
-            options.publishMediaPlayerAudioTrack.SetValue(true);
-            options.publishMediaPlayerVideoTrack.SetValue(true);
             options.enableAudioRecordingOrPlayout.SetValue(true);
-            if (MusicPlayer != null)
-            {
-                options.publishMediaPlayerId.SetValue(MusicPlayer.GetId());
-                this.Log.UpdateLog("MusicPlayer id:" + MusicPlayer.GetId());
-
-                MusicPlayer.InitEventHandler(new MpkEventHandler(this));
-            }
-            else
-            {
-                this.Log.UpdateLog("MusicPlayer failed");
-            }
-
             options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+
             var ret = RtcEngine.JoinChannel(_token, _channelName, this.channelUserId, options);
-            this.Log.UpdateLog("RtcEngineController JoinChannel_MPK returns: " + ret);
+            this.Log.UpdateLog("RtcEngineController JoinChannel returns: " + ret);
         }
 
         //Show data in AgoraBasicProfile
@@ -232,10 +215,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer2
             var ret = MusicContentCenter.IsPreloaded(this.CurSongCode);
             this.Log.UpdateLog("IsPreloaded:" + ret);
         }
-
-
-
-
 
         public void OnStartScoreButtonClick()
         {
@@ -460,8 +439,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer2
 
 
             var vendorConfig = new MusicContentCenterVendor2Configuration();
-            vendorConfig.appId = "appid";
-            vendorConfig.appKey = "appkey";
+            vendorConfig.appId = "appId";
+            vendorConfig.appKey = "appKey";
             vendorConfig.token = "token";
             vendorConfig.userId = "userId";
             vendorConfig.deviceId = "deviceId";
@@ -470,10 +449,24 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer2
             vendorConfig.channelId = _sample.GetChannelName();
             vendorConfig.channelUserId = _sample.channelUserId.ToString();
 
-
             string vendorString = Agora.Rtc.AgoraJson.ToJson(vendorConfig);
             var Ret = _sample.MusicContentCenter.AddVendor(MusicContentCenterVendorID.kMusicContentCenterVendor2, vendorString);
             _sample.Log.UpdateLog("MusicContentCenter.AddVendor: " + Ret);
+
+
+            _sample.MusicPlayer = _sample.MusicContentCenter.CreateMusicPlayer();
+            _sample.MusicPlayer.InitEventHandler(new MpkEventHandler(_sample));
+            _sample.Log.UpdateLog("MusicPlayer id:" + _sample.MusicPlayer.GetId());
+
+            ChannelMediaOptions options = new ChannelMediaOptions();
+            options.publishMediaPlayerAudioTrack.SetValue(true);
+            options.publishMediaPlayerVideoTrack.SetValue(true);
+            options.publishMediaPlayerId.SetValue(_sample.MusicPlayer.GetId());
+         
+
+            options.clientRoleType.SetValue(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
+            var ret = _sample.RtcEngine.UpdateChannelMediaOptions( options);
+            _sample.Log.UpdateLog("UpdateChannelMediaOptions  returns: " + ret);
         }
 
         public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
