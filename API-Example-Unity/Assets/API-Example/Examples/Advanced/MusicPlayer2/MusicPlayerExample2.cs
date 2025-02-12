@@ -444,7 +444,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MusicPlayer2
             vendorConfig.token = "token";
             vendorConfig.userId = "userId";
             vendorConfig.deviceId = "deviceId";
-            vendorConfig.urlTokenExpireTime = 3600;
+            vendorConfig.urlTokenExpireTime = 900;
             vendorConfig.chargeMode = (int)ChargeMode.kChargeModeOnce;
             vendorConfig.channelId = _sample.GetChannelName();
             vendorConfig.channelUserId = _sample.channelUserId.ToString();
