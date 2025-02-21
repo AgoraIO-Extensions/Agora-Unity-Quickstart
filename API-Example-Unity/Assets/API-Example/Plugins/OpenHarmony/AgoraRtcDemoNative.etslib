@@ -1,0 +1,49 @@
+import { buffer, JSON, MessageEvents, ThreadWorkerGlobalScope } from '@kit.ArkTS';
+import hilog from '@ohos.hilog';
+import bundleManager from '@ohos.bundle.bundleManager';
+import abilityAccessCtrl, { Permissions } from '@ohos.abilityAccessCtrl';
+import { BusinessError } from '@ohos.base';
+import fs from '@ohos.file.fs';
+
+export class AgoraRtcDemoNative {
+
+
+  public static copyFileToSandBox(streamingAssetsPath: string): string {
+
+    let extractFileName: (filePath: string) => string = (filePath: string): string => {
+      // 使用 split 方法根据 '/' 分割路径字符串
+      const parts = filePath.split('/');
+      // 文件名是分割后数组的最后一个元素
+      return parts[parts.length - 1];
+    };
+
+    streamingAssetsPath = streamingAssetsPath.replace('jar:file://', '');
+    let fileName = extractFileName(streamingAssetsPath);
+    hilog.info(0x0000, "AgoraRtcWrapperNative", `streamingAssetsPath: ${streamingAssetsPath} fileName: ${fileName}`)
+    let context: Context = globalThis.context;
+    if (context == null) {
+      hilog.error(0x0000, "AgoraRtcWrapperNative", "context is null");
+    }
+    let boxPath = context.getApplicationContext().filesDir;
+    let filePath = boxPath + '/' + fileName;
+    hilog.info(0x0000, "AgoraRtcWrapperNative", `filePath: ${filePath}`)
+    let uint8Array: Uint8Array = context.resourceManager.getRawFileContentSync(streamingAssetsPath);
+    let bf = buffer.from(uint8Array).buffer;
+    const fsOpen =
+      fs.openSync(filePath, fs.OpenMode.READ_WRITE | fs.OpenMode.READ_ONLY | fs.OpenMode.CREATE | fs.OpenMode.TRUNC)
+    let destFile = fs.writeSync(fsOpen.fd, bf);
+    fs.close(destFile)
+
+    return filePath;
+  }
+}
+
+
+
+export function RegisterAgoraRtcDemoNative() {
+  let register: Record<string, Object> = {};
+  register["AgoraRtcDemoNative"] = AgoraRtcDemoNative;
+  return register;
+}
+
+

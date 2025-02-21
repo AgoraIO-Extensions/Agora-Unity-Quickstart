@@ -169,8 +169,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomCaptureAudio
                 }
             }
 #elif UNITY_OPENHARMONY && !UNITY_EDITOR
-            var AgoraRtcWrapperNative = new OpenHarmonyJSClass("AgoraRtcWrapperNative");
-            string filePath = AgoraRtcWrapperNative.CallStatic<string>("copyFileToSandBox", Path.Combine(Application.streamingAssetsPath, "audio/pcm16.wav"));
+            var AgoraRtcDemoNative = new OpenHarmonyJSClass("AgoraRtcDemoNative");
+            string filePath = AgoraRtcDemoNative.CallStatic<string>("copyFileToSandBox", Path.Combine(Application.streamingAssetsPath, "audio/pcm16.wav"));
 #else
             string filePath = Path.Combine(Application.streamingAssetsPath, "audio/pcm16.wav");
 #endif

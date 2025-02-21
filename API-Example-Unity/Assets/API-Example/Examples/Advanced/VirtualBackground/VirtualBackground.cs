@@ -179,8 +179,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.VirtualBackground
         internal string CopyFile(string fromFile, string toFile)
         {
 #if UNITY_OPENHARMONY
-         var AgoraRtcWrapperNative = new OpenHarmonyJSClass("AgoraRtcWrapperNative");
-         toFile = AgoraRtcWrapperNative.CallStatic<string>("copyFileToSandBox", fromFile);
+         var AgoraRtcDemoNative = new OpenHarmonyJSClass("AgoraRtcDemoNative");
+         toFile = AgoraRtcDemoNative.CallStatic<string>("copyFileToSandBox", fromFile);
          return toFile;
 #else 
             if (Application.platform == RuntimePlatform.Android)
