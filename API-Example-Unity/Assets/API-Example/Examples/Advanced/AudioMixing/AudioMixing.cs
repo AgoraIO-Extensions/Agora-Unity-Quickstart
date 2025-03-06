@@ -104,8 +104,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioMixing
             // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
             _localPath = "/assets/audio/Agora.io-Interactions.mp3";
 #elif UNITY_OPENHARMONY
+
             var AgoraRtcDemoNative = new OpenHarmonyJSClass("AgoraRtcDemoNative");
             _localPath = AgoraRtcDemoNative.CallStatic<string>("copyFileToSandBox", Path.Combine(Application.streamingAssetsPath, "audio/Agora.io-Interactions.mp3"));
+
 #else
             _localPath = Application.streamingAssetsPath + "/audio/" + "Agora.io-Interactions.mp3";
 #endif

@@ -216,8 +216,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
                 // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
                 path = "/assets/img/MPK.mp4";
 #elif UNITY_OPENHARMONY && !UNITY_EDITOR
+
                 var AgoraRtcDemoNative = new OpenHarmonyJSClass("AgoraRtcDemoNative");
                 path = AgoraRtcDemoNative.CallStatic<string>("copyFileToSandBox", Path.Combine(Application.streamingAssetsPath, "img/MPK.mp4"));
+
 #else
                 path = Path.Combine(Application.streamingAssetsPath, "img/MPK.mp4");
 #endif

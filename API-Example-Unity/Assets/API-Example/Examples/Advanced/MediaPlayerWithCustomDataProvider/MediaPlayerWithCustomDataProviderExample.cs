@@ -245,8 +245,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayerWithCustomDa
             // On Android We already copy file into persistentDataPath
             file = Application.persistentDataPath + "/MPK.mp4";
 #elif UNITY_OPENHARMONY && !UNITY_EDITOR
+
             var AgoraRtcDemoNative = new OpenHarmonyJSClass("AgoraRtcDemoNative");
             file = AgoraRtcDemoNative.CallStatic<string>("copyFileToSandBox", Path.Combine(Application.streamingAssetsPath, "img/MPK.mp4"));
+
 #else
             file = Application.streamingAssetsPath + "/img/MPK.mp4";
 #endif
