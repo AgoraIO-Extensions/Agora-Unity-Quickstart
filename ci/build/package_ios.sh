@@ -1,7 +1,6 @@
-echo `pwd` 
+echo $(pwd)
 
 WORKSPACE=$1
-
 
 # Project名称
 PROJECT_NAME=Unity-iPhone
@@ -25,7 +24,6 @@ echo "============Build Clean Begin============"
 xcodebuild clean -project ${PROJECT_PATH} -scheme ${SCHEME_NAME} -configuration ${BUILD_TYPE} -quiet || exit
 echo "============Build Clean End============"
 
-
 ##xcarchive文件的存放路径
 ARCHIVE_PATH="./build_temp/xcarchive_${x}/${SCHEME_NAME}_xcarchive.xcarchive"
 
@@ -35,7 +33,6 @@ xcodebuild CODE_SIGN_STYLE="Manual" \
     -configuration ${BUILD_TYPE} \
     -scheme ${SCHEME_NAME} clean CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO archive -archivePath $ARCHIVE_PATH -quiet -destination 'generic/platform=iOS' || exit
 echo "============Build Archive Success============"
-
 
 ## 导出IPA原始的包
 echo "============Export IPA Begin============"
@@ -49,11 +46,8 @@ sh ${WORKSPACE}/sign ./Build/unityexample.ipa
 ls ./Build
 # ls ${WORKSPACE}
 
-mv ./unityexample_A.ipa ./Build/unityexample_A.ipa 
-mv ./unityexample_B.ipa ./Build/unityexample_B.ipa 
-mv ./unityexample_C.ipa ./Build/unityexample_C.ipa 
-mv ./unityexample_D.ipa ./Build/unityexample_D.ipa 
-mv ./unityexample_E.ipa ./Build/unityexample_E.ipa
+ls .
+mv ./unityexample_*.ipa ./Build/
 
 echo "============Sign IPA Sucess============"
 
@@ -62,4 +56,3 @@ rm -f ./Build/*.plist
 rm -f ./Build/*.log
 rm -f ./Build/unityexample.ipa
 echo "============Clear IPA End============"
-
