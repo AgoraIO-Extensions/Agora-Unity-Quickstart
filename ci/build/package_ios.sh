@@ -55,11 +55,8 @@ sh ${WORKSPACE}/sign ./$BUILD_PATH/unityexample.ipa
 ls ./$BUILD_PATH
 # ls ${WORKSPACE}
 
-mv ./unityexample_A.ipa ./$BUILD_PATH/unityexample_A.ipa 
-mv ./unityexample_B.ipa ./$BUILD_PATH/unityexample_B.ipa 
-mv ./unityexample_C.ipa ./$BUILD_PATH/unityexample_C.ipa 
-mv ./unityexample_D.ipa ./$BUILD_PATH/unityexample_D.ipa 
-mv ./unityexample_E.ipa ./$BUILD_PATH/unityexample_E.ipa
+ls .
+mv ./unityexample_*.ipa ./$BUILD_PATH/
 
 echo "============Sign IPA Sucess============"
 
