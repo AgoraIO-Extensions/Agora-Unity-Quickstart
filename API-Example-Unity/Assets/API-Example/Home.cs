@@ -138,6 +138,7 @@ namespace Agora_RTC_Plugin.API_Example
             PermissionHelper.RequestCameraPermission();
 #endif
 
+            Application.targetFrameRate = 60;
             GameObject content = GameObject.Find("Content");
             var contentRectTrans = content.GetComponent<RectTransform>();
 
