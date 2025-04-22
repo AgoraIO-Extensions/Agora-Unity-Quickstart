@@ -403,6 +403,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
         public LocalVideoCallQualityPanel GetLocalVideoCallQualityPanel()
         {
             var go = GameObject.Find("0");
+            if (go == null) return null;
             return go.GetComponentInChildren<LocalVideoCallQualityPanel>();
         }
 
@@ -524,12 +525,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.JoinChannelVideo
 
         public override void OnLocalVideoStats(RtcConnection connection, LocalVideoStats stats)
         {
-            var panel = _videoSample.GetLocalVideoCallQualityPanel();
-            if (panel != null)
-            {
-                panel.VideoStats = stats;
-                panel.RefreshPanel();
-            }
+            //var panel = _videoSample.GetLocalVideoCallQualityPanel();
+            //if (panel != null)
+            //{
+            //    panel.VideoStats = stats;
+            //    panel.RefreshPanel();
+            //}
         }
 
         public override void OnRemoteVideoStats(RtcConnection connection, RemoteVideoStats stats)
