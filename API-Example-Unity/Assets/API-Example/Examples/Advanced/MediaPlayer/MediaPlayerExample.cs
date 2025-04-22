@@ -115,6 +115,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MediaPlayer
             var logFile = Application.persistentDataPath + "/rtc.log";
             RtcEngine.SetLogFile(logFile);
             this.Log.UpdateLog("logFile:" + logFile);
+
+
+            var config = new VideoEncoderConfiguration();
+            config.dimensions = new VideoDimensions(1920, 1080);
+            config.frameRate = 60;
+            config.bitrate = 0;
+            RtcEngine.SetVideoEncoderConfiguration(config);
+
         }
 
         private void InitMediaPlayer()

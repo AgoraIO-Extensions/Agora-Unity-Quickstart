@@ -91,6 +91,36 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
             context.areaCode = AREA_CODE.AREA_CODE_GLOB;
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
+
+            RtcEngine.SetParameters("{\"che.audio.uplink_max_retry_times\": 5}");
+            RtcEngine.SetParameters("{\"che.audio.downlink_max_retry_times\": 5}");
+            RtcEngine.SetParameters("{\"rtc.paced_sender_enabled\": 0}");
+            RtcEngine.SetParameters("{\"rtc.video.playout_delay_min\": 0}");
+            RtcEngine.SetParameters("{\"rtc.video.downMaxRetryTimes\": 5}");
+            RtcEngine.SetParameters("{\"che.video.vpr.enable\": false}");
+            RtcEngine.SetParameters("{\"rtc.video.avsync\": false}");
+            RtcEngine.SetParameters("{\"engine.video.enable_hw_decoder\": false}");
+            RtcEngine.SetParameters(
+            "\"che.video.harqScene\": 1," +
+            "\"che.video.fec_outside_bw_ratio\": 20," +
+            "\"rtc.video.apas_harq_enable\": true," +
+            "\"che.video.enable_pec\": true," +
+            "\"rtc.ack_delay\": 0," +
+            "\"rtc.remote_ack_delay\": 0," +
+            "\"rtc.video.old_render_timestamp_gap\": 200 }");
+            RtcEngine.SetParameters("{\"rtc.cc_private\": 1048}");
+            RtcEngine.SetParameters("{\"rtc.congestion_window_compensation_mode\": 1}");
+            RtcEngine.SetParameters("{\"rtc.video.decoder_out_byte_frame\": true}");
+            RtcEngine.SetParameters("{\"rtc.video.broadcaster_playout_delay_min\": 0}");
+            //RtcEngine.SetParameters("{\"rtc.video.disable_rewrite_num_reorder_frame\": true}");
+
+            RtcEngine.SetParameters("{\"che.video.broadcast.special_config\": {\"che.video.vpr.enable\": false}}");
+            RtcEngine.SetParameters("{\"rtc.video.broadcaster_playout_delay_max\": 0}");
+            RtcEngine.SetParameters("{\"rtc.video.playout_delay_max\": 0}");
+
+
+            RtcEngine.SetParameters("{\"rtc.log_filter\": 65535}");
+            RtcEngine.SetParameters("{\"rtc.log_size\": 9999999}");
         }
 
         private void SetBasicConfiguration()
@@ -330,7 +360,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));
 
-            _sample.MakeVideoView(0, "", _sample.YUVToggle.isOn, _sample.PlaneToggle.isOn);
+            //_sample.MakeVideoView(0, "", _sample.YUVToggle.isOn, _sample.PlaneToggle.isOn);
         }
 
         public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)

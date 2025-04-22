@@ -24,7 +24,7 @@ namespace Agora_RTC_Plugin.API_Example
         public InputField AppIdInupt;
         public InputField ChannelInput;
         public InputField TokenInput;
-
+       
         public AppIdInput AppInputConfig;
         public GameObject CasePanel;
         public GameObject CaseScrollerView;
@@ -138,7 +138,7 @@ namespace Agora_RTC_Plugin.API_Example
             PermissionHelper.RequestCameraPermission();
 #endif
 
-            Application.targetFrameRate = 60;
+            Application.targetFrameRate = 90;
             GameObject content = GameObject.Find("Content");
             var contentRectTrans = content.GetComponent<RectTransform>();
 
