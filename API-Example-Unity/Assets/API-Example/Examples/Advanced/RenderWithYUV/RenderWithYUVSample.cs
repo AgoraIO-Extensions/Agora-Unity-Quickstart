@@ -117,7 +117,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
             RtcEngine.SetParameters("{\"che.video.broadcast.special_config\": {\"che.video.vpr.enable\": false}}");
             RtcEngine.SetParameters("{\"rtc.video.broadcaster_playout_delay_max\": 0}");
             RtcEngine.SetParameters("{\"rtc.video.playout_delay_max\": 0}");
-
+            RtcEngine.SetParameters("{\"rtc.video.enable_sr\": {\"enabled\": false, \"mode\":2}}");
 
             RtcEngine.SetParameters("{\"rtc.log_filter\": 65535}");
             RtcEngine.SetParameters("{\"rtc.log_size\": 9999999}");
