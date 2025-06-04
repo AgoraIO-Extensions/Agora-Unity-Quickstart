@@ -56,4 +56,4 @@ def doPublish(buildVariables) {
     sh "rm -rf *.zip || true"
 }
 
-pipelineLoad(this, "Unity_Demo_Build", "build", "mac", "AD_MAC_Compile_92_1_232_03")
+pipelineLoad(this, "Unity_Demo_Build", "build", "mac", "mac && unity")
