@@ -307,10 +307,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.WriteBackVideoRawData
             _sample.Log.UpdateLog("OnUplinkNetworkInfoUpdated");
         }
 
-        public override void OnDownlinkNetworkInfoUpdated(DownlinkNetworkInfo info)
-        {
-            _sample.Log.UpdateLog("OnDownlinkNetworkInfoUpdated");
-        }
     }
 
     # endregion
