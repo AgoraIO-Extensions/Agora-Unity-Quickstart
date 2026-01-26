@@ -146,14 +146,19 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
 
             if (this.TogglePrimartCamera.isOn)
             {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
                 var videoDeviceManager = RtcEngine.GetVideoDeviceManager();
                 var devices = videoDeviceManager.EnumerateVideoDevices();
 
+                
                 if (devices.Length >= 1)
-                {
+                { 
+#endif
                     var configuration = new CameraCapturerConfiguration();
                     configuration.format = new VideoFormat(640, 320, 30);
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
                     configuration.deviceId.SetValue(devices[0].deviceId);
+#endif
                     var nRet = this.RtcEngine.StartCameraCapture(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA, configuration);
                     this.Log.UpdateLog("StartCameraCapture :" + nRet);
                     var item = new TranscodingVideoStream();
@@ -163,23 +168,30 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
                     item.width = 640;
                     item.height = 320;
                     list.Add(item);
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
                 }
+
                 else
                 {
                     this.Log.UpdateLog("PRIMARY_CAMERA Not Found!");
                 }
+#endif
             }
 
             if (this.ToggleSecondaryCamera.isOn)
             {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
                 var videoDeviceManager = RtcEngine.GetVideoDeviceManager();
                 var devices = videoDeviceManager.EnumerateVideoDevices();
 
                 if (devices.Length >= 2)
                 {
+#endif
                     var configuration = new CameraCapturerConfiguration();
-                    configuration.format = new VideoFormat(640,320,30);
+                    configuration.format = new VideoFormat(640,320,30); 
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
                     configuration.deviceId.SetValue(devices[1].deviceId);
+#endif
                     this.RtcEngine.StartCameraCapture(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_SECONDARY, configuration);
                     var item = new TranscodingVideoStream();
                     item.sourceType = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_SECONDARY;
@@ -188,11 +200,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
                     item.width = 360;
                     item.height = 240;
                     list.Add(item);
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
                 }
                 else
                 {
                     this.Log.UpdateLog("SECONDARY_CAMERA Not Found!");
                 }
+#endif
             }
 
             if (this.TogglePng.isOn)
