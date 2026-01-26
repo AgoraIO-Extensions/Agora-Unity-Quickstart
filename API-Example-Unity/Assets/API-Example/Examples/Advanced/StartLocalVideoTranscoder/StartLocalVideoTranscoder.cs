@@ -352,12 +352,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
                 ScreenCaptureSourceInfo item = info[0];
                 if (item.type == ScreenCaptureSourceType.ScreenCaptureSourceType_Window)
                 {
-                    RtcEngine.StartScreenCaptureByWindowId(item.sourceId, default(Rectangle),
-                       default(ScreenCaptureParameters));
+                    RtcEngine.StartScreenCaptureByWindowId(item.sourceId, new Rectangle(),
+                       new ScreenCaptureParameters());
                 }
                 else
                 {
-                    RtcEngine.StartScreenCaptureByDisplayId((uint)item.sourceId, default(Rectangle),
+                    RtcEngine.StartScreenCaptureByDisplayId((uint)item.sourceId, new Rectangle(),
                  new ScreenCaptureParameters { captureMouseCursor = true, frameRate = 30 });
                 }
                 return true;
