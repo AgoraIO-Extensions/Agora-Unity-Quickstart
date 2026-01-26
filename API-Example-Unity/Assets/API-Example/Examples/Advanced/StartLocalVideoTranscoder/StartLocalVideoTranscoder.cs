@@ -156,7 +156,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
 #endif
                     var configuration = new CameraCapturerConfiguration();
                     configuration.format = new VideoFormat(640, 320, 30);
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
                     configuration.deviceId.SetValue(devices[0].deviceId);
+#endif
                     var nRet = this.RtcEngine.StartCameraCapture(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA, configuration);
                     this.Log.UpdateLog("StartCameraCapture :" + nRet);
                     var item = new TranscodingVideoStream();
@@ -186,8 +188,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
                 {
 #endif
                     var configuration = new CameraCapturerConfiguration();
-                    configuration.format = new VideoFormat(640,320,30);
+                    configuration.format = new VideoFormat(640,320,30); 
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
                     configuration.deviceId.SetValue(devices[1].deviceId);
+#endif
                     this.RtcEngine.StartCameraCapture(VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_SECONDARY, configuration);
                     var item = new TranscodingVideoStream();
                     item.sourceType = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA_SECONDARY;
