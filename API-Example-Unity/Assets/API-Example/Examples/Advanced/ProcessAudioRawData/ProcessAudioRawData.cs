@@ -33,7 +33,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
         internal IRtcEngine RtcEngine;
 
         public int CHANNEL = 2;
-        public int PULL_FREQ_PER_SEC = 100;
+        public int PULL_FREQ_PER_SEC = 10;
         public int SAMPLE_RATE = 48000;
 
 
@@ -43,22 +43,26 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
         internal int _readCount;
 
         internal RingBuffer<float> _audioBuffer;
+        internal AudioSource _audioSource;
         internal AudioClip _audioClip;
+        internal Pcm16AudioWriter _audioWriter;
 
         void Start()
         {
             LoadAssetData();
             if (CheckAppId())
             {
+                _audioWriter = new Pcm16AudioWriter("ProcessAudioRawData_" + DateTime.Now.ToString("yyyyMMddHHmmss"),
+                    SAMPLE_RATE, CHANNEL);
                 InitEngine();
                 JoinChannel();
 
-                var aud = GetComponent<AudioSource>();
-                if (aud == null)
+                _audioSource= GetComponent<AudioSource>();
+                if (_audioSource == null)
                 {
-                    gameObject.AddComponent<AudioSource>();
+                    _audioSource = gameObject.AddComponent<AudioSource>();
                 }
-                SetupAudio(aud, "externalClip");
+                SetupAudio(_audioSource, "externalClip");
             }
         }
 
@@ -105,6 +109,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
             RtcEngine.Initialize(context);
             RtcEngine.InitEventHandler(handler);
 
+            var samplesPerCall = SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL * 2;
             RtcEngine.SetPlaybackAudioFrameParameters(SAMPLE_RATE, CHANNEL,
                 RAW_AUDIO_FRAME_OP_MODE_TYPE.RAW_AUDIO_FRAME_OP_MODE_READ_WRITE, 1024);
             RtcEngine.SetRecordingAudioFrameParameters(SAMPLE_RATE, CHANNEL,
@@ -133,12 +138,24 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
         private void OnDestroy()
         {
             Debug.Log("OnDestroy");
+
+            if (_audioSource != null)
+            {
+                _audioSource.Stop();
+            }
+
+            if (_audioClip != null)
+            {
+                Destroy(_audioClip);
+            }
+
             if (RtcEngine != null)
             {
                 RtcEngine.InitEventHandler(null);
                 RtcEngine.UnRegisterAudioFrameObserver();
                 RtcEngine.LeaveChannel();
                 RtcEngine.Dispose();
+                _audioWriter.Flush();
             }
         }
 
@@ -168,7 +185,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
                 //Debug.Log(string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8}", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8]));
             }
 
-            Debug.LogFormat("buffer length remains: {0}", _writeCount - _readCount);
+            // Debug.LogFormat("buffer length remains: {0}", _writeCount - _readCount);
         }
 
         internal static float[] ConvertByteToFloat16(byte[] byteArray)
@@ -251,16 +268,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
 
         public override bool OnRecordAudioFrame(string channelId, AudioFrame audioFrame)
         {
-            Debug.Log("OnRecordAudioFrame-----------");
+            // Debug.Log("OnRecordAudioFrame-----------");
             return true;
         }
 
         public override bool OnPlaybackAudioFrame(string channelId, AudioFrame audioFrame)
         {
-            Debug.Log("OnPlaybackAudioFrame-----------");
+            // Debug.Log("OnPlaybackAudioFrame-----------");
 
             var floatArray = ProcessAudioRawData.ConvertByteToFloat16(audioFrame.RawBuffer);
-
+            _agoraAudioRawData._audioWriter.PutData(audioFrame.RawBuffer);
             lock (_agoraAudioRawData._audioBuffer)
             {
                 _agoraAudioRawData._audioBuffer.Put(floatArray);
@@ -278,7 +295,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
                                                         uint uid,
                                                         AudioFrame audio_frame)
         {
-            Debug.Log("OnPlaybackAudioFrameBeforeMixing-----------");
+            // Debug.Log("OnPlaybackAudioFrameBeforeMixing-----------");
             return false;
         }
 
@@ -286,7 +303,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
                                                         string uid,
                                                         AudioFrame audio_frame)
         {
-            Debug.Log("OnPlaybackAudioFrameBeforeMixing2-----------");
+            // Debug.Log("OnPlaybackAudioFrameBeforeMixing2-----------");
             return false;
         }
     }

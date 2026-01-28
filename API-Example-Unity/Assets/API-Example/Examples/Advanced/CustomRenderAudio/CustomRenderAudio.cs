@@ -37,12 +37,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
 
 
         private const int CHANNEL = 2;
-        private const int SAMPLE_RATE = 44100;
+        private const int SAMPLE_RATE = 48000;
         private const int PULL_FREQ_PER_SEC = 100;
 
 
         private RingBuffer<float> _audioBuffer;
+        private AudioSource _audioSource;
         private AudioClip _audioClip;
+        Pcm16AudioWriter _audioWriter;
 
 
         private Thread _pullAudioFrameThread;
@@ -50,16 +52,19 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
 
         private int _writeCount;
         private int _readCount;
+        
+  
 
         private void Start()
         {
             LoadAssetData();
             if (CheckAppId())
             {
+                _audioWriter = new Pcm16AudioWriter("CustomRenderAudio_" + DateTime.Now.ToString("yyyyMMddHHmmss"), SAMPLE_RATE, CHANNEL);
                 InitRtcEngine();
                 JoinChannel();
-                var aud = InitAudioSource();
-                StartPullAudioFrame(aud, "externalClip");
+                _audioSource = InitAudioSource();
+                StartPullAudioFrame(_audioSource, "externalClip");
             }
         }
 
@@ -135,7 +140,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
             _pullAudioFrameThread.Start();
 
             _audioClip = AudioClip.Create(clipName,
-                SAMPLE_RATE / PULL_FREQ_PER_SEC, CHANNEL, SAMPLE_RATE, true,
+                SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL, 
+                CHANNEL, SAMPLE_RATE, true,
                 OnAudioRead);
             aud.clip = _audioClip;
             aud.loop = true;
@@ -155,9 +161,20 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
                 RtcEngine.LeaveChannel();
                 RtcEngine.Dispose();
                 RtcEngine = null;
+                _audioWriter.Flush();
             }
             //need wait pullAudioFrameThread stop 
             _pullAudioFrameThread.Join();
+
+            if (_audioSource != null)
+            {
+                _audioSource.Stop();
+            }
+
+            if (_audioClip != null)
+            {
+                Destroy(_audioClip);
+            }
         }
 
         private void PullAudioFrameThread()
@@ -197,18 +214,19 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
                     }
                     nRet = -1;
                     nRet = RtcEngine.PullAudioFrame(audioFrame);
-                    Debug.Log("PullAudioFrame returns: " + nRet);
+                    // Debug.Log("PullAudioFrame returns: " + nRet);
 
                     if (nRet == 0)
                     {
                         Marshal.Copy((IntPtr)audioFrame.buffer, byteBuffer, 0, byteBuffer.Length);
                         var floatArray = ConvertByteToFloat16(byteBuffer);
+                        _audioWriter.PutData(byteBuffer);
                         lock (_audioBuffer)
                         {
                             _audioBuffer.Put(floatArray);
                         }
                         _writeCount += floatArray.Length;
-
+                       
                     }
                 }
 
