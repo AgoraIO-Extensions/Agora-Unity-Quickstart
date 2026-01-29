@@ -176,15 +176,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
         {
             lock (_audioBuffer)
             {
-                for (var i = 0; i < data.Length; i++)
+                if(_audioBuffer.Count >= data.Length)
                 {
-                    if (_audioBuffer.Count > 0)
-                    {
-                        data[i] = _audioBuffer.Get();
-                        _readCount += 1;
-                    }
+                    _audioBuffer.MoveTo(data);
                 }
-                //Debug.Log(string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8}", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8]));
+                else
+                {
+                   Array.Clear(data,0, data.Length);
+                }
             }
 
             // Debug.LogFormat("buffer length remains: {0}", _writeCount - _readCount);

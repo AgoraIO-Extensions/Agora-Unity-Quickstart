@@ -269,19 +269,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
             //if (!_startSignal) return;
             lock (_audioBuffer)
             {
-                for (var i = 0; i < data.Length; i++)
+                if(_audioBuffer.Count >= data.Length)
                 {
-
-                    if (_audioBuffer.Count > 0)
-                    {
-                        data[i] = _audioBuffer.Get();
-                    }
-                    else
-                    {
-                        data[i] = 0;
-                    }
+                    _audioBuffer.MoveTo(data);
                 }
-
+                else
+                {
+                    Array.Clear(data,0, data.Length);
+                }
                 //readCount += 1;
             }
 
