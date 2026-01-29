@@ -104,6 +104,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
                 context.areaCode = AREA_CODE.AREA_CODE_GLOB;
                 RtcEngine.Initialize(context);
                 RtcEngine.InitEventHandler(handler);
+                
+                // RtcEngine.SetParameters("{\"che.audio.use.call.mode\":false}");
+                RtcEngine.SetParameters("{\"che.audio.keep.audiosession\":true}");
             }
         }
 
@@ -112,6 +115,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.CustomRenderAudio
             lock (_rtcLock)
             {
                 RtcEngine.EnableAudio();
+                RtcEngine.EnableVideo();
+                RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
                 //no enableAudioDevice to set false？ how this methond work?
                 var nRet = RtcEngine.SetExternalAudioSink(true, SAMPLE_RATE, CHANNEL);
                 this.Log.UpdateLog("SetExternalAudioSink ret:" + nRet);

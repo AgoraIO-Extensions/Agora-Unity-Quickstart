@@ -111,12 +111,12 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
 
             var samplesPerCall = SAMPLE_RATE / PULL_FREQ_PER_SEC * CHANNEL * 2;
             RtcEngine.SetPlaybackAudioFrameParameters(SAMPLE_RATE, CHANNEL,
-                RAW_AUDIO_FRAME_OP_MODE_TYPE.RAW_AUDIO_FRAME_OP_MODE_READ_WRITE, 1024);
+                RAW_AUDIO_FRAME_OP_MODE_TYPE.RAW_AUDIO_FRAME_OP_MODE_READ_WRITE, samplesPerCall);
             RtcEngine.SetRecordingAudioFrameParameters(SAMPLE_RATE, CHANNEL,
-                RAW_AUDIO_FRAME_OP_MODE_TYPE.RAW_AUDIO_FRAME_OP_MODE_READ_WRITE, 1024);
-            RtcEngine.SetMixedAudioFrameParameters(SAMPLE_RATE, CHANNEL, 1024);
+                RAW_AUDIO_FRAME_OP_MODE_TYPE.RAW_AUDIO_FRAME_OP_MODE_READ_WRITE, samplesPerCall);
+            RtcEngine.SetMixedAudioFrameParameters(SAMPLE_RATE, CHANNEL, samplesPerCall);
             RtcEngine.SetEarMonitoringAudioFrameParameters(SAMPLE_RATE, CHANNEL,
-                RAW_AUDIO_FRAME_OP_MODE_TYPE.RAW_AUDIO_FRAME_OP_MODE_READ_WRITE, 1024);
+                RAW_AUDIO_FRAME_OP_MODE_TYPE.RAW_AUDIO_FRAME_OP_MODE_READ_WRITE, samplesPerCall);
 
             RtcEngine.RegisterAudioFrameObserver(new AudioFrameObserver(this),
                  AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_PLAYBACK |
@@ -125,13 +125,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ProcessAudioRawData
                  AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_BEFORE_MIXING |
                  AUDIO_FRAME_POSITION.AUDIO_FRAME_POSITION_EAR_MONITORING,
                 OBSERVER_MODE.RAW_DATA);
+            
+            RtcEngine.SetParameters("{\"che.audio.keep.audiosession\":true}");
         }
 
         void JoinChannel()
         {
-            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             RtcEngine.EnableAudio();
             RtcEngine.EnableVideo();
+            RtcEngine.SetClientRole(CLIENT_ROLE_TYPE.CLIENT_ROLE_BROADCASTER);
             RtcEngine.JoinChannel(_token, _channelName, "", 0);
         }
 
