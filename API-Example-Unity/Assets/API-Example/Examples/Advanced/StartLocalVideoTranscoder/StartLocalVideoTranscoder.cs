@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using System.Collections.Generic;
 using Agora.Rtc;
@@ -6,6 +7,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using io.agora.rtc.demo;
+using UnityEngine.Networking;
 
 namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscoder
 {
@@ -51,11 +53,76 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
             LoadAssetData();
             if (CheckAppId())
             {
-                SetUpUI();
-                InitEngine();
-                InitMediaPlayer();
-                JoinChannel();
+				StartCoroutine(PrepareCopyFile(()=>{
+                    SetUpUI();
+                	InitEngine();
+                	InitMediaPlayer();
+                	JoinChannel();
+                }));
             }
+        }
+
+		private IEnumerator PrepareCopyFile(Action onFinish)
+        {
+            // Copy png file
+            var fromPngPath = Path.Combine(Application.streamingAssetsPath, "img/png.png");
+            var toPngPath = Path.Combine(Application.persistentDataPath, "png.png");
+            yield return CopyFile(fromPngPath, toPngPath);
+
+            // Copy jpg file
+            var fromJpgPath = Path.Combine(Application.streamingAssetsPath, "img/jpg.jpg");
+            var toJpgPath = Path.Combine(Application.persistentDataPath, "jpg.jpg");
+            yield return CopyFile(fromJpgPath, toJpgPath);
+
+            // Copy gif file
+            var fromGifPath = Path.Combine(Application.streamingAssetsPath, "img/gif.gif");
+            var toGifPath = Path.Combine(Application.persistentDataPath, "gif.gif");
+            yield return CopyFile(fromGifPath, toGifPath);
+
+            onFinish.Invoke();
+        }
+
+
+		private IEnumerator CopyFile(string fromPath, string toPath)
+        {
+            if (fromPath.Contains("://") || fromPath.Contains(":///"))
+            {
+                using (UnityWebRequest www = UnityWebRequest.Get(fromPath))
+                {
+                    yield return www.SendWebRequest();
+
+                    if (www.result != UnityWebRequest.Result.Success)
+                    {
+                        Debug.LogError("Failed to load file: " + www.error);
+                    }
+                    else
+                    {
+                        try
+                        {
+                            File.WriteAllBytes(toPath, www.downloadHandler.data);
+                            Debug.Log("File successfully copied to " + toPath);
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogError("Failed to save file: " + e.Message);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                try
+                {
+                    File.Copy(fromPath, toPath, true);
+                    Debug.Log("File successfully copied to " + toPath);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("Failed to copy file: " + e.Message);
+                }
+            }
+
+            yield break;
         }
 
 
@@ -211,12 +278,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
 
             if (this.TogglePng.isOn)
             {
-#if UNITY_ANDROID && !UNITY_EDITOR
-                // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
-                var filePath = "/assets/img/png.png";
-#else
-                var filePath = Path.Combine(Application.streamingAssetsPath, "img/png.png");
-#endif
+                var filePath = Path.Combine(Application.persistentDataPath, "png.png");
                 var item = new TranscodingVideoStream();
                 item.sourceType = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_RTC_IMAGE_PNG;
                 item.imageUrl = filePath;
@@ -229,13 +291,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
 
             if (this.ToggleJpg.isOn)
             {
-
-#if UNITY_ANDROID && !UNITY_EDITOR
-                // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
-                var filePath = "/assets/img/jpg.jpg";
-#else
-                var filePath = Path.Combine(Application.streamingAssetsPath, "img/jpg.jpg");
-#endif
+                var filePath = Path.Combine(Application.persistentDataPath, "jpg.jpg");
                 var item = new TranscodingVideoStream();
                 item.sourceType = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_RTC_IMAGE_JPEG;
                 item.imageUrl = filePath;
@@ -246,15 +302,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
                 list.Add(item);
             }
 
-
             if (this.ToggleGif.isOn)
             {
-#if UNITY_ANDROID && !UNITY_EDITOR
-                // On Android, the StreamingAssetPath is just accessed by /assets instead of Application.streamingAssetPath
-                var filePath = "/assets/img/gif.gif";
-#else
-                var filePath = Path.Combine(Application.streamingAssetsPath, "img/gif.gif");
-#endif
+                var filePath = Path.Combine(Application.persistentDataPath, "gif.gif");
                 var item = new TranscodingVideoStream();
                 item.sourceType = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_RTC_IMAGE_GIF;
                 item.imageUrl = filePath;
