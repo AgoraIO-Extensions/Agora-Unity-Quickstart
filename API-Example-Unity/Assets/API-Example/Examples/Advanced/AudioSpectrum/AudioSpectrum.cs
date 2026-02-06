@@ -324,7 +324,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
             go.transform.localScale = new Vector3(1.0f, 1.333f, 0.5f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<VideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurfaceYUV>();
             return videoSurface;
         }
 
@@ -360,7 +360,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.AudioSpectrum
             go.transform.localScale = new Vector3(4.5f, 3f, 1f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<VideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurfaceYUV>();
             return videoSurface;
         }
 

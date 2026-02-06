@@ -13,21 +13,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
 {
     public class StartLocalVideoTranscoder : MonoBehaviour
     {
-        [FormerlySerializedAs("appIdInput")]
-        [SerializeField]
+        [FormerlySerializedAs("appIdInput")] [SerializeField]
         private AppIdInput _appIdInput;
 
-        [Header("_____________Basic Configuration_____________")]
-        [FormerlySerializedAs("APP_ID")]
-        [SerializeField]
+        [Header("_____________Basic Configuration_____________")] [FormerlySerializedAs("APP_ID")] [SerializeField]
         private string _appID = "";
 
-        [FormerlySerializedAs("TOKEN")]
-        [SerializeField]
+        [FormerlySerializedAs("TOKEN")] [SerializeField]
         private string _token = "";
 
-        [FormerlySerializedAs("CHANNEL_NAME")]
-        [SerializeField]
+        [FormerlySerializedAs("CHANNEL_NAME")] [SerializeField]
         private string _channelName = "";
 
 
@@ -53,16 +48,17 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
             LoadAssetData();
             if (CheckAppId())
             {
-				StartCoroutine(PrepareCopyFile(()=>{
+                StartCoroutine(PrepareCopyFile(() =>
+                {
                     SetUpUI();
-                	InitEngine();
-                	InitMediaPlayer();
-                	JoinChannel();
+                    InitEngine();
+                    InitMediaPlayer();
+                    JoinChannel();
                 }));
             }
         }
 
-		private IEnumerator PrepareCopyFile(Action onFinish)
+        private IEnumerator PrepareCopyFile(Action onFinish)
         {
             // Copy png file
             var fromPngPath = Path.Combine(Application.streamingAssetsPath, "img/png.png");
@@ -83,7 +79,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
         }
 
 
-		private IEnumerator CopyFile(string fromPath, string toPath)
+        private IEnumerator CopyFile(string fromPath, string toPath)
         {
             if (fromPath.Contains("://") || fromPath.Contains(":///"))
             {
@@ -91,10 +87,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
                 {
                     yield return www.SendWebRequest();
 
+#if UNITY_2020_1_OR_NEWER
                     if (www.result != UnityWebRequest.Result.Success)
+#else
+                    if (www.isNetworkError || www.isHttpError)
+#endif
                     {
                         Debug.LogError("Failed to load file: " + www.error);
                     }
+
                     else
                     {
                         try
@@ -110,6 +111,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
                 }
             }
             else
+
             {
                 try
                 {
@@ -162,7 +164,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
         private bool CheckAppId()
         {
             Log = new Logger(LogText);
-            return Log.DebugAssert(_appID.Length > 10, "Please fill in your appId in API-Example/profile/appIdInput.asset");
+            return Log.DebugAssert(_appID.Length > 10,
+                "Please fill in your appId in API-Example/profile/appIdInput.asset");
         }
 
         private void InitEngine()
@@ -187,6 +190,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
             {
                 Debug.Log("GetAgoraRtcMediaPlayer failed!");
             }
+
             MpkEventHandler handler = new MpkEventHandler(this);
             MediaPlayer.InitEventHandler(handler);
             Debug.Log("playerId id: " + MediaPlayer.GetId());
@@ -208,7 +212,6 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
 
         private LocalTranscoderConfiguration GenerateLocalTranscoderConfiguration()
         {
-
             List<TranscodingVideoStream> list = new List<TranscodingVideoStream>();
 
             if (this.TogglePrimartCamera.isOn)
@@ -217,9 +220,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
                 var videoDeviceManager = RtcEngine.GetVideoDeviceManager();
                 var devices = videoDeviceManager.EnumerateVideoDevices();
 
-                
+
                 if (devices.Length >= 1)
-                { 
+                {
 #endif
                     var configuration = new CameraCapturerConfiguration();
                     configuration.format = new VideoFormat(640, 320, 30);
@@ -255,7 +258,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
                 {
 #endif
                     var configuration = new CameraCapturerConfiguration();
-                    configuration.format = new VideoFormat(640,320,30); 
+                    configuration.format = new VideoFormat(640, 320, 30);
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
                     configuration.deviceId.SetValue(devices[1].deviceId);
 #endif
@@ -357,7 +360,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
             if (this.ToggleMediaPlay.isOn)
             {
                 this.MediaPlayer.Stop();
-                var ret = this.MediaPlayer.Open("https://big-class-test.oss-cn-hangzhou.aliyuncs.com/61102.1592987815092.mp4", 0);
+                var ret = this.MediaPlayer.Open(
+                    "https://big-class-test.oss-cn-hangzhou.aliyuncs.com/61102.1592987815092.mp4", 0);
                 this.Log.UpdateLog("Media palyer ret:" + ret);
                 var item = new TranscodingVideoStream();
                 item.sourceType = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_MEDIA_PLAYER;
@@ -403,13 +407,14 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
                 if (item.type == ScreenCaptureSourceType.ScreenCaptureSourceType_Window)
                 {
                     RtcEngine.StartScreenCaptureByWindowId(item.sourceId, new Rectangle(),
-                       new ScreenCaptureParameters());
+                        new ScreenCaptureParameters());
                 }
                 else
                 {
                     RtcEngine.StartScreenCaptureByDisplayId((uint)item.sourceId, new Rectangle(),
-                 new ScreenCaptureParameters { captureMouseCursor = true, frameRate = 30 });
+                        new ScreenCaptureParameters { captureMouseCursor = true, frameRate = 30 });
                 }
+
                 return true;
             }
             else
@@ -472,7 +477,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
 
         #region -- Video Render UI Logic ---
 
-        internal static VideoSurface MakeVideoView(uint uid, string channelId = "", VIDEO_SOURCE_TYPE source = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA)
+        internal static VideoSurface MakeVideoView(uint uid, string channelId = "",
+            VIDEO_SOURCE_TYPE source = VIDEO_SOURCE_TYPE.VIDEO_SOURCE_CAMERA)
         {
             var go = GameObject.Find(uid.ToString());
             if (!ReferenceEquals(go, null))
@@ -508,6 +514,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
                     float scale = (float)height / (float)width;
                     videoSurface.transform.localScale = new Vector3(-1, 1, scale);
                 }
+
                 Debug.Log("OnTextureSizeModify: " + width + "  " + height);
             };
 
@@ -532,12 +539,13 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
                 Debug.LogWarning("VideoSureface update shader");
                 mesh.material = new Material(Shader.Find("Unlit/Texture"));
             }
+
             // set up transform
             go.transform.position = Vector3.zero;
             go.transform.localScale = new Vector3(0.25f, 0.5f, 0.5f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<VideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurfaceYUV>();
             return videoSurface;
         }
 
@@ -573,7 +581,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
             go.transform.localScale = new Vector3(2f, 3f, 1f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<VideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurfaceYUV>();
             return videoSurface;
         }
 
@@ -613,7 +621,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
                 _sample.RtcEngine.GetVersion(ref build)));
             _sample.Log.UpdateLog(
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
-                                connection.channelId, connection.localUid, elapsed));
+                    connection.channelId, connection.localUid, elapsed));
 
             StartLocalVideoTranscoder.MakeVideoView(0);
         }
@@ -629,7 +637,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
             StartLocalVideoTranscoder.DestroyVideoView(0);
         }
 
-        public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole, CLIENT_ROLE_TYPE newRole, ClientRoleOptions newRoleOptions)
+        public override void OnClientRoleChanged(RtcConnection connection, CLIENT_ROLE_TYPE oldRole,
+            CLIENT_ROLE_TYPE newRole, ClientRoleOptions newRoleOptions)
         {
             _sample.Log.UpdateLog("OnClientRoleChanged");
         }
@@ -664,7 +673,8 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartLocalVideoTranscod
         public override void OnPlayerSourceStateChanged(MEDIA_PLAYER_STATE state, MEDIA_PLAYER_REASON reason)
         {
             _sample.Log.UpdateLog(string.Format(
-                "OnPlayerSourceStateChanged state: {0}, ec: {1}, playId: {2}", state, reason, _sample.MediaPlayer.GetId()));
+                "OnPlayerSourceStateChanged state: {0}, ec: {1}, playId: {2}", state, reason,
+                _sample.MediaPlayer.GetId()));
             Debug.Log("OnPlayerSourceStateChanged");
             if (state == MEDIA_PLAYER_STATE.PLAYER_STATE_OPEN_COMPLETED)
             {
