@@ -321,7 +321,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
             go.transform.localScale = new Vector3(0.25f, 0.5f, .5f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<VideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurfaceYUV>();
             return videoSurface;
         }
 
@@ -357,7 +357,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
             go.transform.localScale = new Vector3(3f, 4f, 1f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<VideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurfaceYUV>();
             return videoSurface;
         }
 

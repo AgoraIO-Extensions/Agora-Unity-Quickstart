@@ -292,7 +292,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.MultChannelPush
             go.transform.localScale = new Vector3(3f, 4f, 1f);
 
             // configure videoSurface
-            VideoSurface videoSurface = go.AddComponent<VideoSurface>();
+            VideoSurface videoSurface = go.AddComponent<VideoSurfaceYUV>();
             return videoSurface;
         }
 
