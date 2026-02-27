@@ -123,8 +123,11 @@ EditorBuildSettings:
     path: Assets/API-Example/Examples/Advanced/WriteBackVideoRawData/WriteBackVideoRawDataScene.unity
     guid: cf65ed82301fd4f84bbe12244bd56f1e
   - enabled: 1
-    path: Assets/API-Example/Examples/Advanced/RenderWithYUV/RenderWithYUV.unity
+    path: Assets/API-Example/Examples/Advanced/RenderWithRGBA/RenderWithRGBA.unity
     guid: e4761610ddd74415ba995470c22e2a76
+  - enabled: 1
+    path: Assets/API-Example/Examples/Advanced/RenderWithAlpha/RenderWithAlpha.unity
+    guid: 2440508e68ec3451192adbd5323f8af1
   - enabled: 1
     path: Assets/API-Example/Examples/Rtm/RtmScene/RTMClientScene.unity
     guid: 99fe2bcb1e3ab4b91a986e940d4959aa

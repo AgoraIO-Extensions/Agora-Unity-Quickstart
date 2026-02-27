@@ -210,15 +210,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
             {
                 var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
                 Log.UpdateLog(string.Format(">>>>> Start sharing {0}", windowId));
-                var nRet = RtcEngine.StartScreenCaptureByWindowId(long.Parse(windowId), default(Rectangle),
-                        default(ScreenCaptureParameters));
+                var nRet = RtcEngine.StartScreenCaptureByWindowId(long.Parse(windowId), new Rectangle(),
+                        new ScreenCaptureParameters());
                 this.Log.UpdateLog("StartScreenCaptureByWindowId:" + nRet);
             }
             else
             {
                 var dispId = uint.Parse(option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1]);
                 Log.UpdateLog(string.Format(">>>>> Start sharing display {0}", dispId));
-                var nRet = RtcEngine.StartScreenCaptureByDisplayId(dispId, default(Rectangle),
+                var nRet = RtcEngine.StartScreenCaptureByDisplayId(dispId, new Rectangle(),
                     new ScreenCaptureParameters { captureMouseCursor = true, frameRate = 30 });
                 this.Log.UpdateLog("StartScreenCaptureByDisplayId:" + nRet);
             }
@@ -321,7 +321,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
             go.transform.localScale = new Vector3(0.25f, 0.5f, .5f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<VideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurfaceYUV>();
             return videoSurface;
         }
 
@@ -357,7 +357,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShareWhileVideoCa
             go.transform.localScale = new Vector3(3f, 4f, 1f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<VideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurfaceYUV>();
             return videoSurface;
         }
 

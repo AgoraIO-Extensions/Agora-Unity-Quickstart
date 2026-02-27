@@ -221,7 +221,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
             go.transform.localScale = new Vector3(0.25f, 0.5f, .5f);
 
             // configure videoSurface
-            VideoSurface videoSurface = go.AddComponent<VideoSurface>();
+            VideoSurface videoSurface = go.AddComponent<VideoSurfaceYUV>();
             return videoSurface;
         }
 
@@ -257,7 +257,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.StartDirectCdnStreaming
             go.transform.localScale = new Vector3(3f, 4f, 1f);
 
             // configure videoSurface
-            VideoSurface videoSurface = go.AddComponent<VideoSurface>();
+            VideoSurface videoSurface = go.AddComponent<VideoSurfaceYUV>();
             return videoSurface;
         }
 
