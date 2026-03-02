@@ -205,15 +205,15 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             {
                 var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
                 Log.UpdateLog(string.Format(">>>>> Start sharing {0}", windowId));
-                var nRet = RtcEngine.StartScreenCaptureByWindowId(long.Parse(windowId), default(Rectangle),
-                        default(ScreenCaptureParameters));
+                var nRet = RtcEngine.StartScreenCaptureByWindowId(long.Parse(windowId), new Rectangle(),
+                        new ScreenCaptureParameters());
                 this.Log.UpdateLog("StartScreenCaptureByWindowId:" + nRet);
             }
             else
             {
                 var dispId = uint.Parse(option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1]);
                 Log.UpdateLog(string.Format(">>>>> Start sharing display {0}", dispId));
-                var nRet = RtcEngine.StartScreenCaptureByDisplayId(dispId, default(Rectangle),
+                var nRet = RtcEngine.StartScreenCaptureByDisplayId(dispId, new Rectangle(),
                     new ScreenCaptureParameters { captureMouseCursor = true, frameRate = 30 });
                 this.Log.UpdateLog("StartScreenCaptureByDisplayId:" + nRet);
             }
