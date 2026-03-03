@@ -206,7 +206,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
                 var windowId = option.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1];
                 Log.UpdateLog(string.Format(">>>>> Start sharing {0}", windowId));
                 var nRet = RtcEngine.StartScreenCaptureByWindowId(long.Parse(windowId), new Rectangle(),
-                        new ScreenCaptureParameters());
+                       new ScreenCaptureParameters());
                 this.Log.UpdateLog("StartScreenCaptureByWindowId:" + nRet);
             }
             else
@@ -375,7 +375,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             go.transform.localScale = new Vector3(0.25f, 0.5f, .5f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<VideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurfaceYUV>();
             return videoSurface;
         }
 
@@ -411,7 +411,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.ScreenShare
             go.transform.localScale = new Vector3(3f, 4f, 1f);
 
             // configure videoSurface
-            var videoSurface = go.AddComponent<VideoSurface>();
+            var videoSurface = go.AddComponent<VideoSurfaceYUV>();
             return videoSurface;
         }
 

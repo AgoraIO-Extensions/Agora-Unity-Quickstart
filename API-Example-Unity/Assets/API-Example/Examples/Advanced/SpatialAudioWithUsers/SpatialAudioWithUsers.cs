@@ -229,10 +229,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Advanced.SpatialAudioWithUsers
         private void SetupUI()
         {
             GameObject go = GameObject.Find("LocalView");
-            LocalView = go.AddComponent<VideoSurface>();
+            LocalView = go.AddComponent<VideoSurfaceYUV>();
             go.transform.Rotate(0.0f, 0.0f, 180.0f);
             go = GameObject.Find("RemoteView");
-            RemoteView = go.AddComponent<VideoSurface>();
+            RemoteView = go.AddComponent<VideoSurfaceYUV>();
             go.transform.Rotate(0.0f, 0.0f, 180.0f);
             go = GameObject.Find("Leave");
             go.GetComponent<Button>().onClick.AddListener(Leave);

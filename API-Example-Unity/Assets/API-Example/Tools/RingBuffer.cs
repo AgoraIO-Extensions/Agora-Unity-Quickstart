@@ -202,6 +202,24 @@ namespace RingBuffer
                 array[arrayIndex] = buffer[_index];
             }
         }
+        
+        public void MoveTo(T[] array)
+        {
+            if (size < array.Length)
+            {
+                throw new System.InvalidOperationException("The RingBuffer size lass then arrar.size");
+            }
+            
+            int _index = head;
+            for(var i = 0; i < array.Length; i++)
+            {
+                array[i] = buffer[_index];
+                _index = (_index + 1) % Capacity;
+            }
+            
+            head = _index;
+            size -= array.Length;
+        }
 
         /// <summary>
         /// Removes <paramref name="item"/> from the buffer.
