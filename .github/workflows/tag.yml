@@ -1,0 +1,46 @@
+name: Create or overwrite tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: Tag name to create or overwrite
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create or overwrite tag
+        env:
+          TAG_NAME: ${{ inputs.tag_name }}
+        run: |
+          if [ -z "$TAG_NAME" ]; then
+            echo "tag_name is required"
+            exit 1
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git fetch --tags --force
+
+          if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+            git tag -d "$TAG_NAME"
+          fi
+
+          git push origin ":refs/tags/$TAG_NAME" || true
+
+          git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
+          git push origin "refs/tags/$TAG_NAME"
+
+          echo "Tag '$TAG_NAME' has been created/overwritten at commit $GITHUB_SHA"
