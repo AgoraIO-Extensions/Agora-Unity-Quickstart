@@ -10,9 +10,9 @@ using System.Collections.Generic;
 using io.agora.rtc.demo;
 
 
-namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
+namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithRGBASample
 {
-    public class RenderWithYUVSample : MonoBehaviour
+    public class RenderWithRGBASample : MonoBehaviour
     {
         [FormerlySerializedAs("appIdInput")]
         [SerializeField]
@@ -35,7 +35,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
         internal Logger Log;
         internal IRtcEngine RtcEngine = null;
 
-        public Toggle YUVToggle;
+        public Toggle RGBAToggle;
         public Toggle PlaneToggle;
 
 
@@ -154,7 +154,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
 
         #region -- Video Render UI Logic ---
 
-        internal void MakeVideoView(uint uid, string channelId = "", bool useYUV = false, bool usePlane = false)
+        internal void MakeVideoView(uint uid, string channelId = "", bool useRGBA = false, bool usePlane = false)
         {
             var go = GameObject.Find(uid.ToString());
             if (!ReferenceEquals(go, null))
@@ -165,9 +165,9 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
             VideoSurface videoSurface = null;
 
             if (usePlane)
-                videoSurface = MakePlaneSurface(uid.ToString(), useYUV);
+                videoSurface = MakePlaneSurface(uid.ToString(), useRGBA);
             else
-                videoSurface = MakeImageSurface(uid.ToString(), useYUV);
+                videoSurface = MakeImageSurface(uid.ToString(), useRGBA);
 
             if (ReferenceEquals(videoSurface, null)) return;
             // configure videoSurface
@@ -203,7 +203,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
         }
 
         // VIDEO TYPE 1: 3D Object
-        private VideoSurface MakePlaneSurface(string goName, bool useYUV = false)
+        private VideoSurface MakePlaneSurface(string goName, bool useRGBA = false)
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
@@ -239,16 +239,16 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
 
             // configure videoSurface
             VideoSurface videoSurface = null;
-            if (useYUV)
-                videoSurface = go.AddComponent<VideoSurfaceYUV>();
-            else
+            if (useRGBA)
                 videoSurface = go.AddComponent<VideoSurface>();
+            else
+                videoSurface = go.AddComponent<VideoSurfaceYUV>();
 
             return videoSurface;
         }
 
         // Video TYPE 2: RawImage
-        private VideoSurface MakeImageSurface(string goName, bool useYUV = false)
+        private VideoSurface MakeImageSurface(string goName, bool useRGBA = false)
         {
             GameObject go = new GameObject();
 
@@ -280,10 +280,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
 
             // configure videoSurface
             VideoSurface videoSurface = null;
-            if (useYUV)
-                videoSurface = go.AddComponent<VideoSurfaceYUV>();
-            else
+            if (useRGBA)
                 videoSurface = go.AddComponent<VideoSurface>();
+            else
+                videoSurface = go.AddComponent<VideoSurfaceYUV>();
 
             return videoSurface;
         }
@@ -304,11 +304,11 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
 
     internal class UserEventHandler : IRtcEngineEventHandler
     {
-        private readonly RenderWithYUVSample _sample;
+        private readonly RenderWithRGBASample _sample;
 
         private HashSet<uint> usersInChannel = new HashSet<uint>();
 
-        internal UserEventHandler(RenderWithYUVSample videoSample)
+        internal UserEventHandler(RenderWithRGBASample videoSample)
         {
             _sample = videoSample;
         }
@@ -330,7 +330,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
                 string.Format("OnJoinChannelSuccess channelName: {0}, uid: {1}, elapsed: {2}",
                                 connection.channelId, connection.localUid, elapsed));
 
-            _sample.MakeVideoView(0, "", _sample.YUVToggle.isOn, _sample.PlaneToggle.isOn);
+            _sample.MakeVideoView(0, "", _sample.RGBAToggle.isOn, _sample.PlaneToggle.isOn);
         }
 
         public override void OnRejoinChannelSuccess(RtcConnection connection, int elapsed)
@@ -341,10 +341,10 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
         public override void OnLeaveChannel(RtcConnection connection, RtcStats stats)
         {
             _sample.Log.UpdateLog("OnLeaveChannel");
-            RenderWithYUVSample.DestroyVideoView(0);
+            RenderWithRGBASample.DestroyVideoView(0);
             foreach (var uid in this.usersInChannel)
             {
-                RenderWithYUVSample.DestroyVideoView(uid);
+                RenderWithRGBASample.DestroyVideoView(uid);
             }
             this.usersInChannel.Clear();
 
@@ -358,7 +358,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
         public override void OnUserJoined(RtcConnection connection, uint uid, int elapsed)
         {
             _sample.Log.UpdateLog(string.Format("OnUserJoined uid: ${0} elapsed: ${1}", uid, elapsed));
-            _sample.MakeVideoView(uid, _sample.GetChannelName(), _sample.YUVToggle.isOn, _sample.PlaneToggle.isOn);
+            _sample.MakeVideoView(uid, _sample.GetChannelName(), _sample.RGBAToggle.isOn, _sample.PlaneToggle.isOn);
             this.usersInChannel.Add(uid);
         }
 
@@ -366,7 +366,7 @@ namespace Agora_RTC_Plugin.API_Example.Examples.Basic.RenderWithYUVSample
         {
             _sample.Log.UpdateLog(string.Format("OnUserOffLine uid: ${0}, reason: ${1}", uid,
                 (int)reason));
-            RenderWithYUVSample.DestroyVideoView(uid);
+            RenderWithRGBASample.DestroyVideoView(uid);
             this.usersInChannel.Remove(uid);
         }
     }
